@@ -2,8 +2,9 @@
 
 namespace App\Controllers;
 
-// Controlador minimo para sostener solo las rutas actuales mientras
-// login, registro y base de datos todavia no estan implementados.
+use App\Models\UserModel;
+
+// Controlador principal del flujo de acceso de EdenAir.
 class TesinaController extends BaseController
 {
     // Landing publica.
@@ -18,11 +19,27 @@ class TesinaController extends BaseController
         return view('login');
     }
 
-    // POST de login temporal.
-    // Por ahora solo vuelve a la misma vista porque todavia no hay autenticacion real.
+    // Procesa el login real usando la tabla users.
     public function login()
     {
-        return redirect()->to('/login');
+        $userModel = new UserModel();
+        $usuario = (string) $this->request->getPost('usuario');
+        $password = (string) $this->request->getPost('password');
+
+        $user = $userModel->where('usuario', $usuario)->first();
+        $isValid = $user && password_verify($password, $user['password_hash']);
+
+        if (!$isValid) {
+            return redirect()->to('/login')->with('error', "Usuario o contrase\u{00f1}a inv\u{00e1}lidos.");
+        }
+
+        session()->set([
+            'user_id' => $user['id'],
+            'user_name' => $user['nombre'],
+            'is_logged_in' => true,
+        ]);
+
+        return redirect()->to('/dashboard');
     }
 
     // Vista de registro.
@@ -31,24 +48,55 @@ class TesinaController extends BaseController
         return view('register');
     }
 
-    // POST de registro temporal.
-    // Por ahora solo vuelve a la misma vista porque todavia no hay guardado real.
+    // Crea un usuario nuevo si los datos son validos.
     public function registerStore()
     {
-        return redirect()->to('/register');
+        $userModel = new UserModel();
+        $nombre = (string) $this->request->getPost('nombre');
+        $email = (string) $this->request->getPost('email');
+        $usuario = (string) $this->request->getPost('usuario');
+        $password = (string) $this->request->getPost('password');
+        $passwordConfirm = (string) $this->request->getPost('password_confirm');
+
+        if ($password !== $passwordConfirm) {
+            return redirect()->to('/register')->with('error', "Las contrase\u{00f1}as no coinciden.");
+        }
+
+        $exists = $userModel
+            ->groupStart()
+            ->where('email', $email)
+            ->orWhere('usuario', $usuario)
+            ->groupEnd()
+            ->first();
+
+        if ($exists) {
+            return redirect()->to('/register')->with('error', 'El correo o usuario ya existe.');
+        }
+
+        $userModel->insert([
+            'nombre' => $nombre,
+            'email' => $email,
+            'usuario' => $usuario,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        ]);
+
+        return redirect()->to('/login')->with('success', "Cuenta creada correctamente. Ahora inicia sesi\u{00f3}n.");
     }
 
-    // Dashboard de ejemplo.
-    // Se deja accesible mientras no exista login real.
+    // Dashboard privado: requiere sesion iniciada.
     public function dashboard()
     {
+        if (!session()->get('is_logged_in')) {
+            return redirect()->to('/login')->with('error', "Primero debes iniciar sesi\u{00f3}n.");
+        }
+
         return view('dashboard');
     }
 
-    // Logout temporal.
-    // Sin sesion real, solo redirige al login.
+    // Cierra la sesion actual y vuelve al login.
     public function logout()
     {
-        return redirect()->to('/login');
+        session()->destroy();
+        return redirect()->to('/login')->with('success', "Sesi\u{00f3}n cerrada.");
     }
 }

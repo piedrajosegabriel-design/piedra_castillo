@@ -4,9 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-// Placeholder minimo.
-// Se conserva el archivo porque el proyecto ya contempla usuarios,
-// pero por ahora no se usa ninguna base de datos ni consultas reales.
+// Modelo encargado de leer y guardar usuarios en la tabla users.
 class UserModel extends Model
 {
+    protected $table = 'users';
+    protected $primaryKey = 'id';
+    protected $returnType = 'array';
+    protected $useAutoIncrement = true;
+    protected $allowedFields = ['nombre', 'email', 'usuario', 'password_hash'];
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
 }

@@ -1,46 +1,35 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap");
 
-/* Estructura del archivo:
-   1. Variables y base global
-   2. Fondo y layout compartido
-   3. Landing / home
-   4. Auth: login y registro
-   5. Dashboard
-   6. Animaciones y responsive */
-
-/* Variables visuales globales: colores, sombras y radios principales. */
 :root {
-    --bg: #f6f1e8;
-    --bg-secondary: #dde9e4;
-    --bg-accent: #bfd9d2;
-    --surface: rgba(255, 250, 243, 0.8);
-    --surface-strong: #fffaf3;
-    --surface-muted: rgba(238, 246, 242, 0.92);
-    --line: rgba(23, 49, 47, 0.12);
-    --line-strong: rgba(23, 49, 47, 0.18);
-    --text: #17312f;
-    --muted: #637774;
-    --accent: #176f68;
-    --accent-strong: #0f5751;
-    --accent-soft: #dff3ee;
-    --accent-softer: rgba(23, 111, 104, 0.12);
-    --warm: #ba6f4c;
-    --warm-soft: rgba(186, 111, 76, 0.14);
-    --danger: #984f4f;
-    --danger-soft: rgba(152, 79, 79, 0.14);
-    --success: #356f4a;
-    --success-soft: rgba(53, 111, 74, 0.14);
-    --info: #1a667a;
-    --info-soft: rgba(26, 102, 122, 0.14);
-    --shadow-lg: 0 32px 80px rgba(23, 49, 47, 0.16);
-    --shadow-md: 0 18px 40px rgba(23, 49, 47, 0.12);
+    --bg: #f3efe8;
+    --bg-secondary: #e2eae6;
+    --bg-accent: #ccd9d5;
+    --surface: rgba(250, 247, 242, 0.88);
+    --surface-strong: #fcfaf7;
+    --surface-muted: rgba(255, 255, 255, 0.66);
+    --text: #1e322f;
+    --muted: #627370;
+    --accent: #1d6c66;
+    --accent-strong: #124e49;
+    --accent-soft: #dceee8;
+    --warm: #a56646;
+    --warm-soft: rgba(165, 102, 70, 0.12);
+    --info: #355f73;
+    --info-soft: rgba(53, 95, 115, 0.12);
+    --success: #437357;
+    --success-soft: rgba(67, 115, 87, 0.12);
+    --danger: #934f52;
+    --danger-soft: rgba(147, 79, 82, 0.12);
+    --line: rgba(30, 50, 47, 0.1);
+    --line-strong: rgba(30, 50, 47, 0.16);
+    --shadow-lg: 0 28px 60px rgba(31, 48, 45, 0.1);
+    --shadow-md: 0 16px 32px rgba(31, 48, 45, 0.08);
     --radius-xl: 28px;
-    --radius-lg: 22px;
-    --radius-md: 16px;
-    --radius-sm: 12px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
 }
 
-/* Reset basico y configuracion general. */
 *,
 *::before,
 *::after {
@@ -57,42 +46,24 @@ body {
     font-family: "Manrope", "Segoe UI", sans-serif;
     color: var(--text);
     background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 28%),
-        radial-gradient(circle at 85% 15%, rgba(186, 111, 76, 0.16), transparent 22%),
-        linear-gradient(140deg, var(--bg) 0%, var(--bg-secondary) 50%, var(--bg-accent) 100%);
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.72), transparent 24%),
+        linear-gradient(145deg, var(--bg) 0%, var(--bg-secondary) 56%, var(--bg-accent) 100%);
     position: relative;
     overflow-x: hidden;
 }
 
-/* Capas decorativas globales del fondo. */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.24) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.24) 1px, transparent 1px);
-    background-size: 72px 72px;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 80%);
-    pointer-events: none;
-    opacity: 0.45;
-}
-
-body::after {
-    content: "";
-    position: fixed;
-    right: -12vw;
-    bottom: -22vh;
-    width: 42vw;
-    height: 42vw;
-    min-width: 320px;
-    min-height: 320px;
-    background: radial-gradient(circle, rgba(23, 111, 104, 0.15) 0%, rgba(23, 111, 104, 0) 70%);
-    filter: blur(18px);
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+    background-size: 88px 88px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.36), transparent 84%);
     pointer-events: none;
 }
 
-/* Normalizaciones pequeñas para elementos comunes. */
 img {
     display: block;
     max-width: 100%;
@@ -111,7 +82,7 @@ input {
 button,
 a,
 input {
-    transition: all 0.25s ease;
+    transition: all 0.22s ease;
 }
 
 .home-body,
@@ -120,75 +91,72 @@ input {
     display: block;
 }
 
-/* Fondo animado reusable para landing, auth y dashboard. */
 .fx-bg {
     position: fixed;
     inset: 0;
+    z-index: 0;
     pointer-events: none;
     overflow: hidden;
-    z-index: 0;
 }
 
 .orb {
     position: absolute;
     border-radius: 999px;
-    filter: blur(6px);
-    opacity: 0.55;
-    animation: drift 16s ease-in-out infinite;
+    filter: blur(10px);
+    opacity: 0.42;
+    animation: drift 18s ease-in-out infinite;
 }
 
 .orb-1 {
-    width: 380px;
-    height: 380px;
-    top: -120px;
+    width: 360px;
+    height: 360px;
+    top: -140px;
     left: -80px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 72%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
 }
 
 .orb-2 {
-    width: 280px;
-    height: 280px;
-    top: 18%;
-    right: -100px;
-    background: radial-gradient(circle, rgba(186, 111, 76, 0.32) 0%, rgba(186, 111, 76, 0) 72%);
-    animation-delay: -4s;
+    width: 260px;
+    height: 260px;
+    top: 16%;
+    right: -90px;
+    background: radial-gradient(circle, rgba(165, 102, 70, 0.24), rgba(165, 102, 70, 0));
+    animation-delay: -5s;
 }
 
 .orb-3 {
-    width: 300px;
-    height: 300px;
+    width: 280px;
+    height: 280px;
     bottom: -100px;
-    left: 10%;
-    background: radial-gradient(circle, rgba(23, 111, 104, 0.22) 0%, rgba(23, 111, 104, 0) 72%);
+    left: 12%;
+    background: radial-gradient(circle, rgba(29, 108, 102, 0.18), rgba(29, 108, 102, 0));
     animation-delay: -8s;
 }
 
-/* Header superior con efecto glass. */
 .home-header {
-    width: min(1180px, calc(100% - 32px));
+    width: min(1180px, calc(100% - 40px));
     margin: 18px auto 0;
     padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 18px;
     position: sticky;
-    top: 18px;
+    top: 16px;
     z-index: 10;
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    background: rgba(255, 250, 243, 0.68);
-    box-shadow: 0 14px 34px rgba(23, 49, 47, 0.1);
-    backdrop-filter: blur(16px);
-    border-radius: 999px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.54);
+    background: rgba(252, 250, 247, 0.76);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 24px rgba(31, 48, 45, 0.06);
 }
 
-/* Marca y navegacion superior. */
 .home-logo {
     display: inline-flex;
     align-items: center;
     gap: 12px;
     font-weight: 800;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
 }
 
 .logo-mark {
@@ -196,13 +164,10 @@ input {
     height: 42px;
     display: inline-grid;
     place-items: center;
-    border-radius: 14px;
-    background:
-        linear-gradient(135deg, rgba(23, 111, 104, 0.18), rgba(186, 111, 76, 0.2)),
-        var(--surface-strong);
-    border: 1px solid rgba(23, 111, 104, 0.12);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
+    border-radius: 12px;
+    color: var(--accent-strong);
+    background: linear-gradient(135deg, rgba(29, 108, 102, 0.16), rgba(165, 102, 70, 0.14));
+    border: 1px solid rgba(29, 108, 102, 0.12);
 }
 
 .home-nav {
@@ -214,7 +179,7 @@ input {
 
 .home-nav span {
     color: var(--muted);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .nav-link,
@@ -225,31 +190,30 @@ input {
     min-height: 42px;
     padding: 0 18px;
     border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.44);
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.42);
-    border: 1px solid rgba(23, 49, 47, 0.08);
 }
 
 .nav-link:hover,
 .home-nav a:hover {
     transform: translateY(-1px);
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.74);
 }
 
 .nav-link--cta {
     color: #fff;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-    box-shadow: 0 12px 28px rgba(23, 111, 104, 0.24);
     border-color: transparent;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+    box-shadow: 0 10px 22px rgba(29, 108, 102, 0.18);
 }
 
 .nav-link--cta:hover {
-    background: linear-gradient(135deg, #1a7d75 0%, #0f5751 100%);
+    background: linear-gradient(135deg, #227771 0%, #124e49 100%);
 }
 
-/* Hero principal y panel resumido. */
 .home-main {
-    width: min(1180px, calc(100% - 32px));
+    width: min(1180px, calc(100% - 40px));
     margin: 0 auto;
     padding: 34px 0 44px;
     position: relative;
@@ -258,24 +222,23 @@ input {
 
 .home-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 420px);
+    grid-template-columns: minmax(0, 1.08fr) minmax(300px, 390px);
     gap: 24px;
     align-items: stretch;
-    padding: clamp(24px, 4vw, 40px);
+    padding: clamp(26px, 4vw, 38px);
     border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.58);
     background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 250, 243, 0.84)),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(252, 249, 244, 0.92)),
         var(--surface);
-    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(10px);
 }
 
 .dashboard-hero {
     align-items: center;
 }
 
-/* Tipografia reutilizable para titulos, subtitulos y CTAs. */
 .hero-copy {
     display: flex;
     flex-direction: column;
@@ -286,27 +249,27 @@ input {
 .section-kicker,
 .card-kicker {
     margin: 0;
+    color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     font-size: 0.78rem;
     font-weight: 800;
-    color: var(--accent);
 }
 
 .hero-copy h1,
-.section-heading h2,
 .auth-side h1,
+.section-heading h2,
 .login-box h2,
 .register-box h2 {
     margin: 0;
     font-family: "Fraunces", Georgia, serif;
-    line-height: 1.04;
-    letter-spacing: -0.03em;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
 }
 
 .hero-copy h1,
 .auth-side h1 {
-    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    font-size: clamp(2.35rem, 5.4vw, 4.4rem);
     max-width: 12ch;
 }
 
@@ -317,11 +280,11 @@ input {
 .metric-copy,
 .status-item p,
 .helper-text,
-.form-subtitle {
+.form-subtitle,
+.auth-note {
     margin: 0;
     color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.65;
+    line-height: 1.66;
 }
 
 .hero-actions {
@@ -334,28 +297,26 @@ input {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 52px;
+    min-height: 50px;
     padding: 0 22px;
     border-radius: 999px;
     font-weight: 800;
-    letter-spacing: 0.01em;
     border: 1px solid transparent;
 }
 
 .hero-btn.primary {
     color: #fff;
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-    box-shadow: 0 14px 32px rgba(23, 111, 104, 0.26);
+    box-shadow: 0 12px 24px rgba(29, 108, 102, 0.18);
 }
 
 .hero-btn.primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 36px rgba(23, 111, 104, 0.3);
 }
 
 .hero-btn.ghost {
+    border-color: var(--line);
     background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(23, 49, 47, 0.08);
 }
 
 .hero-btn.ghost:hover {
@@ -364,7 +325,6 @@ input {
 }
 
 .hero-stats {
-    margin-top: 6px;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
@@ -373,15 +333,14 @@ input {
 .hero-stat {
     padding: 16px 18px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.42);
-    border: 1px solid rgba(23, 49, 47, 0.08);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .hero-stat strong {
     display: block;
     margin-bottom: 4px;
-    font-size: 1.3rem;
-    line-height: 1;
+    font-size: 1.18rem;
 }
 
 .hero-stat span {
@@ -389,7 +348,6 @@ input {
     font-size: 0.92rem;
 }
 
-/* Superficies tipo glass reutilizadas en hero, cards y paneles. */
 .hero-panel,
 .home-card,
 .metric-card,
@@ -397,29 +355,15 @@ input {
 .auth-card {
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.58);
     background:
-        linear-gradient(160deg, rgba(255, 255, 255, 0.58), rgba(255, 250, 243, 0.86)),
+        linear-gradient(165deg, rgba(255, 255, 255, 0.54), rgba(252, 249, 245, 0.92)),
         var(--surface);
     box-shadow: var(--shadow-md);
-    backdrop-filter: blur(14px);
 }
 
-.hero-panel::after,
-.home-card::after,
-.metric-card::after,
-.status-panel::after,
-.auth-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 42%);
-    pointer-events: none;
-}
-
-/* Panel resumen del hero con metricas compactas. */
 .hero-panel {
-    border-radius: var(--radius-lg);
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -430,12 +374,12 @@ input {
     width: fit-content;
     padding: 8px 12px;
     border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent);
     background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .panel-reading {
@@ -453,7 +397,7 @@ input {
 
 .panel-value {
     font-family: "Fraunces", Georgia, serif;
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-size: clamp(2.2rem, 4.8vw, 3.3rem);
     line-height: 1;
 }
 
@@ -467,13 +411,13 @@ input {
     padding: 14px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.44);
 }
 
 .panel-item strong {
     display: block;
     margin-top: 6px;
-    font-size: 1.12rem;
+    font-size: 1.05rem;
 }
 
 .section-heading {
@@ -484,11 +428,10 @@ input {
 }
 
 .section-heading h2 {
-    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    font-size: clamp(1.7rem, 3vw, 2.45rem);
     max-width: 14ch;
 }
 
-/* Tarjetas de la landing y chips del stack. */
 .home-cards,
 .metrics-grid,
 .dashboard-grid {
@@ -514,13 +457,12 @@ input {
 .home-card:hover,
 .metric-card:hover,
 .status-panel:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 48px rgba(23, 49, 47, 0.18);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 34px rgba(31, 48, 45, 0.1);
 }
 
-/* Visuales de cada card de ambiente. */
 .card-visual {
-    min-height: 220px;
+    min-height: 210px;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -535,34 +477,33 @@ input {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at top right, rgba(255, 255, 255, 0.26), transparent 35%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.18) 100%);
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.22), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.16));
     pointer-events: none;
 }
 
 .card-visual--aula {
-    background: linear-gradient(135deg, #2f7e7a 0%, #154744 100%);
+    background: linear-gradient(145deg, #336f6b 0%, #1b4f4b 100%);
 }
 
 .card-visual--oficina {
-    background: linear-gradient(135deg, #bf7d58 0%, #8f4f32 100%);
+    background: linear-gradient(145deg, #9f694c 0%, #724630 100%);
 }
 
 .card-visual--hogar {
-    background: linear-gradient(135deg, #396d88 0%, #1f435a 100%);
+    background: linear-gradient(145deg, #4d6f7e 0%, #284654 100%);
 }
 
 .visual-pill {
     width: fit-content;
     padding: 7px 12px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.14);
     font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
     text-transform: uppercase;
-    backdrop-filter: blur(8px);
+    letter-spacing: 0.08em;
 }
 
 .visual-reading {
@@ -573,7 +514,7 @@ input {
 .visual-reading strong {
     display: block;
     font-family: "Fraunces", Georgia, serif;
-    font-size: 2.3rem;
+    font-size: 2.1rem;
     line-height: 1;
 }
 
@@ -592,8 +533,8 @@ input {
 
 .card-content h3 {
     margin: 0;
-    font-size: 1.34rem;
-    line-height: 1.2;
+    font-size: 1.26rem;
+    line-height: 1.24;
 }
 
 .card-tags {
@@ -608,14 +549,13 @@ input {
     min-height: 32px;
     padding: 0 12px;
     border-radius: 999px;
-    background: rgba(23, 111, 104, 0.08);
+    background: rgba(29, 108, 102, 0.08);
     color: var(--accent);
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     font-weight: 700;
 }
 
 .tech-strip {
-    margin-top: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -624,50 +564,45 @@ input {
 .tech-pill {
     display: inline-flex;
     align-items: center;
-    min-height: 42px;
+    min-height: 40px;
     padding: 0 16px;
     border-radius: 999px;
-    border: 1px solid rgba(23, 49, 47, 0.08);
-    background: rgba(255, 255, 255, 0.48);
-    font-weight: 700;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.46);
     color: var(--muted);
+    font-weight: 700;
 }
 
 .tech-pill.active-pill {
     color: var(--accent);
     background: var(--accent-soft);
-    border-color: rgba(23, 111, 104, 0.16);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(23, 111, 104, 0.12);
+    border-color: rgba(29, 108, 102, 0.16);
 }
 
 .home-footer {
-    width: min(1180px, calc(100% - 32px));
-    margin: 0 auto 26px;
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto 24px;
     padding: 18px 24px;
-    border-radius: 22px;
-    background: rgba(255, 250, 243, 0.62);
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    background: rgba(252, 250, 247, 0.7);
     color: var(--muted);
     text-align: center;
-    backdrop-filter: blur(12px);
 }
 
-/* Layout de login y registro en dos columnas. */
 .auth-shell {
-    width: min(1180px, calc(100% - 32px));
+    width: min(1180px, calc(100% - 40px));
     margin: 0 auto;
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 470px);
-    gap: clamp(28px, 5vw, 64px);
+    grid-template-columns: minmax(0, 1.02fr) minmax(320px, 450px);
+    gap: clamp(28px, 5vw, 60px);
     align-items: center;
     padding: 28px 0 42px;
     position: relative;
     z-index: 1;
 }
 
-/* Columna informativa de auth. */
 .auth-side {
     display: flex;
     flex-direction: column;
@@ -682,32 +617,29 @@ input {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
-    margin-top: 4px;
 }
 
 .auth-stat {
     padding: 18px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.42);
-    border: 1px solid rgba(23, 49, 47, 0.08);
-    box-shadow: 0 18px 34px rgba(23, 49, 47, 0.08);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .auth-stat strong {
     display: block;
     margin-bottom: 4px;
-    font-size: 1.2rem;
+    font-size: 1.12rem;
 }
 
 .auth-stat span {
     color: var(--muted);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
 }
 
 .auth-feature-list {
     display: grid;
     gap: 14px;
-    margin-top: 4px;
 }
 
 .auth-feature {
@@ -717,8 +649,8 @@ input {
     align-items: start;
     padding: 18px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.38);
-    border: 1px solid rgba(23, 49, 47, 0.08);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.36);
 }
 
 .feature-index {
@@ -726,8 +658,8 @@ input {
     height: 38px;
     display: inline-grid;
     place-items: center;
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(23, 111, 104, 0.18), rgba(186, 111, 76, 0.18));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(29, 108, 102, 0.14), rgba(165, 102, 70, 0.12));
     font-size: 0.82rem;
     font-weight: 800;
     color: var(--accent);
@@ -738,35 +670,32 @@ input {
     font-size: 1rem;
 }
 
-.auth-feature p,
-.auth-note {
+.auth-feature p {
     margin: 0;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.62;
 }
 
-/* Formularios, inputs y feedback visual. */
 .auth-card,
 .login-box,
 .register-box {
     width: 100%;
     max-width: 100%;
     padding: 28px;
-    border-radius: var(--radius-xl);
     opacity: 0;
-    transform: translateY(24px) scale(0.985);
-    transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.25s ease;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.22s ease;
 }
 
 .login-box.loaded,
 .register-box.loaded {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
 }
 
 .login-box h2,
 .register-box h2 {
-    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-size: clamp(1.9rem, 4vw, 2.45rem);
 }
 
 .form-subtitle {
@@ -782,7 +711,6 @@ input {
     gap: 16px;
 }
 
-/* Grilla base y estados de foco de inputs. */
 .input-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -791,13 +719,13 @@ input {
 
 .input-box {
     margin: 0;
-    transition: transform 0.25s ease;
+    transition: transform 0.22s ease;
 }
 
 .input-box label {
     display: block;
     margin-bottom: 8px;
-    font-size: 0.95rem;
+    font-size: 0.93rem;
     font-weight: 700;
 }
 
@@ -805,22 +733,21 @@ input {
     width: 100%;
     min-height: 52px;
     padding: 0 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(23, 49, 47, 0.12);
-    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    border: 1px solid rgba(30, 50, 47, 0.12);
+    background: rgba(255, 255, 255, 0.78);
     color: var(--text);
     outline: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .input-box input::placeholder {
-    color: #8a9a98;
+    color: #8a9895;
 }
 
 .input-box input:focus {
-    border-color: rgba(23, 111, 104, 0.28);
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow: 0 0 0 4px rgba(23, 111, 104, 0.12);
+    background: #fff;
+    border-color: rgba(29, 108, 102, 0.28);
+    box-shadow: 0 0 0 4px rgba(29, 108, 102, 0.1);
 }
 
 .input-box.input-active {
@@ -835,53 +762,53 @@ input {
 
 .password-box button {
     width: auto;
-    min-width: 88px;
+    min-width: 86px;
     min-height: 52px;
     padding: 0 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(23, 111, 104, 0.12);
+    border-radius: 12px;
+    border: 1px solid rgba(29, 108, 102, 0.12);
     background: var(--accent-soft);
     color: var(--accent-strong);
     box-shadow: none;
 }
 
 .password-box button:hover {
+    background: #d0e6df;
     transform: translateY(-1px);
-    background: #d3ede6;
 }
 
 button {
     width: 100%;
-    min-height: 54px;
+    min-height: 52px;
     padding: 0 18px;
     border: none;
-    border-radius: 16px;
+    border-radius: 14px;
     color: #fff;
     font-weight: 800;
     letter-spacing: 0.01em;
     cursor: pointer;
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-    box-shadow: 0 14px 32px rgba(23, 111, 104, 0.24);
+    box-shadow: 0 10px 22px rgba(29, 108, 102, 0.18);
 }
 
 button:hover,
 button.is-hovered {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 38px rgba(23, 111, 104, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(29, 108, 102, 0.22);
 }
 
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
-    outline: 3px solid rgba(23, 111, 104, 0.18);
+    outline: 3px solid rgba(29, 108, 102, 0.18);
     outline-offset: 3px;
 }
 
 .form-alert {
     margin: 16px 0 0;
     padding: 14px 16px;
-    border-radius: 14px;
-    font-size: 0.95rem;
+    border-radius: 12px;
+    font-size: 0.94rem;
     line-height: 1.5;
     border: 1px solid transparent;
 }
@@ -889,13 +816,13 @@ a:focus-visible {
 .form-alert.error {
     background: var(--danger-soft);
     color: var(--danger);
-    border-color: rgba(152, 79, 79, 0.16);
+    border-color: rgba(147, 79, 82, 0.14);
 }
 
 .form-alert.success {
     background: var(--success-soft);
     color: var(--success);
-    border-color: rgba(53, 111, 74, 0.16);
+    border-color: rgba(67, 115, 87, 0.14);
 }
 
 .forgot {
@@ -907,7 +834,7 @@ a:focus-visible {
 }
 
 .forgot:hover {
-    opacity: 0.85;
+    opacity: 0.84;
 }
 
 .helper-text {
@@ -923,8 +850,8 @@ a:focus-visible {
 .strength-bar-track {
     height: 10px;
     border-radius: 999px;
+    background: rgba(30, 50, 47, 0.08);
     overflow: hidden;
-    background: rgba(23, 49, 47, 0.08);
 }
 
 .strength-bar {
@@ -933,7 +860,7 @@ a:focus-visible {
     height: 100%;
     border-radius: inherit;
     background: var(--warm);
-    transition: width 0.25s ease, background-color 0.25s ease;
+    transition: width 0.24s ease, background-color 0.24s ease;
 }
 
 .match-ok {
@@ -944,7 +871,6 @@ a:focus-visible {
     color: var(--danger);
 }
 
-/* Tarjetas del dashboard y estados. */
 .metrics-grid {
     margin-top: 24px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -965,24 +891,23 @@ a:focus-visible {
 }
 
 .metric-label {
-    font-size: 0.95rem;
+    font-size: 0.94rem;
     color: var(--muted);
     font-weight: 700;
 }
 
-/* Badges, dots y notas auxiliares del dashboard. */
 .metric-badge,
 .status-pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 32px;
+    min-height: 30px;
     padding: 0 12px;
     border-radius: 999px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 0.04em;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .metric-badge.status-good,
@@ -994,7 +919,7 @@ a:focus-visible {
 .metric-badge.status-watch,
 .status-pill.status-watch {
     background: var(--warm-soft);
-    color: #8b542e;
+    color: #7c5036;
 }
 
 .metric-badge.status-info,
@@ -1006,7 +931,7 @@ a:focus-visible {
 .metric-value {
     margin: 0;
     font-family: "Fraunces", Georgia, serif;
-    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-size: clamp(2.2rem, 4.8vw, 3.1rem);
     line-height: 1;
 }
 
@@ -1039,7 +964,7 @@ a:focus-visible {
 .status-item strong {
     display: block;
     margin-bottom: 4px;
-    font-size: 1rem;
+    font-size: 0.98rem;
 }
 
 .status-dot {
@@ -1050,33 +975,29 @@ a:focus-visible {
 }
 
 .status-dot.status-good {
-    background: #3d9667;
-    box-shadow: 0 0 0 6px rgba(61, 150, 103, 0.14);
+    background: #4e8a67;
 }
 
 .status-dot.status-watch {
-    background: #c07b49;
-    box-shadow: 0 0 0 6px rgba(192, 123, 73, 0.14);
+    background: #b47147;
 }
 
 .status-dot.status-info {
-    background: #3d7896;
-    box-shadow: 0 0 0 6px rgba(61, 120, 150, 0.14);
+    background: #476c7e;
 }
 
 .dashboard-note {
     margin-top: 16px;
     padding: 14px 16px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.48);
     border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.5);
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.62;
 }
 
-/* Animaciones suaves para hover y fondo. */
 .pulse-neon {
-    animation: soft-glow 1.2s ease-in-out infinite alternate;
+    animation: soft-glow 1.15s ease-in-out infinite alternate;
 }
 
 @keyframes drift {
@@ -1086,21 +1007,20 @@ a:focus-visible {
     }
 
     50% {
-        transform: translate3d(10px, -18px, 0) scale(1.05);
+        transform: translate3d(10px, -14px, 0) scale(1.04);
     }
 }
 
 @keyframes soft-glow {
     0% {
-        box-shadow: 0 18px 40px rgba(23, 49, 47, 0.12);
+        box-shadow: 0 16px 28px rgba(31, 48, 45, 0.08);
     }
 
     100% {
-        box-shadow: 0 22px 48px rgba(23, 111, 104, 0.18);
+        box-shadow: 0 22px 34px rgba(29, 108, 102, 0.12);
     }
 }
 
-/* Ajustes responsive para tablet y mobile. */
 @media (max-width: 1024px) {
     .home-hero,
     .dashboard-hero,
@@ -1122,9 +1042,9 @@ a:focus-visible {
 
 @media (max-width: 760px) {
     .home-header {
-        width: calc(100% - 20px);
+        width: calc(100% - 22px);
         padding: 14px 16px;
-        border-radius: 24px;
+        border-radius: 18px;
         top: 10px;
         margin-top: 10px;
         flex-direction: column;
@@ -1143,7 +1063,7 @@ a:focus-visible {
     .home-main,
     .home-footer,
     .auth-shell {
-        width: calc(100% - 20px);
+        width: calc(100% - 22px);
     }
 
     .home-main {
@@ -1159,7 +1079,6 @@ a:focus-visible {
         padding: 20px;
     }
 
-    .hero-actions,
     .hero-stats,
     .auth-stat-grid,
     .input-grid,
@@ -1198,13 +1117,8 @@ a:focus-visible {
         grid-column: 2;
         justify-self: start;
     }
-
-    .home-footer {
-        margin-bottom: 18px;
-    }
 }
 
-/* Si el usuario prefiere menos movimiento, reducimos animaciones. */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

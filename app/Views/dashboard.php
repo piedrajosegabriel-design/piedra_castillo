@@ -1,208 +1,212 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Metadatos basicos de la vista privada. -->
     <meta charset="UTF-8">
+    <title>Dashboard - EdenAir</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdenAir | Dashboard</title>
-
-    <!-- CSS global que unifica todo el aspecto de la aplicacion. -->
-    <link rel="stylesheet" href="<?= base_url('CSS/todo.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('CSS/dashboard.css') ?>">
 </head>
-<body class="home-body dashboard-body">
-    <!-- Fondo decorativo fijo compartido con la landing. -->
-    <div class="fx-bg">
-        <span class="orb orb-1"></span>
-        <span class="orb orb-2"></span>
-        <span class="orb orb-3"></span>
-    </div>
 
-    <!-- Header del area privada con saludo y salida. -->
-    <header class="home-header">
-        <!-- Marca y acceso rapido de vuelta a la landing. -->
-        <a class="home-logo" href="<?= site_url('/') ?>">
-            <span class="logo-mark">EA</span>
-            <span>EdenAir</span>
-        </a>
+<body>
+<div class="dashboard" id="dashboard">
 
-        <!-- Saludo de sesion y logout. -->
-        <nav class="home-nav">
-            <span>Hola, <?= esc((string) session()->get('user_name')) ?></span>
-            <a class="nav-link" href="<?= site_url('logout') ?>">Cerrar sesi&oacute;n</a>
-        </nav>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-button" id="menuButton" type="button" aria-label="Abrir o cerrar menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <a href="<?= site_url('/') ?>" class="brand">
+                <div class="brand-icon">EA</div>
+                <div>
+                    <h2>EdenAir</h2>
+                    <p>Panel ambiental</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="header-user">
+            <span class="update-time" id="updateTime">Actualizado recien</span>
+            <span class="user-name">Hola, <?= esc(session()->get('user_name') ?? 'Usuario') ?></span>
+            <a href="<?= site_url('logout') ?>" class="logout-link">Cerrar sesion</a>
+        </div>
     </header>
 
-    <main class="home-main">
-        <!-- Hero del dashboard: resume el estado general del sistema. -->
-        <section class="home-hero dashboard-hero">
-            <!-- Resumen textual del estado actual del sistema. -->
-            <div class="hero-copy">
-                <p class="eyebrow">Panel operativo</p>
-                <h1>Resumen en tiempo real del estado ambiental.</h1>
-                <p class="hero-lead">
-                    Esta versi&oacute;n del dashboard prioriza lectura r&aacute;pida, contraste visual y una estructura
-                    lista para crecer cuando conectes la l&oacute;gica real del ESP32 y m&aacute;s ambientes.
-                </p>
+    <aside class="sidebar">
+        <nav class="sidebar-menu">
+            <a href="#" class="active">
+                <span class="menu-icon">Inicio</span>
+                <span class="menu-text">Resumen</span>
+            </a>
 
-                <div class="hero-stats">
-                    <!-- Mini resumen del estado de la sesion y del panel. -->
-                    <div class="hero-stat">
-                        <strong>Activo</strong>
-                        <span>sesi&oacute;n iniciada</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>3 m&eacute;tricas</strong>
-                        <span>resumen inicial</span>
-                    </div>
-                    <div class="hero-stat">
-                        <strong>Listo</strong>
-                        <span>para integrar sensores</span>
-                    </div>
-                </div>
+            <a href="#">
+                <span class="menu-icon">Zona</span>
+                <span class="menu-text">Ambientes</span>
+            </a>
+
+            <a href="#">
+                <span class="menu-icon">Aviso</span>
+                <span class="menu-text">Alertas</span>
+            </a>
+
+            <a href="#">
+                <span class="menu-icon">Datos</span>
+                <span class="menu-text">Historial</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <section class="overview">
+            <div class="overview-copy">
+                <p class="eyebrow">Resumen general</p>
+                <h1>Un dashboard mas claro para leer el estado del ambiente.</h1>
+                <p>
+                    EdenAir prioriza lo importante: estado general, ambientes activos,
+                    alertas visibles y proximos pasos para decidir rapido.
+                </p>
             </div>
 
-            <!-- Tarjeta lateral con estado general y datos sinteticos. -->
-            <aside class="hero-panel tilt-card">
-                <div class="panel-chip">Sistema activo</div>
+            <div class="overview-card">
+                <span class="overview-label">Estado del sistema</span>
+                <strong>Estable</strong>
+                <p>Las mediciones generales se mantienen en rango y los dispositivos estan en linea.</p>
 
-                <div class="panel-reading">
-                    <span>Estado general</span>
-                    <strong class="panel-value">Estable</strong>
-                    <small>Las variables del entorno se mantienen dentro del rango esperado.</small>
+                <div class="overview-tags">
+                    <span class="tag good">3 ambientes activos</span>
+                    <span class="tag info">Lectura cada 3 s</span>
                 </div>
-
-                <div class="panel-grid">
-                    <div class="panel-item">
-                        <span class="panel-label">Ultima lectura</span>
-                        <strong>Hace 3 s</strong>
-                    </div>
-                    <div class="panel-item">
-                        <span class="panel-label">Latencia</span>
-                        <strong>Normal</strong>
-                    </div>
-                    <div class="panel-item">
-                        <span class="panel-label">Zona activa</span>
-                        <strong>Principal</strong>
-                    </div>
-                    <div class="panel-item">
-                        <span class="panel-label">Alertas</span>
-                        <strong>0 cr&iacute;ticas</strong>
-                    </div>
-                </div>
-            </aside>
+            </div>
         </section>
 
-        <!-- Metricas principales visibles apenas entra el usuario. -->
-        <section class="metrics-grid">
-            <!-- Cada tarjeta representa una metrica clave del ambiente. -->
-            <article class="metric-card tilt-card">
-                <div class="metric-head">
-                    <span class="metric-label">Temperatura</span>
-                    <span class="metric-badge status-good">Estable</span>
-                </div>
-                <p class="metric-value" id="tempMetric">--.- &deg;C</p>
-                <p class="metric-copy">Rango sugerido para confort: entre 22 &deg;C y 25 &deg;C.</p>
+        <section class="metrics">
+            <article class="metric-card temperature-card">
+                <p class="metric-title">Temperatura promedio</p>
+                <h2 id="tempMetric">24.6 °C</h2>
+                <small>Confort termico general</small>
             </article>
 
-            <article class="metric-card tilt-card">
-                <div class="metric-head">
-                    <span class="metric-label">Humedad</span>
-                    <span class="metric-badge status-info">Controlada</span>
-                </div>
-                <p class="metric-value" id="humMetric">--%</p>
-                <p class="metric-copy">Ideal para mantener sensaci&oacute;n t&eacute;rmica agradable y estable.</p>
+            <article class="metric-card humidity-card">
+                <p class="metric-title">Humedad promedio</p>
+                <h2 id="humMetric">58%</h2>
+                <small>Nivel aceptable</small>
             </article>
 
-            <article class="metric-card tilt-card">
-                <div class="metric-head">
-                    <span class="metric-label">Calidad de aire</span>
-                    <span class="metric-badge status-watch">Revision</span>
-                </div>
-                <p class="metric-value" id="airMetric">--</p>
-                <p class="metric-copy">Visual listo para futuras reglas autom&aacute;ticas y alertas.</p>
+            <article class="metric-card comfort-card">
+                <p class="metric-title">Calidad del ambiente</p>
+                <h2 id="airMetric">Buena</h2>
+                <small>Lectura simple para el usuario</small>
+            </article>
+
+            <article class="metric-card alert-card">
+                <p class="metric-title">Alertas activas</p>
+                <h2>2</h2>
+                <small>Solo una necesita accion inmediata</small>
             </article>
         </section>
 
-        <!-- Paneles secundarios con estados por ambiente y proximos pasos. -->
-        <section class="dashboard-grid">
-            <!-- Columna con lectura por ambiente. -->
-            <article class="status-panel">
-                <div class="section-heading">
-                    <p class="section-kicker">Ambientes</p>
-                    <h2>Lectura rapida por zona.</h2>
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-title">
+                    <h2>Ambientes</h2>
+                    <span>Lectura actual</span>
                 </div>
 
-                <div class="status-list">
-                    <div class="status-item">
-                        <span class="status-dot status-good"></span>
-                        <div>
+                <div class="environment-list">
+                    <div class="environment">
+                        <div class="environment-main">
                             <strong>Aula principal</strong>
-                            <p>Condiciones equilibradas para mantener confort y concentraci&oacute;n.</p>
+                            <p>Temperatura 23.8 °C · Humedad 55%</p>
                         </div>
-                        <span class="status-pill status-good">Normal</span>
+                        <span class="status good">Estable</span>
                     </div>
 
-                    <div class="status-item">
-                        <span class="status-dot status-info"></span>
-                        <div>
+                    <div class="environment">
+                        <div class="environment-main">
                             <strong>Oficina</strong>
-                            <p>Lecturas consistentes y espacio listo para agregar hist&oacute;ricos.</p>
+                            <p>Temperatura 24.9 °C · Humedad 60%</p>
                         </div>
-                        <span class="status-pill status-info">Monitoreo</span>
+                        <span class="status good">Normal</span>
                     </div>
 
-                    <div class="status-item">
-                        <span class="status-dot status-watch"></span>
-                        <div>
+                    <div class="environment">
+                        <div class="environment-main">
                             <strong>Hogar</strong>
-                            <p>Sin desv&iacute;o cr&iacute;tico, pero listo para reglas de automatizaci&oacute;n.</p>
+                            <p>Temperatura 26.1 °C · Humedad 62%</p>
                         </div>
-                        <span class="status-pill status-watch">Atento</span>
+                        <span class="status warning">Atento</span>
                     </div>
                 </div>
             </article>
 
-            <!-- Columna con proximos pasos de evolucion del proyecto. -->
-            <article class="status-panel">
-                <div class="section-heading">
-                    <p class="section-kicker">Siguientes pasos</p>
-                    <h2>Base lista para crecer.</h2>
+            <article class="panel">
+                <div class="panel-title">
+                    <h2>Alertas y acciones</h2>
+                    <span>Prioridad del dia</span>
                 </div>
 
-                <div class="status-list">
-                    <div class="status-item">
-                        <span class="status-dot status-good"></span>
-                        <div>
-                            <strong>Integrar lecturas reales</strong>
-                            <p>Conecta el ESP32 para reemplazar los valores de demostraci&oacute;n del panel.</p>
-                        </div>
-                        <span class="status-pill status-good">Listo</span>
+                <div class="alert-list">
+                    <div class="alert danger">
+                        <strong>Hogar con temperatura alta</strong>
+                        <p>Conviene ventilar o bajar la carga termica del ambiente.</p>
                     </div>
 
-                    <div class="status-item">
-                        <span class="status-dot status-info"></span>
-                        <div>
-                            <strong>Agregar historicos</strong>
-                            <p>Incorpora registros por ambiente para comparar cambios a lo largo del tiempo.</p>
-                        </div>
-                        <span class="status-pill status-info">Proximo</span>
+                    <div class="alert warning">
+                        <strong>Humedad en subida</strong>
+                        <p>La zona hogar esta algo por encima del rango recomendado.</p>
+                    </div>
+
+                    <div class="alert success">
+                        <strong>Aula y oficina sin novedades</strong>
+                        <p>Sus lecturas estan dentro del rango esperado por ahora.</p>
                     </div>
                 </div>
+            </article>
+        </section>
 
-                <div class="dashboard-note">
-                    El dashboard ya tiene mejor jerarqu&iacute;a visual para sumar gr&aacute;ficos,
-                    alertas y decisiones autom&aacute;ticas sin rehacer toda la interfaz.
+        <section class="bottom-grid">
+            <article class="panel">
+                <div class="panel-title">
+                    <h2>Tendencia diaria</h2>
+                    <span>Ultimas horas</span>
+                </div>
+
+                <div class="chart-box" aria-hidden="true">
+                    <div class="bar" style="height: 42%"></div>
+                    <div class="bar" style="height: 58%"></div>
+                    <div class="bar" style="height: 50%"></div>
+                    <div class="bar" style="height: 66%"></div>
+                    <div class="bar" style="height: 54%"></div>
+                    <div class="bar" style="height: 72%"></div>
+                    <div class="bar" style="height: 60%"></div>
+                </div>
+
+                <p class="chart-caption">Vista rapida para detectar cambios sin sobrecargar la pantalla.</p>
+            </article>
+
+            <article class="panel">
+                <div class="panel-title">
+                    <h2>Dispositivos</h2>
+                    <span>Estado actual</span>
+                </div>
+
+                <ul class="device-list">
+                    <li><span>ESP32 Aula</span><strong>En linea</strong></li>
+                    <li><span>ESP32 Oficina</span><strong>En linea</strong></li>
+                    <li><span>ESP32 Hogar</span><strong>En linea</strong></li>
+                </ul>
+
+                <div class="next-step">
+                    <strong>Siguiente paso</strong>
+                    <p>Cuando integres datos reales, este panel puede mostrar ultima lectura y bateria.</p>
                 </div>
             </article>
         </section>
     </main>
+</div>
 
-    <!-- Footer del dashboard. -->
-    <footer class="home-footer">
-        <p>EdenAir - Dashboard base para monitoreo ambiental con ESP32.</p>
-    </footer>
-
-    <!-- Script que alimenta el dashboard con datos demo y microinteracciones. -->
-    <script src="<?= base_url('JS/dashboard.js') ?>"></script>
+<script src="<?= base_url('JS/dashboard.js') ?>"></script>
 </body>
 </html>
