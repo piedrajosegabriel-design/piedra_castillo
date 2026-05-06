@@ -99,6 +99,36 @@ input {
     overflow: hidden;
 }
 
+.back-home-box {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 3;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid rgba(30, 50, 47, 0.12);
+    background: rgba(252, 250, 247, 0.82);
+    box-shadow: 0 10px 22px rgba(31, 48, 45, 0.1);
+    color: var(--accent-strong);
+    backdrop-filter: blur(12px);
+}
+
+.back-home-box:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(31, 48, 45, 0.14);
+}
+
+.back-home-box svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: currentColor;
+}
+
 .orb {
     position: absolute;
     border-radius: 999px;
@@ -202,14 +232,16 @@ input {
 }
 
 .nav-link--cta {
-    color: #fff;
-    border-color: transparent;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
-    box-shadow: 0 10px 22px rgba(29, 108, 102, 0.18);
+    color: #111;
+    border-color: rgba(17, 17, 17, 0.08);
+    background: linear-gradient(135deg, #c6ece3 0%, #8fd2c4 100%);
+    box-shadow: 0 12px 26px rgba(29, 108, 102, 0.22);
+    font-weight: 800;
 }
 
 .nav-link--cta:hover {
-    background: linear-gradient(135deg, #227771 0%, #124e49 100%);
+    background: linear-gradient(135deg, #d5f3ec 0%, #9bdccd 100%);
+    color: #111;
 }
 
 .home-main {
@@ -440,7 +472,7 @@ input {
 }
 
 .home-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .tilt-card {
@@ -492,6 +524,10 @@ input {
 
 .card-visual--hogar {
     background: linear-gradient(145deg, #4d6f7e 0%, #284654 100%);
+}
+
+.card-visual--dormitorio {
+    background: linear-gradient(145deg, #7b8d67 0%, #4d5f3c 100%);
 }
 
 .visual-pill {
@@ -1064,6 +1100,14 @@ a:focus-visible {
     .home-footer,
     .auth-shell {
         width: calc(100% - 22px);
+    }
+
+    .back-home-box {
+        top: 16px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
     }
 
     .home-main {

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="<?= base_url('CSS/dashboard.css') ?>">
 </head>
 
-<body>
+<body class="dashboard-body">
 <div class="dashboard" id="dashboard">
 
     <header class="header">
@@ -28,9 +28,9 @@
         </div>
 
         <div class="header-user">
-            <span class="update-time" id="updateTime">Actualizado recien</span>
+            <span class="update-time" id="updateTime">Actualizado hace instantes</span>
             <span class="user-name">Hola, <?= esc(session()->get('user_name') ?? 'Usuario') ?></span>
-            <a href="<?= site_url('logout') ?>" class="logout-link">Cerrar sesion</a>
+            <a href="<?= site_url('logout') ?>" class="logout-link">Cerrar sesi&oacute;n</a>
         </div>
     </header>
 
@@ -38,7 +38,7 @@
         <nav class="sidebar-menu">
             <a href="#" class="active">
                 <span class="menu-icon">Inicio</span>
-                <span class="menu-text">Resumen</span>
+                <span class="menu-text">Panorama</span>
             </a>
 
             <a href="#">
@@ -48,12 +48,12 @@
 
             <a href="#">
                 <span class="menu-icon">Aviso</span>
-                <span class="menu-text">Alertas</span>
+                <span class="menu-text">Incidencias</span>
             </a>
 
             <a href="#">
                 <span class="menu-icon">Datos</span>
-                <span class="menu-text">Historial</span>
+                <span class="menu-text">Tendencias</span>
             </a>
         </nav>
     </aside>
@@ -61,106 +61,185 @@
     <main class="main">
         <section class="overview">
             <div class="overview-copy">
-                <p class="eyebrow">Resumen general</p>
-                <h1>Un dashboard mas claro para leer el estado del ambiente.</h1>
+                <p class="eyebrow">Panorama ejecutivo</p>
+                <h1>Una lectura m&aacute;s clara, elegante y confiable del estado ambiental.</h1>
                 <p>
-                    EdenAir prioriza lo importante: estado general, ambientes activos,
-                    alertas visibles y proximos pasos para decidir rapido.
+                    EdenAir organiza la informaci&oacute;n esencial en una vista serena y precisa,
+                    para facilitar la lectura del contexto general, distinguir prioridades
+                    y acompa&ntilde;ar decisiones con mayor seguridad.
                 </p>
+
+                <div class="legend-row">
+                    <span class="legend-item legend-good"><i></i>Condici&oacute;n &oacute;ptima</span>
+                    <span class="legend-item legend-watch"><i></i>Seguimiento sugerido</span>
+                    <span class="legend-item legend-danger"><i></i>Atenci&oacute;n prioritaria</span>
+                </div>
             </div>
 
             <div class="overview-card">
-                <span class="overview-label">Estado del sistema</span>
-                <strong>Estable</strong>
-                <p>Las mediciones generales se mantienen en rango y los dispositivos estan en linea.</p>
+                <span class="overview-label">Estado operativo</span>
+                <strong>Operaci&oacute;n estable</strong>
+                <p>Los indicadores principales se mantienen dentro del rango esperado y los equipos responden con normalidad.</p>
 
-                <div class="overview-tags">
-                    <span class="tag good">3 ambientes activos</span>
-                    <span class="tag info">Lectura cada 3 s</span>
+                <div class="signal-board">
+                    <span class="signal-pill good"><i></i>4 ambientes supervisados</span>
+                    <span class="signal-pill info"><i></i>Actualizaci&oacute;n continua</span>
+                    <span class="signal-pill warning"><i></i>1 recomendaci&oacute;n abierta</span>
                 </div>
             </div>
         </section>
 
         <section class="metrics">
             <article class="metric-card temperature-card">
-                <p class="metric-title">Temperatura promedio</p>
-                <h2 id="tempMetric">24.6 °C</h2>
-                <small>Confort termico general</small>
+                <div class="gauge" id="tempGauge" style="--gauge-fill: 55%;">
+                    <div class="gauge-inner">
+                        <span class="gauge-caption">Temperatura</span>
+                        <h2 id="tempMetric">24.6 &deg;C</h2>
+                    </div>
+                </div>
+                <p class="metric-title">Temperatura media</p>
+                <div class="metric-scale">
+                    <span>Inferior</span>
+                    <span>&Oacute;ptimo</span>
+                    <span>Elevado</span>
+                </div>
+                <small>Referencia t&eacute;rmica general del conjunto.</small>
             </article>
 
             <article class="metric-card humidity-card">
-                <p class="metric-title">Humedad promedio</p>
-                <h2 id="humMetric">58%</h2>
-                <small>Nivel aceptable</small>
+                <div class="gauge" id="humGauge" style="--gauge-fill: 58%;">
+                    <div class="gauge-inner">
+                        <span class="gauge-caption">Humedad</span>
+                        <h2 id="humMetric">58%</h2>
+                    </div>
+                </div>
+                <p class="metric-title">Humedad relativa</p>
+                <div class="metric-scale">
+                    <span>Baja</span>
+                    <span>Equilibrada</span>
+                    <span>Alta</span>
+                </div>
+                <small>Percepci&oacute;n ambiental resumida en un solo nivel.</small>
             </article>
 
             <article class="metric-card comfort-card">
-                <p class="metric-title">Calidad del ambiente</p>
-                <h2 id="airMetric">Buena</h2>
-                <small>Lectura simple para el usuario</small>
+                <div class="gauge" id="airGauge" style="--gauge-fill: 78%;">
+                    <div class="gauge-inner">
+                        <span class="gauge-caption">Calidad</span>
+                        <h2 id="airMetric">Buena</h2>
+                    </div>
+                </div>
+                <p class="metric-title">Confort ambiental</p>
+                <div class="metric-scale">
+                    <span>Inicial</span>
+                    <span>Adecuada</span>
+                    <span>Destacada</span>
+                </div>
+                <small>S&iacute;ntesis visual pensada para una lectura inmediata.</small>
             </article>
 
             <article class="metric-card alert-card">
-                <p class="metric-title">Alertas activas</p>
+                <p class="metric-title">Incidencias activas</p>
+                <div class="traffic-visual" aria-hidden="true">
+                    <span class="traffic-dot danger active"></span>
+                    <span class="traffic-dot warning active"></span>
+                    <span class="traffic-dot success"></span>
+                </div>
                 <h2>2</h2>
-                <small>Solo una necesita accion inmediata</small>
+                <small>Rojo se&ntilde;ala prioridad inmediata. &Aacute;mbar sugiere observaci&oacute;n.</small>
             </article>
         </section>
 
         <section class="content-grid">
             <article class="panel">
                 <div class="panel-title">
-                    <h2>Ambientes</h2>
-                    <span>Lectura actual</span>
+                    <h2>Ambientes supervisados</h2>
+                    <span>Estado actual</span>
                 </div>
 
                 <div class="environment-list">
-                    <div class="environment">
+                    <div class="environment environment-good">
+                        <span class="environment-icon" aria-hidden="true"></span>
                         <div class="environment-main">
-                            <strong>Aula principal</strong>
-                            <p>Temperatura 23.8 °C · Humedad 55%</p>
+                            <div class="environment-heading">
+                                <strong>Aula principal</strong>
+                                <span class="status good">En equilibrio</span>
+                            </div>
+                            <p>Temperatura 23.8 &deg;C &middot; Humedad 55%</p>
+                            <div class="mini-meter good"><span style="width: 72%"></span></div>
                         </div>
-                        <span class="status good">Estable</span>
                     </div>
 
-                    <div class="environment">
+                    <div class="environment environment-good">
+                        <span class="environment-icon" aria-hidden="true"></span>
                         <div class="environment-main">
-                            <strong>Oficina</strong>
-                            <p>Temperatura 24.9 °C · Humedad 60%</p>
+                            <div class="environment-heading">
+                                <strong>Oficina</strong>
+                                <span class="status good">Rango saludable</span>
+                            </div>
+                            <p>Temperatura 24.9 &deg;C &middot; Humedad 60%</p>
+                            <div class="mini-meter good"><span style="width: 64%"></span></div>
                         </div>
-                        <span class="status good">Normal</span>
                     </div>
 
-                    <div class="environment">
+                    <div class="environment environment-warning">
+                        <span class="environment-icon" aria-hidden="true"></span>
                         <div class="environment-main">
-                            <strong>Hogar</strong>
-                            <p>Temperatura 26.1 °C · Humedad 62%</p>
+                            <div class="environment-heading">
+                                <strong>Hogar</strong>
+                                <span class="status warning">Seguimiento</span>
+                            </div>
+                            <p>Temperatura 26.1 &deg;C &middot; Humedad 62%</p>
+                            <div class="mini-meter warning"><span style="width: 82%"></span></div>
                         </div>
-                        <span class="status warning">Atento</span>
+                    </div>
+
+                    <div class="environment environment-good">
+                        <span class="environment-icon" aria-hidden="true"></span>
+                        <div class="environment-main">
+                            <div class="environment-heading">
+                                <strong>Dormitorio</strong>
+                                <span class="status good">Descanso ideal</span>
+                            </div>
+                            <p>Temperatura 22.7 &deg;C &middot; Humedad 57%</p>
+                            <div class="mini-meter good"><span style="width: 68%"></span></div>
+                        </div>
                     </div>
                 </div>
             </article>
 
             <article class="panel">
                 <div class="panel-title">
-                    <h2>Alertas y acciones</h2>
-                    <span>Prioridad del dia</span>
+                    <h2>Incidencias y criterio</h2>
+                    <span>Prioridades del d&iacute;a</span>
                 </div>
 
                 <div class="alert-list">
                     <div class="alert danger">
-                        <strong>Hogar con temperatura alta</strong>
-                        <p>Conviene ventilar o bajar la carga termica del ambiente.</p>
+                        <span class="alert-icon" aria-hidden="true"></span>
+                        <div class="alert-copy">
+                            <span class="alert-level">Intervenci&oacute;n sugerida</span>
+                            <strong>Hogar con temperatura por encima del nivel ideal</strong>
+                            <p>Se recomienda favorecer la ventilaci&oacute;n o reducir la carga t&eacute;rmica del espacio.</p>
+                        </div>
                     </div>
 
                     <div class="alert warning">
-                        <strong>Humedad en subida</strong>
-                        <p>La zona hogar esta algo por encima del rango recomendado.</p>
+                        <span class="alert-icon" aria-hidden="true"></span>
+                        <div class="alert-copy">
+                            <span class="alert-level">Observaci&oacute;n preventiva</span>
+                            <strong>Ascenso gradual de humedad</strong>
+                            <p>El ambiente hogare&ntilde;o comienza a ubicarse por encima del rango recomendado.</p>
+                        </div>
                     </div>
 
                     <div class="alert success">
-                        <strong>Aula y oficina sin novedades</strong>
-                        <p>Sus lecturas estan dentro del rango esperado por ahora.</p>
+                        <span class="alert-icon" aria-hidden="true"></span>
+                        <div class="alert-copy">
+                            <span class="alert-level">Comportamiento estable</span>
+                            <strong>Aula, oficina y dormitorio conservan una condici&oacute;n favorable</strong>
+                            <p>Los tres sectores presentan valores estables y sin se&ntilde;ales de desajuste.</p>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -169,8 +248,14 @@
         <section class="bottom-grid">
             <article class="panel">
                 <div class="panel-title">
-                    <h2>Tendencia diaria</h2>
-                    <span>Ultimas horas</span>
+                    <h2>Comportamiento diario</h2>
+                    <span>&Uacute;ltimas horas</span>
+                </div>
+
+                <div class="chart-levels" aria-hidden="true">
+                    <span>Alto</span>
+                    <span>Medio</span>
+                    <span>Bajo</span>
                 </div>
 
                 <div class="chart-box" aria-hidden="true">
@@ -183,24 +268,49 @@
                     <div class="bar" style="height: 60%"></div>
                 </div>
 
-                <p class="chart-caption">Vista rapida para detectar cambios sin sobrecargar la pantalla.</p>
+                <p class="chart-caption">Una lectura resumida para advertir variaciones sin distraer la atenci&oacute;n principal.</p>
             </article>
 
             <article class="panel">
                 <div class="panel-title">
-                    <h2>Dispositivos</h2>
-                    <span>Estado actual</span>
+                    <h2>Dispositivos conectados</h2>
+                    <span>Disponibilidad actual</span>
                 </div>
 
                 <ul class="device-list">
-                    <li><span>ESP32 Aula</span><strong>En linea</strong></li>
-                    <li><span>ESP32 Oficina</span><strong>En linea</strong></li>
-                    <li><span>ESP32 Hogar</span><strong>En linea</strong></li>
+                    <li>
+                        <div class="device-main">
+                            <span class="device-dot" aria-hidden="true"></span>
+                            <span>ESP32 Aula</span>
+                        </div>
+                        <strong>Disponible</strong>
+                    </li>
+                    <li>
+                        <div class="device-main">
+                            <span class="device-dot" aria-hidden="true"></span>
+                            <span>ESP32 Oficina</span>
+                        </div>
+                        <strong>Disponible</strong>
+                    </li>
+                    <li>
+                        <div class="device-main">
+                            <span class="device-dot" aria-hidden="true"></span>
+                            <span>ESP32 Hogar</span>
+                        </div>
+                        <strong>Disponible</strong>
+                    </li>
+                    <li>
+                        <div class="device-main">
+                            <span class="device-dot" aria-hidden="true"></span>
+                            <span>ESP32 Dormitorio</span>
+                        </div>
+                        <strong>Disponible</strong>
+                    </li>
                 </ul>
 
                 <div class="next-step">
-                    <strong>Siguiente paso</strong>
-                    <p>Cuando integres datos reales, este panel puede mostrar ultima lectura y bateria.</p>
+                    <strong>Proyecci&oacute;n pr&oacute;xima</strong>
+                    <p>Al incorporar datos reales, este bloque puede reunir &uacute;ltima lectura, bater&iacute;a y calidad del enlace.</p>
                 </div>
             </article>
         </section>

@@ -41,7 +41,8 @@
                 <h1>Un panel m&aacute;s claro para entender el clima de cada ambiente.</h1>
                 <p class="hero-lead">
                     EdenAir integra sensores ESP32 para medir temperatura y humedad, compararlas
-                    con rangos ideales y detectar r&aacute;pido cuando un aula, oficina u hogar sale de confort.
+                    con rangos ideales y detectar r&aacute;pido cuando un aula, oficina, hogar o dormitorio
+                    sale de confort.
                 </p>
 
                 <div class="hero-actions">
@@ -56,7 +57,7 @@
                         <span>captura continua</span>
                     </div>
                     <div class="hero-stat">
-                        <strong>3 zonas</strong>
+                        <strong>4 zonas</strong>
                         <span>ambientes de prueba</span>
                     </div>
                     <div class="hero-stat">
@@ -170,6 +171,29 @@
                         <span>Bienestar</span>
                         <span>Domotica</span>
                         <span>ESP32</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="home-card tilt-card">
+                <div class="card-visual card-visual--dormitorio">
+                    <span class="visual-pill">Dormitorio</span>
+                    <div class="visual-reading">
+                        <strong>22.8 &deg;C</strong>
+                        <span>Descanso estable</span>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <h3>Dormitorios con confort pensado para el descanso</h3>
+                    <p>
+                        Lecturas simples para sostener un entorno equilibrado durante la noche
+                        y anticipar cambios que afecten el descanso.
+                    </p>
+                    <div class="card-tags">
+                        <span>Descanso</span>
+                        <span>Ventilacion</span>
+                        <span>Equilibrio</span>
                     </div>
                 </div>
             </article>

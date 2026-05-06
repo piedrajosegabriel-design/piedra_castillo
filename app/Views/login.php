@@ -17,6 +17,12 @@
         <span class="orb orb-3"></span>
     </div>
 
+    <a href="<?= site_url('/') ?>" class="back-home-box" aria-label="Volver al inicio">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3.4 4 10v10h5.6v-5.7h4.8V20H20V10l-8-6.6Z" />
+        </svg>
+    </a>
+
     <main class="auth-shell">
         <!-- Columna izquierda: explica el producto y acompana visualmente el acceso. -->
         <section class="auth-side">

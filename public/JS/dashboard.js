@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var tempMetric = document.getElementById("tempMetric");
     var humMetric = document.getElementById("humMetric");
     var airMetric = document.getElementById("airMetric");
+    var tempGauge = document.getElementById("tempGauge");
+    var humGauge = document.getElementById("humGauge");
+    var airGauge = document.getElementById("airGauge");
 
     function setCurrentTime() {
         if (!updateTime) return;
@@ -18,10 +21,33 @@ document.addEventListener("DOMContentLoaded", function () {
         return Math.random() * (max - min) + min;
     }
 
+    function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    function setGaugeFill(element, value) {
+        if (!element) return;
+        element.style.setProperty("--gauge-fill", clamp(value, 8, 100) + "%");
+    }
+
     function updateMetrics() {
-        if (tempMetric) tempMetric.textContent = randomRange(21.8, 26.9).toFixed(1) + " \u00b0C";
-        if (humMetric) humMetric.textContent = randomRange(42, 64).toFixed(0) + "%";
-        if (airMetric) airMetric.textContent = ["Buena", "Estable", "Correcta"][Math.floor(Math.random() * 3)];
+        var temperature = randomRange(21.8, 26.9);
+        var humidity = randomRange(42, 64);
+        var airStates = [
+            { label: "Excelente", fill: 84 },
+            { label: "Equilibrada", fill: 74 },
+            { label: "Adecuada", fill: 67 }
+        ];
+        var airState = airStates[Math.floor(Math.random() * airStates.length)];
+
+        if (tempMetric) tempMetric.textContent = temperature.toFixed(1) + " \u00b0C";
+        if (humMetric) humMetric.textContent = humidity.toFixed(0) + "%";
+        if (airMetric) airMetric.textContent = airState.label;
+
+        setGaugeFill(tempGauge, ((temperature - 18) / 12) * 100);
+        setGaugeFill(humGauge, humidity);
+        setGaugeFill(airGauge, airState.fill);
+
         setCurrentTime();
     }
 
