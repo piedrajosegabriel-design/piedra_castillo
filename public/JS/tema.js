@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var botones = document.querySelectorAll("[data-boton-tema]");
+    var toggle = document.getElementById("input");
     var raiz = document.documentElement;
 
     function leerTemaGuardado() {
@@ -22,24 +22,26 @@ document.addEventListener("DOMContentLoaded", function () {
         return raiz.getAttribute("data-theme") === "dark" ? "dark" : "light";
     }
 
-    function actualizarBotones(tema) {
-        botones.forEach(function (boton) {
-            boton.textContent = tema === "dark" ? "Tema claro" : "Tema oscuro";
-            boton.setAttribute("aria-pressed", tema === "dark" ? "true" : "false");
-        });
+    function actualizarToggle(tema) {
+        if (!toggle) {
+            return;
+        }
+
+        toggle.checked = tema === "dark";
+        toggle.setAttribute("aria-checked", tema === "dark" ? "true" : "false");
     }
 
     function aplicarTema(tema) {
         raiz.setAttribute("data-theme", tema);
         guardarTema(tema);
-        actualizarBotones(tema);
+        actualizarToggle(tema);
     }
 
-    botones.forEach(function (boton) {
-        boton.addEventListener("click", function () {
-            aplicarTema(temaActual() === "dark" ? "light" : "dark");
+    if (toggle) {
+        toggle.addEventListener("change", function () {
+            aplicarTema(toggle.checked ? "dark" : "light");
         });
-    });
+    }
 
     aplicarTema(leerTemaGuardado());
 });
