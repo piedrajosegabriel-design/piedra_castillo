@@ -1,123 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Metadatos basicos de la vista de autenticacion. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EdenAir | Login</title>
-
-    <!-- Estilos globales compartidos por todo el front. -->
+    <script>
+        const temaGuardado = localStorage.getItem('tema');
+        if (temaGuardado) {
+            document.documentElement.setAttribute('data-theme', temaGuardado);
+        }
+    </script>
     <link rel="stylesheet" href="<?= base_url('CSS/todo.css') ?>">
 </head>
-<body class="auth-body">
-    <!-- Fondo decorativo fijo para dar profundidad sin afectar el formulario. -->
-    <div class="fx-bg">
-        <span class="orb orb-1"></span>
-        <span class="orb orb-2"></span>
-        <span class="orb orb-3"></span>
-    </div>
+<body class="pagina">
+<div class="contenedor">
+    <header class="encabezado">
+        <a href="<?= site_url('/') ?>" class="marca">
+            <span class="marca-icono">EA</span>
+            <span class="marca-texto">
+                <strong>EdenAir</strong>
+                <small>Ingreso al sistema</small>
+            </span>
+        </a>
 
-    <a href="<?= site_url('/') ?>" class="back-home-box" aria-label="Volver al inicio">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3.4 4 10v10h5.6v-5.7h4.8V20H20V10l-8-6.6Z" />
-        </svg>
-    </a>
+        <div class="menu">
+            <button type="button" class="boton boton-tema" data-boton-tema>Tema oscuro</button>
+            <a href="<?= site_url('registro') ?>" class="boton boton-secundario">Registro</a>
+        </div>
+    </header>
 
-    <main class="auth-shell">
-        <!-- Columna izquierda: explica el producto y acompana visualmente el acceso. -->
-        <section class="auth-side">
-            <p class="eyebrow">EdenAir</p>
-            <h1>Entr&aacute; a tu panel y segu&iacute; el estado de cada ambiente.</h1>
-            <p class="auth-copy">
-                Accede a una vista m&aacute;s ordenada para revisar lecturas, comparar condiciones
-                y detectar r&aacute;pidamente cuando el confort ambiental sale del rango esperado.
-            </p>
+    <main class="contenido">
+        <section class="seccion seccion-principal">
+            <div class="bloque">
+                <p class="etiqueta">Login</p>
+                <h1 class="titulo">Accede a tu panel de monitoreo.</h1>
+                <p class="texto">
+                    El login permite entrar con usuario o correo y abrir el panel
+                    principal del sistema con una autenticacion segura.
+                </p>
 
-            <div class="auth-stat-grid">
-                <!-- Datos rapidos para contextualizar la pantalla. -->
-                <div class="auth-stat">
-                    <strong>3 paneles</strong>
-                    <span>zonas iniciales</span>
-                </div>
-                <div class="auth-stat">
-                    <strong>Alertas</strong>
-                    <span>visuales y r&aacute;pidas</span>
-                </div>
-                <div class="auth-stat">
-                    <strong>Sesiones</strong>
-                    <span>seguras</span>
-                </div>
+                <ul class="lista-simple">
+                    <li>
+                        <strong>Autenticacion segura</strong>
+                        <span>La contrasena se compara con hash y la sesion se regenera al ingresar.</span>
+                    </li>
+                    <li>
+                        <strong>Entrada simple</strong>
+                        <span>El formulario es corto y muestra mensajes claros.</span>
+                    </li>
+                    <li>
+                        <strong>Acceso confiable</strong>
+                        <span>La validacion del ingreso prioriza claridad y proteccion.</span>
+                    </li>
+                </ul>
             </div>
 
-            <div class="auth-feature-list">
-                <!-- Bloques cortos que explican beneficios del sistema. -->
-                <article class="auth-feature">
-                    <span class="feature-index">01</span>
-                    <div>
-                        <h3>Lecturas claras</h3>
-                        <p>Informaci&oacute;n principal al frente, sin ruido y con mejor jerarqu&iacute;a visual.</p>
-                    </div>
-                </article>
+            <div class="bloque">
+                <p class="etiqueta">Ingreso</p>
+                <h2>Completa tus datos</h2>
+                <p class="texto">Puedes usar tu usuario o tu correo electronico.</p>
 
-                <article class="auth-feature">
-                    <span class="feature-index">02</span>
-                    <div>
-                        <h3>Mejor seguimiento</h3>
-                        <p>Una interfaz lista para crecer con m&aacute;s sensores, ambientes y alertas.</p>
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
+                <?php endif; ?>
+
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div class="mensaje mensaje-exito"><?= esc(session()->getFlashdata('success')) ?></div>
+                <?php endif; ?>
+
+                <form action="<?= site_url('login') ?>" method="POST" id="formLogin" class="formulario">
+                    <?= csrf_field() ?>
+
+                    <div class="campo">
+                        <label for="usuario">Usuario o correo</label>
+                        <input type="text" name="usuario" id="usuario" placeholder="usuario o correo@dominio.com" value="<?= esc(old('usuario')) ?>" autocomplete="username" required>
                     </div>
-                </article>
+
+                    <div class="campo">
+                        <label for="loginPassword">Contrasena</label>
+                        <div class="campo-password">
+                            <input type="password" name="password" id="loginPassword" placeholder="Ingresa tu contrasena" autocomplete="current-password" required>
+                            <button type="button" class="boton boton-secundario boton-bloque" id="verPasswordLogin">Mostrar</button>
+                        </div>
+                    </div>
+
+                    <p class="nota">Las credenciales se validan en servidor y la sesion queda protegida.</p>
+
+                    <button type="submit" class="boton boton-bloque" id="botonLogin">Entrar</button>
+                    <a href="<?= site_url('registro') ?>" class="enlace-centro">No tengo cuenta todavia</a>
+                </form>
             </div>
-
-            <p class="auth-note">Usa tu usuario y contrase&ntilde;a para ingresar al dashboard de EdenAir.</p>
-        </section>
-
-        <!-- Columna derecha: formulario real de login. -->
-        <section class="login-box auth-card">
-            <p class="card-kicker">Acceso</p>
-            <h2>Iniciar sesion</h2>
-            <p class="form-subtitle">Entr&aacute; a tu cuenta para continuar con el monitoreo del sistema.</p>
-
-            <!-- Flashdata de error enviado desde el controlador luego de un redirect. -->
-            <?php if (session()->getFlashdata('error')): ?>
-                <p class="form-alert error"><?= esc(session()->getFlashdata('error')) ?></p>
-            <?php endif; ?>
-
-            <!-- Flashdata de exito, por ejemplo despues de registrarse. -->
-            <?php if (session()->getFlashdata('success')): ?>
-                <p class="form-alert success"><?= esc(session()->getFlashdata('success')) ?></p>
-            <?php endif; ?>
-
-            <!-- Enviamos el formulario al POST /login definido en Routes.php. -->
-            <form action="<?= site_url('login') ?>" method="POST">
-                <!-- Token CSRF requerido por CodeIgniter para aceptar el POST. -->
-                <?= csrf_field() ?>
-
-                <!-- Campo de usuario usado para buscar el registro en la tabla users. -->
-                <div class="input-box">
-                    <label for="usuario">Usuario</label>
-                    <input type="text" name="usuario" id="usuario" placeholder="Ingresa tu usuario" required>
-                </div>
-
-                <!-- Campo de contrasena con boton para alternar visibilidad. -->
-                <div class="input-box">
-                    <label for="password">Contrase&ntilde;a</label>
-                    <div class="password-box">
-                        <input type="password" name="password" id="password" placeholder="Ingresa tu contrase&ntilde;a" required>
-                        <button type="button" id="togglePassword" aria-label="Mostrar contrase&ntilde;a">Ver</button>
-                    </div>
-                </div>
-
-                <button type="submit">Entrar al dashboard</button>
-
-                <!-- Enlace secundario hacia la pantalla de registro. -->
-                <a href="<?= site_url('register') ?>" id="goRegisterLink" class="forgot">
-                    &iquest;No tienes cuenta? Reg&iacute;strate
-                </a>
-            </form>
         </section>
     </main>
+</div>
 
-    <!-- Script especifico de interacciones del login. -->
-    <script src="<?= base_url('JS/login.js') ?>"></script>
+<script src="<?= base_url('JS/tema.js') ?>"></script>
+<script src="<?= base_url('JS/login.js') ?>"></script>
 </body>
 </html>

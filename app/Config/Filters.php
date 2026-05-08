@@ -36,6 +36,8 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'auth'          => \App\Filters\AuthFilter::class,
+        'guest'         => \App\Filters\GuestFilter::class,
     ];
 
     /**
@@ -54,12 +56,8 @@ class Filters extends BaseFilters
     // Filtros del framework que se ejecutan siempre.
     // Ojo: forcehttps y pagecache pueden afectar comportamiento global.
     public array $required = [
-        'before' => [
-            'forcehttps', // Force Global Secure Requests
-            'pagecache',  // Web Page Caching
-        ],
+        'before' => [],
         'after' => [
-            'pagecache',   // Web Page Caching
             'performance', // Performance Metrics
             'toolbar',     // Debug Toolbar
         ],
@@ -75,12 +73,16 @@ class Filters extends BaseFilters
      * }
      */
     // Aqui se define la seguridad base del proyecto.
-    // CSRF esta activo antes de cada request, por eso login y register
+    // CSRF esta activo antes de cada request, por eso login y registro
     // necesitan incluir el helper csrf_field() en sus formularios.
     public array $globals = [
         'before' => [
             // 'honeypot',
-            'csrf',
+            'csrf' => [
+                'except' => [
+                    'api/*',
+                ],
+            ],
             // 'invalidchars',
         ],
         'after' => [
@@ -115,6 +117,6 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     // Espacio reservado para filtros aplicados solo a ciertas rutas.
-    // Ejemplo futuro: proteger /dashboard/* con un filtro de autenticacion.
+    // Ejemplo futuro: proteger /panel/* con un filtro de autenticacion.
     public array $filters = [];
 }

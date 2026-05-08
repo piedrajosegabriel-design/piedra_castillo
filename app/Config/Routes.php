@@ -6,22 +6,30 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// Flujo principal de la app:
-// 1. El usuario entra a la landing.
-// 2. Desde ahi puede ir a login o registro.
-// 3. Si las credenciales son correctas, llega al dashboard privado.
+$routes->get('/', 'AccesoController::inicio');
 
-// Landing principal.
-$routes->get('/', 'TesinaController::home');
+$routes->group('', ['filter' => 'guest'], static function ($routes) {
+    $routes->get('login', 'AccesoController::login');
+    $routes->post('login', 'AccesoController::validarLogin');
+    $routes->get('registro', 'AccesoController::registro');
+    $routes->post('registro', 'AccesoController::guardarRegistro');
+    $routes->get('register', 'AccesoController::registro');
+    $routes->post('register', 'AccesoController::guardarRegistro');
+});
 
-// Formulario de login y envio de credenciales.
-$routes->get('/login', 'TesinaController::inicio');
-$routes->post('/login', 'TesinaController::login');
+$routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);
 
-// Formulario de registro y alta del usuario.
-$routes->get('/register', 'TesinaController::register');
-$routes->post('/register', 'TesinaController::registerStore');
+$routes->group('panel', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('', 'PanelController::index');
+    $routes->post('medicion', 'PanelController::guardarMedicion');
+    $routes->post('modo', 'PanelController::cambiarModo');
+    $routes->post('actuador', 'PanelController::cambiarActuador');
+});
 
-// Panel privado y cierre de sesion.
-$routes->get('/dashboard', 'TesinaController::dashboard');
-$routes->get('/logout', 'TesinaController::logout');
+$routes->get('dashboard', 'PanelController::index', ['filter' => 'auth']);
+
+$routes->group('api/devices', static function ($routes) {
+    $routes->post('(:segment)/measurements', 'Api\DeviceApiController::storeMeasurement/$1');
+    $routes->get('(:segment)/commands/pending', 'Api\DeviceApiController::pendingCommands/$1');
+    $routes->post('(:segment)/commands/(:num)/executed', 'Api\DeviceApiController::markCommandExecuted/$1/$2');
+});

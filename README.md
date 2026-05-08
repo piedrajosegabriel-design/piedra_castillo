@@ -1,61 +1,189 @@
-# CodeIgniter 4 Framework
+# EdenAir - Base simulada para tesina con CodeIgniter 4
 
-## What is CodeIgniter?
+Sistema inteligente de monitoreo y ambientacion automatica de espacios interiores.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+Esta primera etapa funciona sin hardware real y deja preparada la arquitectura final:
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+`ESP32 -> API en CodeIgniter 4 -> MySQL`
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+`Usuario -> Web en CodeIgniter 4 -> MySQL`
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+## Tecnologias
 
-## Important Change with index.php
+- PHP 8.2
+- CodeIgniter 4
+- MySQL
+- Programacion orientada a objetos
+- HTML
+- CSS
+- JavaScript simple
+- Fetch/AJAX
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+## Lo que ya incluye esta etapa
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+- Registro e inicio de sesion.
+- Sesiones de usuario.
+- Seleccion de ambiente: oficina, aula, hogar, dormitorio o personalizable.
+- Creacion automatica de un dispositivo ESP32 simulado por usuario.
+- Dashboard con temperatura, humedad, CO2 y calidad del aire.
+- Estados de actuadores: ventilador, aromatizador y LED de alerta.
+- Modo automatico y modo manual.
+- Control manual desde la web.
+- Guardado de comandos en MySQL.
+- Logica de automatizacion basica.
+- API lista para recibir mediciones futuras desde una ESP32 real.
+- API lista para devolver comandos pendientes y marcar comandos ejecutados.
+- Seeders con usuario demo y mediciones iniciales.
 
-**Please** read the user guide for a better explanation of how CI4 works!
+## Puesta en marcha
 
-## Repository Management
+1. Crear la base de datos:
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+```sql
+CREATE DATABASE IF NOT EXISTS tesina_esp32
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
+```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+2. Revisar `.env` y confirmar estos datos:
 
-## Contributing
+```dotenv
+database.default.hostname = localhost
+database.default.database = tesina_esp32
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+```
 
-We welcome contributions from the community.
+3. Ejecutar migraciones y seeder:
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
+```bash
+php spark migrate
+php spark db:seed DatabaseSeeder
+```
 
-## Server Requirements
+Si en PowerShell `php` no esta en el `PATH`, puedes usar directamente:
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+```bash
+C:\xampp\php\php.exe spark migrate
+C:\xampp\php\php.exe spark db:seed DatabaseSeeder
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+4. Abrir en navegador:
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+`http://localhost/piedra_castillo/public/`
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+## Usuario demo
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+- Usuario: `demo`
+- Contrasena: `123456`
+
+## Flujo web
+
+1. El usuario se registra.
+2. El sistema crea automaticamente:
+   - su ambiente
+   - su ESP32 simulada
+   - el estado inicial de actuadores
+   - mediciones precargadas
+3. Desde el dashboard puede:
+   - cargar mediciones simuladas
+   - cambiar entre modo automatico y manual
+   - encender o apagar actuadores en modo manual
+   - ejecutar comandos pendientes para simular el trabajo de la ESP32
+4. El dashboard se actualiza con `fetch` sin recargar toda la pagina.
+
+## Endpoints API para Postman
+
+Cada usuario tiene un `device_uid` y un `X-Device-Token` visibles en el dashboard.
+
+### 1. Enviar medicion simulando una ESP32
+
+`POST /public/api/devices/{device_uid}/measurements`
+
+Header:
+
+```http
+X-Device-Token: TU_TOKEN
+Content-Type: application/json
+```
+
+Body:
+
+```json
+{
+  "temperature": 28.4,
+  "humidity": 67,
+  "co2_ppm": 1280,
+  "air_quality_index": 42,
+  "notes": "Prueba desde Postman"
+}
+```
+
+### 2. Consultar comandos pendientes
+
+`GET /public/api/devices/{device_uid}/commands/pending`
+
+Header:
+
+```http
+X-Device-Token: TU_TOKEN
+```
+
+### 3. Marcar comando como ejecutado
+
+`POST /public/api/devices/{device_uid}/commands/{id}/executed`
+
+Header:
+
+```http
+X-Device-Token: TU_TOKEN
+```
+
+## Como funciona la simulacion actual
+
+- Las mediciones pueden nacer desde seeders, desde formularios web o desde Postman.
+- Si el modo esta en automatico, el backend evalua umbrales del ambiente y genera comandos.
+- Los comandos quedan guardados en MySQL.
+- La ejecucion de comandos puede simularse desde la web o marcandolos por API.
+- En modo manual, el usuario controla actuadores desde el dashboard y cada accion tambien queda registrada.
+
+## Tablas principales
+
+- `users`
+- `spaces`
+- `devices`
+- `measurements`
+- `device_states`
+- `device_commands`
+
+## Como conectar la ESP32 real en la siguiente etapa
+
+La idea final es reutilizar exactamente esta base:
+
+1. La ESP32 medira temperatura, humedad, CO2 y otras variables.
+2. La ESP32 enviara esas mediciones con `HTTP POST` al endpoint:
+   - `/api/devices/{device_uid}/measurements`
+3. El backend analizara la medicion y generara comandos si corresponde.
+4. La ESP32 consultara comandos pendientes con `HTTP GET`:
+   - `/api/devices/{device_uid}/commands/pending`
+5. Cuando ejecute una accion fisica, marcara el comando como ejecutado con `HTTP POST`:
+   - `/api/devices/{device_uid}/commands/{id}/executed`
+
+## Ejemplo conceptual de futuro firmware
+
+```text
+1. Leer sensores
+2. POST mediciones al backend
+3. GET comandos pendientes
+4. Ejecutar ventilador / aromatizador / LED
+5. POST confirmacion de ejecucion
+6. Repetir ciclo
+```
+
+## Notas
+
+- No se usa Firebase, Supabase, Node.js, React ni Laravel.
+- No existe conexion directa de la ESP32 a MySQL.
+- La logica central pasa siempre por la API en CodeIgniter 4.
