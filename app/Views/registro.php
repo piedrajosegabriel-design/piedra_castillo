@@ -101,22 +101,22 @@
                 <h1 class="titulo">Crea tu cuenta y activa el acceso en segundos.</h1>
                 <p class="texto">
                     El registro prepara tu cuenta, valida tus datos y deja listo
-                    el acceso. La eleccion del ambiente se realiza despues del
-                    primer ingreso en una experiencia visual mas guiada.
+                    el acceso. La elección del ambiente se realiza después del
+                    primer ingreso en una experiencia visual más guiada.
                 </p>
 
                 <ul class="lista-simple">
                     <li>
                         <strong>Formulario directo</strong>
-                        <span>Solo los datos necesarios para empezar sin pasos de mas.</span>
+                        <span>Solo los datos necesarios para empezar sin pasos de más.</span>
                     </li>
                     <li>
-                        <strong>Validaciones utiles</strong>
-                        <span>Correo valido, confirmacion de contrasena y clave segura.</span>
+                        <strong>Validaciones útiles</strong>
+                        <span>Correo válido, confirmación de contraseña y clave segura.</span>
                     </li>
                     <li>
-                        <strong>Eleccion guiada del ambiente</strong>
-                        <span>Despues de iniciar sesion eliges el espacio con una interfaz interactiva y animada.</span>
+                        <strong>Elección guiada del ambiente</strong>
+                        <span>Después de iniciar sesión, eliges el espacio con una interfaz interactiva y animada.</span>
                     </li>
                 </ul>
             </div>
@@ -124,8 +124,7 @@
             <div class="bloque">
                 <p class="etiqueta">Alta de usuario</p>
                 <h2>Completa tus datos</h2>
-                <p class="texto">Primero crea tu acceso. El ambiente lo eliges despues de entrar.</p>
-
+                
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
                 <?php endif; ?>
@@ -151,7 +150,7 @@
                         </div>
 
                         <div class="campo">
-                            <label for="email">Correo electronico</label>
+                            <label for="email">Correo electrónico</label>
                             <input type="email" id="email" name="email" value="<?= esc(old('email')) ?>" placeholder="correo@ejemplo.com" autocomplete="email" required>
                         </div>
                     </div>
@@ -159,25 +158,18 @@
                     <div class="campo">
                         <label for="usuario">Usuario</label>
                         <input type="text" id="usuario" name="usuario" value="<?= esc(old('usuario')) ?>" placeholder="usuario.personal" autocomplete="username" required>
-                        <p class="nota">Usa letras, numeros, puntos, guiones o guion bajo.</p>
+                        <p class="nota">Usá letras, números, puntos, guiones o guion bajo.</p>
                     </div>
 
-                    <div class="bloque-suave">
-                        <strong>El ambiente se configura despues del login</strong>
-                        <p class="texto">
-                            Al ingresar por primera vez veras una pantalla interactiva
-                            para elegir entre oficina, aula, hogar, dormitorio o un
-                            perfil personalizable.
-                        </p>
-                    </div>
+                   
 
                     <div class="campo">
-                        <label for="registroPassword">Contrasena</label>
+                        <label for="registroPassword">Contraseña</label>
                         <div class="campo-password">
-                            <input type="password" id="registroPassword" name="password" placeholder="Crea una contrasena" autocomplete="new-password" minlength="8" required>
+                            <input type="password" id="registroPassword" name="password" placeholder="Creá una contraseña" autocomplete="new-password" minlength="8" required>
                             <button type="button" class="boton boton-secundario boton-bloque" id="verPasswordRegistro">Mostrar</button>
                         </div>
-                        <p class="nota">Debe tener al menos 8 caracteres, una mayuscula, una minuscula y un numero.</p>
+                        <p class="nota">Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.</p>
                     </div>
 
                     <div class="medidor">
@@ -188,11 +180,11 @@
                     </div>
 
                     <div class="campo">
-                        <label for="confirmPassword">Confirmar contrasena</label>
-                        <input type="password" id="confirmPassword" name="password_confirm" placeholder="Repite la contrasena" autocomplete="new-password" minlength="8" required>
+                        <label for="confirmPassword">Confirmar contraseña</label>
+                        <input type="password" id="confirmPassword" name="password_confirm" placeholder="Repetí la contraseña" autocomplete="new-password" minlength="8" required>
                     </div>
 
-                    <p id="coincideTexto" class="nota">Esperando confirmacion de contrasena.</p>
+                    <p id="coincideTexto" class="nota">Esperando confirmación de contraseña.</p>
 
                     <button type="submit" class="boton boton-bloque" id="botonRegistro">Crear cuenta</button>
                     <a href="<?= site_url('login') ?>" class="enlace-centro">Ya tengo una cuenta</a>
