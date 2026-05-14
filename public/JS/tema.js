@@ -1,25 +1,38 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var toggle = document.getElementById("input");
+    var CLAVE_TEMA = "tema";
+    var TEMA_CLARO = "light";
+    var TEMA_OSCURO = "dark";
     var raiz = document.documentElement;
+    var toggle = document.getElementById("input");
+
+    function esTemaValido(tema) {
+        return tema === TEMA_CLARO || tema === TEMA_OSCURO;
+    }
 
     function leerTemaGuardado() {
         try {
-            return localStorage.getItem("tema") === "dark" ? "dark" : "light";
+            var tema = localStorage.getItem(CLAVE_TEMA);
+            return esTemaValido(tema) ? tema : null;
         } catch (error) {
-            return "light";
+            return null;
         }
     }
 
     function guardarTema(tema) {
         try {
-            localStorage.setItem("tema", tema);
+            localStorage.setItem(CLAVE_TEMA, tema);
         } catch (error) {
             return;
         }
     }
 
-    function temaActual() {
-        return raiz.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    function leerTemaDelDocumento() {
+        var tema = raiz.getAttribute("data-theme");
+        return esTemaValido(tema) ? tema : null;
+    }
+
+    function obtenerTemaInicial() {
+        return leerTemaGuardado() || leerTemaDelDocumento() || TEMA_CLARO;
     }
 
     function actualizarToggle(tema) {
@@ -27,21 +40,41 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        toggle.checked = tema === "dark";
-        toggle.setAttribute("aria-checked", tema === "dark" ? "true" : "false");
+        var esOscuro = tema === TEMA_OSCURO;
+
+        toggle.checked = esOscuro;
+        toggle.defaultChecked = esOscuro;
+        toggle.setAttribute("aria-checked", esOscuro ? "true" : "false");
+        toggle.setAttribute("title", esOscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
     }
 
-    function aplicarTema(tema) {
-        raiz.setAttribute("data-theme", tema);
-        guardarTema(tema);
-        actualizarToggle(tema);
+    function aplicarTema(tema, guardar) {
+        var temaFinal = tema === TEMA_OSCURO ? TEMA_OSCURO : TEMA_CLARO;
+
+        raiz.setAttribute("data-theme", temaFinal);
+
+        if (guardar !== false) {
+            guardarTema(temaFinal);
+        }
+
+        actualizarToggle(temaFinal);
     }
 
     if (toggle) {
         toggle.addEventListener("change", function () {
-            aplicarTema(toggle.checked ? "dark" : "light");
+            aplicarTema(this.checked ? TEMA_OSCURO : TEMA_CLARO, true);
         });
     }
 
-    aplicarTema(leerTemaGuardado());
+    window.addEventListener("storage", function (event) {
+        if (event.key && event.key !== CLAVE_TEMA) {
+            return;
+        }
+
+        if (esTemaValido(event.newValue)) {
+            aplicarTema(event.newValue, false);
+        }
+    });
+
+    aplicarTema(obtenerTemaInicial(), false);
 });

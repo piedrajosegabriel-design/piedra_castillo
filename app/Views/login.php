@@ -25,61 +25,70 @@
 
         <div class="menu">
             <label class="switch">
-                <input id="input" type="checkbox" checked="darkTheme" />
-                <div class="slider round">
-                    <div class="sun-moon">
-                        <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                    </div>
-                    <div class="stars">
-                        <svg id="star-1" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-2" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-3" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-4" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                    </div>
+              <input id="input" type="checkbox" checked="darkTheme" />
+              <div class="slider round">
+                <div class="sun-moon">
+                  <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+
+                  <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
                 </div>
+                <div class="stars">
+                  <svg id="star-1" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-2" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-3" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-4" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
             </label>
             <a href="<?= site_url('registro') ?>" class="boton boton-secundario">Registro</a>
         </div>
@@ -92,7 +101,9 @@
                 <h1 class="titulo">Accede a tu panel de monitoreo.</h1>
                 <p class="texto">
                     El login permite entrar con usuario o correo y abrir el panel
-                    principal del sistema con una autenticacion segura.
+                    principal del sistema con una autenticacion segura. Si es tu
+                    primer ingreso, luego veras una pantalla interactiva para
+                    elegir el ambiente.
                 </p>
 
                 <ul class="lista-simple">
@@ -105,8 +116,8 @@
                         <span>El formulario es corto y muestra mensajes claros.</span>
                     </li>
                     <li>
-                        <strong>Acceso confiable</strong>
-                        <span>La validacion del ingreso prioriza claridad y proteccion.</span>
+                        <strong>Primer acceso guiado</strong>
+                        <span>Si aun no tienes ambiente, el sistema te lleva a una seleccion visual y animada.</span>
                     </li>
                 </ul>
             </div>
@@ -140,7 +151,7 @@
                         </div>
                     </div>
 
-                    <p class="nota">Las credenciales se validan en servidor y la sesion queda protegida.</p>
+                    <p class="nota">Las credenciales se validan en servidor y, si es tu primera vez, el siguiente paso sera elegir el ambiente.</p>
 
                     <button type="submit" class="boton boton-bloque" id="botonLogin">Entrar</button>
                     <a href="<?= site_url('registro') ?>" class="enlace-centro">No tengo cuenta todavia</a>

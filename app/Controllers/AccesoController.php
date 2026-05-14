@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use App\Services\DeviceProvisioningService;
 use App\Services\EnvironmentPresetService;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class AccesoController extends BaseController
 {
@@ -43,15 +44,33 @@ class AccesoController extends BaseController
             $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
         }
 
-        (new DeviceProvisioningService())->ensureUserSetup((int) $usuario['id']);
         $this->iniciarSesion($usuario);
+
+        $userId                = (int) $usuario['id'];
+        $provisioningService   = new DeviceProvisioningService();
+
+        if (! $provisioningService->hasConfiguredSpace($userId)) {
+            return redirect()->to('/panel/ambiente')
+                ->with('success', 'Inicio de sesion correcto. Ahora elige el ambiente que deseas monitorear.');
+        }
+
+        $provisioningService->ensureUserSetup($userId, [], false);
 
         return redirect()->to('/panel');
     }
 
     public function registro(): string
     {
-        return view('registro', [
+        return view('registro');
+    }
+
+    public function seleccionAmbiente(): string|RedirectResponse
+    {
+        if ((new DeviceProvisioningService())->hasConfiguredSpace($this->usuarioActual())) {
+            return redirect()->to('/panel');
+        }
+
+        return view('seleccion_ambiente', [
             'presets' => (new EnvironmentPresetService())->getPresets(),
         ]);
     }
@@ -66,33 +85,50 @@ class AccesoController extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        $errores = $this->validarAmbientePersonalizado($datos);
-
         $usuarios = new UserModel();
         if ($usuarios->existeCorreoOUsuario($datos['email'], $datos['usuario'])) {
-            $errores['unique'] = 'El correo o el nombre de usuario ya se encuentran registrados.';
+            return redirect()->to('/registro')
+                ->withInput()
+                ->with('errors', [
+                    'unique' => 'El correo o el nombre de usuario ya se encuentran registrados.',
+                ]);
         }
 
+        $usuarios->crearUsuario($datos);
+
+        return redirect()->to('/login')
+            ->with('success', 'Cuenta creada correctamente. Inicia sesion y elige tu ambiente.');
+    }
+
+    public function guardarAmbiente()
+    {
+        $userId              = $this->usuarioActual();
+        $provisioningService = new DeviceProvisioningService();
+
+        if ($provisioningService->hasConfiguredSpace($userId)) {
+            return redirect()->to('/panel');
+        }
+
+        $datos = $this->leerDatosAmbiente();
+
+        if (! $this->validateData($datos, $this->reglasAmbiente())) {
+            return redirect()->to('/panel/ambiente')
+                ->withInput()
+                ->with('errors', $this->validator->getErrors());
+        }
+
+        $errores = $this->validarAmbientePersonalizado($datos);
+
         if ($errores !== []) {
-            return redirect()->to('/registro')
+            return redirect()->to('/panel/ambiente')
                 ->withInput()
                 ->with('errors', $errores);
         }
 
-        $userId = $usuarios->crearUsuario($datos);
+        $provisioningService->ensureUserSetup($userId, $datos);
 
-        (new DeviceProvisioningService())->ensureUserSetup($userId, [
-            'environment_type' => $datos['environment_type'],
-            'custom_name'      => $datos['custom_name'],
-            'min_temperature'  => $datos['min_temperature'],
-            'max_temperature'  => $datos['max_temperature'],
-            'min_humidity'     => $datos['min_humidity'],
-            'max_humidity'     => $datos['max_humidity'],
-            'max_co2'          => $datos['max_co2'],
-        ]);
-
-        return redirect()->to('/login')
-            ->with('success', 'Cuenta creada correctamente. Ya puedes iniciar sesion.');
+        return redirect()->to('/panel')
+            ->with('success', 'Ambiente configurado correctamente.');
     }
 
     public function logout()
@@ -118,6 +154,12 @@ class AccesoController extends BaseController
             'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
             'password'         => 'required|min_length[8]|max_length[255]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
             'password_confirm' => 'required|matches[password]',
+        ];
+    }
+
+    private function reglasAmbiente(): array
+    {
+        return [
             'environment_type' => 'required|in_list[oficina,aula,hogar,dormitorio,personalizable]',
             'custom_name'      => 'permit_empty|max_length[120]',
             'min_temperature'  => 'permit_empty|decimal',
@@ -159,6 +201,12 @@ class AccesoController extends BaseController
             'usuario'          => trim((string) $this->request->getPost('usuario')),
             'password'         => (string) $this->request->getPost('password'),
             'password_confirm' => (string) $this->request->getPost('password_confirm'),
+        ];
+    }
+
+    private function leerDatosAmbiente(): array
+    {
+        $datos = [
             'environment_type' => (string) $this->request->getPost('environment_type'),
             'custom_name'      => trim((string) $this->request->getPost('custom_name')),
             'min_temperature'  => trim((string) $this->request->getPost('min_temperature')),
@@ -167,6 +215,17 @@ class AccesoController extends BaseController
             'max_humidity'     => trim((string) $this->request->getPost('max_humidity')),
             'max_co2'          => trim((string) $this->request->getPost('max_co2')),
         ];
+
+        if (($datos['environment_type'] ?? '') !== self::AMBIENTE_PERSONALIZADO) {
+            $datos['custom_name'] = '';
+            $datos['min_temperature'] = '';
+            $datos['max_temperature'] = '';
+            $datos['min_humidity'] = '';
+            $datos['max_humidity'] = '';
+            $datos['max_co2'] = '';
+        }
+
+        return $datos;
     }
 
     private function validarAmbientePersonalizado(array $datos): array
@@ -224,5 +283,10 @@ class AccesoController extends BaseController
             'user_name'    => $usuario['nombre'],
             'is_logged_in' => true,
         ]);
+    }
+
+    private function usuarioActual(): int
+    {
+        return (int) session()->get('user_id');
     }
 }

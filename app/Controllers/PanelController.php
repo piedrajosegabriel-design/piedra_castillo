@@ -7,6 +7,7 @@ use App\Services\CommandService;
 use App\Services\DeviceProvisioningService;
 use App\Services\PanelService;
 use App\Services\SimulationService;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class PanelController extends BaseController
 {
@@ -14,8 +15,12 @@ class PanelController extends BaseController
     private const ACTUADORES = ['fan', 'aromatizer', 'alert_led'];
     private const VALORES_ACTUADOR = ['on', 'off'];
 
-    public function index(): string
+    public function index(): string|RedirectResponse
     {
+        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+            return $redirect;
+        }
+
         return view('panel', [
             'panel' => $this->crearPanel(),
         ]);
@@ -23,6 +28,10 @@ class PanelController extends BaseController
 
     public function guardarMedicion()
     {
+        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+            return $redirect;
+        }
+
         $datos = $this->request->getPost();
 
         if (! $this->validateData($datos, [
@@ -47,6 +56,10 @@ class PanelController extends BaseController
 
     public function cambiarModo()
     {
+        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+            return $redirect;
+        }
+
         $modo = (string) $this->request->getPost('mode');
 
         if (! in_array($modo, self::MODOS, true)) {
@@ -71,6 +84,10 @@ class PanelController extends BaseController
 
     public function cambiarActuador()
     {
+        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+            return $redirect;
+        }
+
         $actuador = (string) $this->request->getPost('actuator');
         $valor    = (string) $this->request->getPost('value');
 
@@ -98,7 +115,7 @@ class PanelController extends BaseController
     private function crearPanel(): array
     {
         $userId = $this->usuarioActual();
-        (new DeviceProvisioningService())->ensureUserSetup($userId);
+        (new DeviceProvisioningService())->ensureUserSetup($userId, [], false);
 
         return (new PanelService())->obtenerDatos($userId);
     }
@@ -116,5 +133,15 @@ class PanelController extends BaseController
     private function usuarioActual(): int
     {
         return (int) session()->get('user_id');
+    }
+
+    private function redireccionarSiFaltaAmbiente(): ?RedirectResponse
+    {
+        if ((new DeviceProvisioningService())->hasConfiguredSpace($this->usuarioActual())) {
+            return null;
+        }
+
+        return redirect()->to('/panel/ambiente')
+            ->with('error', 'Primero elige el ambiente que deseas monitorear.');
     }
 }

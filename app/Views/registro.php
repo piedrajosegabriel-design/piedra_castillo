@@ -25,61 +25,70 @@
 
         <div class="menu">
             <label class="switch">
-                <input id="input" type="checkbox" checked="darkTheme" />
-                <div class="slider round">
-                    <div class="sun-moon">
-                        <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                        <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="50"></circle>
-                        </svg>
-                    </div>
-                    <div class="stars">
-                        <svg id="star-1" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-2" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-3" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                        <svg id="star-4" class="star" viewBox="0 0 20 20">
-                            <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
-                        </svg>
-                    </div>
+              <input id="input" type="checkbox" checked="darkTheme" />
+              <div class="slider round">
+                <div class="sun-moon">
+                  <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+
+                  <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
+                  <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="50"></circle>
+                  </svg>
                 </div>
+                <div class="stars">
+                  <svg id="star-1" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-2" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-3" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                  <svg id="star-4" class="star" viewBox="0 0 20 20">
+                    <path
+                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
             </label>
             <a href="<?= site_url('login') ?>" class="boton boton-secundario">Login</a>
         </div>
@@ -89,10 +98,11 @@
         <section class="seccion seccion-principal">
             <div class="bloque">
                 <p class="etiqueta">Registro</p>
-                <h1 class="titulo">Crea tu cuenta y prepara el ambiente inicial.</h1>
+                <h1 class="titulo">Crea tu cuenta y activa el acceso en segundos.</h1>
                 <p class="texto">
-                    El registro prepara la cuenta del usuario, el espacio inicial
-                    y la configuracion necesaria para comenzar a usar el sistema.
+                    El registro prepara tu cuenta, valida tus datos y deja listo
+                    el acceso. La eleccion del ambiente se realiza despues del
+                    primer ingreso en una experiencia visual mas guiada.
                 </p>
 
                 <ul class="lista-simple">
@@ -105,8 +115,8 @@
                         <span>Correo valido, confirmacion de contrasena y clave segura.</span>
                     </li>
                     <li>
-                        <strong>Configuracion inicial</strong>
-                        <span>Puedes usar un preset o dejar preparado un ambiente personalizado.</span>
+                        <strong>Eleccion guiada del ambiente</strong>
+                        <span>Despues de iniciar sesion eliges el espacio con una interfaz interactiva y animada.</span>
                     </li>
                 </ul>
             </div>
@@ -114,7 +124,7 @@
             <div class="bloque">
                 <p class="etiqueta">Alta de usuario</p>
                 <h2>Completa tus datos</h2>
-                <p class="texto">Elige un ambiente inicial y crea una contrasena segura.</p>
+                <p class="texto">Primero crea tu acceso. El ambiente lo eliges despues de entrar.</p>
 
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
@@ -152,53 +162,13 @@
                         <p class="nota">Usa letras, numeros, puntos, guiones o guion bajo.</p>
                     </div>
 
-                    <div class="campo">
-                        <label for="environment_type">Ambiente inicial</label>
-                        <select id="environment_type" name="environment_type" required>
-                            <option value="">Selecciona un ambiente</option>
-                            <?php foreach (($presets ?? []) as $key => $preset): ?>
-                                <option value="<?= esc($key) ?>" <?= old('environment_type') === $key ? 'selected' : '' ?>>
-                                    <?= esc($preset['label']) ?> - <?= esc($preset['description']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div id="bloquePersonalizado" class="bloque-suave oculto">
-                        <div class="campo">
-                            <label for="custom_name">Nombre del ambiente</label>
-                            <input type="text" id="custom_name" name="custom_name" value="<?= esc(old('custom_name')) ?>" placeholder="Ejemplo: Laboratorio de pruebas">
-                        </div>
-
-                        <div class="fila">
-                            <div class="campo">
-                                <label for="min_temperature">Temperatura minima (C)</label>
-                                <input type="number" step="0.1" id="min_temperature" name="min_temperature" value="<?= esc(old('min_temperature')) ?>">
-                            </div>
-
-                            <div class="campo">
-                                <label for="max_temperature">Temperatura maxima (C)</label>
-                                <input type="number" step="0.1" id="max_temperature" name="max_temperature" value="<?= esc(old('max_temperature')) ?>">
-                            </div>
-                        </div>
-
-                        <div class="fila">
-                            <div class="campo">
-                                <label for="min_humidity">Humedad minima (%)</label>
-                                <input type="number" step="0.1" id="min_humidity" name="min_humidity" value="<?= esc(old('min_humidity')) ?>">
-                            </div>
-
-                            <div class="campo">
-                                <label for="max_humidity">Humedad maxima (%)</label>
-                                <input type="number" step="0.1" id="max_humidity" name="max_humidity" value="<?= esc(old('max_humidity')) ?>">
-                            </div>
-                        </div>
-
-                        <div class="campo">
-                            <label for="max_co2">Limite de CO2 (ppm)</label>
-                            <input type="number" id="max_co2" name="max_co2" value="<?= esc(old('max_co2')) ?>">
-                            <p class="nota">Si dejas campos vacios, el sistema tomara los valores del preset.</p>
-                        </div>
+                    <div class="bloque-suave">
+                        <strong>El ambiente se configura despues del login</strong>
+                        <p class="texto">
+                            Al ingresar por primera vez veras una pantalla interactiva
+                            para elegir entre oficina, aula, hogar, dormitorio o un
+                            perfil personalizable.
+                        </p>
                     </div>
 
                     <div class="campo">

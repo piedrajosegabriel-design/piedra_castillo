@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Models\SpaceModel;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -14,7 +15,11 @@ class GuestFilter implements FilterInterface
             return null;
         }
 
-        return redirect()->to('/panel');
+        $spaceExists = (new SpaceModel())
+            ->where('user_id', (int) session()->get('user_id'))
+            ->countAllResults() > 0;
+
+        return redirect()->to($spaceExists ? '/panel' : '/panel/ambiente');
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

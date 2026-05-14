@@ -20,6 +20,8 @@ $routes->group('', ['filter' => 'guest'], static function ($routes) {
 $routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);
 
 $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('ambiente', 'AccesoController::seleccionAmbiente');
+    $routes->post('ambiente', 'AccesoController::guardarAmbiente');
     $routes->get('', 'PanelController::index');
     $routes->post('medicion', 'PanelController::guardarMedicion');
     $routes->post('modo', 'PanelController::cambiarModo');

@@ -26,11 +26,20 @@ class DeviceProvisioningService
         $this->simulationService = new SimulationService();
     }
 
-    public function ensureUserSetup(int $userId, array $spaceInput = []): array
+    public function hasConfiguredSpace(int $userId): bool
+    {
+        return $this->spaceModel->where('user_id', $userId)->countAllResults() > 0;
+    }
+
+    public function ensureUserSetup(int $userId, array $spaceInput = [], bool $createSpaceIfMissing = true): array
     {
         $space = $this->spaceModel->where('user_id', $userId)->first();
 
         if (! $space) {
+            if (! $createSpaceIfMissing) {
+                throw new \RuntimeException('El usuario aun no tiene un ambiente configurado.');
+            }
+
             $spaceId = (int) $this->spaceModel->insert(array_merge(
                 ['user_id' => $userId],
                 $this->presetService->buildSpaceData(
