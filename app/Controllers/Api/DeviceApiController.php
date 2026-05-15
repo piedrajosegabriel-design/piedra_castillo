@@ -11,76 +11,50 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class DeviceApiController extends BaseController
 {
+    // =========================================================================
+    // API DE MEDICIONES
+    // =========================================================================
     public function storeMeasurement(string $deviceUid)
     {
         try {
             [$device, $space] = $this->resolveAuthenticatedDevice($deviceUid);
         } catch (\InvalidArgumentException $exception) {
-            return $this->response
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
-                ->setJSON([
-                    'status'  => 'error',
-                    'message' => $exception->getMessage(),
-                ]);
+            return $this->responderNoAutorizado($exception->getMessage());
         }
 
-        $payload          = $this->getJsonPayload();
-
-        $errors = [];
-
-        foreach (['temperature', 'humidity', 'co2_ppm', 'air_quality_index'] as $field) {
-            if (! isset($payload[$field]) || $payload[$field] === '') {
-                $errors[$field] = 'El campo ' . $field . ' es obligatorio.';
-            }
-        }
-
-        if (isset($payload['air_quality_index']) && ((int) $payload['air_quality_index'] < 0 || (int) $payload['air_quality_index'] > 100)) {
-            $errors['air_quality_index'] = 'La calidad del aire debe estar entre 0 y 100.';
-        }
+        $payload = $this->getJsonPayload();
+        $errors  = $this->validarPayloadMedicion($payload);
 
         if ($errors !== []) {
-            return $this->response
-                ->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)
-                ->setJSON([
-                    'status'  => 'error',
-                    'message' => implode(' ', array_values($errors)),
-                    'errors'  => $errors,
-                ]);
+            return $this->responderErroresValidacion($errors);
         }
 
         $result = (new SimulationService())->createMeasurement($device, $space, 'api', $payload);
 
-        (new DeviceModel())->update($device['id'], [
-            'last_seen_at' => date('Y-m-d H:i:s'),
-        ]);
+        $this->actualizarActividadDispositivo((int) $device['id']);
 
         return $this->response->setJSON([
-            'status'     => 'success',
-            'message'    => 'Medicion recibida correctamente.',
-            'measurement'=> $result['measurement'],
-            'automation' => $result['automation'],
+            'status'      => 'success',
+            'message'     => 'Medicion recibida correctamente.',
+            'measurement' => $result['measurement'],
+            'automation'  => $result['automation'],
         ]);
     }
 
+    // =========================================================================
+    // API DE COMANDOS PENDIENTES
+    // =========================================================================
     public function pendingCommands(string $deviceUid)
     {
         try {
             [$device] = $this->resolveAuthenticatedDevice($deviceUid);
         } catch (\InvalidArgumentException $exception) {
-            return $this->response
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
-                ->setJSON([
-                    'status'  => 'error',
-                    'message' => $exception->getMessage(),
-                ]);
+            return $this->responderNoAutorizado($exception->getMessage());
         }
 
         $commands = (new CommandService())->getPendingCommands((int) $device['id']);
 
-        (new DeviceModel())->update($device['id'], [
-            'last_seen_at'         => date('Y-m-d H:i:s'),
-            'last_command_sync_at' => date('Y-m-d H:i:s'),
-        ]);
+        $this->actualizarActividadDispositivo((int) $device['id'], true);
 
         return $this->response->setJSON([
             'status'           => 'success',
@@ -89,34 +63,24 @@ class DeviceApiController extends BaseController
         ]);
     }
 
+    // =========================================================================
+    // API DE CONFIRMACION DE COMANDO
+    // =========================================================================
     public function markCommandExecuted(string $deviceUid, int $commandId)
     {
         try {
             [$device] = $this->resolveAuthenticatedDevice($deviceUid);
         } catch (\InvalidArgumentException $exception) {
-            return $this->response
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
-                ->setJSON([
-                    'status'  => 'error',
-                    'message' => $exception->getMessage(),
-                ]);
+            return $this->responderNoAutorizado($exception->getMessage());
         }
 
         $command = (new CommandService())->markCommandAsExecuted((int) $device['id'], $commandId, 'device-api');
 
         if (! $command) {
-            return $this->response
-                ->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)
-                ->setJSON([
-                    'status'  => 'error',
-                    'message' => 'No se encontro el comando solicitado para este dispositivo.',
-                ]);
+            return $this->responderNoEncontrado('No se encontro el comando solicitado para este dispositivo.');
         }
 
-        (new DeviceModel())->update($device['id'], [
-            'last_seen_at'         => date('Y-m-d H:i:s'),
-            'last_command_sync_at' => date('Y-m-d H:i:s'),
-        ]);
+        $this->actualizarActividadDispositivo((int) $device['id'], true);
 
         return $this->response->setJSON([
             'status'  => 'success',
@@ -125,6 +89,9 @@ class DeviceApiController extends BaseController
         ]);
     }
 
+    // =========================================================================
+    // AUTENTICACION DEL DISPOSITIVO
+    // =========================================================================
     private function resolveAuthenticatedDevice(string $deviceUid): array
     {
         $deviceModel = new DeviceModel();
@@ -149,6 +116,9 @@ class DeviceApiController extends BaseController
         return [$device, $space];
     }
 
+    // =========================================================================
+    // LECTURA Y VALIDACION DE PAYLOAD
+    // =========================================================================
     private function getJsonPayload(): array
     {
         $json = $this->request->getJSON(true);
@@ -160,6 +130,79 @@ class DeviceApiController extends BaseController
         return $this->request->getPost();
     }
 
+    private function validarPayloadMedicion(array $payload): array
+    {
+        $errors = [];
+
+        foreach (['temperature', 'humidity', 'co2_ppm', 'air_quality_index'] as $field) {
+            if (! isset($payload[$field]) || $payload[$field] === '') {
+                $errors[$field] = 'El campo ' . $field . ' es obligatorio.';
+            }
+        }
+
+        if (
+            isset($payload['air_quality_index'])
+            && ((int) $payload['air_quality_index'] < 0 || (int) $payload['air_quality_index'] > 100)
+        ) {
+            $errors['air_quality_index'] = 'La calidad del aire debe estar entre 0 y 100.';
+        }
+
+        return $errors;
+    }
+
+    // =========================================================================
+    // ACTIVIDAD DEL DISPOSITIVO
+    // =========================================================================
+    private function actualizarActividadDispositivo(int $deviceId, bool $sincronizoComandos = false): void
+    {
+        $data = [
+            'last_seen_at' => date('Y-m-d H:i:s'),
+        ];
+
+        if ($sincronizoComandos) {
+            $data['last_command_sync_at'] = date('Y-m-d H:i:s');
+        }
+
+        (new DeviceModel())->update($deviceId, $data);
+    }
+
+    // =========================================================================
+    // RESPUESTAS JSON
+    // =========================================================================
+    private function responderNoAutorizado(string $mensaje)
+    {
+        return $this->response
+            ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
+            ->setJSON([
+                'status'  => 'error',
+                'message' => $mensaje,
+            ]);
+    }
+
+    private function responderErroresValidacion(array $errors)
+    {
+        return $this->response
+            ->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)
+            ->setJSON([
+                'status'  => 'error',
+                'message' => implode(' ', array_values($errors)),
+                'errors'  => $errors,
+            ]);
+    }
+
+    private function responderNoEncontrado(string $mensaje)
+    {
+        return $this->response
+            ->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)
+            ->setJSON([
+                'status'  => 'error',
+                'message' => $mensaje,
+            ]);
+    }
+
+    // =========================================================================
+    // FORMATEO DE COMANDOS
+    // =========================================================================
     private function formatCommand(array $command): array
     {
         $payload = json_decode((string) ($command['payload'] ?? ''), true);

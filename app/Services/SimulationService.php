@@ -32,7 +32,7 @@ class SimulationService
                 'co2_ppm'            => $payload['co2_ppm'],
                 'air_quality_index'  => $payload['air_quality_index'],
                 'air_quality_label'  => $payload['air_quality_label'],
-                'notes'              => 'Medicion precargada para la simulacion inicial.',
+                'notes'              => 'Medición precargada para la simulación inicial.',
                 'captured_at'        => $payload['captured_at'],
             ]);
         }

@@ -76,12 +76,12 @@ class PanelService
                 'nombre'          => $dispositivo['name'],
                 'uid'             => $dispositivo['device_uid'],
                 'token'           => $dispositivo['api_token'],
-                'ultimo_envio'    => $this->fechaHumana($dispositivo['last_seen_at'] ?? null, 'Sin envios todavia'),
-                'ultima_consulta' => $this->fechaHumana($dispositivo['last_command_sync_at'] ?? null, 'Sin consultas todavia'),
+                'ultimo_envio'    => $this->fechaHumana($dispositivo['last_seen_at'] ?? null, 'Sin envíos todavía'),
+                'ultima_consulta' => $this->fechaHumana($dispositivo['last_command_sync_at'] ?? null, 'Sin consultas todavía'),
             ],
             'state' => [
                 'modo'       => $estado['operating_mode'] ?? 'automatic',
-                'modo_label' => ($estado['operating_mode'] ?? 'automatic') === 'manual' ? 'Manual' : 'Automatico',
+                'modo_label' => ($estado['operating_mode'] ?? 'automatic') === 'manual' ? 'Manual' : 'Automático',
                 'detalle'    => $estado['last_reason'] ?? 'Sin cambios recientes.',
             ],
             'resumen' => [
@@ -125,7 +125,7 @@ class PanelService
         return [
             [
                 'titulo' => 'Temperatura',
-                'detalle' => 'Ultimas lecturas registradas.',
+                'detalle' => 'Últimas lecturas registradas.',
                 'actual' => number_format(end($temperaturas), 1) . ' C',
                 'tono' => $this->tonoTemperatura((float) end($temperaturas), $espacio),
                 'rango' => sprintf('Rango ideal: %.1f a %.1f C', (float) $espacio['min_temperature'], (float) $espacio['max_temperature']),
@@ -139,7 +139,7 @@ class PanelService
             ],
             [
                 'titulo' => 'Humedad',
-                'detalle' => 'Comparacion simple del ambiente.',
+                'detalle' => 'Comparación simple del ambiente.',
                 'actual' => number_format(end($humedades), 1) . ' %',
                 'tono' => $this->tonoHumedad((float) end($humedades), $espacio),
                 'rango' => sprintf('Rango ideal: %.0f a %.0f %%', (float) $espacio['min_humidity'], (float) $espacio['max_humidity']),
@@ -153,10 +153,10 @@ class PanelService
             ],
             [
                 'titulo' => 'CO2',
-                'detalle' => 'Nivel de concentracion en el espacio.',
+                'detalle' => 'Nivel de concentración en el espacio.',
                 'actual' => (int) end($co2) . ' ppm',
                 'tono' => $this->tonoCo2((int) end($co2), $espacio),
-                'rango' => 'Limite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
+                'rango' => 'Límite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
                 'puntos' => $this->crearPuntosGrafico(
                     $puntos,
                     'co2_ppm',
@@ -167,7 +167,7 @@ class PanelService
             ],
             [
                 'titulo' => 'Calidad del aire',
-                'detalle' => 'Mientras mas alto, mejor estado.',
+                'detalle' => 'Mientras más alto, mejor estado.',
                 'actual' => (int) end($aire) . '/100',
                 'tono' => $this->tonoAire((int) end($aire)),
                 'rango' => 'Escala simple: de 0 a 100',
@@ -223,7 +223,7 @@ class PanelService
                 'tono'   => $co2 > ((int) $espacio['max_co2'] + 250)
                     ? 'danger'
                     : ($co2 > (int) $espacio['max_co2'] ? 'warning' : 'success'),
-                'detalle' => 'Limite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
+                'detalle' => 'Límite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
             ],
             [
                 'titulo' => 'Calidad del aire',
@@ -242,9 +242,9 @@ class PanelService
         }
 
         return [
-            $this->crearActuador('fan', 'Ventilador', $estado['fan_state'] ?? 'off', 'Renueva el aire cuando sube la temperatura o el CO2.'),
+            $this->crearActuador('fan', 'Aire acondicionado', $estado['fan_state'] ?? 'off', 'Refresca el ambiente cuando sube la temperatura o el CO2.'),
             $this->crearActuador('aromatizer', 'Aromatizador', $estado['aromatizer_state'] ?? 'off', 'Apoya cuando la calidad del aire baja.'),
-            $this->crearActuador('alert_led', 'Luz de alerta', $estado['alert_led_state'] ?? 'off', 'Marca visualmente una condicion fuera de rango.'),
+            $this->crearActuador('alert_led', 'Luz de alerta', $estado['alert_led_state'] ?? 'off', 'Marca visualmente una condición fuera de rango.'),
         ];
     }
 
@@ -283,8 +283,8 @@ class PanelService
         if (! $medicion) {
             return [[
                 'tono'   => 'info',
-                'titulo' => 'Sin mediciones aun',
-                'texto'  => 'Registra una medicion para empezar a ver el estado del ambiente.',
+                'titulo' => 'Sin mediciones aún',
+                'texto'  => 'Registra una medición para empezar a ver el estado del ambiente.',
             ]];
         }
 
@@ -294,7 +294,7 @@ class PanelService
             $alertas[] = [
                 'tono'   => 'danger',
                 'titulo' => 'Temperatura alta',
-                'texto'  => 'Conviene favorecer ventilacion o refresco.',
+                'texto'  => 'Conviene favorecer el aire acondicionado o el refresco del ambiente.',
             ];
         }
 
@@ -302,7 +302,7 @@ class PanelService
             $alertas[] = [
                 'tono'   => 'warning',
                 'titulo' => 'Humedad alta',
-                'texto'  => 'El ambiente esta por encima del rango recomendado.',
+                'texto'  => 'El ambiente está por encima del rango recomendado.',
             ];
         }
 
@@ -310,7 +310,7 @@ class PanelService
             $alertas[] = [
                 'tono'   => 'warning',
                 'titulo' => 'CO2 elevado',
-                'texto'  => 'La ventilacion puede ser necesaria para recuperar el rango ideal.',
+                'texto'  => 'El aire acondicionado puede ser necesario para recuperar el rango ideal.',
             ];
         }
 
@@ -326,7 +326,7 @@ class PanelService
             $alertas[] = [
                 'tono'   => 'success',
                 'titulo' => 'Estado estable',
-                'texto'  => 'Las ultimas mediciones se mantienen dentro del rango esperado.',
+                'texto'  => 'Las últimas mediciones se mantienen dentro del rango esperado.',
             ];
         }
 

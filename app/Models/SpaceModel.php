@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class SpaceModel extends Model
 {
+    // Configuracion base del modelo y tabla de ambientes configurados por usuario.
     protected $table            = 'spaces';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';

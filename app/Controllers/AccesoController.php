@@ -9,8 +9,14 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class AccesoController extends BaseController
 {
+    // =========================================================================
+    // CONSTANTE DE AMBIENTE
+    // =========================================================================
     private const AMBIENTE_PERSONALIZADO = 'personalizable';
 
+    // =========================================================================
+    // VISTAS PUBLICAS
+    // =========================================================================
     public function inicio(): string
     {
         return view('inicio');
@@ -21,49 +27,38 @@ class AccesoController extends BaseController
         return view('login');
     }
 
-    public function validarLogin()
-    {
-        $datos = $this->leerDatosLogin();
-
-        if (! $this->validateData($datos, $this->reglasLogin())) {
-            return redirect()->to('/login')
-                ->withInput()
-                ->with('error', 'Completa tu usuario o correo y la contrasena.');
-        }
-
-        $usuarios = new UserModel();
-        $usuario  = $usuarios->buscarParaLogin($datos['usuario']);
-
-        if (! $usuario || ! password_verify($datos['password'], $usuario['password_hash'])) {
-            return redirect()->to('/login')
-                ->withInput()
-                ->with('error', 'Las credenciales ingresadas no son validas.');
-        }
-
-        if (password_needs_rehash($usuario['password_hash'], PASSWORD_DEFAULT)) {
-            $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
-        }
-
-        $this->iniciarSesion($usuario);
-
-        $userId                = (int) $usuario['id'];
-        $provisioningService   = new DeviceProvisioningService();
-
-        if (! $provisioningService->hasConfiguredSpace($userId)) {
-            return redirect()->to('/panel/ambiente')
-                ->with('success', 'Inicio de sesion correcto. Ahora elige el ambiente que deseas monitorear.');
-        }
-
-        $provisioningService->ensureUserSetup($userId, [], false);
-
-        return redirect()->to('/panel');
-    }
-
     public function registro(): string
     {
         return view('registro');
     }
 
+    // =========================================================================
+    // LOGIN
+    // =========================================================================
+    public function validarLogin()
+    {
+        $datos = $this->leerDatosLogin();
+
+        if ($redirect = $this->validarFormularioLogin($datos)) {
+            return $redirect;
+        }
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->buscarParaLogin($datos['usuario']);
+
+        if ($redirect = $this->validarCredencialesLogin($usuario, $datos['password'])) {
+            return $redirect;
+        }
+
+        $this->actualizarHashLoginSiHaceFalta($usuarios, $usuario, $datos['password']);
+        $this->iniciarSesion($usuario);
+
+        return $this->redirigirDespuesDelLogin((int) $usuario['id']);
+    }
+
+    // =========================================================================
+    // SELECCION DE AMBIENTE
+    // =========================================================================
     public function seleccionAmbiente(): string|RedirectResponse
     {
         if ((new DeviceProvisioningService())->hasConfiguredSpace($this->usuarioActual())) {
@@ -75,34 +70,35 @@ class AccesoController extends BaseController
         ]);
     }
 
+    // =========================================================================
+    // REGISTRO
+    // =========================================================================
     public function guardarRegistro()
     {
         $datos = $this->leerDatosRegistro();
 
-        if (! $this->validateData($datos, $this->reglasRegistro(), $this->mensajesRegistro())) {
-            return redirect()->to('/registro')
-                ->withInput()
-                ->with('errors', $this->validator->getErrors());
+        if ($redirect = $this->validarFormularioRegistro($datos)) {
+            return $redirect;
         }
 
         $usuarios = new UserModel();
-        if ($usuarios->existeCorreoOUsuario($datos['email'], $datos['usuario'])) {
-            return redirect()->to('/registro')
-                ->withInput()
-                ->with('errors', [
-                    'unique' => 'El correo o el nombre de usuario ya se encuentran registrados.',
-                ]);
+
+        if ($redirect = $this->validarUsuarioDisponible($usuarios, $datos)) {
+            return $redirect;
         }
 
         $usuarios->crearUsuario($datos);
 
         return redirect()->to('/login')
-            ->with('success', 'Cuenta creada correctamente. Inicia sesion y elige tu ambiente.');
+            ->with('success', 'Cuenta creada correctamente. Inicia sesión y elige tu ambiente.');
     }
 
+    // =========================================================================
+    // GUARDAR AMBIENTE
+    // =========================================================================
     public function guardarAmbiente()
     {
-        $userId              = $this->usuarioActual();
+        $userId = $this->usuarioActual();
         $provisioningService = new DeviceProvisioningService();
 
         if ($provisioningService->hasConfiguredSpace($userId)) {
@@ -111,18 +107,8 @@ class AccesoController extends BaseController
 
         $datos = $this->leerDatosAmbiente();
 
-        if (! $this->validateData($datos, $this->reglasAmbiente())) {
-            return redirect()->to('/panel/ambiente')
-                ->withInput()
-                ->with('errors', $this->validator->getErrors());
-        }
-
-        $errores = $this->validarAmbientePersonalizado($datos);
-
-        if ($errores !== []) {
-            return redirect()->to('/panel/ambiente')
-                ->withInput()
-                ->with('errors', $errores);
+        if ($redirect = $this->validarFormularioAmbiente($datos)) {
+            return $redirect;
         }
 
         $provisioningService->ensureUserSetup($userId, $datos);
@@ -131,13 +117,19 @@ class AccesoController extends BaseController
             ->with('success', 'Ambiente configurado correctamente.');
     }
 
+    // =========================================================================
+    // LOGOUT
+    // =========================================================================
     public function logout()
     {
         session()->destroy();
 
-        return redirect()->to('/login')->with('success', 'Sesion cerrada correctamente.');
+        return redirect()->to('/login')->with('success', 'Sesión cerrada correctamente.');
     }
 
+    // =========================================================================
+    // REGLAS DE VALIDACION
+    // =========================================================================
     private function reglasLogin(): array
     {
         return [
@@ -170,21 +162,120 @@ class AccesoController extends BaseController
         ];
     }
 
+    // =========================================================================
+    // MENSAJES DE VALIDACION
+    // =========================================================================
     private function mensajesRegistro(): array
     {
         return [
             'usuario' => [
-                'regex_match' => 'El usuario solo puede contener letras, numeros, puntos, guiones y guion bajo.',
+                'regex_match' => 'El usuario solo puede contener letras, números, puntos, guiones y guion bajo.',
             ],
             'password' => [
-                'regex_match' => 'La contrasena debe incluir al menos una letra mayuscula, una minuscula y un numero.',
+                'regex_match' => 'La contraseña debe incluir al menos una letra mayúscula, una minúscula y un número.',
             ],
             'password_confirm' => [
-                'matches' => 'La confirmacion de contrasena no coincide.',
+                'matches' => 'La confirmación de contraseña no coincide.',
             ],
         ];
     }
 
+    // =========================================================================
+    // HELPERS DE LOGIN Y REGISTRO
+    // =========================================================================
+    private function validarFormularioLogin(array $datos): ?RedirectResponse
+    {
+        if ($this->validateData($datos, $this->reglasLogin())) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/login', 'error', 'Completa tu usuario o correo y la contraseña.');
+    }
+
+    private function validarCredencialesLogin(?array $usuario, string $password): ?RedirectResponse
+    {
+        if ($usuario && password_verify($password, $usuario['password_hash'])) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/login', 'error', 'Las credenciales ingresadas no son válidas.');
+    }
+
+    private function actualizarHashLoginSiHaceFalta(UserModel $usuarios, array $usuario, string $password): void
+    {
+        if (! password_needs_rehash($usuario['password_hash'], PASSWORD_DEFAULT)) {
+            return;
+        }
+
+        $usuarios->actualizarHashContrasena((int) $usuario['id'], $password);
+    }
+
+    private function redirigirDespuesDelLogin(int $userId): RedirectResponse
+    {
+        $provisioningService = new DeviceProvisioningService();
+
+        if (! $provisioningService->hasConfiguredSpace($userId)) {
+            return $this->redirigirConDato('/panel/ambiente', 'success', 'Inicio de sesión correcto. Ahora elige el ambiente que deseas monitorear.');
+        }
+
+        $provisioningService->ensureUserSetup($userId, [], false);
+
+        return redirect()->to('/panel');
+    }
+
+    private function validarFormularioRegistro(array $datos): ?RedirectResponse
+    {
+        if ($this->validateData($datos, $this->reglasRegistro(), $this->mensajesRegistro())) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/registro', 'errors', $this->validator->getErrors());
+    }
+
+    private function validarUsuarioDisponible(UserModel $usuarios, array $datos): ?RedirectResponse
+    {
+        if (! $usuarios->existeCorreoOUsuario($datos['email'], $datos['usuario'])) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/registro', 'errors', [
+            'unique' => 'El correo o el nombre de usuario ya se encuentran registrados.',
+        ]);
+    }
+
+    private function validarFormularioAmbiente(array $datos): ?RedirectResponse
+    {
+        if (! $this->validateData($datos, $this->reglasAmbiente())) {
+            return $this->redirigirConInputYDato('/panel/ambiente', 'errors', $this->validator->getErrors());
+        }
+
+        $errores = $this->validarAmbientePersonalizado($datos);
+
+        if ($errores === []) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/ambiente', 'errors', $errores);
+    }
+
+    // =========================================================================
+    // HELPERS DE REDIRECCION
+    // =========================================================================
+    private function redirigirConInputYDato(string $ruta, string $clave, $valor): RedirectResponse
+    {
+        return redirect()->to($ruta)
+            ->withInput()
+            ->with($clave, $valor);
+    }
+
+    private function redirigirConDato(string $ruta, string $clave, $valor): RedirectResponse
+    {
+        return redirect()->to($ruta)->with($clave, $valor);
+    }
+
+    // =========================================================================
+    // LECTURA DE FORMULARIOS
+    // =========================================================================
     private function leerDatosLogin(): array
     {
         return [
@@ -228,6 +319,9 @@ class AccesoController extends BaseController
         return $datos;
     }
 
+    // =========================================================================
+    // VALIDACION EXTRA DE AMBIENTE
+    // =========================================================================
     private function validarAmbientePersonalizado(array $datos): array
     {
         if (($datos['environment_type'] ?? '') !== self::AMBIENTE_PERSONALIZADO) {
@@ -244,7 +338,7 @@ class AccesoController extends BaseController
         $this->validarRangoOpcional($datos, 'min_humidity', 'max_humidity', 'humidity_range', 'humedad', $errores);
 
         if ($datos['max_co2'] !== '' && (int) $datos['max_co2'] <= 0) {
-            $errores['max_co2'] = 'El limite de CO2 debe ser mayor que cero.';
+            $errores['max_co2'] = 'El límite de CO2 debe ser mayor que cero.';
         }
 
         return $errores;
@@ -266,15 +360,18 @@ class AccesoController extends BaseController
         }
 
         if ($minimo === '' || $maximo === '') {
-            $errores[$errorKey] = 'Completa el rango de ' . $label . ' o deja ambos valores vacios.';
+            $errores[$errorKey] = 'Completa el rango de ' . $label . ' o deja ambos valores vacíos.';
             return;
         }
 
         if ((float) $minimo >= (float) $maximo) {
-            $errores[$errorKey] = 'El valor minimo de ' . $label . ' debe ser menor que el maximo.';
+            $errores[$errorKey] = 'El valor mínimo de ' . $label . ' debe ser menor que el máximo.';
         }
     }
 
+    // =========================================================================
+    // SESION
+    // =========================================================================
     private function iniciarSesion(array $usuario): void
     {
         session()->regenerate(true);

@@ -40,7 +40,7 @@ class CommandService
             'source'             => $source,
             'command_type'       => 'mode',
             'target_value'       => $mode,
-            'payload'            => json_encode(['reason' => 'Cambio de modo desde la aplicacion'], JSON_UNESCAPED_UNICODE),
+            'payload'            => json_encode(['reason' => 'Cambio de modo desde la aplicación'], JSON_UNESCAPED_UNICODE),
             'status'             => 'executed',
             'executed_at'        => date('Y-m-d H:i:s'),
         ]);
@@ -49,7 +49,7 @@ class CommandService
             'operating_mode' => $mode,
             'updated_by'     => $source,
             'last_reason'    => $mode === 'automatic'
-                ? 'Modo automatico activo.'
+                ? 'Modo automático activo.'
                 : 'Modo manual activo.',
         ]);
 

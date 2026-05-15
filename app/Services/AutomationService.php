@@ -48,7 +48,7 @@ class AutomationService
 
         $fanTarget = ($temp > $maxTemp || $humidity > $maxHum || $co2 > $maxCo2) ? 'on' : 'off';
         if ($fanTarget === 'on') {
-            $reasons[] = 'Ventilacion sugerida.';
+            $reasons[] = 'Aire acondicionado sugerido.';
         }
 
         $aromatizerTarget = $airScore < 60 ? 'on' : 'off';
@@ -78,7 +78,7 @@ class AutomationService
                 (int) $device['id'],
                 $commandType,
                 $targetValue,
-                implode(' ', $reasons) !== '' ? implode(' ', $reasons) : 'Ajuste automatico.'
+                implode(' ', $reasons) !== '' ? implode(' ', $reasons) : 'Ajuste automático.'
             );
 
             if ($command) {

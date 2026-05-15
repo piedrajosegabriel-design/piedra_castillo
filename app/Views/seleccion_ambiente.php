@@ -27,13 +27,13 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
             <span class="marca-icono">EA</span>
             <span class="marca-texto">
                 <strong>EdenAir</strong>
-                <small>Configuracion inicial</small>
+                <small>Configuración inicial</small>
             </span>
         </a>
 
         <div class="menu">
             <label class="switch">
-              <input id="input" type="checkbox" checked="darkTheme" />
+              <input id="input" type="checkbox" aria-label="Cambiar tema" />
               <div class="slider round">
                 <div class="sun-moon">
                   <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
@@ -98,7 +98,7 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
                 </div>
               </div>
             </label>
-            <a href="<?= site_url('logout') ?>" class="boton boton-secundario">Cerrar sesion</a>
+            <a href="<?= site_url('logout') ?>" class="boton boton-secundario">Cerrar sesión</a>
         </div>
     </header>
 
@@ -106,11 +106,11 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
         <section class="seccion seccion-ambiente">
             <div class="bloque bloque-ambiente-simple" id="panelAmbiente" data-preset="<?= esc($presetSeleccionado) ?>">
                 <div class="cabecera-ambiente-simple">
-                    <p class="etiqueta">Configuracion inicial</p>
+                    <p class="etiqueta">Configuración inicial</p>
                     <h1 class="titulo">Elige el tipo de ambiente.</h1>
                     <p class="texto">
-                        Selecciona una opcion y continua. Si eliges
-                        <strong>personalizable</strong>, podras ajustar tus propios limites.
+                        Selecciona una opción y continúa. Si eliges
+                        <strong>personalizable</strong>, podrás ajustar tus propios límites.
                     </p>
                 </div>
 
@@ -170,7 +170,7 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
                     <div class="resumen-ambiente" id="resumenAmbiente">
                         <div class="resumen-ambiente-cabecera">
                             <div>
-                                <p class="etiqueta">Seleccion actual</p>
+                                <p class="etiqueta">Selección actual</p>
                                 <h2 id="previewNombre">Hogar</h2>
                             </div>
                             <span class="estado estado-info" id="previewEstado">Preset listo</span>
@@ -190,7 +190,7 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
                             </div>
 
                             <div class="dato-ambiente">
-                                <small>CO2 limite</small>
+                                <small>CO2 límite</small>
                                 <strong id="previewCo2">1000 ppm</strong>
                             </div>
                         </div>
@@ -204,37 +204,37 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
 
                         <div class="fila">
                             <div class="campo">
-                                <label for="min_temperature">Temperatura minima (C)</label>
+                                <label for="min_temperature">Temperatura mínima (C)</label>
                                 <input type="number" step="0.1" id="min_temperature" name="min_temperature" value="<?= esc(old('min_temperature')) ?>">
                             </div>
 
                             <div class="campo">
-                                <label for="max_temperature">Temperatura maxima (C)</label>
+                                <label for="max_temperature">Temperatura máxima (C)</label>
                                 <input type="number" step="0.1" id="max_temperature" name="max_temperature" value="<?= esc(old('max_temperature')) ?>">
                             </div>
                         </div>
 
                         <div class="fila">
                             <div class="campo">
-                                <label for="min_humidity">Humedad minima (%)</label>
+                                <label for="min_humidity">Humedad mínima (%)</label>
                                 <input type="number" step="0.1" id="min_humidity" name="min_humidity" value="<?= esc(old('min_humidity')) ?>">
                             </div>
 
                             <div class="campo">
-                                <label for="max_humidity">Humedad maxima (%)</label>
+                                <label for="max_humidity">Humedad máxima (%)</label>
                                 <input type="number" step="0.1" id="max_humidity" name="max_humidity" value="<?= esc(old('max_humidity')) ?>">
                             </div>
                         </div>
 
                         <div class="campo">
-                            <label for="max_co2">Limite de CO2 (ppm)</label>
+                            <label for="max_co2">Límite de CO2 (ppm)</label>
                             <input type="number" id="max_co2" name="max_co2" value="<?= esc(old('max_co2')) ?>">
-                            <p class="nota">Si dejas campos vacios, se usaran los valores base del preset personalizable.</p>
+                            <p class="nota">Si dejas campos vacíos, se usarán los valores base del preset personalizable.</p>
                         </div>
                     </div>
 
                     <div class="acciones-ambiente">
-                        <p class="nota">Al continuar se crea el espacio, se prepara la simulacion inicial y se habilita el panel.</p>
+                        <p class="nota">Al continuar se crea el espacio, se prepara la simulación inicial y se habilita el panel.</p>
                         <button type="submit" class="boton boton-bloque" id="botonAmbiente">Continuar al panel</button>
                     </div>
                 </form>

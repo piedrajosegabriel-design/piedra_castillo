@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseController extends Controller
 {
+    // Helpers base disponibles para todos los controladores del proyecto.
     // Esta clase base existe para compartir helpers, servicios o propiedades
     // entre todos los controladores reales del proyecto.
     /**
@@ -29,6 +30,7 @@ abstract class BaseController extends Controller
 
     protected $helpers = ['form', 'url'];
 
+    // Punto de inicializacion comun para cualquier controlador que herede de esta clase.
     /**
      * @return void
      */

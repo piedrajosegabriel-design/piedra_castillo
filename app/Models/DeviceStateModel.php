@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class DeviceStateModel extends Model
 {
+    // Configuracion base del modelo y tabla del estado actual del dispositivo.
     protected $table            = 'device_states';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';

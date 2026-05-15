@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class DeviceCommandModel extends Model
 {
+    // Configuracion base del modelo y tabla de comandos enviados al dispositivo.
     protected $table            = 'device_commands';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';

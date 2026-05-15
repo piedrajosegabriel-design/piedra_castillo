@@ -26,7 +26,7 @@
 
         <div class="menu">
             <label class="switch">
-              <input id="input" type="checkbox" checked="darkTheme" />
+              <input id="input" type="checkbox" aria-label="Cambiar tema" />
               <div class="slider round">
                 <div class="sun-moon">
                   <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
@@ -94,7 +94,7 @@
 
             <?php if ($conSesion): ?>
                 <a href="<?= site_url('panel') ?>" class="boton boton-secundario">Ir al panel</a>
-                <a href="<?= site_url('logout') ?>" class="boton">Cerrar sesion</a>
+                <a href="<?= site_url('logout') ?>" class="boton">Cerrar sesión</a>
             <?php else: ?>
                 <a href="<?= site_url('login') ?>" class="boton boton-secundario">Login</a>
                 <a href="<?= site_url('registro') ?>" class="boton">Registro</a>
@@ -109,7 +109,7 @@
                 <h1 class="titulo">Monitorea cada espacio con una vista clara y ordenada.</h1>
                 <p class="texto">
                     EdenAir presenta el servicio, centraliza el acceso de usuarios
-                    y ofrece un panel comodo para seguir el estado del ambiente.
+                    y ofrece un panel cómodo para seguir el estado del ambiente.
                 </p>
 
                 <div class="acciones">
@@ -126,7 +126,7 @@
                 <p class="etiqueta">Lo principal</p>
                 <ul class="lista-simple">
                     <li>
-                        <strong>Informacion del servicio</strong>
+                        <strong>Información del servicio</strong>
                         <span>Describe el monitoreo ambiental desde el primer ingreso.</span>
                     </li>
                     <li>
@@ -135,7 +135,7 @@
                     </li>
                     <li>
                         <strong>Panel organizado</strong>
-                        <span>La informacion queda distribuida de forma comoda y facil de recorrer.</span>
+                        <span>La información queda distribuida de forma cómoda y fácil de recorrer.</span>
                     </li>
                 </ul>
             </div>
@@ -147,7 +147,7 @@
                 <h2>Monitoreo del espacio</h2>
                 <p class="texto">
                     El sistema organiza temperatura, humedad, CO2 y calidad del aire
-                    en un panel pensado para una lectura rapida.
+                    en un panel pensado para una lectura rápida.
                 </p>
             </article>
 
@@ -155,14 +155,14 @@
                 <p class="etiqueta">Acceso</p>
                 <h2>Usuarios registrados</h2>
                 <p class="texto">
-                    Cada usuario crea su cuenta, inicia sesion y administra su propio
+                    Cada usuario crea su cuenta, inicia sesión y administra su propio
                     ambiente desde el panel principal.
                 </p>
             </article>
 
             <article class="tarjeta">
                 <p class="etiqueta">Interfaz</p>
-                <h2>Simple y comoda</h2>
+                <h2>Simple y cómoda</h2>
                 <p class="texto">
                     La interfaz combina color, orden y contraste para verse completa
                     sin cargar demasiado la pagina.
@@ -174,10 +174,10 @@
             <article class="tarjeta">
                 <p class="etiqueta">Incluye</p>
                 <ul class="lista-puntos">
-                    <li>Vista principal con informacion del sistema.</li>
+                    <li>Vista principal con información del sistema.</li>
                     <li>Login para usuarios registrados.</li>
-                    <li>Registro con validaciones basicas y contrasena segura.</li>
-                    <li>Panel con resumen, alertas, historial y explicacion de API.</li>
+                    <li>Registro con validaciones básicas y contraseña segura.</li>
+                    <li>Panel con resumen, alertas, historial y explicación de API.</li>
                 </ul>
             </article>
 

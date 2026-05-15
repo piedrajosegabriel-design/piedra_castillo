@@ -9,7 +9,7 @@
 -- 5. API del dispositivo o simulador
 --
 -- Seguridad:
--- La contrasena NO se guarda en texto plano.
+-- La contraseña NO se guarda en texto plano.
 -- En la tabla users se guarda password_hash.
 -- La aplicacion usa password_hash() y password_verify().
 

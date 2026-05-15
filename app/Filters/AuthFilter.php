@@ -21,11 +21,11 @@ class AuthFilter implements FilterInterface
                 ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
                 ->setJSON([
                     'status'  => 'error',
-                    'message' => 'Debes iniciar sesion para continuar.',
+                    'message' => 'Debes iniciar sesión para continuar.',
                 ]);
         }
 
-        return redirect()->to('/login')->with('error', 'Primero debes iniciar sesion.');
+        return redirect()->to('/login')->with('error', 'Primero debes iniciar sesión.');
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

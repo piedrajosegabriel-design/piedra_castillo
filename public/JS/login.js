@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var isHidden = passwordInput.type === "password";
             passwordInput.type = isHidden ? "text" : "password";
             toggleButton.textContent = isHidden ? "Ocultar" : "Mostrar";
-            toggleButton.setAttribute("aria-label", isHidden ? "Ocultar contrasena" : "Mostrar contrasena");
+    toggleButton.setAttribute("aria-label", isHidden ? "Ocultar contraseña" : "Mostrar contraseña");
         });
     }
 

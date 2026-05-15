@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class DeviceModel extends Model
 {
+    // Configuracion base del modelo y tabla de dispositivos asociados al usuario.
     protected $table            = 'devices';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';

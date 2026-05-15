@@ -25,7 +25,7 @@
 
         <div class="menu">
             <label class="switch">
-              <input id="input" type="checkbox" checked="darkTheme" />
+              <input id="input" type="checkbox" aria-label="Cambiar tema" />
               <div class="slider round">
                 <div class="sun-moon">
                   <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
@@ -101,15 +101,15 @@
                 <h1 class="titulo">Accede a tu panel de monitoreo.</h1>
                 <p class="texto">
                     El login permite entrar con usuario o correo y abrir el panel
-                    principal del sistema con una autenticacion segura. Si es tu
-                    primer ingreso, luego veras una pantalla interactiva para
+                    principal del sistema con una autenticación segura. Si es tu
+                    primer ingreso, luego verás una pantalla interactiva para
                     elegir el ambiente.
                 </p>
 
                 <ul class="lista-simple">
                     <li>
-                        <strong>Autenticacion segura</strong>
-                        <span>La contrasena se compara con hash y la sesion se regenera al ingresar.</span>
+                        <strong>Autenticación segura</strong>
+                        <span>La contraseña se compara con hash y la sesión se regenera al ingresar.</span>
                     </li>
                     <li>
                         <strong>Entrada simple</strong>
@@ -117,7 +117,7 @@
                     </li>
                     <li>
                         <strong>Primer acceso guiado</strong>
-                        <span>Si aun no tienes ambiente, el sistema te lleva a una seleccion visual y animada.</span>
+                        <span>Si aún no tienes ambiente, el sistema te lleva a una selección visual y animada.</span>
                     </li>
                 </ul>
             </div>
@@ -125,7 +125,7 @@
             <div class="bloque">
                 <p class="etiqueta">Ingreso</p>
                 <h2>Completa tus datos</h2>
-                <p class="texto">Puedes usar tu usuario o tu correo electronico.</p>
+                <p class="texto">Puedes usar tu usuario o tu correo electrónico.</p>
 
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
@@ -144,17 +144,17 @@
                     </div>
 
                     <div class="campo">
-                        <label for="loginPassword">Contrasena</label>
+                        <label for="loginPassword">Contraseña</label>
                         <div class="campo-password">
-                            <input type="password" name="password" id="loginPassword" placeholder="Ingresa tu contrasena" autocomplete="current-password" required>
+                            <input type="password" name="password" id="loginPassword" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
                             <button type="button" class="boton boton-secundario boton-bloque" id="verPasswordLogin">Mostrar</button>
                         </div>
                     </div>
 
-                    <p class="nota">Las credenciales se validan en servidor y, si es tu primera vez, el siguiente paso sera elegir el ambiente.</p>
+                    <p class="nota">Las credenciales se validan en servidor y, si es tu primera vez, el siguiente paso será elegir el ambiente.</p>
 
                     <button type="submit" class="boton boton-bloque" id="botonLogin">Entrar</button>
-                    <a href="<?= site_url('registro') ?>" class="enlace-centro">No tengo cuenta todavia</a>
+                    <a href="<?= site_url('registro') ?>" class="enlace-centro">No tengo cuenta todavía</a>
                 </form>
             </div>
         </section>

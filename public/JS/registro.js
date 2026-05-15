@@ -60,18 +60,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (confirmacion.value === "") {
-            textoCoincide.textContent = "Esperando confirmacion de contrasena.";
+        textoCoincide.textContent = "Esperando confirmación de contraseña.";
             textoCoincide.style.color = "";
             return;
         }
 
         if (password.value === confirmacion.value) {
-            textoCoincide.textContent = "Las contrasenas coinciden.";
+        textoCoincide.textContent = "Las contraseñas coinciden.";
             textoCoincide.style.color = "#3f8b5e";
             return;
         }
 
-        textoCoincide.textContent = "Las contrasenas no coinciden.";
+        textoCoincide.textContent = "Las contraseñas no coinciden.";
         textoCoincide.style.color = "#be5159";
     }
 

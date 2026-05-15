@@ -6,6 +6,7 @@ use CodeIgniter\Model;
 
 class MeasurementModel extends Model
 {
+    // Configuracion base del modelo y tabla historica de mediciones ambientales.
     protected $table            = 'measurements';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';
