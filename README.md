@@ -77,7 +77,7 @@ C:\xampp\php\php.exe spark db:seed DatabaseSeeder
 ## Usuario demo
 
 - Usuario: `demo`
-- Contrasena: `123456`
+- Contraseña: `123456`
 
 ## Flujo web
 

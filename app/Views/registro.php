@@ -1,201 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdenAir | Registro</title>
-    <script>
-        const temaGuardado = localStorage.getItem('tema');
-        if (temaGuardado) {
-            document.documentElement.setAttribute('data-theme', temaGuardado);
-        }
-    </script>
-    <link rel="stylesheet" href="<?= base_url('CSS/todo.css') ?>">
+    <?= view('partials/head', ['title' => 'EdenAir | Registro']) ?>
 </head>
-<body class="pagina">
-<div class="contenedor">
-    <header class="encabezado">
-        <a href="<?= site_url('/') ?>" class="marca">
-            <span class="marca-icono">EA</span>
-            <span class="marca-texto">
-                <strong>EdenAir</strong>
-                <small>Crear cuenta</small>
-            </span>
-        </a>
+<body class="ea-body">
+<div class="ea-shell">
+    <?= view('partials/navbar', [
+        'subtitle' => 'Crear cuenta',
+        'actions'  => '<a href="' . site_url('login') . '" class="ea-button ea-button-secondary">Login</a>',
+    ]) ?>
 
-        <div class="menu">
-            <label class="switch">
-              <input id="input" type="checkbox" aria-label="Cambiar tema" />
-              <div class="slider round">
-                <div class="sun-moon">
-                  <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
+    <main class="ea-auth">
+        <aside class="ea-auth-aside">
+            <svg class="ea-auth-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <?php for ($i = 0; $i < 12; $i++):
+                    $y = ($i + 1) * (100 / 13);
+                    $phase = ($i % 3) * 8;
+                    $amp = 4 + ($i % 4); ?>
+                    <path d="M -4 <?= $y ?> C 20 <?= $y - $amp ?>, 40 <?= $y + $amp + $phase * 0.2 ?>, 60 <?= $y - $amp ?> C 80 <?= $y + $amp ?>, 100 <?= $y - $amp - $phase * 0.2 ?>, 104 <?= $y ?>"
+                          fill="none" stroke="rgba(236,242,232,0.16)" stroke-width="0.6" />
+                <?php endfor; ?>
+            </svg>
 
-                  <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                </div>
-                <div class="stars">
-                  <svg id="star-1" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-2" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-3" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-4" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-            </label>
-            <a href="<?= site_url('login') ?>" class="boton boton-secundario">Login</a>
-        </div>
-    </header>
-
-    <main class="contenido">
-        <section class="seccion seccion-principal">
-            <div class="bloque">
-                <p class="etiqueta">Registro</p>
-                <h1 class="titulo">Crea tu cuenta y activa el acceso en segundos.</h1>
-                <p class="texto">
-                    El registro prepara tu cuenta, valida tus datos y deja listo
-                    el acceso. La eleccion del ambiente se realiza despues del
-                    primer ingreso en una experiencia visual mas guiada.
-                </p>
-
-                <ul class="lista-simple">
-                    <li>
-                        <strong>Formulario directo</strong>
-                        <span>Solo los datos necesarios para empezar sin pasos de más.</span>
-                    </li>
-                    <li>
-                        <strong>Validaciones utiles</strong>
-                        <span>Correo valido, confirmacion de contrasena y clave segura.</span>
-                    </li>
-                    <li>
-                        <strong>Eleccion guiada del ambiente</strong>
-                        <span>Despues de iniciar sesion eliges el espacio con una interfaz interactiva y animada.</span>
-                    </li>
-                </ul>
+            <div class="ea-auth-meta">
+                <span>EdenAir / Alta de usuario</span>
+                <span>v 1.0 · 2026</span>
             </div>
 
-            <div class="bloque">
-                <p class="etiqueta">Alta de usuario</p>
-                <h2>Completa tus datos</h2>
-                <p class="texto">Primero crea tu acceso. El ambiente lo eliges despues de entrar.</p>
+            <div>
+                <?= view('partials/logo', ['tone' => 'cream', 'size' => 56, 'variant' => 'horizontal']) ?>
+                <h1 class="ea-auth-title">Empezá tu<br><em>edén.</em></h1>
+                <p class="ea-auth-lede">
+                    Creá tu cuenta para empezar a medir el aire de tu espacio.
+                    Después del primer ingreso vas a poder elegir el tipo de ambiente
+                    y conectar tu módulo ESP32.
+                </p>
+            </div>
+
+            <ul class="ea-auth-points">
+                <li>
+                    <span></span>
+                    <span>
+                        <strong>Formulario directo</strong>
+                        Solo los datos necesarios para empezar.
+                    </span>
+                </li>
+                <li>
+                    <span></span>
+                    <span>
+                        <strong>Contraseña segura</strong>
+                        Mínimo 8 caracteres, mayúsculas, minúsculas y números.
+                    </span>
+                </li>
+                <li>
+                    <span></span>
+                    <span>
+                        <strong>Ambiente al final</strong>
+                        Después de entrar elegís hogar, oficina, aula o personalizable.
+                    </span>
+                </li>
+            </ul>
+        </aside>
+
+        <section class="ea-auth-main">
+            <div class="ea-auth-card">
+                <div>
+                    <p class="ea-eyebrow">Alta de usuario</p>
+                    <h2>Creá tu acceso.</h2>
+                    <p class="ea-lede">El ambiente se configura después del primer login.</p>
+                </div>
 
                 <?php if (session()->getFlashdata('error')): ?>
-                    <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
+                    <div class="ea-message ea-message--error"><?= esc(session()->getFlashdata('error')) ?></div>
                 <?php endif; ?>
 
                 <?php $errores = session()->getFlashdata('errors') ?? []; ?>
                 <?php if ($errores): ?>
-                    <div class="mensaje mensaje-error">
-                        <ul class="lista-puntos">
-                            <?php foreach ($errores as $error): ?>
-                                <li><?= esc($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
+                    <div class="ea-message ea-message--error">
+                        <div>
+                            <strong>Revisá los siguientes campos:</strong>
+                            <ul>
+                                <?php foreach ($errores as $error): ?>
+                                    <li><?= esc($error) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= site_url('registro') ?>" method="POST" id="formRegistro" class="formulario">
+                <form action="<?= site_url('registro') ?>" method="POST" id="formRegistro" class="ea-form" novalidate>
                     <?= csrf_field() ?>
 
-                    <div class="fila">
-                        <div class="campo">
+                    <div class="ea-field-row">
+                        <div class="ea-field">
                             <label for="nombre">Nombre completo</label>
-                            <input type="text" id="nombre" name="nombre" value="<?= esc(old('nombre')) ?>" placeholder="Tu nombre" autocomplete="name" required>
+                            <input type="text" id="nombre" name="nombre"
+                                   value="<?= esc(old('nombre')) ?>"
+                                   placeholder="Tu nombre"
+                                   autocomplete="name" required>
                         </div>
 
-                        <div class="campo">
+                        <div class="ea-field">
                             <label for="email">Correo electrónico</label>
-                            <input type="email" id="email" name="email" value="<?= esc(old('email')) ?>" placeholder="correo@ejemplo.com" autocomplete="email" required>
+                            <input type="email" id="email" name="email"
+                                   value="<?= esc(old('email')) ?>"
+                                   placeholder="correo@ejemplo.com"
+                                   autocomplete="email" required>
                         </div>
                     </div>
 
-                    <div class="campo">
+                    <div class="ea-field">
                         <label for="usuario">Usuario</label>
-                        <input type="text" id="usuario" name="usuario" value="<?= esc(old('usuario')) ?>" placeholder="usuario.personal" autocomplete="username" required>
-                        <p class="nota">Usa letras, numeros, puntos, guiones o guion bajo.</p>
+                        <input type="text" id="usuario" name="usuario"
+                               value="<?= esc(old('usuario')) ?>"
+                               placeholder="usuario.personal"
+                               autocomplete="username" required>
+                        <p class="ea-hint">Letras, números, puntos, guiones o guion bajo.</p>
                     </div>
 
-                    <div class="bloque-suave">
-                        <strong>El ambiente se configura despues del login</strong>
-                        <p class="texto">
-                            Al ingresar por primera vez veras una pantalla interactiva
-                            para elegir entre oficina, aula, hogar, dormitorio o un
-                            perfil personalizable.
+                    <div class="ea-field">
+                        <label for="registroPassword">Contraseña</label>
+                        <div class="ea-password">
+                            <input type="password" id="registroPassword" name="password"
+                                   placeholder="Creá una contraseña"
+                                   autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="ea-button ea-button-secondary" id="verPasswordRegistro">Mostrar</button>
+                        </div>
+                        <p class="ea-hint">8+ caracteres, una mayúscula, una minúscula y un número.</p>
+                    </div>
+
+                    <div class="ea-strength">
+                        <div class="ea-strength-track">
+                            <span id="fuerzaBarra"></span>
+                        </div>
+                        <p id="fuerzaTexto" class="ea-hint">Seguridad pendiente.</p>
+                    </div>
+
+                    <div class="ea-field">
+                        <label for="confirmPassword">Confirmar contraseña</label>
+                        <input type="password" id="confirmPassword" name="password_confirm"
+                               placeholder="Repetí la contraseña"
+                               autocomplete="new-password" minlength="8" required>
+                    </div>
+
+                    <p id="coincideTexto" class="ea-hint">Esperando confirmación de contraseña.</p>
+
+                    <div class="ea-card ea-card--cream" style="padding: 18px 22px;">
+                        <p class="ea-eyebrow" style="margin-bottom: 6px;">Próximo paso</p>
+                        <strong style="font-family: var(--ea-font-serif); font-size: 20px; letter-spacing: -0.01em;">
+                            Elegís el ambiente después del login.
+                        </strong>
+                        <p class="ea-hint" style="margin-top: 6px;">
+                            Vas a poder seleccionar entre hogar, oficina, aula, dormitorio
+                            o personalizar tus propios rangos ideales.
                         </p>
                     </div>
 
-                    <div class="campo">
-                        <label for="registroPassword">Contraseña</label>
-                        <div class="campo-password">
-                            <input type="password" id="registroPassword" name="password" placeholder="Crea una contrasena" autocomplete="new-password" minlength="8" required>
-                            <button type="button" class="boton boton-secundario boton-bloque" id="verPasswordRegistro">Mostrar</button>
-                        </div>
-                        <p class="nota">Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.</p>
+                    <button type="submit" class="ea-button ea-button-primary ea-button-block" id="botonRegistro">
+                        Crear cuenta
+                    </button>
+
+                    <div class="ea-auth-foot">
+                        <a href="<?= site_url('login') ?>" class="ea-auth-link">Ya tengo una cuenta</a>
                     </div>
-
-                    <div class="medidor">
-                        <div class="medidor-barra">
-                            <span id="fuerzaBarra"></span>
-                        </div>
-                        <p id="fuerzaTexto" class="nota">Seguridad pendiente.</p>
-                    </div>
-
-                    <div class="campo">
-                        <label for="confirmPassword">Confirmar contrasena</label>
-                        <input type="password" id="confirmPassword" name="password_confirm" placeholder="Repite la contrasena" autocomplete="new-password" minlength="8" required>
-                    </div>
-
-                    <p id="coincideTexto" class="nota">Esperando confirmación de contraseña.</p>
-
-                    <button type="submit" class="boton boton-bloque" id="botonRegistro">Crear cuenta</button>
-                    <a href="<?= site_url('login') ?>" class="enlace-centro">Ya tengo una cuenta</a>
                 </form>
             </div>
         </section>

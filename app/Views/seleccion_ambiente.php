@@ -9,238 +9,182 @@ if (! is_string($presetSeleccionado) || $presetSeleccionado === '') {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdenAir | Elegir ambiente</title>
-    <script>
-        const temaGuardado = localStorage.getItem('tema');
-        if (temaGuardado) {
-            document.documentElement.setAttribute('data-theme', temaGuardado);
-        }
-    </script>
-    <link rel="stylesheet" href="<?= base_url('CSS/todo.css') ?>">
+    <?= view('partials/head', ['title' => 'EdenAir | Elegir ambiente']) ?>
 </head>
-<body class="pagina pagina-ambiente">
-<div class="contenedor">
-    <header class="encabezado">
-        <a href="<?= site_url('/') ?>" class="marca">
-            <span class="marca-icono">EA</span>
-            <span class="marca-texto">
-                <strong>EdenAir</strong>
-                <small>Configuración inicial</small>
-            </span>
-        </a>
+<body class="ea-body">
+<div class="ea-shell">
+    <?= view('partials/navbar', [
+        'subtitle' => 'Configuración inicial',
+        'actions'  => '<a href="' . site_url('logout') . '" class="ea-button ea-button-secondary">Cerrar sesión</a>',
+    ]) ?>
 
-        <div class="menu">
-            <label class="switch">
-              <input id="input" type="checkbox" aria-label="Cambiar tema" />
-              <div class="slider round">
-                <div class="sun-moon">
-                  <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-
-                  <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                  <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="50"></circle>
-                  </svg>
-                </div>
-                <div class="stars">
-                  <svg id="star-1" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-2" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-3" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                  <svg id="star-4" class="star" viewBox="0 0 20 20">
-                    <path
-                      d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-            </label>
-            <a href="<?= site_url('logout') ?>" class="boton boton-secundario">Cerrar sesión</a>
-        </div>
-    </header>
-
-    <main class="contenido">
-        <section class="seccion seccion-ambiente">
-            <div class="bloque bloque-ambiente-simple" id="panelAmbiente" data-preset="<?= esc($presetSeleccionado) ?>">
-                <div class="cabecera-ambiente-simple">
-                    <p class="etiqueta">Configuración inicial</p>
-                    <h1 class="titulo">Elige el tipo de ambiente.</h1>
-                    <p class="texto">
-                        Selecciona una opción y continúa. Si eliges
-                        <strong>personalizable</strong>, podrás ajustar tus propios límites.
+    <main>
+        <section class="ea-section">
+            <div class="ea-page">
+                <div class="ea-page-header">
+                    <div>
+                        <p class="ea-eyebrow">Configuración inicial</p>
+                        <h1>Elegí el tipo de <em>ambiente.</em></h1>
+                    </div>
+                    <p class="ea-lede">
+                        Cada perfil define los rangos ideales de temperatura, humedad
+                        y CO₂. Si elegís <strong>personalizable</strong> podés ajustar
+                        tus propios límites.
                     </p>
                 </div>
 
                 <?php if (session()->getFlashdata('success')): ?>
-                    <div class="mensaje mensaje-exito"><?= esc(session()->getFlashdata('success')) ?></div>
-                <?php endif; ?>
-
-                <?php if (session()->getFlashdata('error')): ?>
-                    <div class="mensaje mensaje-error"><?= esc(session()->getFlashdata('error')) ?></div>
-                <?php endif; ?>
-
-                <?php if ($errores): ?>
-                    <div class="mensaje mensaje-error">
-                        <ul class="lista-puntos">
-                            <?php foreach ($errores as $error): ?>
-                                <li><?= esc($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
+                    <div class="ea-message ea-message--success" style="margin-bottom: 22px;">
+                        <?= esc(session()->getFlashdata('success')) ?>
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= site_url('panel/ambiente') ?>" method="POST" id="formAmbiente" class="formulario formulario-ambiente-simple">
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div class="ea-message ea-message--error" style="margin-bottom: 22px;">
+                        <?= esc(session()->getFlashdata('error')) ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($errores): ?>
+                    <div class="ea-message ea-message--error" style="margin-bottom: 22px;">
+                        <div>
+                            <strong>Revisá los siguientes campos:</strong>
+                            <ul>
+                                <?php foreach ($errores as $error): ?>
+                                    <li><?= esc($error) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div id="panelAmbiente" data-preset="<?= esc($presetSeleccionado) ?>">
+                <form action="<?= site_url('panel/ambiente') ?>" method="POST"
+                      id="formAmbiente" class="ea-stack-lg">
                     <?= csrf_field() ?>
 
-                    <div class="mosaico-ambiente">
+                    <div class="ea-env-grid">
                         <?php foreach (($presets ?? []) as $key => $preset): ?>
                             <?php $resumen = sprintf(
-                                '%.1f-%.1f C | %.0f-%.0f %% | %d ppm',
+                                '%.1f-%.1f °C · %.0f-%.0f %% · %d ppm',
                                 (float) $preset['min_temperature'],
                                 (float) $preset['max_temperature'],
                                 (float) $preset['min_humidity'],
                                 (float) $preset['max_humidity'],
                                 (int) $preset['max_co2']
                             ); ?>
-                            <label class="tarjeta-ambiente-selector<?= $presetSeleccionado === $key ? ' activa' : '' ?>" data-preset-card>
-                                <input
-                                    type="radio"
-                                    name="environment_type"
-                                    value="<?= esc($key) ?>"
-                                    <?= $presetSeleccionado === $key ? 'checked' : '' ?>
-                                    required
-                                >
-
-                                <span class="tarjeta-ambiente-contenido">
-                                    <span class="tarjeta-ambiente-superior">
-                                        <span class="tarjeta-ambiente-codigo"><?= esc(strtoupper(substr($preset['label'], 0, 2))) ?></span>
-                                        <span class="tarjeta-ambiente-check"></span>
-                                    </span>
-                                    <strong><?= esc($preset['label']) ?></strong>
-                                    <small><?= esc($preset['description']) ?></small>
-                                    <span class="tarjeta-ambiente-rango"><?= esc($resumen) ?></span>
+                            <label class="ea-env-card<?= $presetSeleccionado === $key ? ' activa' : '' ?>" data-preset-card>
+                                <input type="radio" name="environment_type" value="<?= esc($key) ?>"
+                                       <?= $presetSeleccionado === $key ? 'checked' : '' ?> required>
+                                <span class="ea-spread">
+                                    <span class="ea-env-code"><?= esc(strtoupper(substr((string) $preset['label'], 0, 2))) ?></span>
                                 </span>
+                                <strong><?= esc($preset['label']) ?></strong>
+                                <small><?= esc($preset['description']) ?></small>
+                                <span class="ea-env-range"><?= esc($resumen) ?></span>
                             </label>
                         <?php endforeach; ?>
                     </div>
 
-                    <div class="resumen-ambiente" id="resumenAmbiente">
-                        <div class="resumen-ambiente-cabecera">
+                    <article class="ea-card" id="resumenAmbiente">
+                        <div class="ea-spread" style="margin-bottom: 14px;">
                             <div>
-                                <p class="etiqueta">Selección actual</p>
-                                <h2 id="previewNombre">Hogar</h2>
+                                <p class="ea-eyebrow">Selección actual</p>
+                                <h2 class="ea-serif" id="previewNombre" style="font-size: 32px; letter-spacing: -0.015em; margin-top: 8px;">Hogar</h2>
                             </div>
-                            <span class="estado estado-info" id="previewEstado">Preset listo</span>
+                            <span class="ea-badge ea-badge--info" id="previewEstado">Preset listo</span>
                         </div>
 
-                        <p class="texto" id="previewDescripcion">Balance general para convivencia diaria.</p>
+                        <p class="ea-lede" id="previewDescripcion" style="color: var(--ea-ink-2); font-size: 15px;">
+                            Balance general para convivencia diaria.
+                        </p>
 
-                        <div class="resumen-ambiente-datos">
-                            <div class="dato-ambiente">
-                                <small>Temperatura</small>
-                                <strong id="previewTemperatura">20.0 a 26.0 C</strong>
+                        <div class="ea-stat-grid" style="margin-top: 22px;">
+                            <div class="ea-stat-card">
+                                <div class="ea-stat-head">
+                                    <span class="ea-stat-label">Temperatura</span>
+                                </div>
+                                <strong class="ea-stat-value" id="previewTemperatura">20.0 a 26.0 °C</strong>
                             </div>
-
-                            <div class="dato-ambiente">
-                                <small>Humedad</small>
-                                <strong id="previewHumedad">35 a 60 %</strong>
+                            <div class="ea-stat-card tone-info">
+                                <div class="ea-stat-head">
+                                    <span class="ea-stat-label">Humedad</span>
+                                </div>
+                                <strong class="ea-stat-value" id="previewHumedad">35 a 60 %</strong>
                             </div>
-
-                            <div class="dato-ambiente">
-                                <small>CO2 límite</small>
-                                <strong id="previewCo2">1000 ppm</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="bloquePersonalizado" class="bloque-suave bloque-personalizable<?= $presetSeleccionado === 'personalizable' ? '' : ' oculto' ?>">
-                        <div class="campo">
-                            <label for="custom_name">Nombre del ambiente</label>
-                            <input type="text" id="custom_name" name="custom_name" value="<?= esc(old('custom_name')) ?>" placeholder="Ejemplo: Laboratorio de pruebas">
-                        </div>
-
-                        <div class="fila">
-                            <div class="campo">
-                                <label for="min_temperature">Temperatura mínima (C)</label>
-                                <input type="number" step="0.1" id="min_temperature" name="min_temperature" value="<?= esc(old('min_temperature')) ?>">
-                            </div>
-
-                            <div class="campo">
-                                <label for="max_temperature">Temperatura máxima (C)</label>
-                                <input type="number" step="0.1" id="max_temperature" name="max_temperature" value="<?= esc(old('max_temperature')) ?>">
+                            <div class="ea-stat-card tone-warning">
+                                <div class="ea-stat-head">
+                                    <span class="ea-stat-label">CO₂ límite</span>
+                                </div>
+                                <strong class="ea-stat-value" id="previewCo2">1000 ppm</strong>
                             </div>
                         </div>
+                    </article>
 
-                        <div class="fila">
-                            <div class="campo">
-                                <label for="min_humidity">Humedad mínima (%)</label>
-                                <input type="number" step="0.1" id="min_humidity" name="min_humidity" value="<?= esc(old('min_humidity')) ?>">
+                    <article id="bloquePersonalizado"
+                             class="ea-card ea-card--cream<?= $presetSeleccionado === 'personalizable' ? '' : ' oculto' ?>">
+                        <p class="ea-eyebrow">Perfil personalizable</p>
+                        <h3 class="ea-serif" style="font-size: 24px; margin: 8px 0 18px;">Definí tus propios rangos.</h3>
+
+                        <div class="ea-form">
+                            <div class="ea-field">
+                                <label for="custom_name">Nombre del ambiente</label>
+                                <input type="text" id="custom_name" name="custom_name"
+                                       value="<?= esc(old('custom_name')) ?>"
+                                       placeholder="Ejemplo: Laboratorio de pruebas">
                             </div>
 
-                            <div class="campo">
-                                <label for="max_humidity">Humedad máxima (%)</label>
-                                <input type="number" step="0.1" id="max_humidity" name="max_humidity" value="<?= esc(old('max_humidity')) ?>">
+                            <div class="ea-field-row">
+                                <div class="ea-field">
+                                    <label for="min_temperature">Temperatura mínima (°C)</label>
+                                    <input type="number" step="0.1" id="min_temperature" name="min_temperature"
+                                           value="<?= esc(old('min_temperature')) ?>">
+                                </div>
+                                <div class="ea-field">
+                                    <label for="max_temperature">Temperatura máxima (°C)</label>
+                                    <input type="number" step="0.1" id="max_temperature" name="max_temperature"
+                                           value="<?= esc(old('max_temperature')) ?>">
+                                </div>
+                            </div>
+
+                            <div class="ea-field-row">
+                                <div class="ea-field">
+                                    <label for="min_humidity">Humedad mínima (%)</label>
+                                    <input type="number" step="0.1" id="min_humidity" name="min_humidity"
+                                           value="<?= esc(old('min_humidity')) ?>">
+                                </div>
+                                <div class="ea-field">
+                                    <label for="max_humidity">Humedad máxima (%)</label>
+                                    <input type="number" step="0.1" id="max_humidity" name="max_humidity"
+                                           value="<?= esc(old('max_humidity')) ?>">
+                                </div>
+                            </div>
+
+                            <div class="ea-field">
+                                <label for="max_co2">Límite de CO₂ (ppm)</label>
+                                <input type="number" id="max_co2" name="max_co2"
+                                       value="<?= esc(old('max_co2')) ?>">
+                                <p class="ea-hint">Si dejás campos vacíos se usan los valores base del preset personalizable.</p>
                             </div>
                         </div>
+                    </article>
 
-                        <div class="campo">
-                            <label for="max_co2">Límite de CO2 (ppm)</label>
-                            <input type="number" id="max_co2" name="max_co2" value="<?= esc(old('max_co2')) ?>">
-                            <p class="nota">Si dejas campos vacíos, se usarán los valores base del preset personalizable.</p>
-                        </div>
-                    </div>
-
-                    <div class="acciones-ambiente">
-                        <p class="nota">Al continuar se crea el espacio, se prepara la simulación inicial y se habilita el panel.</p>
-                        <button type="submit" class="boton boton-bloque" id="botonAmbiente">Continuar al panel</button>
+                    <div class="ea-spread" style="flex-wrap: wrap;">
+                        <p class="ea-hint">
+                            Al continuar se crea el espacio, se prepara la simulación inicial
+                            y se habilita el panel.
+                        </p>
+                        <button type="submit" class="ea-button ea-button-primary" id="botonAmbiente">
+                            Continuar al panel
+                        </button>
                     </div>
                 </form>
+                </div>
             </div>
         </section>
     </main>
+
+    <?= view('partials/footer') ?>
 </div>
 
 <script id="presetData" type="application/json"><?= json_encode($presets ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>

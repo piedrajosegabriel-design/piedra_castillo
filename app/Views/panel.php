@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdenAir | Panel</title>
-    <script>
-        const temaGuardado = localStorage.getItem('tema');
-        if (temaGuardado) {
-            document.documentElement.setAttribute('data-theme', temaGuardado);
-        }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('CSS/dashboard.css') ?>">
+    <?= view('partials/head', [
+        'title'    => 'EdenAir | Panel',
+        'extraCss' => ['CSS/dashboard.css'],
+    ]) ?>
 </head>
-<body class="dashboard-body dashboard-loading">
+<body class="dashboard-body ea-body dashboard-loading">
 <?php
     $panel = isset($panel) && is_array($panel) ? $panel : [];
 
@@ -340,8 +331,13 @@
     <div class="dashboard-loader-grid"></div>
     <div class="dashboard-loader-shell">
         <div class="dashboard-loader-brand">
-            <span class="dashboard-loader-mark">EA</span>
-            <strong class="dashboard-loader-name">EdenAir</strong>
+            <svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true">
+                <circle cx="50" cy="50" r="44" fill="none" stroke="#ecf2e8" stroke-width="2"/>
+                <path d="M 18 70 C 30 35, 60 25, 82 30" fill="none" stroke="#ecf2e8" stroke-width="2" stroke-linecap="round"/>
+                <path d="M 18 70 C 40 60, 65 55, 82 30" fill="none" stroke="#bcd2bd" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="2.4" fill="#ecf2e8"/>
+            </svg>
+            <strong class="dashboard-loader-name">Eden<em style="font-style:italic;color:#c9d870;">Air</em></strong>
         </div>
 
         <div class="dashboard-loader-scene" aria-hidden="true">
@@ -392,10 +388,16 @@
             </button>
 
             <a href="<?= site_url('/') ?>" class="brand-link">
-                <span class="brand-mark">EA</span>
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" width="28" height="28">
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M 18 70 C 30 35, 60 25, 82 30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 18 70 C 40 60, 65 55, 82 30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+                    </svg>
+                </span>
                 <span class="brand-copy">
-                    <strong>EdenAir</strong>
-                    <small>Sistema ambiental moderno</small>
+                    <strong>Eden<em style="font-style:italic;color:var(--eden-500);">Air</em></strong>
+                    <small>Sistema de monitoreo ambiental</small>
                 </span>
             </a>
         </div>
@@ -408,73 +410,7 @@
             </div>
 
             <div class="header-tools">
-                <label class="switch">
-                  <input id="input" type="checkbox" aria-label="Cambiar tema del panel" />
-                  <div class="slider round">
-                    <div class="sun-moon">
-                      <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-
-                      <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                      <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="50"></circle>
-                      </svg>
-                    </div>
-                    <div class="stars">
-                      <svg id="star-1" class="star" viewBox="0 0 20 20">
-                        <path
-                          d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                        ></path>
-                      </svg>
-                      <svg id="star-2" class="star" viewBox="0 0 20 20">
-                        <path
-                          d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                        ></path>
-                      </svg>
-                      <svg id="star-3" class="star" viewBox="0 0 20 20">
-                        <path
-                          d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                        ></path>
-                      </svg>
-                      <svg id="star-4" class="star" viewBox="0 0 20 20">
-                        <path
-                          d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"
-                        ></path>
-                      </svg>
-                    </div>
-                  </div>
-                </label>
-
+                <?= view('partials/theme_toggle') ?>
                 <a href="<?= site_url('logout') ?>" class="logout-link">Cerrar sesión</a>
             </div>
         </div>
@@ -804,17 +740,24 @@
                 </div>
             </div>
 
-            <div class="alerts-list">
-                <?php foreach ($alerts as $alerta): ?>
-                    <article class="card alert-item alert-<?= esc((string) ($alerta['tono'] ?? 'neutral')) ?>">
-                        <span class="alert-marker tone-<?= esc((string) ($alerta['tono'] ?? 'neutral')) ?>"></span>
-                        <div>
-                            <h3><?= esc((string) ($alerta['titulo'] ?? 'Alerta del sistema')) ?></h3>
-                            <p class="section-text"><?= esc((string) ($alerta['texto'] ?? 'Sin detalle disponible.')) ?></p>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            </div>
+            <?php if ($alerts === []): ?>
+                <div class="empty-state">
+                    <strong>Sin alertas registradas</strong>
+                    <p>El ambiente se mantiene dentro de los rangos esperados. Las nuevas alertas aparecerán acá apenas se generen.</p>
+                </div>
+            <?php else: ?>
+                <div class="alerts-list">
+                    <?php foreach ($alerts as $alerta): ?>
+                        <article class="card alert-item alert-<?= esc((string) ($alerta['tono'] ?? 'neutral')) ?> tone-<?= esc((string) ($alerta['tono'] ?? 'neutral')) ?>">
+                            <span class="alert-marker tone-<?= esc((string) ($alerta['tono'] ?? 'neutral')) ?>"></span>
+                            <div>
+                                <h3><?= esc((string) ($alerta['titulo'] ?? 'Alerta del sistema')) ?></h3>
+                                <p class="section-text"><?= esc((string) ($alerta['texto'] ?? 'Sin detalle disponible.')) ?></p>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <section id="configuracion" class="section-panel">
@@ -836,6 +779,12 @@
                         <span class="status-pill status-<?= esc($modoManual ? 'info' : 'neutral') ?>"><?= esc($modoManual ? 'Control manual' : 'Bloqueados por modo automático') ?></span>
                     </div>
 
+                    <?php if ($actuators === []): ?>
+                        <div class="empty-state empty-state--inline">
+                            <strong>Sin actuadores configurados</strong>
+                            <p>No hay dispositivos cargados todavía. Cuando se enlacen aparecerán acá con sus controles.</p>
+                        </div>
+                    <?php else: ?>
                     <div class="actuator-list">
                         <?php foreach ($actuators as $actuador): ?>
                             <div class="actuator-item">
@@ -865,6 +814,7 @@
                             </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php endif; ?>
                 </article>
 
                 <article class="card mode-card">
@@ -1021,16 +971,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($historyRows as $row): ?>
-                                    <tr>
-                                        <td><?= esc((string) ($row['fecha'] ?? '--')) ?></td>
-                                        <td><?= esc((string) ($row['temperatura'] ?? '--')) ?></td>
-                                        <td><?= esc((string) ($row['humedad'] ?? '--')) ?></td>
-                                        <td><?= esc((string) ($row['co2'] ?? '--')) ?></td>
-                                        <td><?= esc((string) ($row['aire'] ?? '--')) ?></td>
-                                        <td><?= esc((string) ($row['origen'] ?? '--')) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                <?php if ($historyRows === []): ?>
+                                    <tr class="empty-row"><td colspan="6">Sin lecturas registradas todavía.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($historyRows as $row): ?>
+                                        <tr>
+                                            <td><?= esc((string) ($row['fecha'] ?? '--')) ?></td>
+                                            <td><?= esc((string) ($row['temperatura'] ?? '--')) ?></td>
+                                            <td><?= esc((string) ($row['humedad'] ?? '--')) ?></td>
+                                            <td><?= esc((string) ($row['co2'] ?? '--')) ?></td>
+                                            <td><?= esc((string) ($row['aire'] ?? '--')) ?></td>
+                                            <td><?= esc((string) ($row['origen'] ?? '--')) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

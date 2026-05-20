@@ -194,7 +194,7 @@ CREATE TABLE IF NOT EXISTS device_commands (
 -- RESUMEN RAPIDO DE USO
 -- =========================================================
 -- users:
---   login, registro, hash de contrasena.
+--   login, registro, hash de contraseña.
 --
 -- spaces:
 --   ambiente del usuario y limites configurados.
