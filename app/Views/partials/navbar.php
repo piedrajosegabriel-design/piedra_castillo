@@ -10,6 +10,7 @@
 $subtitle  = $subtitle  ?? 'Monitoreo ambiental';
 $actions   = $actions   ?? null;
 $conSesion = $conSesion ?? false;
+$navLinks  = isset($navLinks) && is_array($navLinks) ? $navLinks : [];
 ?>
 <header class="ea-navbar">
     <div class="ea-page ea-navbar-inner">
@@ -19,6 +20,14 @@ $conSesion = $conSesion ?? false;
             'subtitle' => $subtitle,
             'variant'  => 'horizontal',
         ]) ?>
+
+        <?php if ($navLinks): ?>
+            <ul class="ea-nav-links" aria-label="Secciones">
+                <?php foreach ($navLinks as $link): ?>
+                    <li><a href="<?= esc($link['href']) ?>"><?= esc($link['label']) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
 
         <div class="ea-nav-actions">
             <?= view('partials/theme_toggle') ?>

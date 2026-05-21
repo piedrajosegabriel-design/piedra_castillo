@@ -18,7 +18,7 @@
                     $phase = ($i % 3) * 8;
                     $amp = 4 + ($i % 4); ?>
                     <path d="M -4 <?= $y ?> C 20 <?= $y - $amp ?>, 40 <?= $y + $amp + $phase * 0.2 ?>, 60 <?= $y - $amp ?> C 80 <?= $y + $amp ?>, 100 <?= $y - $amp - $phase * 0.2 ?>, 104 <?= $y ?>"
-                          fill="none" stroke="rgba(236,242,232,0.16)" stroke-width="0.6" />
+                        fill="none" stroke="rgba(236,242,232,0.16)" stroke-width="0.6" />
                 <?php endfor; ?>
             </svg>
 
@@ -95,26 +95,26 @@
                         <div class="ea-field">
                             <label for="nombre">Nombre completo</label>
                             <input type="text" id="nombre" name="nombre"
-                                   value="<?= esc(old('nombre')) ?>"
-                                   placeholder="Tu nombre"
-                                   autocomplete="name" required>
+                                value="<?= esc(old('nombre')) ?>"
+                                placeholder="Tu nombre"
+                                autocomplete="name" required>
                         </div>
 
                         <div class="ea-field">
                             <label for="email">Correo electrónico</label>
                             <input type="email" id="email" name="email"
-                                   value="<?= esc(old('email')) ?>"
-                                   placeholder="correo@ejemplo.com"
-                                   autocomplete="email" required>
+                                value="<?= esc(old('email')) ?>"
+                                placeholder="correo@ejemplo.com"
+                                autocomplete="email" required>
                         </div>
                     </div>
 
                     <div class="ea-field">
                         <label for="usuario">Usuario</label>
                         <input type="text" id="usuario" name="usuario"
-                               value="<?= esc(old('usuario')) ?>"
-                               placeholder="usuario.personal"
-                               autocomplete="username" required>
+                            value="<?= esc(old('usuario')) ?>"
+                            placeholder="usuario.personal"
+                            autocomplete="username" required>
                         <p class="ea-hint">Letras, números, puntos, guiones o guion bajo.</p>
                     </div>
 
@@ -122,8 +122,8 @@
                         <label for="registroPassword">Contraseña</label>
                         <div class="ea-password">
                             <input type="password" id="registroPassword" name="password"
-                                   placeholder="Creá una contraseña"
-                                   autocomplete="new-password" minlength="8" required>
+                                placeholder="Creá una contraseña"
+                                autocomplete="new-password" minlength="8" required>
                             <button type="button" class="ea-button ea-button-secondary" id="verPasswordRegistro">Mostrar</button>
                         </div>
                         <p class="ea-hint">8+ caracteres, una mayúscula, una minúscula y un número.</p>
@@ -139,8 +139,8 @@
                     <div class="ea-field">
                         <label for="confirmPassword">Confirmar contraseña</label>
                         <input type="password" id="confirmPassword" name="password_confirm"
-                               placeholder="Repetí la contraseña"
-                               autocomplete="new-password" minlength="8" required>
+                            placeholder="Repetí la contraseña"
+                            autocomplete="new-password" minlength="8" required>
                     </div>
 
                     <p id="coincideTexto" class="ea-hint">Esperando confirmación de contraseña.</p>

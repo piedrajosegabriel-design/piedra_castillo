@@ -295,26 +295,36 @@ body.ea-body {
     align-items: center;
 }
 
-.ea-logo-mark { flex-shrink: 0; }
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
 
-/* Tono "ink": adaptable al tema */
+/* Tono "ink": adaptable a claro / oscuro
+   stroke → anillo y vena (línea estructural)
+   leaf   → cuerpo de la hoja (relleno suave + contorno)
+   dot    → punto sensor */
 .ea-logo-mark--ink .ea-logo-stroke { stroke: var(--ea-ink); }
-.ea-logo-mark--ink .ea-logo-dot    { fill:   var(--ea-ink); }
-.ea-logo-mark--ink .ea-logo-accent { stroke: var(--eden-500); }
+.ea-logo-mark--ink .ea-logo-vein   { stroke: var(--ea-ink); opacity: 0.85; }
+.ea-logo-mark--ink .ea-logo-leaf   { fill: rgba(74, 122, 85, 0.18); stroke: var(--eden-500); }
+.ea-logo-mark--ink .ea-logo-dot    { fill: var(--eden-600); }
 
 :root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-stroke { stroke: var(--eden-100); }
-:root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-dot    { fill:   var(--eden-100); }
-:root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-accent { stroke: var(--eden-300); }
+:root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-vein   { stroke: var(--eden-100); opacity: 0.85; }
+:root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-leaf   { fill: rgba(130, 169, 135, 0.22); stroke: var(--eden-300); }
+:root[data-theme="dark"] .ea-logo-mark--ink .ea-logo-dot    { fill: var(--ea-citrus); }
 
-/* Tono "cream": para fondos oscuros (igual en ambos modos) */
+/* Tono "cream": pensado para fondos oscuros (no depende del tema) */
 .ea-logo-mark--cream .ea-logo-stroke { stroke: var(--eden-100); }
-.ea-logo-mark--cream .ea-logo-dot    { fill:   var(--eden-100); }
-.ea-logo-mark--cream .ea-logo-accent { stroke: var(--eden-300); }
+.ea-logo-mark--cream .ea-logo-vein   { stroke: var(--eden-100); opacity: 0.9; }
+.ea-logo-mark--cream .ea-logo-leaf   { fill: rgba(201, 216, 112, 0.22); stroke: var(--eden-300); }
+.ea-logo-mark--cream .ea-logo-dot    { fill: var(--ea-citrus); }
 
-/* Tono "moss": acento verde fijo */
-.ea-logo-mark--moss .ea-logo-stroke { stroke: var(--eden-500); }
-.ea-logo-mark--moss .ea-logo-dot    { fill:   var(--eden-500); }
-.ea-logo-mark--moss .ea-logo-accent { stroke: var(--eden-300); }
+/* Tono "moss": variante monocroma verde */
+.ea-logo-mark--moss .ea-logo-stroke { stroke: var(--eden-700); }
+.ea-logo-mark--moss .ea-logo-vein   { stroke: var(--eden-600); opacity: 0.9; }
+.ea-logo-mark--moss .ea-logo-leaf   { fill: rgba(130, 169, 135, 0.28); stroke: var(--eden-500); }
+.ea-logo-mark--moss .ea-logo-dot    { fill: var(--eden-700); }
 
 .ea-logo-word {
     font-family: var(--ea-font-serif);

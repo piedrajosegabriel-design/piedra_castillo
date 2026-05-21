@@ -15,6 +15,9 @@ $extraHead = $extraHead ?? '';
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1c4029">
 <title><?= esc($title) ?></title>
+<link rel="icon" type="image/svg+xml" href="<?= base_url('assets/img/branding/favicon.svg') ?>">
+<link rel="alternate icon" href="<?= base_url('favicon.ico') ?>">
+<link rel="mask-icon" href="<?= base_url('assets/img/branding/mark-mono-dark.svg') ?>" color="#1c4029">
 <script>
     (function () {
         try {
