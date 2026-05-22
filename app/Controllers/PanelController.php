@@ -27,8 +27,11 @@ class PanelController extends BaseController
             return $redirect;
         }
 
+        $userId = $this->usuarioActual();
+        (new DeviceProvisioningService())->ensureUserSetup($userId, [], false);
+
         return view('panel', [
-            'panel' => $this->crearPanel(),
+            'panel' => (new PanelService())->obtenerVistaPanel($userId),
         ]);
     }
 
