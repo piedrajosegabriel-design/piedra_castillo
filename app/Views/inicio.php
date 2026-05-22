@@ -7,8 +7,10 @@
         'extraCss' => ['CSS/inicio.css'],
     ]) ?>
 </head>
-<body class="ea-body">
+<body class="ea-body ea-landing">
 <div class="ea-shell">
+    <span class="ea-scroll-progress" aria-hidden="true"><span data-ea-progress></span></span>
+
     <?= view('partials/navbar', [
         'subtitle'  => 'Monitoreo ambiental',
         'conSesion' => $conSesion,
@@ -18,8 +20,37 @@
             ['href' => '#beneficios',     'label' => 'Beneficios'],
             ['href' => '#funcionamiento', 'label' => 'Funcionamiento'],
             ['href' => '#sensores',       'label' => 'Sensores'],
+            ['href' => '#automatizacion', 'label' => 'Automatización'],
         ],
     ]) ?>
+
+    <button type="button" class="ea-nav-toggle" data-ea-nav-toggle aria-expanded="false" aria-controls="ea-mobile-nav" aria-label="Abrir menú de navegación">
+        <span class="ea-nav-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+
+    <nav id="ea-mobile-nav" class="ea-mobile-nav" data-ea-mobile-nav aria-hidden="true">
+        <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#que-es">Qué es</a></li>
+            <li><a href="#beneficios">Beneficios</a></li>
+            <li><a href="#funcionamiento">Funcionamiento</a></li>
+            <li><a href="#sensores">Sensores</a></li>
+            <li><a href="#automatizacion">Automatización</a></li>
+        </ul>
+        <div class="ea-mobile-nav-actions">
+            <div class="ea-mobile-nav-theme">
+                <span class="ea-mobile-nav-theme-label">Tema</span>
+                <?= view('partials/theme_toggle', ['unique' => '-mobile']) ?>
+            </div>
+            <?php if ($conSesion): ?>
+                <a href="<?= site_url('panel') ?>" class="ea-button ea-button-primary ea-button-block">Ir al panel</a>
+                <a href="<?= site_url('logout') ?>" class="ea-button ea-button-secondary ea-button-block">Cerrar sesión</a>
+            <?php else: ?>
+                <a href="<?= site_url('registro') ?>" class="ea-button ea-button-primary ea-button-block">Crear cuenta</a>
+                <a href="<?= site_url('login') ?>" class="ea-button ea-button-secondary ea-button-block">Iniciar sesión</a>
+            <?php endif; ?>
+        </div>
+    </nav>
 
     <main>
         <section class="ea-hero" id="inicio">
@@ -28,6 +59,19 @@
                 <span class="ea-hero-orbit ea-hero-orbit--a"></span>
                 <span class="ea-hero-orbit ea-hero-orbit--b"></span>
                 <span class="ea-hero-orbit ea-hero-orbit--c"></span>
+            </div>
+
+            <div class="ea-hero-leaves" aria-hidden="true">
+                <svg class="ea-hero-leaf ea-hero-leaf--a" viewBox="0 0 64 64">
+                    <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(74,122,85,0.18)" stroke="rgba(74,122,85,0.55)" stroke-width="1.2" stroke-linejoin="round"/>
+                    <path d="M 20 46 C 28 38, 38 26, 48 14" fill="none" stroke="rgba(74,122,85,0.75)" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+                <svg class="ea-hero-leaf ea-hero-leaf--b" viewBox="0 0 64 64">
+                    <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(201,216,112,0.18)" stroke="rgba(201,216,112,0.6)" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
+                <svg class="ea-hero-leaf ea-hero-leaf--c" viewBox="0 0 64 64">
+                    <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(188,210,189,0.22)" stroke="rgba(188,210,189,0.55)" stroke-width="1.2" stroke-linejoin="round"/>
+                </svg>
             </div>
 
             <svg class="ea-hero-pattern" viewBox="0 0 100 120" preserveAspectRatio="none" aria-hidden="true">
@@ -62,35 +106,40 @@
                     </div>
                 </div>
 
-                <article class="ea-card ea-card--ink ea-hero-card-anim" style="padding: 28px;">
-                    <p class="ea-eyebrow" style="color: rgba(236,242,232,0.7);">Sala — lectura en vivo</p>
+                <article class="ea-card ea-card--ink ea-hero-card-anim ea-hero-readout">
+                    <header class="ea-hero-readout-head">
+                        <p class="ea-eyebrow">Sala — lectura en vivo</p>
+                        <span class="ea-hero-pulse" aria-hidden="true">
+                            <span></span><span></span><span></span>
+                        </span>
+                    </header>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 22px 0;">
+                    <div class="ea-hero-stats">
                         <div class="ea-hero-stat">
-                            <p class="ea-mono" style="color: var(--ea-citrus); margin-bottom: 4px;">● CO₂</p>
-                            <strong class="ea-serif" style="font-size: 40px; line-height: 1; color: var(--eden-100);">612</strong>
-                            <span class="ea-mono" style="color: rgba(236,242,232,0.6); margin-left: 4px;">ppm</span>
+                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-citrus);"></span>CO₂</p>
+                            <strong class="ea-hero-stat-value" data-counter data-counter-target="612" data-counter-decimals="0">0</strong>
+                            <span class="ea-hero-stat-unit">ppm</span>
                         </div>
                         <div class="ea-hero-stat">
-                            <p class="ea-mono" style="color: var(--ea-citrus); margin-bottom: 4px;">● Humedad</p>
-                            <strong class="ea-serif" style="font-size: 40px; line-height: 1; color: var(--eden-100);">48</strong>
-                            <span class="ea-mono" style="color: rgba(236,242,232,0.6); margin-left: 4px;">%</span>
+                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-breath);"></span>Humedad</p>
+                            <strong class="ea-hero-stat-value" data-counter data-counter-target="48" data-counter-decimals="0">0</strong>
+                            <span class="ea-hero-stat-unit">%</span>
                         </div>
                         <div class="ea-hero-stat">
-                            <p class="ea-mono" style="color: var(--ea-citrus); margin-bottom: 4px;">● Temperatura</p>
-                            <strong class="ea-serif" style="font-size: 40px; line-height: 1; color: var(--eden-100);">22.4</strong>
-                            <span class="ea-mono" style="color: rgba(236,242,232,0.6); margin-left: 4px;">°C</span>
+                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--eden-300);"></span>Temperatura</p>
+                            <strong class="ea-hero-stat-value" data-counter data-counter-target="22.4" data-counter-decimals="1">0.0</strong>
+                            <span class="ea-hero-stat-unit">°C</span>
                         </div>
                         <div class="ea-hero-stat">
-                            <p class="ea-mono" style="color: var(--ea-clay); margin-bottom: 4px;">● Aire</p>
-                            <strong class="ea-serif" style="font-size: 40px; line-height: 1; color: var(--eden-100);">82</strong>
-                            <span class="ea-mono" style="color: rgba(236,242,232,0.6); margin-left: 4px;">/100</span>
+                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-clay);"></span>Aire</p>
+                            <strong class="ea-hero-stat-value" data-counter data-counter-target="82" data-counter-decimals="0">0</strong>
+                            <span class="ea-hero-stat-unit">/100</span>
                         </div>
                     </div>
 
-                    <div class="ea-spread" style="border-top: 1px solid rgba(236,242,232,0.12); padding-top: 16px; font-family: var(--ea-font-mono); font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(236,242,232,0.6);">
+                    <div class="ea-hero-readout-foot">
                         <span>EA-ENV-01 · ESP32</span>
-                        <span style="color: var(--ea-citrus);">● Aire limpio</span>
+                        <span class="ea-hero-readout-status">● Aire limpio</span>
                     </div>
                 </article>
             </div>
@@ -133,7 +182,7 @@
                             </svg>
                         </span>
                         <h3>Control de actuadores</h3>
-                        <p>Aire acondicionado, aromatizador, LED de alerta y humidificador en modo automático o manual desde el mismo panel.</p>
+                        <p>Ventilador, aromatizador, LED de alerta y humidificador en modo automático o manual desde el mismo panel.</p>
                     </article>
 
                     <article class="ea-feature-card" data-reveal-child>
@@ -303,7 +352,7 @@
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
                         <h4>Actuadores responden</h4>
-                        <p>Aire, aromatizador, LED y humidificador siguen las órdenes recibidas.</p>
+                        <p>Ventilador, aromatizador, LED y humidificador siguen las órdenes recibidas.</p>
                     </div>
                 </div>
 
@@ -330,40 +379,40 @@
                         </p>
 
                         <div class="ea-hardware-list">
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-warning">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
                                         <path d="M12 4a2 2 0 0 0-2 2v8.2a3.6 3.6 0 1 0 4 0V6a2 2 0 0 0-2-2Z"/>
                                         <circle cx="12" cy="16.5" r="1.6" fill="currentColor"/>
                                     </svg>
                                 </span>
-                                <div><strong>Temperatura</strong><small>°C</small></div>
+                                <div><strong>Temperatura</strong><small>°C · ambiente</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-info">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
                                         <path d="M12 3.5c2.4 2.8 5.5 6 5.5 9.5a5.5 5.5 0 1 1-11 0c0-3.5 3.1-6.7 5.5-9.5Z"/>
                                     </svg>
                                 </span>
-                                <div><strong>Humedad</strong><small>%</small></div>
+                                <div><strong>Humedad</strong><small>% · vapor de agua</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-success">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                                         <circle cx="12" cy="12" r="8"/>
                                         <text x="12" y="14.5" text-anchor="middle" font-size="7" font-family="DM Mono, monospace" fill="currentColor" stroke="none">CO₂</text>
                                     </svg>
                                 </span>
-                                <div><strong>CO₂</strong><small>ppm</small></div>
+                                <div><strong>CO₂</strong><small>ppm · ventilación</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-citrus">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                                         <path d="M3 9h12a3 3 0 1 0-3-3"/>
                                         <path d="M3 14h15a3 3 0 1 1-3 3"/>
                                     </svg>
                                 </span>
-                                <div><strong>Calidad de aire</strong><small>0–100</small></div>
+                                <div><strong>Calidad de aire</strong><small>0–100 · índice</small></div>
                             </div>
                         </div>
                     </article>
@@ -376,25 +425,25 @@
                         </p>
 
                         <div class="ea-hardware-list">
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-info">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="2.2"/>
                                         <path d="M12 10c0-3 1-6 4-6 0 3-1.4 5-4 6Zm0 4c0 3-1 6-4 6 0-3 1.4-5 4-6Zm-2-2c-3 0-6-1-6-4 3 0 5 1.4 6 4Zm4 0c3 0 6 1 6 4-3 0-5-1.4-6-4Z"/>
                                     </svg>
                                 </span>
-                                <div><strong>Aire / ventilador</strong><small>Refrigera</small></div>
+                                <div><strong>Ventilador</strong><small>Renueva el aire</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-citrus">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
                                         <path d="M12 3c2 3 4 6 4 9a4 4 0 1 1-8 0c0-3 2-6 4-9Z"/>
                                         <path d="M9 14c-1 1.5-1 3 0 4M15 14c1 1.5 1 3 0 4"/>
                                     </svg>
                                 </span>
-                                <div><strong>Aromatizador</strong><small>Mejora el aire</small></div>
+                                <div><strong>Aromatizador</strong><small>Neutraliza olores</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-warning">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
                                         <path d="M9 3h6l2 5a6 6 0 1 1-10 0Z"/>
@@ -403,18 +452,79 @@
                                 </span>
                                 <div><strong>LED de alerta</strong><small>Aviso visual</small></div>
                             </div>
-                            <div class="ea-hardware-item">
+                            <div class="ea-hardware-item tone-success">
                                 <span class="ea-hardware-item-ico">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
                                         <path d="M12 3.5c2.4 2.8 5.5 6 5.5 9.5a5.5 5.5 0 1 1-11 0c0-3.5 3.1-6.7 5.5-9.5Z"/>
                                         <path d="M8.5 13.5c.6 1.6 2 2.7 3.5 2.7"/>
                                     </svg>
                                 </span>
-                                <div><strong>Humidificador</strong><small>Preparado</small></div>
+                                <div><strong>Humidificador</strong><small>Regula humedad</small></div>
                             </div>
                         </div>
                     </article>
                 </div>
+            </div>
+        </section>
+
+        <section class="ea-section" id="automatizacion" data-reveal>
+            <div class="ea-page">
+                <div class="ea-section-head">
+                    <p class="ea-eyebrow">05 / Automatización</p>
+                    <h2>Reglas que <em>cuidan</em> el ambiente.</h2>
+                </div>
+
+                <p class="ea-rules-intro" data-reveal-child>
+                    EdenAir vigila las variables sin parar y reacciona apenas algo se sale del rango ideal.
+                    Cada regla es simple, transparente y siempre se puede revisar o ajustar.
+                </p>
+
+                <div class="ea-rules">
+                    <article class="ea-rule" data-reveal-child>
+                        <header class="ea-rule-head">
+                            <span class="ea-rule-num">01</span>
+                            <span class="ea-badge ea-badge--danger">Aire viciado</span>
+                        </header>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">CO₂</span> <span class="ea-rule-op">&gt;</span> <span class="ea-rule-val">1000 ppm</span></p>
+                        <p class="ea-rule-arrow" aria-hidden="true">↓</p>
+                        <p class="ea-rule-action">Encender <strong>ventilador</strong> hasta renovar el aire.</p>
+                    </article>
+
+                    <article class="ea-rule" data-reveal-child>
+                        <header class="ea-rule-head">
+                            <span class="ea-rule-num">02</span>
+                            <span class="ea-badge ea-badge--info">Aire seco</span>
+                        </header>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">Humedad</span> <span class="ea-rule-op">&lt;</span> <span class="ea-rule-val">40 %</span></p>
+                        <p class="ea-rule-arrow" aria-hidden="true">↓</p>
+                        <p class="ea-rule-action">Activar <strong>humidificador</strong> hasta recuperar el confort.</p>
+                    </article>
+
+                    <article class="ea-rule" data-reveal-child>
+                        <header class="ea-rule-head">
+                            <span class="ea-rule-num">03</span>
+                            <span class="ea-badge ea-badge--warning">Calor</span>
+                        </header>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">Temperatura</span> <span class="ea-rule-op">&gt;</span> <span class="ea-rule-val">28 °C</span></p>
+                        <p class="ea-rule-arrow" aria-hidden="true">↓</p>
+                        <p class="ea-rule-action">Encender <strong>ventilador</strong> para refrescar el ambiente.</p>
+                    </article>
+
+                    <article class="ea-rule" data-reveal-child>
+                        <header class="ea-rule-head">
+                            <span class="ea-rule-num">04</span>
+                            <span class="ea-badge ea-badge--success">Aire pesado</span>
+                        </header>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">Calidad</span> <span class="ea-rule-op">&lt;</span> <span class="ea-rule-val">60 / 100</span></p>
+                        <p class="ea-rule-arrow" aria-hidden="true">↓</p>
+                        <p class="ea-rule-action">Activar <strong>aromatizador</strong> y mostrar <strong>LED</strong>.</p>
+                    </article>
+                </div>
+
+                <p class="ea-rules-foot">
+                    <span class="ea-badge ea-badge--neutral">Modo manual</span>
+                    &nbsp;Cada actuador también se puede operar a mano desde el panel.
+                </p>
             </div>
         </section>
 

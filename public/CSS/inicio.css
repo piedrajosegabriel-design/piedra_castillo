@@ -4,6 +4,27 @@
    scroll reveal, navbar scroll-spy). El dashboard no usa este archivo.
    ===================================================================== */
 
+/* ---------- Scroll progress bar (solo landing) ---------------------- */
+.ea-landing .ea-scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 60;
+    background: transparent;
+    pointer-events: none;
+}
+
+.ea-landing .ea-scroll-progress > span {
+    display: block;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(to right, var(--eden-500), var(--ea-citrus));
+    transition: width 0.12s linear;
+    box-shadow: 0 0 12px rgba(74, 122, 85, 0.35);
+}
+
 /* ---------- Navbar pública con scroll-spy --------------------------- */
 .ea-navbar { transition: padding 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease; }
 
@@ -147,10 +168,13 @@
     background: var(--eden-100);
     color: var(--eden-700);
     font-family: var(--ea-font-mono);
+    font-style: normal;
+    font-weight: 500;
     font-size: 11.5px;
+    line-height: 1.2;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-bottom: 18px;
+    margin: 0 0 18px;
     border: 1px solid rgba(74, 122, 85, 0.18);
 }
 
@@ -603,29 +627,42 @@
     border-color: rgba(236, 242, 232, 0.42);
 }
 
-/* ---------- Scroll reveal global ----------------------------------- */
+/* ---------- Scroll reveal global -----------------------------------
+   Implementación con CSS variables (--reveal-y / --hover-y) para que
+   el :hover transform pueda componerse con el reveal sin pelearse por
+   especificidad. Sin esto, `transform: none` del .is-visible ganaba y
+   los hover-lift de feature/rule/hardware no se aplicaban.
+   ------------------------------------------------------------------ */
 [data-reveal] {
+    --reveal-y: 20px;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate3d(0, var(--reveal-y), 0);
     transition: opacity 0.7s cubic-bezier(.2,.7,.2,1), transform 0.7s cubic-bezier(.2,.7,.2,1);
     will-change: opacity, transform;
 }
 
 [data-reveal].is-visible {
+    --reveal-y: 0px;
     opacity: 1;
-    transform: none;
 }
 
 [data-reveal-child] {
+    --reveal-y: 14px;
     opacity: 0;
-    transform: translateY(14px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translate3d(0, var(--reveal-y), 0);
+    transition: opacity 0.6s ease, transform 0.45s cubic-bezier(.2,.7,.2,1);
     transition-delay: calc(var(--reveal-i, 0) * 80ms);
 }
 
 [data-reveal].is-visible [data-reveal-child] {
+    --reveal-y: 0px;
     opacity: 1;
-    transform: none;
+}
+
+/* Una vez completado el reveal, JS marca .is-revealed para que el delay
+   cascada no se aplique al hover-out (que se sentía pegajoso). */
+[data-reveal].is-revealed [data-reveal-child] {
+    transition-delay: 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -664,3 +701,509 @@ section[id] { scroll-margin-top: 90px; }
 }
 
 .ea-feature-card:hover::after { transform: scaleX(1); }
+
+.ea-feature-card .ea-feature-icon {
+    transition: transform 0.35s cubic-bezier(.2,.7,.2,1), background-color 0.25s ease;
+}
+
+.ea-feature-card:hover .ea-feature-icon {
+    transform: translateY(-3px) rotate(-4deg);
+    background: var(--eden-200);
+}
+
+:root[data-theme="dark"] .ea-feature-card:hover .ea-feature-icon {
+    background: rgba(74, 122, 85, 0.32);
+}
+
+/* ---------- Hero: hojas flotantes (ambient) ------------------------- */
+.ea-hero-leaves {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ea-hero-leaf {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    opacity: 0.85;
+    filter: drop-shadow(0 6px 14px rgba(20, 32, 26, 0.08));
+}
+
+.ea-hero-leaf--a {
+    top: 14%;
+    left: 4%;
+    width: 56px;
+    height: 56px;
+    animation: ea-leaf-float 14s ease-in-out infinite;
+}
+
+.ea-hero-leaf--b {
+    top: 68%;
+    left: 8%;
+    width: 42px;
+    height: 42px;
+    animation: ea-leaf-float 18s ease-in-out infinite 1.4s reverse;
+}
+
+.ea-hero-leaf--c {
+    top: 28%;
+    right: 6%;
+    width: 80px;
+    height: 80px;
+    animation: ea-leaf-float 22s ease-in-out infinite 2.6s;
+}
+
+@keyframes ea-leaf-float {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%      { transform: translate3d(10px, -16px, 0) rotate(8deg); }
+}
+
+@media (max-width: 720px) {
+    .ea-hero-leaf--c { display: none; }
+}
+
+/* ---------- Hero readout (live stats card) ------------------------- */
+.ea-hero-readout {
+    padding: 26px 28px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--ea-r-lg);
+}
+
+.ea-hero-readout::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(140deg, rgba(201,216,112,0.18), transparent 50%, rgba(74,122,85,0.18));
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.ea-hero-readout > * { position: relative; z-index: 1; }
+
+.ea-hero-readout-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ea-hero-readout-head .ea-eyebrow,
+.ea-card--ink .ea-eyebrow {
+    color: rgba(236, 242, 232, 0.72);
+    background: transparent;
+}
+
+.ea-hero-readout-head .ea-eyebrow::before,
+.ea-card--ink .ea-eyebrow::before {
+    background: var(--ea-citrus);
+}
+
+.ea-hero-pulse {
+    display: inline-flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 16px;
+}
+
+.ea-hero-pulse span {
+    display: block;
+    width: 3px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--ea-citrus);
+    animation: ea-pulse-bar 1.4s ease-in-out infinite;
+}
+
+.ea-hero-pulse span:nth-child(2) { animation-delay: 0.18s; }
+.ea-hero-pulse span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes ea-pulse-bar {
+    0%, 100% { height: 4px; opacity: 0.4; }
+    50%      { height: 14px; opacity: 1; }
+}
+
+.ea-hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin: 20px 0 18px;
+}
+
+.ea-hero-stat {
+    position: relative;
+}
+
+.ea-hero-stat-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.72);
+    margin: 0 0 6px;
+}
+
+.ea-hero-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--dot, var(--ea-citrus));
+    box-shadow: 0 0 8px var(--dot, var(--ea-citrus));
+}
+
+.ea-hero-stat-value {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--eden-100);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.ea-hero-stat-unit {
+    font-family: var(--ea-font-mono);
+    font-size: 12px;
+    color: rgba(236, 242, 232, 0.6);
+    margin-left: 6px;
+    letter-spacing: 0.06em;
+}
+
+.ea-hero-readout-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--ea-gap-md);
+    border-top: 1px solid rgba(236, 242, 232, 0.14);
+    padding-top: 14px;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.6);
+}
+
+.ea-hero-readout-status {
+    color: var(--ea-citrus);
+}
+
+/* ---------- Hardware items: tonos por categoría --------------------- */
+.ea-hardware-item.tone-success { --tone: var(--ea-success); --tone-soft: var(--ea-success-soft); }
+.ea-hardware-item.tone-info    { --tone: var(--ea-info);    --tone-soft: var(--ea-info-soft); }
+.ea-hardware-item.tone-warning { --tone: var(--ea-warning); --tone-soft: var(--ea-warning-soft); }
+.ea-hardware-item.tone-citrus  { --tone: #8a9933;           --tone-soft: rgba(201, 216, 112, 0.22); }
+
+.ea-hardware-item[class*="tone-"] .ea-hardware-item-ico {
+    color: var(--tone, var(--eden-700));
+    background: var(--tone-soft, var(--eden-100));
+}
+
+.ea-hardware-item[class*="tone-"]:hover {
+    border-color: var(--tone, var(--eden-300));
+    background: var(--tone-soft, var(--ea-linen));
+}
+
+:root[data-theme="dark"] .ea-hardware-item.tone-citrus { --tone: var(--ea-citrus); }
+:root[data-theme="dark"] .ea-hardware-item.tone-warning { --tone: var(--ea-clay); }
+:root[data-theme="dark"] .ea-hardware-item.tone-info { --tone: var(--ea-breath); }
+:root[data-theme="dark"] .ea-hardware-item.tone-success { --tone: var(--eden-300); }
+
+/* ---------- Sección Automatización (reglas) ------------------------- */
+.ea-rules-intro {
+    max-width: 64ch;
+    font-size: 16px;
+    color: var(--ea-ink-2);
+    margin: 0 0 28px;
+    line-height: 1.6;
+}
+
+.ea-rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--ea-gap-lg);
+}
+
+.ea-rule {
+    position: relative;
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule-soft);
+    border-radius: var(--ea-r-lg);
+    padding: 22px 22px 24px;
+    box-shadow: var(--ea-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    overflow: hidden;
+}
+
+.ea-rule::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--eden-500), var(--ea-citrus));
+    opacity: 0.85;
+}
+
+.ea-rule:hover {
+    transform: translateY(-4px);
+    border-color: var(--eden-300);
+    box-shadow: var(--ea-shadow-md);
+}
+
+.ea-rule-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ea-rule-num {
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    color: var(--ea-mute);
+}
+
+.ea-rule-cond {
+    font-family: var(--ea-font-mono);
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--ea-ink);
+    background: var(--ea-linen);
+    border-radius: var(--ea-r-sm);
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1.2;
+    margin: 4px 0 6px;
+}
+
+:root[data-theme="dark"] .ea-rule-cond {
+    background: rgba(236, 242, 232, 0.05);
+    color: var(--eden-100);
+}
+
+.ea-rule-var {
+    font-weight: 500;
+    color: var(--eden-700);
+}
+
+:root[data-theme="dark"] .ea-rule-var { color: var(--eden-300); }
+
+.ea-rule-op {
+    color: var(--ea-mute);
+    font-size: 13px;
+}
+
+.ea-rule-val {
+    color: var(--ea-earth);
+    font-weight: 500;
+}
+
+:root[data-theme="dark"] .ea-rule-val { color: var(--ea-clay); }
+
+.ea-rule-arrow {
+    font-family: var(--ea-font-mono);
+    font-size: 18px;
+    color: var(--eden-400);
+    line-height: 1;
+    text-align: center;
+    margin: 2px 0;
+    opacity: 0.7;
+}
+
+.ea-rule-action {
+    font-size: 14.5px;
+    color: var(--ea-ink-2);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.ea-rule-action strong {
+    color: var(--ea-ink);
+    font-weight: 600;
+}
+
+:root[data-theme="dark"] .ea-rule-action strong { color: var(--eden-100); }
+
+.ea-rules-foot {
+    margin-top: 24px;
+    font-size: 13.5px;
+    color: var(--ea-mute);
+    text-align: center;
+}
+
+/* ---------- Navbar móvil (hamburger drawer) ------------------------ */
+.ea-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 50;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    color: var(--ea-ink);
+    box-shadow: var(--ea-shadow-sm);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-nav-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.3);
+}
+
+.ea-nav-toggle-bars {
+    position: relative;
+    width: 18px;
+    height: 14px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ea-nav-toggle-bars span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+    transform-origin: center;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(2) { opacity: 0; }
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+.ea-mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(13, 22, 18, 0.96);
+    backdrop-filter: blur(14px);
+    color: var(--eden-100);
+    padding: 80px 28px 32px;
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.ea-mobile-nav.is-open {
+    display: flex;
+    opacity: 1;
+    transform: none;
+}
+
+.ea-mobile-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-mobile-nav a {
+    display: block;
+    padding: 14px 16px;
+    border-radius: var(--ea-r-md);
+    font-family: var(--ea-font-serif);
+    font-size: 24px;
+    letter-spacing: -0.012em;
+    color: var(--eden-100);
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ea-mobile-nav a:hover,
+.ea-mobile-nav a:focus-visible {
+    background: rgba(74, 122, 85, 0.28);
+    border-color: rgba(188, 210, 189, 0.18);
+    outline: none;
+}
+
+.ea-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(236, 242, 232, 0.1);
+}
+
+.ea-mobile-nav-actions .ea-button-secondary {
+    background: rgba(236, 242, 232, 0.08);
+    color: var(--eden-100);
+    border-color: rgba(236, 242, 232, 0.22);
+}
+
+.ea-mobile-nav-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 6px 4px 14px;
+    border-bottom: 1px solid rgba(236, 242, 232, 0.08);
+    margin-bottom: 6px;
+}
+
+.ea-mobile-nav-theme-label {
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.58);
+}
+
+@media (max-width: 900px) {
+    .ea-nav-toggle { display: inline-flex; }
+    /* Ocultamos las acciones de navbar enteras (incluido theme toggle)
+       para que no se solapen con el hamburger fijo. El theme toggle
+       queda accesible dentro del drawer. */
+    .ea-landing .ea-navbar .ea-nav-actions { display: none; }
+}
+
+body.ea-nav-open {
+    overflow: hidden;
+}
+
+/* ---------- Hero stats: counter typography & ticker --------------- */
+[data-counter] { font-variant-numeric: tabular-nums; }
+
+/* ---------- Sección "Sensores y actuadores" head ------------------- */
+.ea-hardware-block {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.ea-hardware-block:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ea-shadow-md);
+    border-color: var(--eden-300);
+}

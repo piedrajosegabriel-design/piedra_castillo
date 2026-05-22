@@ -12,6 +12,51 @@ document.addEventListener("DOMContentLoaded", function () {
     syncNavbarScrolled();
     window.addEventListener("scroll", syncNavbarScrolled, { passive: true });
 
+    /* -------- Scroll progress bar -------- */
+    var progressFill = document.querySelector("[data-ea-progress]");
+    function syncProgress() {
+        if (!progressFill) return;
+        var doc = document.documentElement;
+        var scrollable = (doc.scrollHeight - window.innerHeight);
+        var pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+        if (pct < 0) pct = 0;
+        if (pct > 100) pct = 100;
+        progressFill.style.width = pct.toFixed(2) + "%";
+    }
+    syncProgress();
+    window.addEventListener("scroll", syncProgress, { passive: true });
+    window.addEventListener("resize", syncProgress);
+
+    /* -------- Mobile nav drawer -------- */
+    var navToggle = document.querySelector("[data-ea-nav-toggle]");
+    var mobileNav = document.querySelector("[data-ea-mobile-nav]");
+
+    function setMobileNav(open) {
+        if (!navToggle || !mobileNav) return;
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        mobileNav.setAttribute("aria-hidden", open ? "false" : "true");
+        mobileNav.classList.toggle("is-open", open);
+        document.body.classList.toggle("ea-nav-open", open);
+        navToggle.setAttribute("aria-label", open ? "Cerrar menú de navegación" : "Abrir menú de navegación");
+    }
+
+    if (navToggle && mobileNav) {
+        navToggle.addEventListener("click", function () {
+            var isOpen = navToggle.getAttribute("aria-expanded") === "true";
+            setMobileNav(!isOpen);
+        });
+        mobileNav.addEventListener("click", function (e) {
+            var link = e.target.closest && e.target.closest("a");
+            if (link) setMobileNav(false);
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") setMobileNav(false);
+        });
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 900) setMobileNav(false);
+        });
+    }
+
     /* -------- Anchor scroll respeta navbar -------- */
     function getNavbarOffset() {
         if (!navbar) return 80;
@@ -90,13 +135,22 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (reducedMotion || typeof IntersectionObserver !== "function") {
-            reveals.forEach(function (el) { el.classList.add("is-visible"); });
+            reveals.forEach(function (el) {
+                el.classList.add("is-visible");
+                el.classList.add("is-revealed");
+            });
         } else {
             var obs = new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add("is-visible");
-                        obs.unobserve(entry.target);
+                        var target = entry.target;
+                        target.classList.add("is-visible");
+                        obs.unobserve(target);
+                        var childCount = target.querySelectorAll("[data-reveal-child]").length;
+                        var totalMs = 700 + childCount * 80;
+                        window.setTimeout(function () {
+                            target.classList.add("is-revealed");
+                        }, totalMs);
                     }
                 });
             }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
@@ -216,5 +270,34 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("resize", update);
         update();
         startAutoplay();
+    }
+
+    /* -------- Hero count-up animation -------- */
+    var counters = document.querySelectorAll("[data-counter]");
+    if (counters.length) {
+        counters.forEach(function (el) {
+            var target = parseFloat(el.getAttribute("data-counter-target"));
+            var decimals = parseInt(el.getAttribute("data-counter-decimals") || "0", 10);
+            if (isNaN(target)) return;
+            if (reducedMotion) {
+                el.textContent = target.toFixed(decimals);
+                return;
+            }
+            var duration = 1400;
+            var start = null;
+            function tick(ts) {
+                if (start === null) start = ts;
+                var elapsed = ts - start;
+                var t = Math.min(1, elapsed / duration);
+                // easeOutCubic
+                var eased = 1 - Math.pow(1 - t, 3);
+                var value = target * eased;
+                el.textContent = value.toFixed(decimals);
+                if (t < 1) window.requestAnimationFrame(tick);
+                else el.textContent = target.toFixed(decimals);
+            }
+            // pequeño delay para sincronizar con el fade del hero
+            window.setTimeout(function () { window.requestAnimationFrame(tick); }, 420);
+        });
     }
 });

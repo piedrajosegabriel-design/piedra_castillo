@@ -3,7 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
     var TEMA_CLARO = "light";
     var TEMA_OSCURO = "dark";
     var raiz = document.documentElement;
-    var toggle = document.getElementById("input");
+    // Soporta varios toggles a la vez (navbar desktop + drawer mobile, etc.)
+    var toggles = Array.prototype.slice.call(
+        document.querySelectorAll('.ea-theme-switch input[type="checkbox"]')
+    );
+    if (!toggles.length) {
+        var legacy = document.getElementById("input");
+        if (legacy) toggles.push(legacy);
+    }
 
     function esTemaValido(tema) {
         return tema === TEMA_CLARO || tema === TEMA_OSCURO;
@@ -36,16 +43,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function actualizarToggle(tema) {
-        if (!toggle) {
+        if (!toggles.length) {
             return;
         }
 
         var esOscuro = tema === TEMA_OSCURO;
 
-        toggle.checked = esOscuro;
-        toggle.defaultChecked = esOscuro;
-        toggle.setAttribute("aria-checked", esOscuro ? "true" : "false");
-        toggle.setAttribute("title", esOscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+        toggles.forEach(function (toggle) {
+            toggle.checked = esOscuro;
+            toggle.defaultChecked = esOscuro;
+            toggle.setAttribute("aria-checked", esOscuro ? "true" : "false");
+            toggle.setAttribute("title", esOscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+        });
     }
 
     function aplicarTema(tema, guardar) {
@@ -60,11 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
         actualizarToggle(temaFinal);
     }
 
-    if (toggle) {
+    toggles.forEach(function (toggle) {
         toggle.addEventListener("change", function () {
             aplicarTema(this.checked ? TEMA_OSCURO : TEMA_CLARO, true);
         });
-    }
+    });
 
     window.addEventListener("storage", function (event) {
         if (event.key && event.key !== CLAVE_TEMA) {
