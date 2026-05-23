@@ -106,42 +106,95 @@
                     </div>
                 </div>
 
-                <article class="ea-card ea-card--ink ea-hero-card-anim ea-hero-readout">
-                    <header class="ea-hero-readout-head">
-                        <p class="ea-eyebrow">Sala — lectura en vivo</p>
-                        <span class="ea-hero-pulse" aria-hidden="true">
-                            <span></span><span></span><span></span>
-                        </span>
-                    </header>
+                <div class="ea-hero-core ea-hero-card-anim"
+                     data-eden-core
+                     data-eden-core-src="<?= base_url('assets/models/eden-air-core.glb') ?>"
+                     data-eden-core-endpoint="<?= site_url('api/sensores') ?>">
+                    <div class="ea-hero-core-stage" data-eden-core-stage role="button" tabindex="0"
+                         aria-label="Activar núcleo EdenAir para ver datos ambientales">
+                        <span class="ea-hero-core-shadow" aria-hidden="true"></span>
+                        <span class="ea-hero-core-glow" aria-hidden="true"></span>
+                        <span class="ea-hero-core-rim" aria-hidden="true"></span>
+                        <canvas class="ea-hero-core-canvas" data-eden-core-canvas aria-hidden="true"></canvas>
+                        <div class="ea-hero-core-particles" data-eden-core-particles aria-hidden="true"></div>
 
-                    <div class="ea-hero-stats">
-                        <div class="ea-hero-stat">
-                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-citrus);"></span>CO₂</p>
-                            <strong class="ea-hero-stat-value" data-counter data-counter-target="612" data-counter-decimals="0">0</strong>
-                            <span class="ea-hero-stat-unit">ppm</span>
+                        <div class="ea-hero-core-fallback" data-eden-core-fallback>
+                            <span class="ea-hero-core-fallback-orb" aria-hidden="true"></span>
+                            <p class="ea-eyebrow">EdenAir · Núcleo</p>
+                            <p class="ea-hero-core-fallback-msg">Cargando núcleo 3D…</p>
                         </div>
-                        <div class="ea-hero-stat">
-                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-breath);"></span>Humedad</p>
-                            <strong class="ea-hero-stat-value" data-counter data-counter-target="48" data-counter-decimals="0">0</strong>
-                            <span class="ea-hero-stat-unit">%</span>
-                        </div>
-                        <div class="ea-hero-stat">
-                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--eden-300);"></span>Temperatura</p>
-                            <strong class="ea-hero-stat-value" data-counter data-counter-target="22.4" data-counter-decimals="1">0.0</strong>
-                            <span class="ea-hero-stat-unit">°C</span>
-                        </div>
-                        <div class="ea-hero-stat">
-                            <p class="ea-hero-stat-label"><span class="ea-hero-dot" style="--dot: var(--ea-clay);"></span>Aire</p>
-                            <strong class="ea-hero-stat-value" data-counter data-counter-target="82" data-counter-decimals="0">0</strong>
-                            <span class="ea-hero-stat-unit">/100</span>
+
+                        <div class="ea-hero-core-hint" data-eden-core-hint>
+                            <span class="ea-hero-core-hint-dot" aria-hidden="true"></span>
+                            <span>Tocá el núcleo para encender</span>
                         </div>
                     </div>
 
-                    <div class="ea-hero-readout-foot">
-                        <span>EA-ENV-01 · ESP32</span>
-                        <span class="ea-hero-readout-status">● Aire limpio</span>
+                    <div class="ea-hero-core-cards" data-eden-core-cards aria-hidden="true">
+                        <article class="ea-hero-core-card" data-metric="temperatura" style="--card-tone: var(--eden-300);">
+                            <span class="ea-hero-core-card-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 4a2 2 0 0 0-2 2v8.2a3.6 3.6 0 1 0 4 0V6a2 2 0 0 0-2-2Z"/>
+                                    <circle cx="12" cy="16.5" r="1.4" fill="currentColor"/>
+                                </svg>
+                            </span>
+                            <div class="ea-hero-core-card-body">
+                                <p class="ea-hero-core-card-label">Temperatura</p>
+                                <p class="ea-hero-core-card-readout">
+                                    <strong data-value>--</strong>
+                                    <span class="ea-hero-core-card-unit" data-unit>°C</span>
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="ea-hero-core-card" data-metric="humedad" style="--card-tone: var(--ea-breath);">
+                            <span class="ea-hero-core-card-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+                                    <path d="M12 3.5c2.4 2.8 5.5 6 5.5 9.5a5.5 5.5 0 1 1-11 0c0-3.5 3.1-6.7 5.5-9.5Z"/>
+                                </svg>
+                            </span>
+                            <div class="ea-hero-core-card-body">
+                                <p class="ea-hero-core-card-label">Humedad</p>
+                                <p class="ea-hero-core-card-readout">
+                                    <strong data-value>--</strong>
+                                    <span class="ea-hero-core-card-unit" data-unit>%</span>
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="ea-hero-core-card" data-metric="co2" style="--card-tone: var(--ea-citrus);">
+                            <span class="ea-hero-core-card-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                    <circle cx="12" cy="12" r="8"/>
+                                    <text x="12" y="14.5" text-anchor="middle" font-size="6.5" font-family="DM Mono, monospace" fill="currentColor" stroke="none">CO₂</text>
+                                </svg>
+                            </span>
+                            <div class="ea-hero-core-card-body">
+                                <p class="ea-hero-core-card-label">CO₂</p>
+                                <p class="ea-hero-core-card-readout">
+                                    <strong data-value>--</strong>
+                                    <span class="ea-hero-core-card-unit" data-unit>ppm</span>
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="ea-hero-core-card" data-metric="calidad_aire" style="--card-tone: var(--eden-400);">
+                            <span class="ea-hero-core-card-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                    <path d="M3 9h12a3 3 0 1 0-3-3"/>
+                                    <path d="M3 14h15a3 3 0 1 1-3 3"/>
+                                </svg>
+                            </span>
+                            <div class="ea-hero-core-card-body">
+                                <p class="ea-hero-core-card-label">Calidad del aire</p>
+                                <p class="ea-hero-core-card-readout">
+                                    <strong data-value>--</strong>
+                                    <span class="ea-hero-core-card-unit" data-unit>/100</span>
+                                </p>
+                            </div>
+                        </article>
                     </div>
-                </article>
+                </div>
             </div>
         </section>
 
@@ -556,5 +609,14 @@
 
 <script src="<?= base_url('JS/tema.js') ?>"></script>
 <script src="<?= base_url('JS/inicio.js') ?>"></script>
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+<script type="module" src="<?= base_url('JS/eden-core-3d.js') ?>"></script>
 </body>
 </html>
