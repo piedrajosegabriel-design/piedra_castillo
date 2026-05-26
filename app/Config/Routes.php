@@ -37,27 +37,28 @@ $routes->group('api/devices', static function ($routes) {
 });
 
 // Endpoint público de lectura ambiental usado por el core 3D del hero.
+// Datos simulados — preparado para cablear medición real más adelante.
 $routes->get('api/sensores', static function () {
     $rand = static fn (float $min, float $max): float => $min + mt_rand() / mt_getrandmax() * ($max - $min);
 
-    $temperatura  = round($rand(21.5, 24.5), 1);
-    $humedad      = (int) round($rand(42, 58));
-    $co2          = (int) round($rand(520, 780));
-    $calidadAire  = (int) round($rand(72, 92));
+    $temperatura = round($rand(21.5, 23.5), 0);
+    $humedad     = (int) round($rand(45, 52));
+    $co2ppm      = (int) round($rand(520, 720));
+    $calidad     = (int) round($rand(82, 95));
 
-    $estado = ($co2 < 800 && $calidadAire >= 70 && $temperatura <= 26 && $humedad >= 40 && $humedad <= 60)
-        ? 'optimo'
-        : 'atencion';
+    $co2Estado = $co2ppm < 800 ? 'OK' : 'Alto';
+    $calidadEt = $calidad >= 90 ? 'Excelente' : ($calidad >= 75 ? 'Buena' : 'Regular');
 
     return service('response')->setJSON([
         'status'    => 'success',
         'timestamp' => date('c'),
-        'estado'    => $estado,
         'sensores'  => [
-            'temperatura'    => ['valor' => $temperatura, 'unidad' => '°C'],
-            'humedad'        => ['valor' => $humedad,     'unidad' => '%'],
-            'co2'            => ['valor' => $co2,         'unidad' => 'ppm'],
-            'calidad_aire'   => ['valor' => $calidadAire, 'unidad' => '/100'],
+            'temperatura'    => ['valor' => $temperatura, 'unidad' => '°C', 'texto' => $temperatura . ' °C'],
+            'humedad'        => ['valor' => $humedad,     'unidad' => '%',  'texto' => $humedad . ' %'],
+            'co2'            => ['valor' => $co2ppm,      'unidad' => 'ppm','texto' => $co2Estado],
+            'calidad_aire'   => ['valor' => $calidad,     'unidad' => '/100','texto' => $calidadEt],
+            'ventilador'     => ['valor' => 'activo',     'texto' => 'Activo'],
+            'humidificacion' => ['valor' => 'optima',     'texto' => 'Óptima'],
         ],
     ]);
 });

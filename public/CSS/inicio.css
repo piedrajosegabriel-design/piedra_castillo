@@ -4,27 +4,6 @@
    scroll reveal, navbar scroll-spy). El dashboard no usa este archivo.
    ===================================================================== */
 
-/* ---------- Scroll progress bar (solo landing) ---------------------- */
-.ea-landing .ea-scroll-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    z-index: 60;
-    background: transparent;
-    pointer-events: none;
-}
-
-.ea-landing .ea-scroll-progress > span {
-    display: block;
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(to right, var(--eden-500), var(--ea-citrus));
-    transition: width 0.12s linear;
-    box-shadow: 0 0 12px rgba(74, 122, 85, 0.35);
-}
-
 /* ---------- Navbar pública con scroll-spy --------------------------- */
 .ea-navbar { transition: padding 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease; }
 
@@ -92,8 +71,26 @@
     .ea-nav-links { display: none; }
 }
 
-/* ---------- Hero: extras animados ----------------------------------- */
-.ea-hero { isolation: isolate; }
+/* ---------- Hero: viewport-exact + extras animados ------------------ */
+.ea-hero {
+    isolation: isolate;
+    min-height: calc(100svh - var(--ea-nav-h, 72px));
+    display: flex;
+    align-items: center;
+    padding-top:    clamp(24px, 4vw, 56px);
+    padding-bottom: clamp(40px, 6vw, 88px);
+}
+.ea-hero .ea-page,
+.ea-hero .ea-hero-grid { width: 100%; }
+
+/* En mobile el grid pasa a 1 columna y el viewport puede no alcanzar */
+@media (max-width: 920px) {
+    .ea-hero {
+        min-height: auto;
+        padding-top: clamp(28px, 6vw, 56px);
+        padding-bottom: clamp(48px, 8vw, 80px);
+    }
+}
 
 .ea-hero-orbits {
     position: absolute;
@@ -1209,9 +1206,11 @@ body.ea-nav-open {
 }
 
 /* =====================================================================
-   Hero — Núcleo 3D interactivo (EdenAir Core)
-   Layout deliberadamente con alturas fijas (sin aspect-ratio) para evitar
-   feedback con el renderer y mantener el hero estable.
+   Hero — Núcleo 3D flotante (EdenAir Core)
+   El modelo flota libre, sin caja contenedora visible. Sólo glow + sombra
+   debajo. Las tarjetas con datos aparecen alrededor en hover y se ocultan
+   al salir. Drag para rotar el modelo. Pensado para no romper el grid del
+   hero y nunca generar scroll horizontal.
    ===================================================================== */
 .ea-landing { overflow-x: clip; }
 
@@ -1219,175 +1218,126 @@ body.ea-nav-open {
     position: relative;
     width: 100%;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
+    height: 460px;
     justify-self: end;
-    max-width: 460px;
+    max-width: 520px;
     margin-left: auto;
+    /* Sin background/border/shadow: el modelo flota libre sobre el hero,
+       NO es una card. */
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: visible;
+}
+
+/* Override de .ea-hero-card-anim:hover — el núcleo 3D no debe levantarse
+   ni proyectar sombra de card en hover. Sólo se le permite el reveal
+   inicial (opacity + translate desde abajo). */
+.ea-hero-core.ea-hero-card-anim:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 .ea-hero-core-stage {
-    position: relative;
-    width: 100%;
-    height: 380px;
-    min-width: 0;
-    border-radius: 26px;
-    overflow: hidden;
-    cursor: pointer;
-    isolation: isolate;
-    background:
-        radial-gradient(circle at 50% 55%, rgba(184, 213, 208, 0.20), transparent 60%),
-        radial-gradient(circle at 50% 100%, rgba(201, 216, 112, 0.12), transparent 65%),
-        linear-gradient(180deg, rgba(244, 241, 234, 0) 0%, rgba(28, 64, 41, 0.06) 100%);
-    border: 1px solid rgba(74, 122, 85, 0.16);
-    box-shadow: 0 18px 48px -28px rgba(28, 64, 41, 0.35);
-    transition: transform 0.4s cubic-bezier(.2,.7,.2,1),
-                box-shadow 0.4s ease,
-                border-color 0.4s ease;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    /* Sin background, sin border: el modelo flota libre. */
+    transition: transform 0.5s cubic-bezier(.2,.7,.2,1);
 }
 
-:root[data-theme="dark"] .ea-hero-core-stage {
-    background:
-        radial-gradient(circle at 50% 50%, rgba(184, 213, 208, 0.16), transparent 60%),
-        radial-gradient(circle at 50% 100%, rgba(201, 216, 112, 0.10), transparent 65%),
-        linear-gradient(180deg, rgba(13, 22, 18, 0) 0%, rgba(13, 22, 18, 0.4) 100%);
-    border-color: rgba(188, 210, 189, 0.18);
+.ea-hero-core.is-dragging .ea-hero-core-stage {
+    cursor: grabbing;
 }
 
 .ea-hero-core-stage:focus-visible {
-    outline: 2px solid var(--eden-500);
-    outline-offset: 4px;
+    outline: 2px dashed var(--eden-500);
+    outline-offset: 6px;
+    border-radius: 50%;
 }
 
-.ea-hero-core.is-active .ea-hero-core-stage {
-    transform: translateY(-2px);
-    border-color: rgba(74, 122, 85, 0.32);
+/* Halo teal radial — perfectamente difuso, sin forma reconocible. Va lejos
+   con un degradado largo para que no se perciba como una "elipse" detrás. */
+.ea-hero-core-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 85%;
+    height: 85%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 50%,
+            rgba(184, 213, 208, 0.14) 0%,
+            rgba(184, 213, 208, 0.06) 22%,
+            rgba(184, 213, 208, 0) 55%);
+    filter: blur(40px);
+    opacity: 0.55;
+    transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
-/* Canvas: ocupa el stage exactamente. !important para evitar que el
-   renderer le inyecte un width/height inline que rompa el layout. */
+:root[data-theme="dark"] .ea-hero-core-glow {
+    background:
+        radial-gradient(circle at 50% 50%,
+            rgba(184, 213, 208, 0.13) 0%,
+            rgba(184, 213, 208, 0.06) 22%,
+            rgba(184, 213, 208, 0) 55%);
+}
+
+.ea-hero-core.is-active .ea-hero-core-glow {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(1.025);
+}
+
+/* Sombra de "contacto" — muy reducida, sólo para que el modelo no parezca
+   volar contra un vacío. Se ve apenas. */
+.ea-hero-core-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    width: 32%;
+    height: 8px;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(13, 22, 18, 0.14) 0%, rgba(13, 22, 18, 0) 70%);
+    filter: blur(10px);
+    opacity: 0.22;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+:root[data-theme="dark"] .ea-hero-core-shadow {
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 70%);
+    opacity: 0.28;
+}
+
+.ea-hero-core.is-active .ea-hero-core-shadow {
+    opacity: 0.32;
+    transform: translateX(-50%) scale(1.04);
+}
+
+/* Canvas Three.js — transparente, ocupa todo el stage, no captura
+   pointer (el stage es el que escucha hover/drag). */
 .ea-hero-core-canvas {
     position: absolute;
-    left: 0;
-    top: 0;
+    inset: 0;
     width: 100% !important;
     height: 100% !important;
     display: block;
-    z-index: 3;
+    z-index: 2;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.7s ease;
 }
 
 .ea-hero-core.is-ready .ea-hero-core-canvas { opacity: 1; }
 
-.ea-hero-core-glow {
-    position: absolute;
-    inset: -8%;
-    z-index: 1;
-    pointer-events: none;
-    background: radial-gradient(circle at 50% 55%, rgba(184, 213, 208, 0.55) 0%, rgba(74, 122, 85, 0) 55%);
-    opacity: 0.45;
-    filter: blur(14px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.ea-hero-core.is-powered .ea-hero-core-glow {
-    opacity: 0.95;
-    transform: scale(1.06);
-}
-
-.ea-hero-core-rim {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 220px;
-    height: 220px;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid rgba(74, 122, 85, 0.18);
-    z-index: 2;
-    pointer-events: none;
-    transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.5s ease, width 0.5s ease, height 0.5s ease;
-}
-
-.ea-hero-core-rim::before,
-.ea-hero-core-rim::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1px dashed rgba(74, 122, 85, 0.2);
-    animation: ea-core-spin 24s linear infinite;
-}
-
-.ea-hero-core-rim::after {
-    inset: 18%;
-    border-style: solid;
-    border-color: rgba(201, 216, 112, 0.25);
-    animation-duration: 38s;
-    animation-direction: reverse;
-}
-
-@keyframes ea-core-spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-.ea-hero-core.is-ready .ea-hero-core-rim {
-    width: 260px;
-    height: 260px;
-    border-color: rgba(74, 122, 85, 0.22);
-}
-
-.ea-hero-core.is-powered .ea-hero-core-rim {
-    border-color: rgba(184, 213, 208, 0.55);
-    box-shadow: 0 0 28px rgba(184, 213, 208, 0.22);
-}
-
-.ea-hero-core.is-powered .ea-hero-core-rim::before {
-    border-color: rgba(184, 213, 208, 0.55);
-}
-
-.ea-hero-core.is-powered .ea-hero-core-rim::after {
-    border-color: rgba(201, 216, 112, 0.55);
-}
-
-.ea-hero-core-shadow {
-    position: absolute;
-    left: 50%;
-    bottom: 8%;
-    width: 56%;
-    height: 18px;
-    transform: translateX(-50%);
-    z-index: 1;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, rgba(13, 22, 18, 0.32) 0%, rgba(13, 22, 18, 0) 70%);
-    filter: blur(10px);
-    opacity: 0.55;
-}
-
-:root[data-theme="dark"] .ea-hero-core-shadow {
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 70%);
-}
-
-.ea-hero-core-particles {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(201, 216, 112, 0.10), transparent 60%);
-    transition: opacity 0.6s ease;
-}
-
-.ea-hero-core.is-powered .ea-hero-core-particles {
-    opacity: 1;
-}
-
-/* ---------- Fallback / placeholder visual (mientras carga el GLB) -- */
+/* Fallback / placeholder mientras carga el GLB. */
 .ea-hero-core-fallback {
     position: absolute;
     inset: 0;
@@ -1400,12 +1350,12 @@ body.ea-nav-open {
     text-align: center;
     padding: 24px;
     color: var(--ea-ink-2);
+    pointer-events: none;
     transition: opacity 0.6s ease;
 }
 
 .ea-hero-core.is-ready .ea-hero-core-fallback {
     opacity: 0;
-    pointer-events: none;
 }
 
 .ea-hero-core-fallback-orb {
@@ -1417,26 +1367,12 @@ body.ea-nav-open {
         radial-gradient(circle at 50% 50%, var(--eden-300) 0%, var(--eden-500) 55%, var(--eden-700) 100%);
     box-shadow:
         inset 0 -22px 36px rgba(13, 22, 18, 0.35),
-        0 18px 44px -18px rgba(74, 122, 85, 0.55),
-        0 0 0 1px rgba(74, 122, 85, 0.18);
+        0 18px 44px -18px rgba(74, 122, 85, 0.55);
     animation: ea-core-breathe 4.2s ease-in-out infinite;
 }
 
-.ea-hero-core-fallback .ea-eyebrow {
-    font-family: var(--ea-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--eden-500);
-    margin: 0;
-}
-
-:root[data-theme="dark"] .ea-hero-core-fallback .ea-eyebrow {
-    color: var(--eden-300);
-}
-
 .ea-hero-core-fallback-msg {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--ea-mute);
     margin: 0;
     font-variant-numeric: tabular-nums;
@@ -1447,202 +1383,1074 @@ body.ea-nav-open {
     50%      { transform: scale(1.05); filter: brightness(1.08); }
 }
 
-/* ---------- Hint ---------------------------------------------------- */
-.ea-hero-core-hint {
-    position: absolute;
-    left: 50%;
-    bottom: 16px;
-    transform: translateX(-50%);
-    z-index: 5;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: rgba(20, 32, 26, 0.72);
-    color: #ecf2e8;
-    font-family: var(--ea-font-mono);
-    font-size: 10.5px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    pointer-events: none;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    white-space: nowrap;
-}
-
-.ea-hero-core-hint-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--ea-citrus);
-    box-shadow: 0 0 8px rgba(201, 216, 112, 0.7);
-    animation: ea-tag-pulse 2.4s ease-in-out infinite;
-}
-
-.ea-hero-core-hint.is-hidden,
-.ea-hero-core.is-powered .ea-hero-core-hint {
-    opacity: 0;
-    transform: translate(-50%, 8px);
-}
-
-/* ---------- Tarjetas de datos (siempre en flujo, sin layout shift) - */
+/* ---------- HUD: micro-paneles ambientales emitidos por el núcleo ----
+   Cada lectura es un panel con:
+   - una columna de datos (key chiquito arriba, valor grande abajo)
+   - un acento vertical teal del lado del dispositivo
+   - una "línea emisora" (leader hairline) que sale del panel hacia el
+     núcleo, con un punto pulsante en el extremo cercano al objeto.
+   La idea es que se sientan emitidos por el dispositivo, no pegados.
+   --------------------------------------------------------------------- */
 .ea-hero-core-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
 }
 
-.ea-hero-core-card {
-    --card-tone: var(--eden-400);
+.ea-hud-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(var(--pill-out-x, 0), var(--pill-out-y, 0));
+    transition:
+        opacity 0.5s ease,
+        transform 0.55s cubic-bezier(.2,.7,.2,1);
+}
+
+/* Reverse direction para los paneles de la derecha: la línea queda
+   visualmente apuntando al núcleo y el bloque de datos hacia afuera. */
+.ea-hud-panel[data-position$="r"] { flex-direction: row-reverse; }
+
+.ea-hero-core.is-active .ea-hud-panel {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+/* ---- Bloque de datos ---- */
+.ea-hud-data {
     position: relative;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: var(--ea-card);
-    border: 1px solid var(--ea-rule);
-    box-shadow: 0 8px 22px -18px rgba(13, 22, 18, 0.3);
-    min-width: 0;
-    opacity: 0.55;
-    transform: translateY(4px);
-    transition: opacity 0.45s ease,
-                transform 0.45s cubic-bezier(.2,.7,.2,1),
-                border-color 0.3s ease,
-                box-shadow 0.3s ease;
-}
-
-:root[data-theme="dark"] .ea-hero-core-card {
-    background: var(--ea-card);
-    border-color: rgba(188, 210, 189, 0.16);
-}
-
-.ea-hero-core.is-powered .ea-hero-core-card {
-    opacity: 1;
-    transform: none;
-    border-color: rgba(74, 122, 85, 0.28);
-    box-shadow: 0 10px 26px -18px rgba(13, 22, 18, 0.35);
-}
-
-.ea-hero-core.is-powered .ea-hero-core-card:nth-child(1) { transition-delay: 0.05s; }
-.ea-hero-core.is-powered .ea-hero-core-card:nth-child(2) { transition-delay: 0.12s; }
-.ea-hero-core.is-powered .ea-hero-core-card:nth-child(3) { transition-delay: 0.19s; }
-.ea-hero-core.is-powered .ea-hero-core-card:nth-child(4) { transition-delay: 0.26s; }
-
-.ea-hero-core-card-ico {
-    flex: 0 0 auto;
-    width: 30px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    border-radius: 9px;
-    background: rgba(74, 122, 85, 0.12);
-    color: var(--eden-700);
-}
-
-:root[data-theme="dark"] .ea-hero-core-card-ico {
-    color: var(--eden-100);
-    background: rgba(74, 122, 85, 0.25);
-}
-
-.ea-hero-core-card-ico svg {
-    width: 17px;
-    height: 17px;
-}
-
-.ea-hero-core-card-body {
-    min-width: 0;
-    overflow: hidden;
-}
-
-.ea-hero-core-card-label {
-    margin: 0 0 2px;
-    font-family: var(--ea-font-mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ea-mute);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ea-hero-core-card-readout {
-    margin: 0;
-    display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
+    padding: 5px 11px 5px 10px;
+    /* Glass casi imperceptible: el lado del dispositivo se desvanece
+       para que el panel parezca disolverse hacia él. */
+    background: linear-gradient(to right,
+        rgba(8, 16, 12, 0.55) 0%,
+        rgba(8, 16, 12, 0.32) 70%,
+        rgba(8, 16, 12, 0.18) 100%);
+    border-left: 1px solid rgba(140, 230, 220, 0.50);
+    box-shadow: -1px 0 8px -2px rgba(140, 230, 220, 0.18);
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
 }
 
-.ea-hero-core-card-readout strong {
-    font-family: var(--ea-font-serif);
-    font-size: 20px;
+.ea-hud-panel[data-position$="r"] .ea-hud-data {
+    align-items: flex-end;
+    text-align: right;
+    background: linear-gradient(to left,
+        rgba(8, 16, 12, 0.55) 0%,
+        rgba(8, 16, 12, 0.32) 70%,
+        rgba(8, 16, 12, 0.18) 100%);
+    border-left: 0;
+    border-right: 1px solid rgba(140, 230, 220, 0.50);
+    box-shadow: 1px 0 8px -2px rgba(140, 230, 220, 0.18);
+}
+
+:root[data-theme="light"] .ea-hud-data {
+    background: linear-gradient(to right,
+        rgba(244, 241, 234, 0.70) 0%,
+        rgba(244, 241, 234, 0.45) 70%,
+        rgba(244, 241, 234, 0.22) 100%);
+    border-left-color: rgba(74, 122, 85, 0.55);
+    box-shadow: -1px 0 8px -2px rgba(74, 122, 85, 0.20);
+}
+
+:root[data-theme="light"] .ea-hud-panel[data-position$="r"] .ea-hud-data {
+    background: linear-gradient(to left,
+        rgba(244, 241, 234, 0.70) 0%,
+        rgba(244, 241, 234, 0.45) 70%,
+        rgba(244, 241, 234, 0.22) 100%);
+    border-left: 0;
+    border-right-color: rgba(74, 122, 85, 0.55);
+    box-shadow: 1px 0 8px -2px rgba(74, 122, 85, 0.20);
+}
+
+.ea-hero-core.is-active .ea-hud-data {
+    border-color: rgba(140, 230, 220, 0.72);
+    box-shadow: -1px 0 12px -2px rgba(140, 230, 220, 0.28);
+}
+
+.ea-hero-core.is-active .ea-hud-panel[data-position$="r"] .ea-hud-data {
+    box-shadow: 1px 0 12px -2px rgba(140, 230, 220, 0.28);
+}
+
+/* ---- Tipografía: jerarquía clara ---- */
+.ea-hud-key {
+    font-family: var(--ea-font-mono);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(140, 200, 192, 0.62);
     line-height: 1;
-    color: var(--ea-ink);
+    white-space: nowrap;
+}
+
+:root[data-theme="light"] .ea-hud-key { color: var(--ea-mute); }
+
+.ea-hud-val {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ea-hud-val b {
+    font-family: var(--ea-font-mono);
+    font-size: 15px;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 0.01em;
+    color: rgba(232, 246, 242, 0.97);
+    line-height: 1;
     font-variant-numeric: tabular-nums;
 }
 
-:root[data-theme="dark"] .ea-hero-core-card-readout strong {
-    color: var(--eden-100);
+.ea-hud-val b[data-text] {
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
 }
 
-.ea-hero-core-card-unit {
-    font-size: 11px;
-    color: var(--ea-ink-2);
+:root[data-theme="light"] .ea-hud-val b { color: var(--ea-ink); }
+
+.ea-hud-unit {
     font-family: var(--ea-font-mono);
-    letter-spacing: 0.04em;
+    font-size: 9.5px;
+    font-weight: 400;
+    color: rgba(140, 200, 192, 0.62);
+    letter-spacing: 0.02em;
+}
+
+:root[data-theme="light"] .ea-hud-unit { color: var(--ea-ink-2); }
+
+/* ---- Leader: hairline + punto conector hacia el núcleo ---- */
+.ea-hud-link {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 1px;
+    /* Gradiente: opaco del lado del dispositivo (la "fuente"), se desvanece
+       hacia el panel (la "recepción"). */
+    background: linear-gradient(to left,
+        rgba(140, 230, 220, 0.65) 0%,
+        rgba(140, 230, 220, 0.20) 60%,
+        rgba(140, 230, 220, 0) 100%);
+}
+
+.ea-hud-panel[data-position$="r"] .ea-hud-link {
+    background: linear-gradient(to right,
+        rgba(140, 230, 220, 0.65) 0%,
+        rgba(140, 230, 220, 0.20) 60%,
+        rgba(140, 230, 220, 0) 100%);
+}
+
+:root[data-theme="light"] .ea-hud-link {
+    background: linear-gradient(to left,
+        rgba(74, 122, 85, 0.65) 0%,
+        rgba(74, 122, 85, 0.20) 60%,
+        rgba(74, 122, 85, 0) 100%);
+}
+
+:root[data-theme="light"] .ea-hud-panel[data-position$="r"] .ea-hud-link {
+    background: linear-gradient(to right,
+        rgba(74, 122, 85, 0.65) 0%,
+        rgba(74, 122, 85, 0.20) 60%,
+        rgba(74, 122, 85, 0) 100%);
+}
+
+/* Punto pulsante en el extremo cercano al dispositivo */
+.ea-hud-link::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(140, 230, 220, 0.92);
+    box-shadow: 0 0 6px rgba(140, 230, 220, 0.65);
+    transform: translate(50%, -50%);
+    animation: ea-hud-tip-pulse 2.8s ease-in-out infinite;
+}
+
+.ea-hud-panel[data-position$="r"] .ea-hud-link::after {
+    right: auto;
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+:root[data-theme="light"] .ea-hud-link::after {
+    background: rgba(74, 122, 85, 0.92);
+    box-shadow: 0 0 6px rgba(74, 122, 85, 0.55);
+}
+
+@keyframes ea-hud-tip-pulse {
+    0%, 100% { opacity: 0.6; }
+    50%      { opacity: 1; }
+}
+
+/* ---- Posiciones alrededor del núcleo ---- */
+.ea-hud-panel[data-position="tl"] {
+    top: 6%; left: 0;
+    --pill-out-x: -14px; --pill-out-y: -8px;
+    transition-delay: 0.04s;
+}
+.ea-hud-panel[data-position="tr"] {
+    top: 6%; right: 0;
+    --pill-out-x: 14px; --pill-out-y: -8px;
+    transition-delay: 0.10s;
+}
+.ea-hud-panel[data-position="ml"] {
+    top: 45%; left: -4%;
+    --pill-out-x: -18px; --pill-out-y: 0;
+    transition-delay: 0.16s;
+}
+.ea-hud-panel[data-position="mr"] {
+    top: 45%; right: -4%;
+    --pill-out-x: 18px; --pill-out-y: 0;
+    transition-delay: 0.22s;
+}
+.ea-hud-panel[data-position="bl"] {
+    bottom: 8%; left: 0;
+    --pill-out-x: -14px; --pill-out-y: 8px;
+    transition-delay: 0.28s;
+}
+.ea-hud-panel[data-position="br"] {
+    bottom: 8%; right: 0;
+    --pill-out-x: 14px; --pill-out-y: 8px;
+    transition-delay: 0.34s;
 }
 
 /* ---------- Responsive --------------------------------------------- */
 @media (max-width: 920px) {
     .ea-hero-core {
-        max-width: 460px;
+        max-width: 480px;
         margin-left: auto;
         margin-right: auto;
         justify-self: center;
-    }
-    .ea-hero-core-stage {
-        height: 340px;
+        height: 420px;
     }
 }
 
 @media (max-width: 720px) {
-    .ea-hero-core { max-width: 420px; }
-    .ea-hero-core-stage {
-        height: 300px;
-        border-radius: 22px;
-    }
-    .ea-hero-core-rim {
-        width: 180px;
-        height: 180px;
-    }
-    .ea-hero-core.is-ready .ea-hero-core-rim {
-        width: 210px;
-        height: 210px;
+    .ea-hero-core {
+        max-width: 380px;
+        height: 380px;
     }
     .ea-hero-core-fallback-orb {
-        width: 110px;
-        height: 110px;
+        width: 108px;
+        height: 108px;
     }
-    .ea-hero-core-card-readout strong { font-size: 18px; }
+
+    /* En mobile los paneles siempre visibles (no hay hover), con leader
+       acortado para no apretar el modelo. */
+    .ea-hud-panel {
+        opacity: 0.62;
+        transform: none;
+    }
+    .ea-hero-core.is-active .ea-hud-panel {
+        opacity: 1;
+    }
+    .ea-hud-link { width: 18px; }
+    .ea-hud-data { padding: 4px 9px 4px 8px; }
+    .ea-hud-val b { font-size: 13px; }
+    .ea-hud-val b[data-text] { font-size: 11.5px; }
+
+    .ea-hud-panel[data-position="tl"] { top: 0;     left: 0; }
+    .ea-hud-panel[data-position="tr"] { top: 0;     right: 0; }
+    .ea-hud-panel[data-position="ml"] { top: 44%;   left: -1%; }
+    .ea-hud-panel[data-position="mr"] { top: 44%;   right: -1%; }
+    .ea-hud-panel[data-position="bl"] { bottom: 2%; left: 0; }
+    .ea-hud-panel[data-position="br"] { bottom: 2%; right: 0; }
 }
 
 @media (max-width: 420px) {
-    .ea-hero-core-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .ea-hero-core-card { padding: 8px 10px; }
-    .ea-hero-core-card-ico { width: 26px; height: 26px; }
-    .ea-hero-core-card-readout strong { font-size: 16px; }
+    .ea-hero-core {
+        max-width: 340px;
+        height: 360px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ea-hero-core-rim::before,
-    .ea-hero-core-rim::after,
-    .ea-hero-core-fallback-orb,
-    .ea-hero-core-hint-dot {
-        animation: none !important;
+    .ea-hero-core-fallback-orb { animation: none !important; }
+}
+
+/* =====================================================================
+   Eden Air Experience — video fullscreen controlado por scroll
+   ===================================================================== */
+
+.ea-experience {
+    position: relative;
+    width: 100%;
+    height: 360vh;             /* longitud total del scroll-scrub */
+    margin: 0;
+    padding: 0;
+    background: #03070a;
+    color: #ecf2e8;
+    isolation: isolate;
+    overflow: clip;
+}
+
+.ea-experience-stage {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #02050a;
+}
+
+/* ---------- Media (video fullscreen) ------------------------------- */
+.ea-experience-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: #02050a;
+}
+
+.ea-experience-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    background: #02050a;
+    display: block;
+    pointer-events: none;
+}
+
+/* ---------- Overlays cinematográficos ------------------------------ */
+.ea-experience-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(3, 7, 10, 0.55) 0%, rgba(3, 7, 10, 0) 22%, rgba(3, 7, 10, 0) 65%, rgba(3, 7, 10, 0.82) 100%),
+        linear-gradient(90deg, rgba(3, 7, 10, 0.55) 0%, rgba(3, 7, 10, 0) 35%);
+}
+
+.ea-experience-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(3, 7, 10, 0) 55%, rgba(3, 7, 10, 0.55) 100%);
+    mix-blend-mode: multiply;
+}
+
+.ea-experience-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 1;
+    will-change: transform;
+    animation: ea-exp-float 16s ease-in-out infinite alternate;
+}
+.ea-experience-glow--a {
+    width: 520px; height: 520px;
+    top: -160px; left: -140px;
+    background: radial-gradient(circle, rgba(106, 155, 159, 0.65) 0%, rgba(106, 155, 159, 0) 70%);
+}
+.ea-experience-glow--b {
+    width: 620px; height: 620px;
+    bottom: -200px; right: -180px;
+    background: radial-gradient(circle, rgba(74, 122, 85, 0.55) 0%, rgba(74, 122, 85, 0) 70%);
+    animation-delay: -8s;
+}
+@keyframes ea-exp-float {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(50px, -30px, 0) scale(1.1); }
+}
+
+/* ---------- Fallback ----------------------------------------------- */
+.ea-experience-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: rgba(188, 210, 189, 0.85);
+    font-size: 13.5px;
+    background:
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(106, 155, 159, 0.16) 0%, rgba(3, 7, 10, 0) 70%),
+        #02050a;
+    transition: opacity 0.5s ease;
+}
+.ea-experience-fallback p {
+    margin: 0;
+    font-family: var(--ea-font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+.ea-experience-fallback.is-hidden { opacity: 0; pointer-events: none; }
+
+.ea-experience-fallback-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #b8d5d0, #4a7a55 60%, #16301f);
+    box-shadow: 0 0 32px rgba(184, 213, 208, 0.55);
+    animation: ea-exp-orb 2.4s ease-in-out infinite;
+}
+@keyframes ea-exp-orb {
+    0%, 100% { transform: scale(1);    opacity: 0.9; }
+    50%      { transform: scale(1.12); opacity: 1;   }
+}
+
+/* ---------- Capa de tipografía premium ---------------------------- */
+/* SIN cards. SIN bordes. SIN backgrounds.
+   Solo texto blanco con sombra sutil flotando sobre el video. */
+
+.ea-experience-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.ea-experience-text {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(22px, 3.2vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-shadow:
+        0 2px 14px rgba(0, 0, 0, 0.7),
+        0 0 36px rgba(0, 0, 0, 0.45);
+    max-width: 32ch;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+    will-change: opacity, transform;
+}
+
+.ea-experience-text.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+.ea-experience-text em {
+    font-style: italic;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: 500;
+}
+
+/* línea decorativa fina al lado del primer texto */
+.ea-experience-line {
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(184, 213, 208, 0.9), rgba(184, 213, 208, 0));
+    vertical-align: middle;
+    margin-right: 14px;
+    box-shadow: 0 0 8px rgba(184, 213, 208, 0.6);
+}
+
+/* kicker (etiqueta pequeña arriba del texto) */
+.ea-experience-kicker {
+    display: block;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.95);
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Tercer texto (sensores) es lista en línea, fuente sans más liviana */
+.ea-experience-text--bl {
+    font-family: var(--ea-font-sans);
+    font-size: clamp(15px, 1.4vw, 19px);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.92);
+    max-width: 38ch;
+}
+
+/* Posiciones en la pantalla — uso "safe area" en %  */
+.ea-experience-text--tl {
+    top:  clamp(10%, 14vh, 18%);
+    left: clamp(24px, 6vw, 80px);
+}
+.ea-experience-text--mr {
+    top:   38%;
+    right: clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+.ea-experience-text--bl {
+    bottom: clamp(10%, 12vh, 16%);
+    left:   clamp(24px, 6vw, 80px);
+}
+.ea-experience-text--cr {
+    top:   46%;
+    right: clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+.ea-experience-text--br {
+    bottom: clamp(8%, 10vh, 14%);
+    right:  clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+
+/* ---------- Tablet ------------------------------------------------ */
+@media (max-width: 980px) {
+    .ea-experience { height: 320vh; }
+    .ea-experience-text {
+        font-size: clamp(20px, 3.6vw, 32px);
+        max-width: 18ch;
     }
+    .ea-experience-text--bl { max-width: 28ch; font-size: clamp(14px, 1.8vw, 17px); }
+}
+
+/* ---------- Mobile: experiencia simplificada y compacta ----------- */
+@media (max-width: 640px) {
+    .ea-experience { height: 240vh; }
+
+    .ea-experience-text {
+        font-size: clamp(20px, 6.5vw, 26px);
+        max-width: 80vw;
+        line-height: 1.18;
+    }
+    .ea-experience-text--bl {
+        font-size: 13.5px;
+        max-width: 84vw;
+        line-height: 1.45;
+    }
+    .ea-experience-kicker { font-size: 10px; letter-spacing: 0.2em; margin-bottom: 6px; }
+    .ea-experience-line { width: 26px; margin-right: 10px; }
+
+    /* En mobile alineamos todo a la izquierda, evitamos derecha que se corta */
+    .ea-experience-text--tl { top: 10%;     left: 22px; right: 22px; }
+    .ea-experience-text--mr { top: 32%;     left: 22px; right: 22px; text-align: left; }
+    .ea-experience-text--bl { bottom: 28%;  left: 22px; right: 22px; }
+    .ea-experience-text--cr { top: 48%;     left: 22px; right: 22px; text-align: left; }
+    .ea-experience-text--br { bottom: 10%;  left: 22px; right: 22px; text-align: left; }
+
+    .ea-experience-glow--a { width: 320px; height: 320px; filter: blur(70px); }
+    .ea-experience-glow--b { width: 360px; height: 360px; filter: blur(70px); }
+}
+
+/* ---------- prefers-reduced-motion -------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .ea-experience-glow,
+    .ea-experience-fallback-orb { animation: none !important; }
+    .ea-experience-text { transition: opacity 0.3s linear !important; transform: none !important; }
+    .ea-experience-text.is-visible { transform: none !important; }
+}
+
+/* Fade negro → paper al salir del video (vuelve a las secciones claras) */
+.ea-experience::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 200px;
+    pointer-events: none;
+    z-index: 3;
+    background: linear-gradient(to top, var(--ea-paper) 0%, rgba(3, 7, 10, 0) 100%);
+}
+
+/* =====================================================================
+   Bridge — puente narrativo entre hero y video (continuidad de marca)
+   ===================================================================== */
+.ea-bridge {
+    position: relative;
+    width: 100%;
+    min-height: clamp(420px, 65vh, 680px);
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    color: #ecf2e8;
+}
+
+.ea-bridge-grad {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        linear-gradient(180deg,
+            var(--ea-paper) 0%,
+            rgba(13, 22, 18, 0.55) 28%,
+            #0a1310 62%,
+            #03070a 100%);
+}
+:root[data-theme="dark"] .ea-bridge-grad {
+    background: linear-gradient(180deg,
+        var(--ea-paper) 0%,
+        #0a1310 55%,
+        #03070a 100%);
+}
+
+.ea-bridge-glow {
+    position: absolute;
+    z-index: 0;
+    width: 760px;
+    height: 760px;
+    left: 50%;
+    bottom: -380px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(106, 155, 159, 0.40) 0%, rgba(106, 155, 159, 0) 65%);
+    filter: blur(80px);
+    border-radius: 50%;
+    animation: ea-bridge-breathe 10s ease-in-out infinite;
+}
+@keyframes ea-bridge-breathe {
+    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1);    }
+    50%      { opacity: 1;   transform: translateX(-50%) scale(1.08); }
+}
+
+.ea-bridge-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding-top:    clamp(40px, 6vw, 80px);
+    padding-bottom: clamp(60px, 8vw, 110px);
+}
+
+.ea-bridge-eyebrow {
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.88);
+    padding: 6px 14px;
+    border: 1px solid rgba(184, 213, 208, 0.25);
+    border-radius: 999px;
+    background: rgba(8, 14, 12, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.ea-bridge-title {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(30px, 5vw, 56px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #ffffff;
+    max-width: 22ch;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+.ea-bridge-title em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.ea-bridge-hint {
+    margin-top: clamp(8px, 1.4vw, 18px);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.7);
+}
+.ea-bridge-hint-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ea-breath, #b8d5d0);
+    box-shadow: 0 0 10px rgba(184, 213, 208, 0.9);
+    animation: ea-bridge-blink 1.6s ease-in-out infinite;
+}
+@keyframes ea-bridge-blink {
+    0%, 100% { opacity: 1;    transform: translateY(0); }
+    50%      { opacity: 0.35; transform: translateY(3px); }
+}
+
+/* Pequeño borde inferior 1px luminoso, separador sutil */
+.ea-bridge-fade {
+    position: absolute;
+    left: 10%; right: 10%;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184, 213, 208, 0.35), transparent);
+    box-shadow: 0 0 12px rgba(184, 213, 208, 0.35);
+    z-index: 2;
+    pointer-events: none;
+}
+
+@media (max-width: 640px) {
+    .ea-bridge { min-height: clamp(360px, 70vh, 520px); }
+    .ea-bridge-inner { padding-top: 48px; padding-bottom: 64px; }
+    .ea-bridge-title { font-size: clamp(26px, 7vw, 36px); max-width: 18ch; }
+    .ea-bridge-glow { width: 480px; height: 480px; bottom: -240px; filter: blur(60px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-bridge-glow,
+    .ea-bridge-hint-dot { animation: none !important; }
+}
+
+/* =====================================================================
+   Environmental Control Core — reemplaza al carrusel genérico
+   ===================================================================== */
+.ea-core-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(80px, 11vw, 160px) 0 clamp(60px, 8vw, 120px);
+    color: #ecf2e8;
+    background: linear-gradient(180deg, var(--ea-paper) 0%, #0a1310 18%, #07100c 100%);
+}
+:root[data-theme="dark"] .ea-core-section {
+    background: linear-gradient(180deg, var(--ea-paper) 0%, #0a1310 18%, #060d0a 100%);
+}
+
+.ea-core-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 50% 40% at 50% 60%, rgba(106, 155, 159, 0.18) 0%, rgba(7, 16, 12, 0) 60%),
+        radial-gradient(ellipse 40% 30% at 18% 28%, rgba(74, 122, 85, 0.16) 0%, rgba(7, 16, 12, 0) 60%);
+}
+
+.ea-core-page {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(40px, 6vw, 80px);
+}
+
+/* ---------- Head ---------- */
+.ea-core-head {
+    text-align: center;
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+    max-width: 720px;
+    margin: 0 auto;
+}
+.ea-core-head .ea-eyebrow {
+    color: rgba(184, 213, 208, 0.85);
+    background: rgba(184, 213, 208, 0.08);
+    border: 1px solid rgba(184, 213, 208, 0.22);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+.ea-core-head .ea-eyebrow::before { display: none; }
+
+.ea-core-title {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #ffffff;
+}
+.ea-core-title em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+.ea-core-lede {
+    margin: 0;
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    color: rgba(236, 242, 232, 0.78);
+    max-width: 52ch;
+}
+
+/* ---------- Diagrama orbital ---------- */
+.ea-core {
+    position: relative;
+    width: min(680px, 90vw);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    container-type: inline-size;
+    container-name: eacore;
+}
+
+.ea-core-orbits {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Anillo intermedio rota lento */
+.ea-core-orbits circle:nth-of-type(2) {
+    transform-origin: 50% 50%;
+    animation: ea-core-spin 60s linear infinite;
+}
+.ea-core-orbits circle:nth-of-type(3) {
+    transform-origin: 50% 50%;
+    animation: ea-core-spin 120s linear infinite reverse;
+}
+@keyframes ea-core-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Pulso central */
+.ea-core-pulse {
+    transform-origin: 50% 50%;
+    animation: ea-core-pulse 3.4s ease-in-out infinite;
+}
+@keyframes ea-core-pulse {
+    0%, 100% { transform: scale(1);    opacity: 0.6; }
+    50%      { transform: scale(1.15); opacity: 1;   }
+}
+
+/* Spokes brillan secuenciados */
+.ea-core-spokes line {
+    stroke-dasharray: 80 60;
+    stroke-dashoffset: 0;
+    animation: ea-core-flow 6s linear infinite;
+    opacity: 0.6;
+}
+.ea-core-spokes line:nth-child(1) { animation-delay: -0s;   }
+.ea-core-spokes line:nth-child(2) { animation-delay: -0.7s; }
+.ea-core-spokes line:nth-child(3) { animation-delay: -1.4s; }
+.ea-core-spokes line:nth-child(4) { animation-delay: -2.1s; }
+.ea-core-spokes line:nth-child(5) { animation-delay: -2.8s; }
+.ea-core-spokes line:nth-child(6) { animation-delay: -3.5s; }
+.ea-core-spokes line:nth-child(7) { animation-delay: -4.2s; }
+@keyframes ea-core-flow {
+    0%   { stroke-dashoffset: 140; opacity: 0.2; }
+    50%  { opacity: 0.9; }
+    100% { stroke-dashoffset: -140; opacity: 0.2; }
+}
+
+/* Etiqueta central */
+.ea-core-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+    text-align: center;
+    gap: 4px;
+}
+.ea-core-center-label {
+    font-family: var(--ea-font-serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.2vw, 28px);
+    color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
+}
+.ea-core-center-sub {
+    font-family: var(--ea-font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.85);
+}
+
+/* Módulos absolutos posicionados con --ang y --r */
+.ea-core-modules {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+}
+
+.ea-core-mod {
+    /* --r es unitless; lo multiplicamos por 1cqi (1% del ancho del .ea-core) */
+    --offset-y: calc(var(--r, 38) * -1cqi);
+    position: absolute;
+    left: 50%;
+    top:  50%;
+    transform:
+        translate(-50%, -50%)
+        rotate(var(--ang))
+        translateY(var(--offset-y))
+        rotate(calc(var(--ang) * -1));
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: rgba(8, 14, 12, 0.55);
+    border: 1px solid rgba(184, 213, 208, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    transition: transform 0.4s cubic-bezier(.2,.7,.2,1), border-color 0.3s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+    cursor: default;
+}
+.ea-core-mod:hover {
+    border-color: rgba(184, 213, 208, 0.45);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(184, 213, 208, 0.15),
+        0 0 30px rgba(184, 213, 208, 0.25);
+    transform:
+        translate(-50%, -50%)
+        rotate(var(--ang))
+        translateY(var(--offset-y))
+        rotate(calc(var(--ang) * -1))
+        scale(1.06);
+}
+
+/* Fallback browsers sin container queries: usar vw aproximado */
+@supports not (width: 1cqi) {
+    .ea-core-mod {
+        --offset-y: calc(var(--r, 38) * -0.9vw);
+    }
+}
+
+.ea-core-mod-key {
+    font-family: var(--ea-font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: 0.005em;
+}
+.ea-core-mod-val {
+    font-family: var(--ea-font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.85);
+}
+
+/* Tone variants — dot pequeño antes del key */
+.ea-core-mod::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 8px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ea-breath, #b8d5d0);
+    box-shadow: 0 0 6px currentColor;
+    color: var(--ea-breath, #b8d5d0);
+}
+.ea-core-mod[data-tone="warm"]::before { color: #d5a76a; background: #d5a76a; box-shadow: 0 0 6px #d5a76a; }
+.ea-core-mod[data-tone="cool"]::before { color: #b8d5d0; background: #b8d5d0; box-shadow: 0 0 6px #b8d5d0; }
+.ea-core-mod[data-tone="leaf"]::before { color: #c9d870; background: #c9d870; box-shadow: 0 0 6px #c9d870; }
+
+/* ---------- Stats discretos ---------- */
+.ea-core-facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: clamp(28px, 6vw, 80px);
+    flex-wrap: wrap;
+}
+.ea-core-facts li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.65);
+    text-align: center;
+}
+.ea-core-facts li span {
+    font-family: var(--ea-font-serif);
+    font-style: italic;
+    font-size: clamp(32px, 5vw, 48px);
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 980px) {
+    .ea-core { width: min(560px, 92vw); }
+    .ea-core-mod { padding: 8px 12px; }
+    .ea-core-mod-key { font-size: 12px; }
+    .ea-core-mod-val { font-size: 9px; }
+}
+
+/* ---------- Mobile: layout más compacto, evitar superposición ---------- */
+@media (max-width: 640px) {
+    .ea-core-section { padding: 64px 0 56px; }
+    .ea-core { width: 96vw; max-width: 460px; }
+    .ea-core-mod {
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+    .ea-core-mod-key { font-size: 11px; }
+    .ea-core-mod-val { font-size: 8.5px; letter-spacing: 0.18em; }
+    .ea-core-mod::before { top: 6px; left: 6px; width: 3px; height: 3px; }
+    .ea-core-center-label { font-size: 18px; }
+    .ea-core-center-sub   { font-size: 8.5px; letter-spacing: 0.28em; }
+    .ea-core-facts li { font-size: 9.5px; letter-spacing: 0.18em; }
+    .ea-core-facts li span { font-size: 32px; }
+}
+
+/* ---------- prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .ea-core-orbits circle,
+    .ea-core-pulse,
+    .ea-core-spokes line { animation: none !important; }
 }

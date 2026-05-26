@@ -30,8 +30,16 @@ $extraHead = $extraHead ?? '';
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="<?= base_url('CSS/eden-brand.css') ?>">
+<?php
+    // Cache-bust automático de CSS para evitar versiones cacheadas durante dev
+    $eaCssBust = function (string $relativePath): string {
+        $abs = FCPATH . $relativePath;
+        $v   = is_file($abs) ? filemtime($abs) : time();
+        return base_url($relativePath) . '?v=' . $v;
+    };
+?>
+<link rel="stylesheet" href="<?= htmlspecialchars($eaCssBust('CSS/eden-brand.css'), ENT_QUOTES, 'UTF-8') ?>">
 <?php foreach ($extraCss as $cssPath): ?>
-    <link rel="stylesheet" href="<?= base_url($cssPath) ?>">
+    <link rel="stylesheet" href="<?= htmlspecialchars($eaCssBust($cssPath), ENT_QUOTES, 'UTF-8') ?>">
 <?php endforeach; ?>
 <?= $extraHead ?>

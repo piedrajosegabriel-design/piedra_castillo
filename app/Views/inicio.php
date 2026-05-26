@@ -9,8 +9,6 @@
 </head>
 <body class="ea-body ea-landing">
 <div class="ea-shell">
-    <span class="ea-scroll-progress" aria-hidden="true"><span data-ea-progress></span></span>
-
     <?= view('partials/navbar', [
         'subtitle'  => 'Monitoreo ambiental',
         'conSesion' => $conSesion,
@@ -87,13 +85,12 @@
                 <div class="ea-hero-intro">
                     <span class="ea-hero-tagline">
                         <span class="ea-hero-tagline-dot" aria-hidden="true"></span>
-                        Plataforma de monitoreo ambiental
+                        Environmental Control System
                     </span>
-                    <h1 class="ea-hero-title">Respirá <em>mejor,</em><br>viví más cómodo.</h1>
+                    <h1 class="ea-hero-title">El aire que <em>se regula</em><br>solo.</h1>
                     <p class="ea-hero-lede">
-                        EdenAir es una plataforma web que mide, controla y automatiza el ambiente
-                        de cada espacio. Sensores, actuadores y reglas inteligentes, listos para
-                        integrarse con ESP32.
+                        EdenAir sensa temperatura, humedad, CO₂ y calidad del aire.
+                        Decide. Activa los módulos. Devuelve un ambiente equilibrado.
                     </p>
                     <div class="ea-hero-actions">
                         <?php if ($conSesion): ?>
@@ -110,90 +107,142 @@
                      data-eden-core
                      data-eden-core-src="<?= base_url('assets/models/eden-air-core.glb') ?>"
                      data-eden-core-endpoint="<?= site_url('api/sensores') ?>">
-                    <div class="ea-hero-core-stage" data-eden-core-stage role="button" tabindex="0"
-                         aria-label="Activar núcleo EdenAir para ver datos ambientales">
-                        <span class="ea-hero-core-shadow" aria-hidden="true"></span>
+                    <div class="ea-hero-core-stage" data-eden-core-stage>
                         <span class="ea-hero-core-glow" aria-hidden="true"></span>
-                        <span class="ea-hero-core-rim" aria-hidden="true"></span>
+                        <span class="ea-hero-core-shadow" aria-hidden="true"></span>
                         <canvas class="ea-hero-core-canvas" data-eden-core-canvas aria-hidden="true"></canvas>
-                        <div class="ea-hero-core-particles" data-eden-core-particles aria-hidden="true"></div>
 
-                        <div class="ea-hero-core-fallback" data-eden-core-fallback>
+                        <div class="ea-hero-core-fallback" data-eden-core-fallback aria-hidden="true">
                             <span class="ea-hero-core-fallback-orb" aria-hidden="true"></span>
-                            <p class="ea-eyebrow">EdenAir · Núcleo</p>
                             <p class="ea-hero-core-fallback-msg">Cargando núcleo 3D…</p>
-                        </div>
-
-                        <div class="ea-hero-core-hint" data-eden-core-hint>
-                            <span class="ea-hero-core-hint-dot" aria-hidden="true"></span>
-                            <span>Tocá el núcleo para encender</span>
                         </div>
                     </div>
 
                     <div class="ea-hero-core-cards" data-eden-core-cards aria-hidden="true">
-                        <article class="ea-hero-core-card" data-metric="temperatura" style="--card-tone: var(--eden-300);">
-                            <span class="ea-hero-core-card-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 4a2 2 0 0 0-2 2v8.2a3.6 3.6 0 1 0 4 0V6a2 2 0 0 0-2-2Z"/>
-                                    <circle cx="12" cy="16.5" r="1.4" fill="currentColor"/>
-                                </svg>
-                            </span>
-                            <div class="ea-hero-core-card-body">
-                                <p class="ea-hero-core-card-label">Temperatura</p>
-                                <p class="ea-hero-core-card-readout">
-                                    <strong data-value>--</strong>
-                                    <span class="ea-hero-core-card-unit" data-unit>°C</span>
-                                </p>
+                        <div class="ea-hud-panel" data-position="tl" data-metric="temperatura">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">Temperatura</span>
+                                <span class="ea-hud-val"><b data-value>22</b><span class="ea-hud-unit" data-unit>°C</span></span>
                             </div>
-                        </article>
-
-                        <article class="ea-hero-core-card" data-metric="humedad" style="--card-tone: var(--ea-breath);">
-                            <span class="ea-hero-core-card-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-                                    <path d="M12 3.5c2.4 2.8 5.5 6 5.5 9.5a5.5 5.5 0 1 1-11 0c0-3.5 3.1-6.7 5.5-9.5Z"/>
-                                </svg>
-                            </span>
-                            <div class="ea-hero-core-card-body">
-                                <p class="ea-hero-core-card-label">Humedad</p>
-                                <p class="ea-hero-core-card-readout">
-                                    <strong data-value>--</strong>
-                                    <span class="ea-hero-core-card-unit" data-unit>%</span>
-                                </p>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
+                        <div class="ea-hud-panel" data-position="tr" data-metric="humedad">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">Humedad</span>
+                                <span class="ea-hud-val"><b data-value>48</b><span class="ea-hud-unit" data-unit>%</span></span>
                             </div>
-                        </article>
-
-                        <article class="ea-hero-core-card" data-metric="co2" style="--card-tone: var(--ea-citrus);">
-                            <span class="ea-hero-core-card-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                    <circle cx="12" cy="12" r="8"/>
-                                    <text x="12" y="14.5" text-anchor="middle" font-size="6.5" font-family="DM Mono, monospace" fill="currentColor" stroke="none">CO₂</text>
-                                </svg>
-                            </span>
-                            <div class="ea-hero-core-card-body">
-                                <p class="ea-hero-core-card-label">CO₂</p>
-                                <p class="ea-hero-core-card-readout">
-                                    <strong data-value>--</strong>
-                                    <span class="ea-hero-core-card-unit" data-unit>ppm</span>
-                                </p>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
+                        <div class="ea-hud-panel" data-position="ml" data-metric="co2">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">CO₂</span>
+                                <span class="ea-hud-val"><b data-value data-text>Normal</b></span>
                             </div>
-                        </article>
-
-                        <article class="ea-hero-core-card" data-metric="calidad_aire" style="--card-tone: var(--eden-400);">
-                            <span class="ea-hero-core-card-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                                    <path d="M3 9h12a3 3 0 1 0-3-3"/>
-                                    <path d="M3 14h15a3 3 0 1 1-3 3"/>
-                                </svg>
-                            </span>
-                            <div class="ea-hero-core-card-body">
-                                <p class="ea-hero-core-card-label">Calidad del aire</p>
-                                <p class="ea-hero-core-card-readout">
-                                    <strong data-value>--</strong>
-                                    <span class="ea-hero-core-card-unit" data-unit>/100</span>
-                                </p>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
+                        <div class="ea-hud-panel" data-position="mr" data-metric="calidad_aire">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">Calidad de aire</span>
+                                <span class="ea-hud-val"><b data-value data-text>Excelente</b></span>
                             </div>
-                        </article>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
+                        <div class="ea-hud-panel" data-position="bl" data-metric="ventilador">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">Ventilador</span>
+                                <span class="ea-hud-val"><b data-value data-text>Activo</b></span>
+                            </div>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
+                        <div class="ea-hud-panel" data-position="br" data-metric="humidificacion">
+                            <div class="ea-hud-data">
+                                <span class="ea-hud-key">Humidificación</span>
+                                <span class="ea-hud-val"><b data-value data-text>Óptima</b></span>
+                            </div>
+                            <span class="ea-hud-link" aria-hidden="true"></span>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ea-bridge" aria-hidden="true" data-reveal>
+            <span class="ea-bridge-grad" aria-hidden="true"></span>
+            <span class="ea-bridge-glow" aria-hidden="true"></span>
+            <div class="ea-page ea-bridge-inner">
+                <span class="ea-bridge-eyebrow">La experiencia</span>
+                <h2 class="ea-bridge-title">Mirá <em>cómo respira</em> el ambiente.</h2>
+                <span class="ea-bridge-hint">
+                    <span class="ea-bridge-hint-dot" aria-hidden="true"></span>
+                    Scrolleá para entrar
+                </span>
+            </div>
+            <span class="ea-bridge-fade" aria-hidden="true"></span>
+        </section>
+
+        <?php
+            // Cache-bust automático según mtime de cada archivo
+            $eaMp4Path  = FCPATH . 'videos/eden-air-scroll-optimized.mp4';
+            $eaWebmPath = FCPATH . 'videos/eden-air-scroll-optimized.webm';
+            $eaMp4Ver   = is_file($eaMp4Path)  ? filemtime($eaMp4Path)  : time();
+            $eaWebmVer  = is_file($eaWebmPath) ? filemtime($eaWebmPath) : time();
+            $eaMp4Url   = base_url('videos/eden-air-scroll-optimized.mp4')  . '?v=' . $eaMp4Ver;
+            $eaWebmUrl  = base_url('videos/eden-air-scroll-optimized.webm') . '?v=' . $eaWebmVer;
+            $eaPosterPath = FCPATH . 'videos/eden-air-poster.jpg';
+        ?>
+        <section class="ea-experience" id="experience" data-ea-experience aria-label="Eden Air en acción">
+            <div class="ea-experience-stage">
+                <div class="ea-experience-media">
+                    <video
+                        class="ea-experience-video"
+                        data-ea-experience-video
+                        data-ea-experience-src="<?= htmlspecialchars($eaMp4Url, ENT_QUOTES, 'UTF-8') ?>"
+                        muted
+                        playsinline
+                        webkit-playsinline="true"
+                        preload="auto"
+                        disablepictureinpicture
+                    >
+                        <?php if (is_file($eaWebmPath)): ?>
+                            <source src="<?= htmlspecialchars($eaWebmUrl, ENT_QUOTES, 'UTF-8') ?>" type="video/webm">
+                        <?php endif; ?>
+                        <source src="<?= htmlspecialchars($eaMp4Url, ENT_QUOTES, 'UTF-8') ?>" type="video/mp4">
+                    </video>
+
+                    <div class="ea-experience-fallback" data-ea-experience-fallback aria-hidden="true">
+                        <span class="ea-experience-fallback-orb"></span>
+                        <p>Cargando experiencia…</p>
+                    </div>
+                </div>
+
+                <span class="ea-experience-overlay" aria-hidden="true"></span>
+                <span class="ea-experience-glow ea-experience-glow--a" aria-hidden="true"></span>
+                <span class="ea-experience-glow ea-experience-glow--b" aria-hidden="true"></span>
+                <span class="ea-experience-vignette" aria-hidden="true"></span>
+
+                <div class="ea-experience-layer" data-ea-experience-texts>
+                    <p class="ea-experience-text ea-experience-text--tl" data-step="0">
+                        <span class="ea-experience-line" aria-hidden="true"></span>
+                        Ambiente <em>inestable</em> detectado
+                    </p>
+
+                    <p class="ea-experience-text ea-experience-text--mr" data-step="1">
+                        Análisis ambiental<br>en <em>tiempo real</em>
+                    </p>
+
+                    <p class="ea-experience-text ea-experience-text--bl" data-step="2">
+                        <span class="ea-experience-kicker">Sensores</span>
+                        Temperatura · Humedad · CO₂ · Calidad del aire
+                    </p>
+
+                    <p class="ea-experience-text ea-experience-text--cr" data-step="3">
+                        Regulación <em>automática</em>
+                    </p>
+
+                    <p class="ea-experience-text ea-experience-text--br" data-step="4">
+                        Aire equilibrado.<br>
+                        <em>Monitoreo continuo.</em>
+                    </p>
                 </div>
             </div>
         </section>
@@ -201,8 +250,9 @@
         <section class="ea-section" id="que-es" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">01 / Qué es EdenAir</p>
-                    <h2>Una vista clara del <em>aire</em> que respirás.</h2>
+                    <p class="ea-eyebrow">01 · Qué detecta</p>
+                    <h2>Detecta el <em>ambiente invisible.</em></h2>
+                    <p>Cuatro variables. Lectura continua. Cero esfuerzo.</p>
                 </div>
 
                 <div class="ea-feature-grid">
@@ -274,138 +324,136 @@
             </div>
         </section>
 
-        <section class="ea-section" id="beneficios" data-reveal>
-            <div class="ea-page">
-                <div class="ea-section-head">
-                    <p class="ea-eyebrow">02 / Beneficios</p>
-                    <h2>Comodidad que <em>florece.</em></h2>
-                </div>
+        <section class="ea-core-section" id="beneficios" data-reveal>
+            <span class="ea-core-bg" aria-hidden="true"></span>
 
-                <div class="ea-carousel" data-ea-carousel aria-label="Beneficios y módulos de EdenAir">
-                    <button type="button" class="ea-carousel-arrow" data-ea-carousel-prev aria-label="Anterior">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M14.5 6 9 12l5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
+            <div class="ea-page ea-core-page">
+                <header class="ea-core-head">
+                    <span class="ea-eyebrow">02 · Environmental Control Core</span>
+                    <h2 class="ea-core-title">Un núcleo. <em>Siete módulos.</em><br>Un ambiente perfecto.</h2>
+                    <p class="ea-core-lede">
+                        El dispositivo lee el ambiente y decide qué módulo activar.
+                        Sin paneles. Sin botones. Sin tu intervención.
+                    </p>
+                </header>
 
-                    <div class="ea-carousel-viewport" data-ea-carousel-viewport>
-                        <div class="ea-carousel-track" data-ea-carousel-track>
-                            <article class="ea-carousel-slide tone-success">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M4 18h16M6 14h12M8 10h8M10 6h4"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">01 · Monitoreo</p>
-                                <h3>Lectura ambiental clara</h3>
-                                <p>Temperatura, humedad, CO₂ y calidad del aire en valores fáciles de leer, con estado y rango ideal.</p>
-                            </article>
+                <div class="ea-core" data-ea-core>
+                    <!-- Anillos orbitales SVG -->
+                    <svg class="ea-core-orbits" viewBox="-200 -200 400 400" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <radialGradient id="eaCoreCenterGrad" cx="50%" cy="40%" r="60%">
+                                <stop offset="0%"  stop-color="#b8d5d0" stop-opacity="0.95"/>
+                                <stop offset="55%" stop-color="#4a7a55" stop-opacity="0.7"/>
+                                <stop offset="100%" stop-color="#0a1310" stop-opacity="1"/>
+                            </radialGradient>
+                            <linearGradient id="eaCoreLine" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%"   stop-color="rgba(184,213,208,0)"/>
+                                <stop offset="50%"  stop-color="rgba(184,213,208,0.6)"/>
+                                <stop offset="100%" stop-color="rgba(184,213,208,0)"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Anillos concéntricos -->
+                        <circle cx="0" cy="0" r="92"  fill="none" stroke="rgba(184,213,208,0.20)" stroke-width="0.6"/>
+                        <circle cx="0" cy="0" r="135" fill="none" stroke="rgba(184,213,208,0.12)" stroke-width="0.6" stroke-dasharray="2 6"/>
+                        <circle cx="0" cy="0" r="178" fill="none" stroke="rgba(184,213,208,0.08)" stroke-width="0.6"/>
 
-                            <article class="ea-carousel-slide tone-info">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M6 8h4v8H6zM14 6h4v12h-4z"/>
-                                        <path d="M8 5v3M8 16v3M16 4v2M16 18v2"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">02 · Control</p>
-                                <h3>Actuadores a mano</h3>
-                                <p>Encendé y apagá ventilador, aromatizador, LED y humidificador desde el panel, en modo manual.</p>
-                            </article>
+                        <!-- 7 spokes apuntando a los módulos (cada ~51.4° desde -90°) -->
+                        <g class="ea-core-spokes" stroke="url(#eaCoreLine)" stroke-width="0.6" fill="none">
+                            <line x1="0" y1="0" x2="0"      y2="-168"/>
+                            <line x1="0" y1="0" x2="130.6"  y2="-105.8"/>
+                            <line x1="0" y1="0" x2="163.7"  y2="37.8"/>
+                            <line x1="0" y1="0" x2="73.0"   y2="151.3"/>
+                            <line x1="0" y1="0" x2="-73.0"  y2="151.3"/>
+                            <line x1="0" y1="0" x2="-163.7" y2="37.8"/>
+                            <line x1="0" y1="0" x2="-130.6" y2="-105.8"/>
+                        </g>
 
-                            <article class="ea-carousel-slide tone-warning">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M5 12h4l2-4 4 8 2-4h2"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">03 · Automatización</p>
-                                <h3>Reglas inteligentes</h3>
-                                <p>EdenAir reacciona solo: si el CO₂ sube, ventila. Si el aire baja, aromatiza. Si algo falla, alerta.</p>
-                            </article>
+                        <!-- Núcleo central -->
+                        <circle class="ea-core-pulse" cx="0" cy="0" r="68" fill="none" stroke="rgba(184,213,208,0.45)" stroke-width="0.8"/>
+                        <circle cx="0" cy="0" r="52" fill="url(#eaCoreCenterGrad)"/>
+                        <circle cx="0" cy="0" r="52" fill="none" stroke="rgba(184,213,208,0.6)" stroke-width="0.6"/>
+                    </svg>
 
-                            <article class="ea-carousel-slide tone-citrus">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="6" y="6" width="12" height="12" rx="2"/>
-                                        <path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">04 · Hardware</p>
-                                <h3>Preparado para ESP32</h3>
-                                <p>API REST documentada para que el microcontrolador envíe mediciones y reciba comandos sin fricción.</p>
-                            </article>
-
-                            <article class="ea-carousel-slide tone-info">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M3 12a9 9 0 1 0 3-6.7"/>
-                                        <path d="M3 4v4.5h4.5"/>
-                                        <path d="M12 7.5V12l3 2"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">05 · Historial</p>
-                                <h3>Datos que persisten</h3>
-                                <p>Cada lectura queda guardada en MySQL para reconstruir la evolución del ambiente cuando se necesite.</p>
-                            </article>
-
-                            <article class="ea-carousel-slide tone-success">
-                                <span class="ea-carousel-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 4v16M4 12h16"/>
-                                        <circle cx="12" cy="12" r="9"/>
-                                    </svg>
-                                </span>
-                                <p class="ea-carousel-eyebrow">06 · Branding</p>
-                                <h3>Interfaz cómoda</h3>
-                                <p>Tipografía sobria, modo claro/oscuro y colores tomados del branding EdenAir. Sin ruido visual.</p>
-                            </article>
-                        </div>
+                    <!-- Logo / nombre al centro absoluto sobre el SVG -->
+                    <div class="ea-core-center" aria-hidden="true">
+                        <span class="ea-core-center-label">Eden</span>
+                        <span class="ea-core-center-sub">AIR · CORE</span>
                     </div>
 
-                    <button type="button" class="ea-carousel-arrow" data-ea-carousel-next aria-label="Siguiente">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="m9.5 6 5.5 6-5.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-
-                    <div class="ea-carousel-dots" data-ea-carousel-dots aria-hidden="true"></div>
+                    <!-- 7 módulos en órbita: ángulos distribuidos cada ~51° -->
+                    <div class="ea-core-modules">
+                        <article class="ea-core-mod" data-tone="warm" style="--ang:-90deg;  --r:42;">
+                            <span class="ea-core-mod-key">Temperatura</span>
+                            <span class="ea-core-mod-val">°C</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="cool" style="--ang:-39deg;  --r:42;">
+                            <span class="ea-core-mod-key">Humedad</span>
+                            <span class="ea-core-mod-val">%</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="leaf" style="--ang: 13deg;  --r:42;">
+                            <span class="ea-core-mod-key">CO₂</span>
+                            <span class="ea-core-mod-val">ppm</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="cool" style="--ang: 64deg;  --r:42;">
+                            <span class="ea-core-mod-key">Calidad de aire</span>
+                            <span class="ea-core-mod-val">índice</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="leaf" style="--ang: 115deg; --r:42;">
+                            <span class="ea-core-mod-key">Ventilación</span>
+                            <span class="ea-core-mod-val">auto</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="cool" style="--ang: 167deg; --r:42;">
+                            <span class="ea-core-mod-key">Humidificación</span>
+                            <span class="ea-core-mod-val">auto</span>
+                        </article>
+                        <article class="ea-core-mod" data-tone="leaf" style="--ang:-141deg; --r:42;">
+                            <span class="ea-core-mod-key">Purificación</span>
+                            <span class="ea-core-mod-val">auto</span>
+                        </article>
+                    </div>
                 </div>
+
+                <ul class="ea-core-facts" aria-label="Capacidades de Eden Air">
+                    <li><span>4</span> variables monitoreadas</li>
+                    <li><span>3</span> módulos regulados</li>
+                    <li><span>24/7</span> aire optimizado</li>
+                </ul>
             </div>
         </section>
 
         <section class="ea-section" id="funcionamiento" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">03 / Cómo funciona</p>
-                    <h2>Cinco pasos, <em>una sola</em> idea.</h2>
+                    <p class="ea-eyebrow">03 · Decision engine</p>
+                    <h2>Sensa. <em>Decide.</em> Actúa.</h2>
+                    <p>Cada lectura recorre el mismo camino. Sin atajos. Sin demoras.</p>
                 </div>
 
                 <div class="ea-flow">
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
-                        <h4>Sensores miden</h4>
-                        <p>El módulo lee temperatura, humedad, CO₂ y calidad de aire.</p>
+                        <h4>Sensa</h4>
+                        <p>El ESP32 mide cuatro variables clave cada pocos segundos.</p>
                     </div>
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
-                        <h4>ESP32 envía</h4>
-                        <p>El microcontrolador publica los datos por la API REST de EdenAir.</p>
+                        <h4>Transmite</h4>
+                        <p>Las lecturas viajan por la API REST hacia el núcleo.</p>
                     </div>
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
-                        <h4>EdenAir guarda</h4>
-                        <p>Las lecturas quedan registradas en MySQL listas para mostrar.</p>
+                        <h4>Registra</h4>
+                        <p>Cada dato queda guardado. Historial siempre disponible.</p>
                     </div>
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
-                        <h4>Reglas deciden</h4>
-                        <p>Las automatizaciones evalúan si algún actuador debe activarse.</p>
+                        <h4>Decide</h4>
+                        <p>Las reglas evalúan en milisegundos qué hacer.</p>
                     </div>
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
-                        <h4>Actuadores responden</h4>
-                        <p>Ventilador, aromatizador, LED y humidificador siguen las órdenes recibidas.</p>
+                        <h4>Actúa</h4>
+                        <p>Ventilación, humidificación y purificación responden solas.</p>
                     </div>
                 </div>
 
@@ -419,8 +467,9 @@
         <section class="ea-section" id="sensores" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">04 / Sensores y actuadores</p>
-                    <h2>Lo que <em>mide</em>, lo que <em>controla.</em></h2>
+                    <p class="ea-eyebrow">04 · Hardware</p>
+                    <h2>Lee el aire. <em>Mueve el ambiente.</em></h2>
+                    <p>Cuatro sensores entran. Cuatro actuadores responden.</p>
                 </div>
 
                 <div class="ea-hardware">
@@ -523,14 +572,10 @@
         <section class="ea-section" id="automatizacion" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">05 / Automatización</p>
-                    <h2>Reglas que <em>cuidan</em> el ambiente.</h2>
+                    <p class="ea-eyebrow">05 · Automatización</p>
+                    <h2>Cuatro reglas. <em>Cero supervisión.</em></h2>
+                    <p>Cada regla es transparente, editable y siempre activa.</p>
                 </div>
-
-                <p class="ea-rules-intro" data-reveal-child>
-                    EdenAir vigila las variables sin parar y reacciona apenas algo se sale del rango ideal.
-                    Cada regla es simple, transparente y siempre se puede revisar o ajustar.
-                </p>
 
                 <div class="ea-rules">
                     <article class="ea-rule" data-reveal-child>
@@ -584,12 +629,9 @@
         <section class="ea-section" data-reveal>
             <div class="ea-page">
                 <div class="ea-cta">
-                    <p class="ea-eyebrow" style="color: rgba(236,242,232,0.7); justify-content: center;">Listo cuando vos</p>
-                    <h2>Entrá al panel y <em>sentí el aire.</em></h2>
-                    <p>
-                        Una interfaz cómoda, ordenada y pensada para que el control ambiental sea simple.
-                        Crear cuenta toma menos de un minuto.
-                    </p>
+                    <p class="ea-eyebrow" style="color: rgba(236,242,232,0.7); justify-content: center;">06 · Acceso</p>
+                    <h2>Aire optimizado. <em>Empezá ahora.</em></h2>
+                    <p>Monitoreo continuo. Control automático. Sin curva de aprendizaje.</p>
                     <div class="ea-hero-actions">
                         <?php if ($conSesion): ?>
                             <a href="<?= site_url('panel') ?>" class="ea-button ea-button-primary">Ir al panel</a>
@@ -607,8 +649,15 @@
     <?= view('partials/footer') ?>
 </div>
 
-<script src="<?= base_url('JS/tema.js') ?>"></script>
-<script src="<?= base_url('JS/inicio.js') ?>"></script>
+<?php
+    $eaJsBust = function (string $relativePath): string {
+        $abs = FCPATH . $relativePath;
+        $v   = is_file($abs) ? filemtime($abs) : time();
+        return base_url($relativePath) . '?v=' . $v;
+    };
+?>
+<script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script type="importmap">
 {
     "imports": {
@@ -617,6 +666,6 @@
     }
 }
 </script>
-<script type="module" src="<?= base_url('JS/eden-core-3d.js') ?>"></script>
+<script type="module" src="<?= htmlspecialchars($eaJsBust('JS/eden-core-3d.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 </body>
 </html>

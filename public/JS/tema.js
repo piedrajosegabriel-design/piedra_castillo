@@ -71,7 +71,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
     toggles.forEach(function (toggle) {
         toggle.addEventListener("change", function () {
-            aplicarTema(this.checked ? TEMA_OSCURO : TEMA_CLARO, true);
+            var temaDestino = this.checked ? TEMA_OSCURO : TEMA_CLARO;
+
+            // Sin animación si el usuario prefiere movimiento reducido
+            if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                aplicarTema(temaDestino, true);
+                return;
+            }
+
+            // Posición central del toggle para anclar la expansión
+            var etiqueta = toggle.closest(".ea-theme-switch") || toggle.parentElement;
+            var rect = etiqueta.getBoundingClientRect();
+            var cx = rect.left + rect.width  / 2;
+            var cy = rect.top  + rect.height / 2;
+            var radio = Math.hypot(window.innerWidth, window.innerHeight);
+
+            raiz.style.setProperty("--theme-x", cx + "px");
+            raiz.style.setProperty("--theme-y", cy + "px");
+            raiz.style.setProperty("--theme-radius", radio + "px");
+
+            // Fallback para navegadores sin View Transitions API
+            if (!document.startViewTransition) {
+                aplicarTema(temaDestino, true);
+                return;
+            }
+
+            document.startViewTransition(function () {
+                aplicarTema(temaDestino, true);
+            });
         });
     });
 
