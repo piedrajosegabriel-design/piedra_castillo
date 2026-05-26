@@ -107,8 +107,10 @@
                     </button>
 
                     <div class="ea-auth-foot">
-                        <a href="<?= site_url('registro') ?>" class="ea-auth-link">No tengo cuenta todavía</a>
-                    </div>
+                      <a href="<?= site_url('recuperar') ?>" class="ea-auth-link">Olvidé mi contraseña   </a>
+                      <a href="<?= site_url('registro') ?>" class="ea-auth-link">No tengo cuenta todavía</a>
+                   </div>
+                   
                 </form>
             </div>
         </section>

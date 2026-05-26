@@ -32,6 +32,15 @@ class CreateTesinaSimulationSchema extends Migration
                     'type'       => 'VARCHAR',
                     'constraint' => 255,
                 ],
+                'reset_token' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 64,
+                    'null'       => true,
+                ],
+                'reset_expires_at' => [
+                    'type' => 'DATETIME',
+                    'null' => true,
+                ],
                 'created_at' => [
                     'type' => 'DATETIME',
                     'null' => true,

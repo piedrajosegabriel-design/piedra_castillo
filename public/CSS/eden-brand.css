@@ -700,6 +700,7 @@ body.ea-body {
     display: flex;
     flex-direction: column;
     gap: var(--ea-gap-md);
+    width: 100%;
 }
 
 .ea-field {
@@ -1259,16 +1260,19 @@ body.ea-body {
 
 .ea-auth-foot {
     display: flex;
-    justify-content: center;
-    margin-top: 6px;
+    justify-content: space-between;
+    margin-top: 4px;
 }
 
 .ea-auth-link {
     font-family: var(--ea-font-sans);
+    text-wrap: nowrap;
     color: var(--eden-700);
     font-weight: 500;
     border-bottom: 1px solid transparent;
     transition: border-color 0.18s ease;
+    margin-left: 2rem;
+    margin-right: 2rem;
 }
 
 .ea-auth-link:hover {

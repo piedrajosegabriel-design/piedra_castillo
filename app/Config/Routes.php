@@ -15,6 +15,10 @@ $routes->group('', ['filter' => 'guest'], static function ($routes) {
     $routes->post('registro', 'AccesoController::guardarRegistro');
     $routes->get('register', 'AccesoController::registro');
     $routes->post('register', 'AccesoController::guardarRegistro');
+    $routes->get('recuperar', 'AccesoController::recuperar');
+    $routes->post('recuperar', 'AccesoController::procesarRecuperacion');
+    $routes->get('restablecer/(:any)', 'AccesoController::restablecer/$1');
+    $routes->post('restablecer/(:any)', 'AccesoController::guardarNuevaPassword/$1');
 });
 
 $routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);

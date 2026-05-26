@@ -6,85 +6,101 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    // =========================================================================
-    // CONFIGURACION DEL MODELO
-    // =========================================================================
     protected $table            = 'users';
     protected $primaryKey       = 'id';
     protected $returnType       = 'array';
     protected $useAutoIncrement = true;
-    protected $allowedFields    = ['nombre', 'email', 'usuario', 'password_hash'];
     protected $useTimestamps    = true;
-    protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
+    protected $allowedFields    = [
+        'nombre',
+        'email',
+        'usuario',
+        'password_hash',
+        'reset_token',
+        'reset_expires_at',
+    ];
 
-    // =========================================================================
-    // CONSULTAS PARA ACCESO
-    // =========================================================================
-    public function buscarParaLogin(string $login): ?array
+    public function buscarParaLogin(string $identificador): ?array
     {
-        $login = $this->normalizarTexto($login);
+        $identificador = trim($identificador);
 
-        if ($login === '') {
+        if ($identificador === '') {
             return null;
         }
 
         return $this->groupStart()
-            ->where('usuario', $login)
-            ->orWhere('email', $this->normalizarEmail($login))
+            ->where('email', strtolower($identificador))
+            ->orWhere('usuario', $identificador)
             ->groupEnd()
             ->first();
     }
 
-    public function existeCorreoOUsuario(string $email, string $username): bool
+    public function existeCorreoOUsuario(string $email, string $usuario): bool
     {
         return $this->groupStart()
-            ->where('email', $this->normalizarEmail($email))
-            ->orWhere('usuario', $this->normalizarTexto($username))
+            ->where('email', strtolower(trim($email)))
+            ->orWhere('usuario', trim($usuario))
             ->groupEnd()
             ->countAllResults() > 0;
     }
 
-    // =========================================================================
-    // CREACION Y ACTUALIZACION
-    // =========================================================================
-    public function crearUsuario(array $data): int
+    public function crearUsuario(array $datos): int
     {
-        return (int) $this->insert($this->crearDatosUsuario($data));
+        $this->insert([
+            'nombre'        => trim((string) ($datos['nombre'] ?? '')),
+            'email'         => strtolower(trim((string) ($datos['email'] ?? ''))),
+            'usuario'       => trim((string) ($datos['usuario'] ?? '')),
+            'password_hash' => password_hash((string) ($datos['password'] ?? ''), PASSWORD_DEFAULT),
+        ]);
+
+        return (int) $this->getInsertID();
     }
 
-    public function actualizarHashContrasena(int $userId, string $plainPassword): void
+    public function actualizarHashContrasena(int $userId, string $password): bool
     {
-        $this->update($userId, [
-            'password_hash' => $this->crearHashContrasena($plainPassword),
+        return $this->update($userId, [
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
         ]);
     }
 
-    // =========================================================================
-    // HELPERS PRIVADOS
-    // =========================================================================
-    private function crearDatosUsuario(array $data): array
+    public function guardarToken(int $userId, string $token, string $expiresAt): bool
     {
-        return [
-            'nombre'        => $this->normalizarTexto((string) ($data['nombre'] ?? '')),
-            'email'         => $this->normalizarEmail((string) ($data['email'] ?? '')),
-            'usuario'       => $this->normalizarTexto((string) ($data['usuario'] ?? '')),
-            'password_hash' => $this->crearHashContrasena((string) ($data['password'] ?? '')),
-        ];
+        return $this->update($userId, [
+            'reset_token'      => $this->hashToken($token),
+            'reset_expires_at' => $expiresAt,
+        ]);
     }
 
-    private function normalizarTexto(string $value): string
+    public function buscarPorToken(string $token): ?array
     {
-        return trim($value);
+        if (trim($token) === '') {
+            return null;
+        }
+
+        return $this->where('reset_token', $this->hashToken($token))
+            ->where('reset_expires_at >=', date('Y-m-d H:i:s'))
+            ->first();
     }
 
-    private function normalizarEmail(string $value): string
+    public function actualizarPasswordConToken(int $userId, string $password): bool
     {
-        return strtolower($this->normalizarTexto($value));
+        return $this->update($userId, [
+            'password_hash'    => password_hash($password, PASSWORD_DEFAULT),
+            'reset_token'      => null,
+            'reset_expires_at' => null,
+        ]);
     }
 
-    private function crearHashContrasena(string $plainPassword): string
+    public function limpiarTokenRecuperacion(int $userId): bool
     {
-        return password_hash($plainPassword, PASSWORD_DEFAULT);
+        return $this->update($userId, [
+            'reset_token'      => null,
+            'reset_expires_at' => null,
+        ]);
+    }
+
+    private function hashToken(string $token): string
+    {
+        return hash('sha256', trim($token));
     }
 }

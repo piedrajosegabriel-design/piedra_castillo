@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(120) NOT NULL,
     usuario VARCHAR(80) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    reset_token VARCHAR(64) NULL,
+    reset_expires_at DATETIME NULL,
     created_at DATETIME NULL,
     updated_at DATETIME NULL,
     PRIMARY KEY (id),
