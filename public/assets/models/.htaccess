@@ -1,0 +1,12 @@
+# Asegurar MIME y caché correctos para los modelos 3D (.glb / .gltf)
+<IfModule mod_mime.c>
+    AddType model/gltf-binary .glb
+    AddType model/gltf+json   .gltf
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(glb|gltf)$">
+        Header set Cache-Control "public, max-age=2592000"
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>

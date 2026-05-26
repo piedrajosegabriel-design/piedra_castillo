@@ -1652,3 +1652,32 @@ body.dashboard-body {
 :root[data-theme="dark"] .dashboard-body .status-warning { color: var(--ea-clay); }
 :root[data-theme="dark"] .dashboard-body .status-danger { color: #e08465; }
 :root[data-theme="dark"] .dashboard-body .status-info { color: var(--ea-breath); }
+
+/* ---------- Transición circular de tema (View Transitions API) ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 700ms;
+    animation-timing-function: ease-in-out;
+    mix-blend-mode: normal;
+}
+
+/* El estado viejo se congela; el nuevo se revela desde el toggle */
+::view-transition-old(root) {
+    animation: none;
+}
+
+::view-transition-new(root) {
+    animation: ea-tema-reveal 700ms ease-in-out;
+}
+
+@keyframes ea-tema-reveal {
+    from { clip-path: circle(0px at var(--theme-x, 50%) var(--theme-y, 50%)); }
+    to   { clip-path: circle(var(--theme-radius, 150vmax) at var(--theme-x, 50%) var(--theme-y, 50%)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 0.01ms !important;
+    }
+}
