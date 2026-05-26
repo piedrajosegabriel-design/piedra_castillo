@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
     syncNavbarScrolled();
     syncNavHeight();
     window.addEventListener("scroll", syncNavbarScrolled, { passive: true });
-    window.addEventListener("scroll", syncNavHeight,     { passive: true });
     window.addEventListener("resize", syncNavHeight);
 
     /* -------- Mobile nav drawer -------- */
@@ -308,6 +307,15 @@ document.addEventListener("DOMContentLoaded", function () {
         var lastProgress = -1;
         var ready        = false;
 
+        // Geometría cacheada: evita getBoundingClientRect() en cada frame de scroll
+        var expSectionTop = 0;
+        var expSectionH   = 0;
+        function cacheExpGeometry() {
+            expSectionTop = expSection.getBoundingClientRect().top + window.scrollY;
+            expSectionH   = expSection.offsetHeight;
+        }
+        cacheExpGeometry();
+
         // Debug útil para diagnosticar
         if (window.console && console.info) {
             console.info(EA_LOG, "Section detectada");
@@ -464,10 +472,16 @@ document.addEventListener("DOMContentLoaded", function () {
             rafId = null;
             if (!expVideo || !ready) return;
             var diff = targetTime - currentTime;
-            if (Math.abs(diff) < 0.015) {
+            var absDiff = Math.abs(diff);
+            if (absDiff < 0.016) {
+                // Ya llegamos
+                currentTime = targetTime;
+            } else if (absDiff > 0.4) {
+                // Salto grande (> 0.4s): snap directo, evita cola interminable
                 currentTime = targetTime;
             } else {
-                currentTime += diff * 0.25;
+                // Lerp rápido: 40% por frame ≈ llega en ~5 frames a 60fps
+                currentTime += diff * 0.4;
             }
             try { expVideo.currentTime = currentTime; } catch (e) {}
 
@@ -489,13 +503,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function syncExperience() {
-            if (!expSection) return;
-            var rect = expSection.getBoundingClientRect();
             var vh = window.innerHeight || document.documentElement.clientHeight;
-            var scrollable = rect.height - vh;
+            var scrollable = expSectionH - vh;
             if (scrollable <= 0) return;
 
-            var raw = (-rect.top) / scrollable;
+            // window.scrollY no fuerza layout; usa geometría cacheada
+            var raw = (window.scrollY - expSectionTop) / scrollable;
             var progress = Math.max(0, Math.min(1, raw));
             if (progress === lastProgress) return;
             lastProgress = progress;
@@ -530,6 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("resize", function () {
             isMobile = window.matchMedia("(max-width: 640px)").matches;
             lastProgress = -1;
+            cacheExpGeometry();   // recalcular tras cambio de tamaño
             syncExperience();
         });
 

@@ -1750,13 +1750,13 @@ body.ea-nav-open {
     z-index: 1;
     pointer-events: none;
     background: radial-gradient(ellipse at center, rgba(3, 7, 10, 0) 55%, rgba(3, 7, 10, 0.55) 100%);
-    mix-blend-mode: multiply;
+    /* mix-blend-mode eliminado: forzaba una capa de composición extra por frame */
 }
 
 .ea-experience-glow {
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
+    filter: blur(60px);   /* 90px → 60px: buffer de composición 55% más chico */
     opacity: 0.45;
     pointer-events: none;
     z-index: 1;
