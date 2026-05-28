@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE KEY uq_users_usuario (usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE users
+ADD reset_token VARCHAR(64) NULL,
+ADD reset_expires_at DATETIME NULL;
+
 -- =========================================================
 -- TABLA: spaces
 -- Guarda el ambiente del usuario y sus rangos base.

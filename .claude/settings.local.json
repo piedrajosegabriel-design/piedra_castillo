@@ -1,23 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls \"C:\\\\Users\\\\jose.piedra\\\\Downloads\\\\Eden Air.zip\" 2>&1)",
-      "Bash(mkdir -p \"C:\\\\Users\\\\jose.piedra\\\\Downloads\\\\EdenAir_branding\")",
-      "Bash(unzip -o \"C:\\\\Users\\\\jose.piedra\\\\Downloads\\\\Eden Air.zip\")",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\inicio.php\")",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\login.php\")",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\registro.php\")",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\seleccion_ambiente.php\")",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\panel.php\")",
-      "Bash(\"C:/xampp/php/php.exe\" -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\inicio.php\")",
-      "Bash(\"C:/xampp/php/php.exe\" -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\login.php\")",
-      "Bash(\"C:/xampp/php/php.exe\" -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\registro.php\")",
-      "Bash(\"C:/xampp/php/php.exe\" -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\seleccion_ambiente.php\")",
-      "Bash(\"C:/xampp/php/php.exe\" -l \"C:\\\\xampp\\\\htdocs\\\\piedra_castillo\\\\app\\\\Views\\\\panel.php\")",
-      "Bash(php -l app/Views/panel.php app/Views/partials/logo.php)",
-      "Bash(/c/xampp/php/php -l C:/xampp/htdocs/piedra_castillo/app/Views/panel.php C:/xampp/htdocs/piedra_castillo/app/Views/partials/logo.php)",
-      "Bash(/c/xampp/php/php -l C:/xampp/htdocs/piedra_castillo/app/Views/partials/logo.php C:/xampp/htdocs/piedra_castillo/app/Views/inicio.php C:/xampp/htdocs/piedra_castillo/app/Views/login.php C:/xampp/htdocs/piedra_castillo/app/Views/registro.php C:/xampp/htdocs/piedra_castillo/app/Views/seleccion_ambiente.php)",
-      "Bash(node -c C:/xampp/htdocs/piedra_castillo/public/JS/dashboard.js)"
+      "Bash(\"C:/xampp/php/php.exe\" -l \"C:/xampp/htdocs/piedra_castillo/app/Views/inicio.php\")",
+      "Bash(node -e \"require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/inicio.js','utf8'\\);new Function\\(require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/inicio.js','utf8'\\)\\);console.log\\('inicio.js syntax OK'\\);new Function\\(require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/tema.js','utf8'\\)\\);console.log\\('tema.js syntax OK'\\);\")",
+      "Bash(curl -s \"http://localhost/piedra_castillo/public/\")"
     ]
   }
 }
