@@ -13,12 +13,22 @@ class UserModel extends Model
     protected $useTimestamps    = true;
     protected $allowedFields    = [
         'nombre',
+        'apellido',
         'email',
         'usuario',
         'password_hash',
         'reset_token',
         'reset_expires_at',
     ];
+
+    public function obtenerPorId(int $userId): ?array
+    {
+        if ($userId <= 0) {
+            return null;
+        }
+
+        return $this->find($userId);
+    }
 
     public function buscarParaLogin(string $identificador): ?array
     {
@@ -44,16 +54,37 @@ class UserModel extends Model
             ->countAllResults() > 0;
     }
 
+    public function existeCorreoOUsuarioExcepto(int $userId, string $email, string $usuario): bool
+    {
+        return $this->where('id !=', $userId)
+            ->groupStart()
+            ->where('email', strtolower(trim($email)))
+            ->orWhere('usuario', trim($usuario))
+            ->groupEnd()
+            ->countAllResults() > 0;
+    }
+
     public function crearUsuario(array $datos): int
     {
         $this->insert([
             'nombre'        => trim((string) ($datos['nombre'] ?? '')),
+            'apellido'      => trim((string) ($datos['apellido'] ?? '')),
             'email'         => strtolower(trim((string) ($datos['email'] ?? ''))),
             'usuario'       => trim((string) ($datos['usuario'] ?? '')),
             'password_hash' => password_hash((string) ($datos['password'] ?? ''), PASSWORD_DEFAULT),
         ]);
 
         return (int) $this->getInsertID();
+    }
+
+    public function actualizarPerfil(int $userId, array $datos): bool
+    {
+        return $this->update($userId, [
+            'nombre'   => trim((string) ($datos['nombre'] ?? '')),
+            'apellido' => trim((string) ($datos['apellido'] ?? '')),
+            'email'    => strtolower(trim((string) ($datos['email'] ?? ''))),
+            'usuario'  => trim((string) ($datos['usuario'] ?? '')),
+        ]);
     }
 
     public function actualizarHashContrasena(int $userId, string $password): bool

@@ -31,6 +31,10 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->get('ambiente', 'AccesoController::seleccionAmbiente');
     $routes->post('ambiente', 'AccesoController::guardarAmbiente');
     $routes->get('', 'PanelController::index');
+    $routes->get('perfil', 'PanelController::perfil');
+    $routes->post('perfil', 'PanelController::actualizarPerfil');
+    $routes->post('password', 'PanelController::actualizarPassword');
+    $routes->get('compra', 'PanelController::compra');
     $routes->post('medicion', 'PanelController::guardarMedicion');
     $routes->post('modo', 'PanelController::cambiarModo');
     $routes->post('actuador', 'PanelController::cambiarActuador');

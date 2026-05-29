@@ -87,24 +87,34 @@ $statusMeta = static function (string $s): array {
         </div>
 
         <nav class="ea-sidebar-nav" aria-label="Secciones">
-            <div class="ea-sidebar-section">Sistema</div>
-            <a href="#dashboard" class="sidebar-link ea-sidebar-item is-active">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.6"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.6"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.6"/></svg></span>
-                <span class="ea-sidebar-label">Resumen</span>
+        <div class="ea-sidebar-section">Sistema</div>
+        <a href="#dashboard" class="sidebar-link ea-sidebar-item is-active">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.6"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.6"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.6"/></svg></span>
+            <span class="ea-sidebar-label">Dashboard</span>
+        </a>
+        <a href="#sensores" class="sidebar-link ea-sidebar-item">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 6 9"/><path d="M3 20h18"/></svg></span>
+            <span class="ea-sidebar-label">Sensores</span>
+            <span class="ea-sidebar-meta"><?= esc((string) count($view['sensorCards'] ?? [])) ?></span>
+        </a>
+        <a href="#configuracion" class="sidebar-link ea-sidebar-item">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
+            <span class="ea-sidebar-label">Actuadores</span>
+            <span class="ea-sidebar-meta"><?= esc((string) count($view['actuators'] ?? [])) ?></span>
+        </a>
+        <a href="#historial" class="sidebar-link ea-sidebar-item">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+            <span class="ea-sidebar-label">Lecturas</span>
+        </a>
+
+            <div class="ea-sidebar-section">Cuenta</div>
+            <a href="<?= site_url('panel/perfil') ?>" class="ea-sidebar-item">
+                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <span class="ea-sidebar-label">Editar datos</span>
             </a>
-            <a href="#sensores" class="sidebar-link ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 6 9"/><path d="M3 20h18"/></svg></span>
-                <span class="ea-sidebar-label">Sensores</span>
-                <span class="ea-sidebar-meta">4</span>
-            </a>
-            <a href="#configuracion" class="sidebar-link ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
-                <span class="ea-sidebar-label">Actuadores</span>
-                <span class="ea-sidebar-meta"><?= esc((string) count($view['actuators'] ?? [])) ?></span>
-            </a>
-            <a href="#historial" class="sidebar-link ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-                <span class="ea-sidebar-label">Lecturas</span>
+            <a href="<?= site_url('panel/compra') ?>" class="ea-sidebar-item">
+                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
+                <span class="ea-sidebar-label">Comprar</span>
             </a>
 
             <div class="ea-sidebar-section">Lógica</div>
@@ -508,7 +518,48 @@ $statusMeta = static function (string $s): array {
                 </div>
             </article>
 
-            <!-- ============== Información técnica (colapsable) ============== -->
+            <!-- Sección: Accesos rápidos -->
+            <div class="ea-sec">
+                <h2>Accesos rápidos</h2>
+            </div>
+
+            <a href="#sensores" class="ea-card ea-quick-card accent-eden">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="10" rx="1.6"/><rect x="15" y="9" width="6" height="11" rx="1.6"/><path d="M6 18h6"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Ver sensores</strong>
+                    <small>4 lecturas activas · intervalo regular</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <a href="#historial" class="ea-card ea-quick-card accent-breath">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 6 9"/><path d="M3 20h18"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Ver lecturas</strong>
+                    <small><?= esc((string) count($view['historyRows'] ?? [])) ?> registros · historial reciente</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <a href="#automatizaciones" class="ea-card ea-quick-card accent-citrus">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Automatizaciones</strong>
+                    <small><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?>/<?= esc((string) count($view['automationRules'] ?? [])) ?> reglas activas</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <a href="#configuracion" class="ea-card ea-quick-card accent-clay">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Revisar actuadores</strong>
+                    <small><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?> activos · <?= esc((string) (count($view['actuators'] ?? []) - (int) ($view['activeActuators'] ?? 0))) ?> en espera</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <!-- Información técnica colapsable -->
             <details class="ea-card ea-tech-details">
                 <summary>
                     <span class="ea-tech-summary">

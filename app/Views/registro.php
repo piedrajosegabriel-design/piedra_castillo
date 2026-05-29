@@ -93,11 +93,11 @@
 
                     <div class="ea-field-row">
                         <div class="ea-field">
-                            <label for="nombre">Nombre completo</label>
+                            <label for="nombre">Nombre</label>
                             <input type="text" id="nombre" name="nombre"
                                 value="<?= esc(old('nombre')) ?>"
                                 placeholder="Tu nombre"
-                                autocomplete="name" required>
+                                autocomplete="given-name" required>
                         </div>
 
                         <div class="ea-field">
@@ -106,6 +106,16 @@
                                 value="<?= esc(old('email')) ?>"
                                 placeholder="correo@ejemplo.com"
                                 autocomplete="email" required>
+                        </div>
+                    </div>
+
+                    <div class="ea-field-row">
+                        <div class="ea-field">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" id="apellido" name="apellido"
+                                value="<?= esc(old('apellido')) ?>"
+                                placeholder="Tu apellido"
+                                autocomplete="family-name" required>
                         </div>
                     </div>
 

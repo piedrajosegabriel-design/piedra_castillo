@@ -20,6 +20,11 @@ class CreateTesinaSimulationSchema extends Migration
                     'type'       => 'VARCHAR',
                     'constraint' => 120,
                 ],
+                'apellido' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 120,
+                    'default'    => '',
+                ],
                 'email' => [
                     'type'       => 'VARCHAR',
                     'constraint' => 120,
