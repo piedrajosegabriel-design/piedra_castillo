@@ -8,6 +8,10 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/', 'AccesoController::inicio');
 
+// Portfolio público — accesible sin login, sin sesión y sin restricciones.
+$routes->get('portfolio',     'PortfolioController::index');
+$routes->get('portfolio.php', 'PortfolioController::index');
+
 $routes->group('', ['filter' => 'guest'], static function ($routes) {
     $routes->get('login', 'AccesoController::login');
     $routes->post('login', 'AccesoController::validarLogin');

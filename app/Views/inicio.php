@@ -34,6 +34,7 @@
             <li><a href="#funcionamiento">Funcionamiento</a></li>
             <li><a href="#sensores">Sensores</a></li>
             <li><a href="#automatizacion">Automatización</a></li>
+            <li><a href="<?= site_url('portfolio') ?>">Portfolio →</a></li>
         </ul>
         <div class="ea-mobile-nav-actions">
             <div class="ea-mobile-nav-theme">
