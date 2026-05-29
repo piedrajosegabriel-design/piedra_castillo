@@ -570,6 +570,13 @@ class PanelService
         $tempPct = max(0, min(100, ($currentTemp - 10) / (35 - 10) * 100));
         $co2Pct  = max(0, min(100, $currentCo2 / 1500 * 100));
 
+        $clamp = static fn (float $v): float => max(0.0, min(100.0, $v));
+
+        // Zona ideal proyectada sobre la misma escala que el porcentaje de cada gauge.
+        $tempBandLow  = $clamp(($minTempProf - 10) / 25 * 100);
+        $tempBandHigh = $clamp(($maxTempProf - 10) / 25 * 100);
+        $co2BandHigh  = $clamp($maxCo2Prof / 1500 * 100);
+
         $tempStatus = ($currentTemp < $minTempProf - 1 || $currentTemp > $maxTempProf + 2) ? 'danger'
             : (($currentTemp < $minTempProf || $currentTemp > $maxTempProf) ? 'warning' : 'success');
         $humStatus  = ($currentHumidity < $minHumProf - 5 || $currentHumidity > $maxHumProf + 5) ? 'danger'
@@ -577,10 +584,10 @@ class PanelService
         $co2Status  = $currentCo2 > $maxCo2Prof + 250 ? 'danger' : ($currentCo2 > $maxCo2Prof ? 'warning' : 'success');
 
         $sensorCards = [
-            ['icon' => 'temp', 'titulo' => 'Temperatura',     'valor' => number_format($currentTemp, 1), 'unidad' => '°C',                    'estado' => $tempStatus, 'detalle' => $defaultTempDetail,             'pct' => $tempPct,        'accent' => 'eden'],
-            ['icon' => 'hum',  'titulo' => 'Humedad',         'valor' => (string) $currentHumidity,      'unidad' => '%',                     'estado' => $humStatus,  'detalle' => $defaultHumidityDetail,         'pct' => $currentHumidity, 'accent' => 'breath'],
-            ['icon' => 'air',  'titulo' => 'Calidad de aire', 'valor' => $airStateLabel,                 'unidad' => 'AQI ' . $currentAir,    'estado' => $airTone,    'detalle' => 'Lectura combinada del aire.',  'pct' => $currentAir,     'accent' => 'citrus'],
-            ['icon' => 'co2',  'titulo' => 'CO₂',             'valor' => (string) $currentCo2,           'unidad' => 'ppm',                   'estado' => $co2Status,  'detalle' => $defaultCo2Detail,              'pct' => $co2Pct,         'accent' => 'clay'],
+            ['icon' => 'temp', 'titulo' => 'Temperatura',     'valor' => number_format($currentTemp, 1), 'unidad' => '°C',                    'estado' => $tempStatus, 'detalle' => $defaultTempDetail,             'pct' => $tempPct,         'bandLow' => $tempBandLow,       'bandHigh' => $tempBandHigh,      'accent' => 'eden'],
+            ['icon' => 'hum',  'titulo' => 'Humedad',         'valor' => (string) $currentHumidity,      'unidad' => '%',                     'estado' => $humStatus,  'detalle' => $defaultHumidityDetail,         'pct' => $currentHumidity, 'bandLow' => $clamp($minHumProf), 'bandHigh' => $clamp($maxHumProf), 'accent' => 'breath'],
+            ['icon' => 'air',  'titulo' => 'Calidad de aire', 'valor' => $airStateLabel,                 'unidad' => 'AQI ' . $currentAir,    'estado' => $airTone,    'detalle' => 'Lectura combinada del aire.',  'pct' => $currentAir,      'bandLow' => 70.0,               'bandHigh' => 100.0,              'accent' => 'citrus'],
+            ['icon' => 'co2',  'titulo' => 'CO₂',             'valor' => (string) $currentCo2,           'unidad' => 'ppm',                   'estado' => $co2Status,  'detalle' => $defaultCo2Detail,              'pct' => $co2Pct,          'bandLow' => 0.0,                'bandHigh' => $co2BandHigh,       'accent' => 'clay'],
         ];
 
         $automationRules = [

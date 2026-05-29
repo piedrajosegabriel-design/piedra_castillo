@@ -163,6 +163,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateSpy();
 
+    /* -------------------- Lecturas: ver más / ver menos -------------------- */
+    var readingsToggle = document.querySelector("[data-readings-toggle]");
+    var readingsCard = document.querySelector("[data-readings]");
+    if (readingsToggle && readingsCard) {
+        readingsToggle.addEventListener("click", function () {
+            var expanded = readingsCard.classList.toggle("is-expanded");
+            var label = expanded ? readingsToggle.getAttribute("data-less") : readingsToggle.getAttribute("data-more");
+            if (label) readingsToggle.textContent = label;
+        });
+    }
+
     /* -------------------- Sidebar (toggle, modos, escape) -------------------- */
     if (!app || !toggle) {
         return;
