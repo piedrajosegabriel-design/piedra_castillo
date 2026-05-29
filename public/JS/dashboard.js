@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var backdrop = document.querySelector("[data-sidebar-backdrop]");
     var links = document.querySelectorAll(".sidebar-link");
     var preserveForms = document.querySelectorAll("[data-preserve-scroll]");
+    var confirmForms = document.querySelectorAll("[data-confirm-form]");
     var mobileQuery = window.matchMedia("(max-width: 960px)");
     var reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     var scrollKey = "dashboard-scroll-y";
@@ -162,6 +163,125 @@ document.addEventListener("DOMContentLoaded", function () {
     }, { passive: true });
 
     updateSpy();
+
+    function ensureConfirmDialog() {
+        var existing = document.querySelector("[data-confirm-dialog]");
+
+        if (existing) {
+            return existing;
+        }
+
+        var dialog = document.createElement("div");
+        dialog.className = "ea-confirm";
+        dialog.setAttribute("data-confirm-dialog", "");
+        dialog.setAttribute("aria-hidden", "true");
+        dialog.innerHTML = '' +
+            '<div class="ea-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="eaConfirmTitle">' +
+                '<div class="ea-confirm-icon" aria-hidden="true">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 4.4 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.4a2 2 0 0 0-3.4 0z"/></svg>' +
+                '</div>' +
+                '<div class="ea-confirm-copy">' +
+                    '<h2 id="eaConfirmTitle">Confirmar cambios</h2>' +
+                    '<p data-confirm-text></p>' +
+                '</div>' +
+                '<div class="ea-confirm-actions">' +
+                    '<button type="button" class="ea-kbtn" data-confirm-cancel>Cancelar</button>' +
+                    '<button type="button" class="ea-kbtn ea-kbtn-primary" data-confirm-accept>Confirmar</button>' +
+                '</div>' +
+            '</div>';
+
+        document.body.appendChild(dialog);
+        return dialog;
+    }
+
+    function openConfirmDialog(message, onAccept) {
+        var dialog = ensureConfirmDialog();
+        var text = dialog.querySelector("[data-confirm-text]");
+        var cancel = dialog.querySelector("[data-confirm-cancel]");
+        var accept = dialog.querySelector("[data-confirm-accept]");
+        var close = function () {
+            dialog.classList.remove("is-open");
+            dialog.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("confirm-lock");
+        };
+        var acceptOnce = function () {
+            close();
+            onAccept();
+        };
+
+        text.textContent = message;
+        dialog.classList.add("is-open");
+        dialog.setAttribute("aria-hidden", "false");
+        document.body.classList.add("confirm-lock");
+
+        cancel.onclick = close;
+        accept.onclick = acceptOnce;
+        dialog.onclick = function (event) {
+            if (event.target === dialog) {
+                close();
+            }
+        };
+        document.addEventListener("keydown", function escapeHandler(event) {
+            if (event.key !== "Escape" || !dialog.classList.contains("is-open")) {
+                return;
+            }
+
+            document.removeEventListener("keydown", escapeHandler);
+            close();
+        });
+        accept.focus();
+    }
+
+    function buildChangeMessage(form) {
+        if (!form.hasAttribute("data-confirm-changes")) {
+            return "";
+        }
+
+        var changes = [];
+        var fields = form.querySelectorAll("[data-confirm-label][data-confirm-current]");
+
+        fields.forEach(function (field) {
+            var currentValue = (field.getAttribute("data-confirm-current") || "").trim();
+            var nextValue = (field.value || "").trim();
+            var label = field.getAttribute("data-confirm-label") || "este dato";
+
+            if (currentValue !== nextValue) {
+                changes.push("Cambiar " + label + " a \"" + nextValue + "\"");
+            }
+        });
+
+        if (changes.length === 0) {
+            return "No se detectaron cambios en tus datos.";
+        }
+
+        if (changes.length === 1) {
+            return "Estas seguro de " + changes[0].charAt(0).toLowerCase() + changes[0].slice(1) + "?";
+        }
+
+        return "Estas seguro de aplicar estos cambios?\n\n- " + changes.join("\n- ");
+    }
+
+    confirmForms.forEach(function (form) {
+        form.addEventListener("submit", function (event) {
+            var message = buildChangeMessage(form) || form.getAttribute("data-confirm-message") || "Estas por aplicar cambios importantes en tu cuenta. Confirma para continuar.";
+
+            if (form.dataset.confirmed === "true") {
+                delete form.dataset.confirmed;
+                return;
+            }
+
+            event.preventDefault();
+            openConfirmDialog(message, function () {
+                form.dataset.confirmed = "true";
+
+                if (typeof form.requestSubmit === "function") {
+                    form.requestSubmit();
+                } else {
+                    form.submit();
+                }
+            });
+        });
+    });
 
     /* -------------------- Sidebar (toggle, modos, escape) -------------------- */
     if (!app || !toggle) {

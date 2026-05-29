@@ -94,6 +94,16 @@ $errors = session()->getFlashdata('errors') ?? [];
             <span class="ea-sidebar-label">Lecturas</span>
         </a>
 
+        <div class="ea-sidebar-section">Cuenta</div>
+        <a href="<?= site_url('panel/perfil') ?>" class="ea-sidebar-item">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="ea-sidebar-label">Editar datos</span>
+        </a>
+        <a href="<?= site_url('panel/compra') ?>" class="ea-sidebar-item">
+            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
+            <span class="ea-sidebar-label">Comprar</span>
+        </a>
+
         <div class="ea-sidebar-section">Lógica</div>
         <a href="#automatizaciones" class="sidebar-link ea-sidebar-item">
             <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h7"/><path d="M4 17h11"/><circle cx="14" cy="7" r="2.2"/><circle cx="18" cy="17" r="2.2"/></svg></span>
@@ -504,6 +514,24 @@ $errors = session()->getFlashdata('errors') ?? [];
                 <span class="ea-quick-body">
                     <strong>Revisar actuadores</strong>
                     <small><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?> activos · <?= esc((string) (count($view['actuators'] ?? []) - (int) ($view['activeActuators'] ?? 0))) ?> en espera</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <a href="<?= site_url('panel/perfil') ?>" class="ea-card ea-quick-card accent-eden">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Editar mis datos</strong>
+                    <small>Nombre, apellido, usuario, email y contrasena</small>
+                </span>
+                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+
+            <a href="<?= site_url('panel/compra') ?>" class="ea-card ea-quick-card accent-breath">
+                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
+                <span class="ea-quick-body">
+                    <strong>Comprar EdenAir</strong>
+                    <small>Vista de checkout estilo Mercado Pago</small>
                 </span>
                 <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>

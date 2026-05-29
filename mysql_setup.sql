@@ -27,6 +27,7 @@ USE tesina_esp32;
 CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     nombre VARCHAR(120) NOT NULL,
+    apellido VARCHAR(120) NOT NULL DEFAULT '',
     email VARCHAR(120) NOT NULL,
     usuario VARCHAR(80) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,

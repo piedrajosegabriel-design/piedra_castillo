@@ -46,7 +46,7 @@ class AccesoController extends BaseController
             $token     = bin2hex(random_bytes(32));
             $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes'));
             $enlace    = site_url('restablecer/' . $token);
-            $nombre    = esc((string) ($usuario['nombre'] ?? ''));
+            $nombre    = (string) ($usuario['nombre'] ?? 'Usuario');
 
             $usuarios->guardarToken((int) $usuario['id'], $token, $expiresAt);
 
@@ -54,20 +54,11 @@ class AccesoController extends BaseController
             $emailService->setFrom(config('Email')->fromEmail, config('Email')->fromName);
             $emailService->setTo((string) $usuario['email']);
             $emailService->setSubject('EdenAir - Restablecer tu contrasena');
-            $emailService->setMessage("
-                <div style='font-family:Arial,sans-serif; color:#17301f; line-height:1.5;'>
-                    <h2>Hola, {$nombre}</h2>
-                    <p>Recibimos una solicitud para restablecer tu contrasena en EdenAir.</p>
-                    <p>Este enlace es de un solo uso y vence en <strong>15 minutos</strong>.</p>
-                    <p style='margin:24px 0;'>
-                        <a href='{$enlace}' style='background:#244233; color:#f5f1e8; padding:12px 20px; text-decoration:none; border-radius:8px; display:inline-block;'>
-                            Restablecer contrasena
-                        </a>
-                    </p>
-                    <p>Si no solicitaste este cambio, puedes ignorar este correo con tranquilidad.</p>
-                    <p style='font-size:13px; color:#5f6f66;'>Si el boton no funciona, copia y pega este enlace en tu navegador:<br>{$enlace}</p>
-                </div>
-            ");
+            $emailService->setMessage(view('emails/recuperar_password', [
+                'nombre' => $nombre,
+                'enlace' => $enlace,
+                'minutos' => 15,
+            ]));
 
             if (! $emailService->send()) {
                 log_message('error', 'Fallo el envio de recuperacion para {email}. Debug: {debug}', [
@@ -216,6 +207,7 @@ class AccesoController extends BaseController
     {
         return [
             'nombre'           => 'required|min_length[3]|max_length[120]',
+            'apellido'         => 'required|min_length[2]|max_length[120]',
             'email'            => 'required|valid_email|max_length[120]',
             'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
             'password'         => 'required|min_length[8]|max_length[255]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
@@ -350,6 +342,7 @@ class AccesoController extends BaseController
     {
         return [
             'nombre'           => trim((string) $this->request->getPost('nombre')),
+            'apellido'         => trim((string) $this->request->getPost('apellido')),
             'email'            => strtolower(trim((string) $this->request->getPost('email'))),
             'usuario'          => trim((string) $this->request->getPost('usuario')),
             'password'         => (string) $this->request->getPost('password'),

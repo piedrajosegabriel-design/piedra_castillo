@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\UserModel;
 use App\Services\AutomationService;
 use App\Services\CommandService;
 use App\Services\DeviceProvisioningService;
@@ -33,6 +34,73 @@ class PanelController extends BaseController
         return view('panel', [
             'panel' => (new PanelService())->obtenerVistaPanel($userId),
         ]);
+    }
+
+    public function perfil(): string|RedirectResponse
+    {
+        $usuario = (new UserModel())->obtenerPorId($this->usuarioActual());
+
+        if (! $usuario) {
+            session()->destroy();
+
+            return redirect()->to('/login')->with('error', 'Tu sesion expiro. Inicia sesion nuevamente.');
+        }
+
+        return view('perfil_usuario', [
+            'usuario' => $usuario,
+        ]);
+    }
+
+    public function actualizarPerfil(): RedirectResponse
+    {
+        $datos = $this->leerDatosPerfil();
+
+        if ($redirect = $this->validarFormularioPerfil($datos)) {
+            return $redirect;
+        }
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->obtenerPorId($this->usuarioActual());
+
+        if ($redirect = $this->validarAutenticacionPerfil($usuario, $datos['current_password'])) {
+            return $redirect;
+        }
+
+        if ($usuarios->existeCorreoOUsuarioExcepto((int) $usuario['id'], $datos['email'], $datos['usuario'])) {
+            return $this->redirigirConInputYDato('/panel/perfil', 'errors', [
+                'unique' => 'El correo o el nombre de usuario ya pertenecen a otra cuenta.',
+            ]);
+        }
+
+        $usuarios->actualizarPerfil((int) $usuario['id'], $datos);
+        session()->set('user_name', trim($datos['nombre'] . ' ' . $datos['apellido']));
+
+        return redirect()->to('/panel/perfil')->with('success', 'Datos actualizados correctamente.');
+    }
+
+    public function actualizarPassword(): RedirectResponse
+    {
+        $datos = $this->leerDatosPassword();
+
+        if ($redirect = $this->validarFormularioPassword($datos)) {
+            return $redirect;
+        }
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->obtenerPorId($this->usuarioActual());
+
+        if ($redirect = $this->validarAutenticacionPerfil($usuario, $datos['current_password'])) {
+            return $redirect;
+        }
+
+        $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
+
+        return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
+    }
+
+    public function compra(): string
+    {
+        return view('compra_mercadopago');
     }
 
     // =========================================================================
@@ -162,6 +230,89 @@ class PanelController extends BaseController
         return redirect()->to('/panel')
             ->withInput()
             ->with('error', implode(' ', array_values($this->validator->getErrors())));
+    }
+
+    private function leerDatosPerfil(): array
+    {
+        return [
+            'nombre'           => trim((string) $this->request->getPost('nombre')),
+            'apellido'         => trim((string) $this->request->getPost('apellido')),
+            'email'            => strtolower(trim((string) $this->request->getPost('email'))),
+            'usuario'          => trim((string) $this->request->getPost('usuario')),
+            'current_password' => (string) $this->request->getPost('current_password'),
+        ];
+    }
+
+    private function leerDatosPassword(): array
+    {
+        return [
+            'current_password' => (string) $this->request->getPost('current_password'),
+            'password'         => (string) $this->request->getPost('password'),
+            'password_confirm' => (string) $this->request->getPost('password_confirm'),
+        ];
+    }
+
+    private function validarFormularioPerfil(array $datos): ?RedirectResponse
+    {
+        $reglas = [
+            'nombre'           => 'required|min_length[2]|max_length[120]',
+            'apellido'         => 'permit_empty|max_length[120]',
+            'email'            => 'required|valid_email|max_length[120]',
+            'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
+            'current_password' => 'required|max_length[255]',
+        ];
+
+        $mensajes = [
+            'usuario' => [
+                'regex_match' => 'El usuario solo puede contener letras, numeros, puntos, guiones y guion bajo.',
+            ],
+        ];
+
+        if ($this->validateData($datos, $reglas, $mensajes)) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'errors', $this->validator->getErrors());
+    }
+
+    private function validarFormularioPassword(array $datos): ?RedirectResponse
+    {
+        $reglas = [
+            'current_password' => 'required|max_length[255]',
+            'password'         => 'required|min_length[8]|max_length[255]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
+            'password_confirm' => 'required|matches[password]',
+        ];
+
+        $mensajes = [
+            'password' => [
+                'regex_match' => 'La contrasena debe incluir al menos una letra mayuscula, una minuscula y un numero.',
+            ],
+            'password_confirm' => [
+                'matches' => 'La confirmacion de contrasena no coincide.',
+            ],
+        ];
+
+        if ($this->validateData($datos, $reglas, $mensajes)) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'errors', $this->validator->getErrors());
+    }
+
+    private function validarAutenticacionPerfil(?array $usuario, string $password): ?RedirectResponse
+    {
+        if ($usuario && password_verify($password, (string) $usuario['password_hash'])) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'error', 'No pudimos autenticarte. Ingresa tu contrasena actual para confirmar el cambio.');
+    }
+
+    private function redirigirConInputYDato(string $ruta, string $clave, mixed $valor): RedirectResponse
+    {
+        return redirect()->to($ruta)
+            ->withInput()
+            ->with($clave, $valor);
     }
 
     // =========================================================================
