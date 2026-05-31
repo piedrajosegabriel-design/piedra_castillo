@@ -7,6 +7,11 @@
 
 /* ---------- Tokens ---------------------------------------------------- */
 :root {
+    /* Easing — strong custom curves used throughout the system */
+    --ea-ease-out:     cubic-bezier(0.23, 1, 0.32, 1);   /* snappy entries, instant response feel */
+    --ea-ease-in-out:  cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement */
+    --ea-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1); /* soft bounce for popovers/reveal */
+
     /* Greens */
     --eden-900: #0e1f17;
     --eden-800: #16301f;
@@ -977,12 +982,39 @@ body.ea-nav-open {
     line-height: 1;
     text-decoration: none;
     transition:
-        background-color 0.18s ease,
-        border-color 0.18s ease,
-        color 0.18s ease,
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
+        background-color 0.16s var(--ea-ease-out),
+        border-color 0.16s var(--ea-ease-out),
+        color 0.16s var(--ea-ease-out),
+        transform 0.14s var(--ea-ease-out),
+        box-shadow 0.16s var(--ea-ease-out);
     box-shadow: var(--ea-shadow-sm);
+}
+
+/* ---- Press feedback: buttons must feel responsive when pressed ---- */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+        transition-duration: 0.08s;
+    }
+}
+/* Touch devices: scale feedback on tap too (no hover false-positives here since :active is safe) */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+    }
 }
 
 .ea-button:focus-visible,
@@ -998,10 +1030,12 @@ body.ea-nav-open {
     --btn-color: var(--eden-100);
 }
 
-.ea-button-primary:hover {
-    --btn-bg: var(--eden-800);
-    transform: translateY(-1px);
-    box-shadow: var(--ea-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --btn-bg: var(--eden-800);
+        transform: translateY(-1px);
+        box-shadow: var(--ea-shadow-md);
+    }
 }
 
 .ea-button-secondary {
@@ -1015,10 +1049,12 @@ body.ea-nav-open {
     color: var(--ea-ink);
 }
 
-.ea-button-secondary:hover {
-    --btn-bg: var(--eden-100);
-    --btn-border: var(--eden-300);
-    color: var(--eden-700);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --btn-bg: var(--eden-100);
+        --btn-border: var(--eden-300);
+        color: var(--eden-700);
+    }
 }
 
 :root[data-theme="dark"] .ea-button-secondary {
@@ -1026,10 +1062,12 @@ body.ea-nav-open {
     color: var(--eden-100);
 }
 
-:root[data-theme="dark"] .ea-button-secondary:hover {
-    --btn-bg: rgba(74, 122, 85, 0.22);
-    --btn-border: var(--eden-500);
-    color: var(--eden-300);
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --btn-bg: rgba(74, 122, 85, 0.22);
+        --btn-border: var(--eden-500);
+        color: var(--eden-300);
+    }
 }
 
 .ea-button-ghost {
@@ -1040,20 +1078,67 @@ body.ea-nav-open {
     padding: 8px 14px;
 }
 
-.ea-button-ghost:hover {
-    --btn-bg: var(--eden-100);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover { --btn-bg: var(--eden-100); }
+    :root[data-theme="dark"] .ea-button-ghost:hover { --btn-bg: rgba(74, 122, 85, 0.22); }
 }
 
-:root[data-theme="dark"] .ea-button-ghost {
-    --btn-color: var(--eden-300);
-}
-
-:root[data-theme="dark"] .ea-button-ghost:hover {
-    --btn-bg: rgba(74, 122, 85, 0.22);
-}
+:root[data-theme="dark"] .ea-button-ghost { --btn-color: var(--eden-300); }
 
 .ea-button-block {
     width: 100%;
+}
+
+.ea-button-sm {
+    padding: 7px 13px;
+    font-size: 12.5px;
+}
+
+/* CTA de compra destacado — disponible en todas las páginas (landing y panel). */
+.ea-button-buy {
+    --btn-bg: linear-gradient(120deg, var(--eden-700) 0%, var(--eden-600) 52%, #356b46 100%);
+    --btn-color: #ffffff;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    padding-inline: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 10px 26px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+}
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    opacity: 0.7;
+    animation: ea-buy-glow 3.6s ease-in-out infinite;
+}
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    animation: ea-buy-shine 4.8s ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --btn-bg: linear-gradient(120deg, var(--eden-800) 0%, var(--eden-700) 55%, #2f6040 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(28, 64, 41, 0.38), inset 0 0 0 1px rgba(201, 216, 112, 0.5);
+    }
+}
+@keyframes ea-buy-glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }
+@keyframes ea-buy-shine { 0%, 62% { left: -120%; } 88%, 100% { left: 140%; } }
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before { animation: none !important; }
+    .ea-button-buy::after { display: none; }
 }
 
 .ea-button:disabled,
@@ -2164,31 +2249,8 @@ body.dashboard-body {
 :root[data-theme="dark"] .dashboard-body .status-danger { color: #e08465; }
 :root[data-theme="dark"] .dashboard-body .status-info { color: var(--ea-breath); }
 
-/* ---------- Transición circular de tema (View Transitions API) ---------- */
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation-duration: 700ms;
-    animation-timing-function: ease-in-out;
-    mix-blend-mode: normal;
-}
-
-/* El estado viejo se congela; el nuevo se revela desde el toggle */
-::view-transition-old(root) {
-    animation: none;
-}
-
-::view-transition-new(root) {
-    animation: ea-tema-reveal 700ms ease-in-out;
-}
-
-@keyframes ea-tema-reveal {
-    from { clip-path: circle(0px at var(--theme-x, 50%) var(--theme-y, 50%)); }
-    to   { clip-path: circle(var(--theme-radius, 150vmax) at var(--theme-x, 50%) var(--theme-y, 50%)); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation-duration: 0.01ms !important;
-    }
-}
+/* Transición de tema:
+   Antes usábamos la View Transitions API con una expansión circular.
+   El problema: el navegador re-mapeaba el scroll a la nueva instantánea y
+   movía la posición. Lo cambiamos por transiciones CSS de colores sobre el
+   shell — ver `.ea-body`/cards más abajo — que NO afectan el scroll. */

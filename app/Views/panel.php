@@ -2,8 +2,11 @@
 <html lang="es">
 <head>
     <?= view('partials/head', [
-        'title'    => 'EdenAir | Panel',
-        'extraCss' => ['CSS/dashboard.css'],
+        'title'     => 'EdenAir · Panel del ambiente',
+        'extraCss'  => ['CSS/dashboard.css'],
+        'extraHead' => '<meta name="description" content="Panel EdenAir: monitoreo en tiempo real de temperatura, humedad, CO₂ y calidad del aire, con control de actuadores y automatizaciones del ambiente.">'
+            . '<meta name="robots" content="noindex, nofollow">'
+            . '<meta name="color-scheme" content="light dark">',
     ]) ?>
 </head>
 <body class="dashboard-body ea-body ea-dashboard-body dashboard-loading">
@@ -71,71 +74,11 @@ $statusMeta = static function (string $s): array {
 
 <div class="ea-dashboard" data-dashboard-app>
 
-    <!-- =========================== SIDEBAR =========================== -->
-    <aside class="ea-sidebar" id="dashboardSidebar" aria-label="Navegación principal">
-        <div class="ea-sidebar-brand">
-            <span class="ea-sidebar-mark" aria-hidden="true">
-                <svg viewBox="0 0 32 32" fill="none">
-                    <path d="M22.5 7.5C12.8 7.5 7 13.4 7 21c0 1.8.4 3.4 1 4.8C13.6 23 18.6 19 22 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-                    <path d="M22.5 7.5c1.6 5-.2 11.4-4.3 14.7-2.7 2.1-5.8 2.7-8.7 1.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </span>
-            <span class="ea-sidebar-word">
-                <b>Eden<em>Air</em></b>
-                <span>Panel · v0.4</span>
-            </span>
-        </div>
-
-        <nav class="ea-sidebar-nav" aria-label="Secciones">
-        <div class="ea-sidebar-section">Sistema</div>
-        <a href="#dashboard" class="sidebar-link ea-sidebar-item is-active">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.6"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.6"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.6"/></svg></span>
-            <span class="ea-sidebar-label">Dashboard</span>
-        </a>
-        <a href="#sensores" class="sidebar-link ea-sidebar-item">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 6 9"/><path d="M3 20h18"/></svg></span>
-            <span class="ea-sidebar-label">Sensores</span>
-            <span class="ea-sidebar-meta"><?= esc((string) count($view['sensorCards'] ?? [])) ?></span>
-        </a>
-        <a href="#configuracion" class="sidebar-link ea-sidebar-item">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
-            <span class="ea-sidebar-label">Actuadores</span>
-            <span class="ea-sidebar-meta"><?= esc((string) count($view['actuators'] ?? [])) ?></span>
-        </a>
-        <a href="#historial" class="sidebar-link ea-sidebar-item">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4.5h4.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-            <span class="ea-sidebar-label">Lecturas</span>
-        </a>
-
-            <div class="ea-sidebar-section">Cuenta</div>
-            <a href="<?= site_url('panel/perfil') ?>" class="ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
-                <span class="ea-sidebar-label">Editar datos</span>
-            </a>
-            <a href="<?= site_url('panel/compra') ?>" class="ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
-                <span class="ea-sidebar-label">Comprar</span>
-            </a>
-
-            <div class="ea-sidebar-section">Lógica</div>
-            <a href="#automatizaciones" class="sidebar-link ea-sidebar-item">
-                <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h7"/><path d="M4 17h11"/><circle cx="14" cy="7" r="2.2"/><circle cx="18" cy="17" r="2.2"/></svg></span>
-                <span class="ea-sidebar-label">Automatizaciones</span>
-                <span class="ea-sidebar-meta"><?= esc((string) count($view['automationRules'] ?? [])) ?></span>
-            </a>
-        </nav>
-
-        <div class="ea-sidebar-footer">
-            <div class="ea-sidebar-status">
-                <span class="ea-sidebar-dot tone-<?= esc($tone) ?>"></span>
-                <span class="ea-sidebar-foot-label">Sistema en línea · ESP32 preparada</span>
-            </div>
-            <a href="<?= site_url('logout') ?>" class="ea-sidebar-logout" title="Cerrar sesión">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h12"/></svg>
-                <span class="ea-sidebar-label">Cerrar sesión</span>
-            </a>
-        </div>
-    </aside>
+    <!-- =========================== SIDEBAR (compartido) =========================== -->
+    <?= view('partials/dashboard_sidebar', [
+        'active'       => 'inicio',
+        'devicesCount' => count($panel['devices_list'] ?? []),
+    ]) ?>
 
     <!-- =========================== MAIN =========================== -->
     <main class="ea-main">
@@ -150,6 +93,36 @@ $statusMeta = static function (string $s): array {
                 <h1>Resumen</h1>
                 <p><?= esc((string) ($view['spaceName'] ?? '')) ?> · <?= esc((string) ($view['spaceLabel'] ?? '')) ?></p>
             </div>
+
+            <?php
+            $devicesList = (array) ($panel['devices_list'] ?? []);
+            $activeDeviceName = '';
+            foreach ($devicesList as $_d) {
+                if (! empty($_d['is_active'])) { $activeDeviceName = (string) $_d['name']; break; }
+            }
+            ?>
+            <?php if (count($devicesList) > 1): ?>
+                <form method="post" action="<?= site_url('panel/dispositivo-activo') ?>" class="ea-device-switcher" data-preserve-scroll>
+                    <?= csrf_field() ?>
+                    <label for="ea-device-select" class="ea-device-switcher-label">Dispositivo</label>
+                    <div class="ea-device-switcher-control">
+                        <select id="ea-device-select" name="device_id" onchange="this.form.submit()" aria-label="Cambiar de dispositivo">
+                            <?php foreach ($devicesList as $_d): ?>
+                                <option value="<?= esc((string) $_d['id'], 'attr') ?>" <?= ! empty($_d['is_active']) ? 'selected' : '' ?>>
+                                    <?= esc($_d['name']) ?> · <?= esc($_d['space']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <svg class="ea-device-switcher-caret" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <noscript><button type="submit" class="ea-button ea-button-sm ea-button-secondary">Cambiar</button></noscript>
+                </form>
+            <?php elseif ($activeDeviceName !== ''): ?>
+                <span class="ea-chip ea-chip-device" title="Dispositivo activo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" aria-hidden="true"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+                    <span><?= esc($activeDeviceName) ?></span>
+                </span>
+            <?php endif; ?>
 
             <span class="ea-chip ea-chip-status status-<?= esc($tone) ?>" title="Estado general del ambiente">
                 <span class="ea-pulse"></span>
@@ -189,19 +162,38 @@ $statusMeta = static function (string $s): array {
                 </div>
             <?php endif; ?>
 
+            <?php
+            // Si el usuario solo tiene el dispositivo simulado auto-creado, lo
+            // invitamos a vincular su Eden Air real. No bloquea: es informativo.
+            $deviceRaw       = (array) ($panel['device_raw'] ?? []);
+            $totalDispositivos = count((array) ($panel['devices_list'] ?? []));
+            $esSoloSimulado  = $totalDispositivos === 1
+                && (int) ($deviceRaw['is_simulated'] ?? 0) === 1
+                && empty($deviceRaw['activation_code']);
+            ?>
+            <?php if ($esSoloSimulado): ?>
+                <section class="ea-claim-banner" aria-label="Vinculá tu dispositivo Eden Air">
+                    <div class="ea-claim-banner-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9 8.5l2.3 2.3L15 7"/></svg>
+                    </div>
+                    <div class="ea-claim-banner-text">
+                        <strong>¿Ya tenés tu Eden Air?</strong>
+                        <span>Vinculá tu dispositivo real con su código de activación y administrá uno o varios desde tu cuenta.</span>
+                    </div>
+                    <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-primary ea-button-buy ea-button-sm">Vincular dispositivo</a>
+                </section>
+            <?php endif; ?>
+
             <!-- ============== HERO · Resumen del ambiente ============== -->
-            <section class="ea-hero tone-<?= esc($tone) ?>" id="dashboard">
+            <section class="ea-hero ea-reveal tone-<?= esc($tone) ?>" id="dashboard">
                 <div class="ea-hero-glow" aria-hidden="true"></div>
 
                 <div class="ea-hero-main">
                     <div class="ea-hero-top">
-                        <span class="ea-badge tone-<?= esc($tone) ?>"><span class="ea-dot"></span><?= esc((string) ($view['generalLabel'] ?? '')) ?></span>
+                        <span class="ea-badge tone-<?= esc($tone) ?> ea-hero-status"><span class="ea-dot"></span><?= esc((string) ($view['generalLabel'] ?? '')) ?></span>
                         <span class="ea-hero-mode ea-mode-tag <?= $modoManual ? 'is-manual' : 'is-auto' ?>">
+                            <span class="ea-mode-tag-dot" aria-hidden="true"></span>
                             <?= $modoManual ? 'Modo manual' : 'Modo automático' ?>
-                        </span>
-                        <span class="ea-hero-conn">
-                            <span class="ea-conn-dot"></span>
-                            En línea · <span class="ea-mono"><?= esc((string) ($view['deviceUid'] ?? '')) ?></span>
                         </span>
                     </div>
 
@@ -210,11 +202,23 @@ $statusMeta = static function (string $s): array {
                     <p class="ea-hero-diag"><?= esc((string) ($view['generalDetail'] ?? '')) ?></p>
 
                     <div class="ea-hero-foot">
-                        <span class="ea-mono">Actualizado <?= esc((string) ($view['lastUpdate'] ?? 'Hoy')) ?></span>
-                        <span class="ea-hero-foot-sep"></span>
-                        <span><strong><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?></strong> actuadores activos</span>
-                        <span class="ea-hero-foot-sep"></span>
-                        <span><strong><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?>/<?= esc((string) count($view['automationRules'] ?? [])) ?></strong> reglas activas</span>
+                        <span class="ea-hero-foot-item">
+                            <span class="ea-hero-foot-label">Actualizado</span>
+                            <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['lastUpdate'] ?? 'Hoy')) ?></span>
+                        </span>
+                        <span class="ea-hero-foot-item">
+                            <span class="ea-hero-foot-label">Actuadores activos</span>
+                            <span class="ea-hero-foot-val"><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?></span>
+                        </span>
+                        <span class="ea-hero-foot-item">
+                            <span class="ea-hero-foot-label">Reglas activas</span>
+                            <span class="ea-hero-foot-val"><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?><small>/<?= esc((string) count($view['automationRules'] ?? [])) ?></small></span>
+                        </span>
+                        <span class="ea-hero-foot-item ea-hero-foot-conn">
+                            <span class="ea-conn-dot"></span>
+                            <span class="ea-hero-foot-label">En línea</span>
+                            <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['deviceUid'] ?? '')) ?></span>
+                        </span>
                     </div>
                 </div>
 
@@ -330,15 +334,22 @@ $statusMeta = static function (string $s): array {
                     </div>
                 </div>
 
-                <div class="ea-mode-panel">
+                <div class="ea-mode-panel <?= $modoManual ? 'is-manual' : 'is-auto' ?>">
                     <div class="ea-mode-copy">
-                        <strong>Modo de operación</strong>
-                        <small><?= $modoManual ? 'Vos controlás los actuadores manualmente.' : 'El sistema decide según las reglas ambientales.' ?></small>
+                        <span class="ea-mode-eyebrow">Modo de operación</span>
+                        <strong><?= $modoManual ? 'Manual' : 'Automático' ?></strong>
+                        <small><?= $modoManual ? 'Vos decidís: usá los interruptores para encender o apagar cada actuador.' : 'El sistema enciende los actuadores cuando una variable sale del rango.' ?></small>
                     </div>
                     <form action="<?= site_url('panel/modo') ?>" method="POST" data-preserve-scroll class="ea-mode-switch" role="group" aria-label="Modo de operación">
                         <?= csrf_field() ?>
-                        <button type="submit" name="mode" value="automatic" class="ea-mode-opt <?= $modoManual ? '' : 'is-active' ?>" <?= $modoManual ? '' : 'aria-current="true"' ?>>Automático</button>
-                        <button type="submit" name="mode" value="manual" class="ea-mode-opt <?= $modoManual ? 'is-active' : '' ?>" <?= $modoManual ? 'aria-current="true"' : '' ?>>Manual</button>
+                        <button type="submit" name="mode" value="automatic" class="ea-mode-opt <?= $modoManual ? '' : 'is-active' ?>" <?= $modoManual ? '' : 'aria-current="true"' ?>>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M12 3v3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M3 12h3"/><path d="M5.6 18.4l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+                            Automático
+                        </button>
+                        <button type="submit" name="mode" value="manual" class="ea-mode-opt <?= $modoManual ? 'is-active' : '' ?>" <?= $modoManual ? 'aria-current="true"' : '' ?>>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M9 11V6a2 2 0 114 0v7"/><path d="M13 8a2 2 0 114 0v6"/><path d="M17 10a2 2 0 114 0v6a5 5 0 01-5 5h-3a5 5 0 01-5-5l-3-5a2 2 0 113-2l2 3"/></svg>
+                            Manual
+                        </button>
                     </form>
                 </div>
             </article>
@@ -451,9 +462,9 @@ $statusMeta = static function (string $s): array {
             <article class="ea-card ea-readings-card" data-readings>
                 <div class="ea-card-head">
                     <h3>Últimas lecturas</h3>
-                    <span class="ea-mono ea-card-meta">· <?= ! empty($view['historyIsSample']) ? 'EJEMPLO' : 'REALES' ?></span>
+                    <span class="ea-badge tone-<?= ! empty($view['historyIsSample']) ? 'warning' : 'success' ?> ea-card-meta-badge"><span class="ea-dot"></span><?= ! empty($view['historyIsSample']) ? 'Datos de ejemplo' : 'Datos reales' ?></span>
                     <span class="ea-kbtn ea-card-head-action" aria-disabled="true" title="Disponible próximamente">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>
                         Exportar
                     </span>
                 </div>
@@ -508,7 +519,10 @@ $statusMeta = static function (string $s): array {
 
                 <div class="ea-readings-foot">
                     <?php if (count($historyRows) > $visibleRows): ?>
-                        <button type="button" class="ea-kbtn" data-readings-toggle data-less="Ver menos" data-more="Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más">Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más</button>
+                        <button type="button" class="ea-kbtn ea-kbtn-primary ea-readings-more" data-readings-toggle data-less="Ver menos" data-more="Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más" aria-expanded="false" aria-controls="historial">
+                            <svg class="ea-readings-more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                            <span data-readings-label>Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más</span>
+                        </button>
                     <?php else: ?>
                         <span class="ea-mono">Mostrando <?= esc((string) count($historyRows)) ?> registros</span>
                     <?php endif; ?>
@@ -517,47 +531,6 @@ $statusMeta = static function (string $s): array {
                     </span>
                 </div>
             </article>
-
-            <!-- Sección: Accesos rápidos -->
-            <div class="ea-sec">
-                <h2>Accesos rápidos</h2>
-            </div>
-
-            <a href="#sensores" class="ea-card ea-quick-card accent-eden">
-                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="10" rx="1.6"/><rect x="15" y="9" width="6" height="11" rx="1.6"/><path d="M6 18h6"/></svg></span>
-                <span class="ea-quick-body">
-                    <strong>Ver sensores</strong>
-                    <small>4 lecturas activas · intervalo regular</small>
-                </span>
-                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-
-            <a href="#historial" class="ea-card ea-quick-card accent-breath">
-                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-5 4 3 4-7 6 9"/><path d="M3 20h18"/></svg></span>
-                <span class="ea-quick-body">
-                    <strong>Ver lecturas</strong>
-                    <small><?= esc((string) count($view['historyRows'] ?? [])) ?> registros · historial reciente</small>
-                </span>
-                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-
-            <a href="#automatizaciones" class="ea-card ea-quick-card accent-citrus">
-                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z"/></svg></span>
-                <span class="ea-quick-body">
-                    <strong>Automatizaciones</strong>
-                    <small><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?>/<?= esc((string) count($view['automationRules'] ?? [])) ?> reglas activas</small>
-                </span>
-                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
-
-            <a href="#configuracion" class="ea-card ea-quick-card accent-clay">
-                <span class="ea-quick-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
-                <span class="ea-quick-body">
-                    <strong>Revisar actuadores</strong>
-                    <small><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?> activos · <?= esc((string) (count($view['actuators'] ?? []) - (int) ($view['activeActuators'] ?? 0))) ?> en espera</small>
-                </span>
-                <svg class="ea-quick-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </a>
 
             <!-- Información técnica colapsable -->
             <details class="ea-card ea-tech-details">

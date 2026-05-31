@@ -1,10 +1,33 @@
-<?php $conSesion = (bool) session()->get('user_id'); ?>
+<?php
+$conSesion = (bool) session()->get('user_id');
+
+// Acciones del navbar: el CTA de compra tiene más peso visual que el login.
+ob_start(); ?>
+    <?php if ($conSesion): ?>
+        <a href="<?= site_url('panel') ?>" class="ea-button ea-button-secondary">Entrar al dashboard</a>
+        <a href="#comprar" class="ea-button ea-button-primary ea-button-buy" data-ea-buy-cta>Comprar</a>
+    <?php else: ?>
+        <a href="<?= site_url('login') ?>" class="ea-button ea-button-secondary">Iniciar sesión</a>
+        <a href="#comprar" class="ea-button ea-button-primary ea-button-buy" data-ea-buy-cta>Comprar Eden&nbsp;Air</a>
+    <?php endif; ?>
+<?php $eaNavActions = ob_get_clean(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <?= view('partials/head', [
-        'title'    => 'EdenAir | Inicio',
+        'title'    => 'Eden Air · Monitoreo y ambientación inteligente del aire',
         'extraCss' => ['CSS/inicio.css'],
+        'extraHead' =>
+              '<meta name="description" content="Eden Air es un sistema inteligente de monitoreo y ambientación automática para interiores: sensa temperatura, humedad, CO₂ y calidad del aire, decide y actúa con un dashboard propio.">'
+            . '<meta name="keywords" content="Eden Air, calidad del aire, monitoreo ambiental, IoT, ESP32, automatización ambiental, sustentable, smart home">'
+            . '<meta property="og:type" content="website">'
+            . '<meta property="og:title" content="Eden Air · Monitoreo y ambientación inteligente del aire">'
+            . '<meta property="og:description" content="Sensa, decide y actúa: dispositivo + dashboard propios para crear ambientes saludables, cómodos y sustentables.">'
+            . '<meta property="og:image" content="' . base_url('assets/img/branding/mark.svg') . '">'
+            . '<meta property="og:locale" content="es_AR">'
+            . '<meta name="twitter:card" content="summary_large_image">'
+            . '<meta name="twitter:title" content="Eden Air · Monitoreo y ambientación inteligente">'
+            . '<meta name="twitter:description" content="Sensa, decide y actúa sobre el ambiente desde un dashboard propio.">',
     ]) ?>
 </head>
 <body class="ea-body ea-landing">
@@ -12,13 +35,13 @@
     <?= view('partials/navbar', [
         'subtitle'  => 'Monitoreo ambiental',
         'conSesion' => $conSesion,
+        'actions'   => $eaNavActions,
         'navLinks'  => [
-            ['href' => '#inicio',         'label' => 'Inicio'],
-            ['href' => '#que-es',         'label' => 'Qué es'],
-            ['href' => '#beneficios',     'label' => 'Beneficios'],
-            ['href' => '#funcionamiento', 'label' => 'Funcionamiento'],
-            ['href' => '#sensores',       'label' => 'Sensores'],
-            ['href' => '#automatizacion', 'label' => 'Automatización'],
+            ['href' => '#que-es',             'label' => 'Qué es'],
+            ['href' => '#beneficios',         'label' => 'Beneficios'],
+            ['href' => '#tecnologia-interna', 'label' => 'Tecnología'],
+            ['href' => '#funcionamiento',     'label' => 'Funcionamiento'],
+            ['href' => '#comprar',            'label' => 'Comprar'],
         ],
     ]) ?>
 
@@ -31,9 +54,11 @@
             <li><a href="#inicio">Inicio</a></li>
             <li><a href="#que-es">Qué es</a></li>
             <li><a href="#beneficios">Beneficios</a></li>
+            <li><a href="#tecnologia-interna">Tecnología interna</a></li>
             <li><a href="#funcionamiento">Funcionamiento</a></li>
             <li><a href="#sensores">Sensores</a></li>
             <li><a href="#automatizacion">Automatización</a></li>
+            <li><a href="#comprar">Comprar</a></li>
             <li><a href="<?= site_url('portfolio') ?>">Portfolio →</a></li>
         </ul>
         <div class="ea-mobile-nav-actions">
@@ -41,11 +66,11 @@
                 <span class="ea-mobile-nav-theme-label">Tema</span>
                 <?= view('partials/theme_toggle', ['unique' => '-mobile']) ?>
             </div>
+            <a href="#comprar" class="ea-button ea-button-primary ea-button-block ea-button-buy">Comprar Eden Air</a>
             <?php if ($conSesion): ?>
-                <a href="<?= site_url('panel') ?>" class="ea-button ea-button-primary ea-button-block">Ir al panel</a>
-                <a href="<?= site_url('logout') ?>" class="ea-button ea-button-secondary ea-button-block">Cerrar sesión</a>
+                <a href="<?= site_url('panel') ?>" class="ea-button ea-button-secondary ea-button-block">Entrar al dashboard</a>
+                <a href="<?= site_url('logout') ?>" class="ea-button ea-button-ghost ea-button-block">Cerrar sesión</a>
             <?php else: ?>
-                <a href="<?= site_url('registro') ?>" class="ea-button ea-button-primary ea-button-block">Crear cuenta</a>
                 <a href="<?= site_url('login') ?>" class="ea-button ea-button-secondary ea-button-block">Iniciar sesión</a>
             <?php endif; ?>
         </div>
@@ -88,7 +113,7 @@
                         <span class="ea-hero-tagline-dot" aria-hidden="true"></span>
                         Environmental Control System
                     </span>
-                    <h1 class="ea-hero-title">El aire que <em>se regula</em><br>solo.</h1>
+                <h1 class="ea-hero-title">Respirá mejor,<br><em>viví más cómodo.</em></h1>
                     <p class="ea-hero-lede">
                         EdenAir sensa temperatura, humedad, CO₂ y calidad del aire.
                         Decide. Activa los módulos. Devuelve un ambiente equilibrado.
@@ -96,9 +121,9 @@
                     <div class="ea-hero-actions">
                         <?php if ($conSesion): ?>
                             <a href="<?= site_url('panel') ?>" class="ea-button ea-button-primary">Abrir panel</a>
-                            <a href="#que-es" class="ea-button ea-button-secondary">Conocer más</a>
+                            <a href="#comprar" class="ea-button ea-button-secondary">Comprar dispositivo</a>
                         <?php else: ?>
-                            <a href="<?= site_url('registro') ?>" class="ea-button ea-button-primary">Crear cuenta</a>
+                            <a href="#comprar" class="ea-button ea-button-primary ea-button-buy">Comprar Eden&nbsp;Air</a>
                             <a href="#que-es" class="ea-button ea-button-secondary">Conocer más</a>
                         <?php endif; ?>
                     </div>
@@ -251,7 +276,6 @@
         <section class="ea-section" id="que-es" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">01 · Qué detecta</p>
                     <h2>Detecta el <em>ambiente invisible.</em></h2>
                     <p>Cuatro variables. Lectura continua. Cero esfuerzo.</p>
                 </div>
@@ -330,7 +354,6 @@
 
             <div class="ea-page ea-core-page">
                 <header class="ea-core-head">
-                    <span class="ea-eyebrow">02 · Environmental Control Core</span>
                     <h2 class="ea-core-title">Un núcleo. <em>Siete módulos.</em><br>Un ambiente perfecto.</h2>
                     <p class="ea-core-lede">
                         El dispositivo lee el ambiente y decide qué módulo activar.
@@ -422,10 +445,77 @@
             </div>
         </section>
 
+        <?php
+            // Video "exploded view" del interior del dispositivo (sin audio, optimizado).
+            $eaTechMp4Path  = FCPATH . 'videos/eden-air-exploded.mp4';
+            $eaTechWebmPath = FCPATH . 'videos/eden-air-exploded.webm';
+            $eaTechPoster   = FCPATH . 'videos/eden-air-exploded-poster.jpg';
+            $eaTechMp4Ver   = is_file($eaTechMp4Path)  ? filemtime($eaTechMp4Path)  : time();
+            $eaTechWebmVer  = is_file($eaTechWebmPath) ? filemtime($eaTechWebmPath) : time();
+            $eaTechMp4Url   = base_url('videos/eden-air-exploded.mp4')  . '?v=' . $eaTechMp4Ver;
+            $eaTechWebmUrl  = base_url('videos/eden-air-exploded.webm') . '?v=' . $eaTechWebmVer;
+            $eaTechPosterUrl = base_url('videos/eden-air-exploded-poster.jpg') . '?v=' . (is_file($eaTechPoster) ? filemtime($eaTechPoster) : time());
+        ?>
+        <section class="ea-tech" id="tecnologia-interna" data-reveal aria-labelledby="ea-tech-title">
+            <div class="ea-page">
+                <div class="ea-section-head ea-tech-head">
+                    <h2 id="ea-tech-title">Tecnología interna diseñada para <em>cuidar tu ambiente.</em></h2>
+                    <p>Eden Air combina sensores, procesamiento inteligente y automatización para interpretar el estado del ambiente y responder de forma precisa.</p>
+                </div>
+
+                <div class="ea-tech-stage" data-reveal-child>
+                    <div class="ea-tech-media">
+                        <video
+                            class="ea-tech-video"
+                            data-ea-tech-video
+                            poster="<?= htmlspecialchars($eaTechPosterUrl, ENT_QUOTES, 'UTF-8') ?>"
+                            muted
+                            loop
+                            playsinline
+                            webkit-playsinline="true"
+                            autoplay
+                            preload="metadata"
+                            disablepictureinpicture
+                            aria-label="Vista interna animada del dispositivo Eden Air mostrando sus módulos"
+                        >
+                            <?php if (is_file($eaTechWebmPath)): ?>
+                                <source src="<?= htmlspecialchars($eaTechWebmUrl, ENT_QUOTES, 'UTF-8') ?>" type="video/webm">
+                            <?php endif; ?>
+                            <source src="<?= htmlspecialchars($eaTechMp4Url, ENT_QUOTES, 'UTF-8') ?>" type="video/mp4">
+                        </video>
+                        <span class="ea-tech-glow" aria-hidden="true"></span>
+                        <span class="ea-tech-vignette" aria-hidden="true"></span>
+                    </div>
+
+                    <ul class="ea-tech-cards" aria-label="Lo que hay dentro de Eden Air">
+                        <li class="ea-tech-card ea-tech-card--tl">
+                            <span class="ea-tech-card-dot" aria-hidden="true"></span>
+                            <span class="ea-tech-card-key">Sensores ambientales</span>
+                            <span class="ea-tech-card-val">Temperatura, humedad, CO₂ y calidad del aire</span>
+                        </li>
+                        <li class="ea-tech-card ea-tech-card--tr">
+                            <span class="ea-tech-card-dot" aria-hidden="true"></span>
+                            <span class="ea-tech-card-key">Control inteligente</span>
+                            <span class="ea-tech-card-val">El ESP32 interpreta cada lectura en tiempo real</span>
+                        </li>
+                        <li class="ea-tech-card ea-tech-card--bl">
+                            <span class="ea-tech-card-dot" aria-hidden="true"></span>
+                            <span class="ea-tech-card-key">Automatización</span>
+                            <span class="ea-tech-card-val">Activa ventilación, humidificación y aroma</span>
+                        </li>
+                        <li class="ea-tech-card ea-tech-card--br">
+                            <span class="ea-tech-card-dot" aria-hidden="true"></span>
+                            <span class="ea-tech-card-key">Diseño eficiente</span>
+                            <span class="ea-tech-card-val">Bajo consumo y preparado para múltiples espacios</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <section class="ea-section" id="funcionamiento" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">03 · Decision engine</p>
                     <h2>Sensa. <em>Decide.</em> Actúa.</h2>
                     <p>Cada lectura recorre el mismo camino. Sin atajos. Sin demoras.</p>
                 </div>
@@ -458,7 +548,7 @@
                     </div>
                 </div>
 
-                <p style="margin-top: 28px; font-size: 13.5px; color: var(--ea-mute); text-align: center;">
+                <p class="ea-flow-notice">
                     <span class="ea-badge ea-badge--info">Estado del hardware</span>
                     &nbsp;Integración con ESP32 preparada — próxima etapa del proyecto.
                 </p>
@@ -468,7 +558,6 @@
         <section class="ea-section" id="sensores" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">04 · Hardware</p>
                     <h2>Lee el aire. <em>Mueve el ambiente.</em></h2>
                     <p>Cuatro sensores entran. Cuatro actuadores responden.</p>
                 </div>
@@ -477,9 +566,7 @@
                     <article class="ea-hardware-block" data-reveal-child>
                         <p class="ea-eyebrow">Sensores</p>
                         <h3>Qué se mide</h3>
-                        <p style="color: var(--ea-ink-2); font-size: 14.5px; margin-top: 8px;">
-                            Cuatro variables que definen el confort y la calidad del aire en un ambiente.
-                        </p>
+                        <p class="ea-hardware-desc">Cuatro variables que definen el confort y la calidad del aire en un ambiente.</p>
 
                         <div class="ea-hardware-list">
                             <div class="ea-hardware-item tone-warning">
@@ -523,9 +610,7 @@
                     <article class="ea-hardware-block" data-reveal-child>
                         <p class="ea-eyebrow">Actuadores</p>
                         <h3>Qué se controla</h3>
-                        <p style="color: var(--ea-ink-2); font-size: 14.5px; margin-top: 8px;">
-                            Cuatro dispositivos que responden a las reglas o al control manual desde el panel.
-                        </p>
+                        <p class="ea-hardware-desc">Cuatro dispositivos que responden a las reglas o al control manual desde el panel.</p>
 
                         <div class="ea-hardware-list">
                             <div class="ea-hardware-item tone-info">
@@ -573,7 +658,6 @@
         <section class="ea-section" id="automatizacion" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <p class="ea-eyebrow">05 · Automatización</p>
                     <h2>Cuatro reglas. <em>Cero supervisión.</em></h2>
                     <p>Cada regla es transparente, editable y siempre activa.</p>
                 </div>
@@ -627,10 +711,67 @@
             </div>
         </section>
 
+        <section class="ea-section ea-buy-section" id="comprar" data-reveal aria-labelledby="ea-buy-title">
+            <div class="ea-page">
+                <div class="ea-section-head">
+                    <h2 id="ea-buy-title">Llevá el control de tu ambiente <em>a casa.</em></h2>
+                    <p>Un dispositivo, un dashboard y ambientes personalizados. Todo incluido, sin costos ocultos ni complementos caros.</p>
+                </div>
+
+                <div class="ea-buy-grid">
+                    <article class="ea-buy-card" data-reveal-child>
+                        <header class="ea-buy-card-head">
+                            <span class="ea-buy-badge">
+                                <span class="ea-buy-badge-dot" aria-hidden="true"></span>
+                                Precio demo · presentación educativa
+                            </span>
+                            <h3 class="ea-buy-name">Eden Air Core</h3>
+                            <p class="ea-buy-tagline">Dispositivo inteligente + acceso al dashboard + configuración personalizada de ambientes.</p>
+                        </header>
+
+                        <div class="ea-buy-price">
+                            <span class="ea-buy-amount"><span class="ea-buy-cur">USD</span>5</span>
+                            <span class="ea-buy-period">precio de prueba<br>para la demo de tesina</span>
+                        </div>
+
+                        <div class="ea-buy-actions">
+                            <?php if ($conSesion): ?>
+                                <a href="<?= site_url('panel/compra') ?>" class="ea-button ea-button-primary ea-button-buy ea-button-block">Comprar Eden Air</a>
+                                <a href="<?= site_url('panel') ?>" class="ea-button ea-button-secondary ea-button-block">Ir al dashboard</a>
+                            <?php else: ?>
+                                <a href="<?= site_url('registro') ?>" class="ea-button ea-button-primary ea-button-buy ea-button-block">Comprar Eden Air</a>
+                                <a href="<?= site_url('login') ?>" class="ea-button ea-button-secondary ea-button-block">Ya tengo cuenta</a>
+                            <?php endif; ?>
+                        </div>
+
+                        <p class="ea-buy-note">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
+                            Precio simulado para la presentación. No representa un valor comercial final.
+                        </p>
+                    </article>
+
+                    <aside class="ea-buy-includes" data-reveal-child aria-label="Qué incluye Eden Air Core">
+                        <h4 class="ea-buy-includes-title">Todo incluido en el plan</h4>
+                        <ul class="ea-buy-list">
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Configuración personalizada de ambientes incluida</li>
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Acceso completo al dashboard de monitoreo</li>
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Vinculación de múltiples dispositivos por cuenta</li>
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Perfiles ambientales por espacio (dormitorio, aula, oficina…)</li>
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Preparado para automatización ambiental</li>
+                            <li><span class="ea-buy-check" aria-hidden="true"></span> Enfoque sustentable y de bajo consumo</li>
+                        </ul>
+                        <p class="ea-buy-includes-foot">
+                            <span class="ea-badge ea-badge--neutral">Incluido</span>
+                            El ambiente personalizado no se cobra aparte: es parte del producto.
+                        </p>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
         <section class="ea-section" data-reveal>
             <div class="ea-page">
                 <div class="ea-cta">
-                    <p class="ea-eyebrow" style="color: rgba(236,242,232,0.7); justify-content: center;">06 · Acceso</p>
                     <h2>Aire optimizado. <em>Empezá ahora.</em></h2>
                     <p>Monitoreo continuo. Control automático. Sin curva de aprendizaje.</p>
                     <div class="ea-hero-actions">
@@ -659,6 +800,40 @@
 ?>
 <script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script>
+/* Video "Ingeniería interna": reproduce solo cuando está en pantalla.
+   Ahorra CPU/batería y respeta prefers-reduced-motion. */
+(function () {
+    var video = document.querySelector("[data-ea-tech-video]");
+    if (!video) return;
+
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+        // Sin movimiento: mostramos el póster estático y no autoreproducimos.
+        video.removeAttribute("autoplay");
+        video.removeAttribute("loop");
+        try { video.pause(); } catch (e) {}
+        return;
+    }
+
+    var intentarPlay = function () {
+        var p = video.play();
+        if (p && typeof p.catch === "function") { p.catch(function () {}); }
+    };
+
+    if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) { intentarPlay(); }
+                else { try { video.pause(); } catch (e) {} }
+            });
+        }, { threshold: 0.25 });
+        io.observe(video);
+    } else {
+        intentarPlay();
+    }
+})();
+</script>
 <script type="importmap">
 {
     "imports": {

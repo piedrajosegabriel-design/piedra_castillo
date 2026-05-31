@@ -32,21 +32,41 @@ class PanelService
      *
      * @return array
      */
-    public function obtenerVistaPanel(int $userId): array
+    public function obtenerVistaPanel(int $userId, ?int $activeDeviceId = null): array
     {
-        $datos = $this->obtenerDatos($userId);
+        $datos = $this->obtenerDatos($userId, $activeDeviceId);
         $datos['view'] = $this->armarBloqueVista($datos);
 
         return $datos;
     }
 
-    public function obtenerDatos(int $userId): array
+    public function obtenerDatos(int $userId, ?int $activeDeviceId = null): array
     {
-        $usuario     = $this->usuarios->find($userId);
-        $espacio     = $this->espacios->where('user_id', $userId)->first();
-        $dispositivo = $this->dispositivos->where('user_id', $userId)->first();
+        $usuario      = $this->usuarios->find($userId);
+        $dispositivos = $this->dispositivos
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'ASC')
+            ->findAll();
 
-        if (! $usuario || ! $espacio || ! $dispositivo) {
+        if (! $usuario || $dispositivos === []) {
+            throw new \RuntimeException('No fue posible preparar el panel del usuario.');
+        }
+
+        // Multi-dispositivo: si el usuario eligió uno activo y le pertenece, lo
+        // usamos; si no, el primero. La lista completa se devuelve en `devices`
+        // para alimentar el switcher de la vista.
+        $dispositivo = $dispositivos[0];
+        if ($activeDeviceId !== null) {
+            foreach ($dispositivos as $d) {
+                if ((int) $d['id'] === $activeDeviceId) {
+                    $dispositivo = $d;
+                    break;
+                }
+            }
+        }
+        $espacio = $this->espacios->find((int) $dispositivo['space_id']);
+
+        if (! $espacio) {
             throw new \RuntimeException('No fue posible preparar el panel del usuario.');
         }
 
@@ -121,6 +141,18 @@ class PanelService
                 'user_id'  => (int) $usuario['id'],
                 'space_id' => (int) $espacio['id'],
             ] + $dispositivo,
+            // Lista corta para el switcher del header del panel.
+            'devices_list' => array_map(function (array $d) use ($dispositivo): array {
+                $tipoEsp = (string) ($d['environment_type'] ?? 'hogar');
+                return [
+                    'id'         => (int) $d['id'],
+                    'name'       => (string) $d['name'],
+                    'space'      => $this->presets->getDisplayName(
+                        $this->espacios->find((int) $d['space_id']) ?? []
+                    ),
+                    'is_active'  => (int) $d['id'] === (int) $dispositivo['id'],
+                ];
+            }, $dispositivos),
         ];
     }
 

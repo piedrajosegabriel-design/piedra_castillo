@@ -164,14 +164,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateSpy();
 
+    /* -------------------- Scroll reveal (sutil, accesible) -------------------- */
+    if ("IntersectionObserver" in window && !reducedMotionQuery.matches) {
+        var reveals = document.querySelectorAll(".ea-reveal");
+        if (reveals.length) {
+            var revealObs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        revealObs.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: "0px 0px -10% 0px", threshold: 0.05 });
+            reveals.forEach(function (el) { revealObs.observe(el); });
+        }
+    } else {
+        document.querySelectorAll(".ea-reveal").forEach(function (el) {
+            el.classList.add("is-visible");
+        });
+    }
+
     /* -------------------- Lecturas: ver más / ver menos -------------------- */
     var readingsToggle = document.querySelector("[data-readings-toggle]");
     var readingsCard = document.querySelector("[data-readings]");
     if (readingsToggle && readingsCard) {
+        var readingsLabel = readingsToggle.querySelector("[data-readings-label]");
         readingsToggle.addEventListener("click", function () {
             var expanded = readingsCard.classList.toggle("is-expanded");
+            readingsToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
             var label = expanded ? readingsToggle.getAttribute("data-less") : readingsToggle.getAttribute("data-more");
-            if (label) readingsToggle.textContent = label;
+            if (label) {
+                if (readingsLabel) {
+                    readingsLabel.textContent = label;
+                } else {
+                    readingsToggle.textContent = label;
+                }
+            }
         });
     }
 

@@ -911,43 +911,237 @@ $sitemap = [
                     </div>
                     <div>
                         <h2 class="ea-pf-h ea-pf-h2">Análisis de la <em>competencia</em>.</h2>
-                        <p class="ea-pf-lede">Sección preparada para completar con investigación real de competidores.</p>
+                        <p class="ea-pf-lede">Cuadro comparativo de doble entrada frente a los principales referentes del rubro, seguido del análisis y las ventajas competitivas de Eden Air.</p>
                     </div>
                 </header>
 
-                <!-- TODO: Completar análisis de competencia con investigación real -->
-                <div class="ea-pf-grid-2" style="margin-bottom: clamp(20px,3vw,28px);">
+                <?php
+                // --- Datos de la comparativa (una sola fuente para tabla y acordeón) ---
+                // Los precios y datos de mercado son estimativos / de referencia.
+                $compCriterios = [
+                    'localizacion'    => 'Localización',
+                    'productos'       => 'Productos y servicios',
+                    'precio'          => 'Precio de venta *',
+                    'pagos'           => 'Medios de pago',
+                    'materia'         => 'Materia prima',
+                    'marca'           => 'Marca',
+                    'tecnologia'      => 'Tecnología',
+                    'embalaje'        => 'Embalaje',
+                    'clientes'        => 'Clientes',
+                    'atencion'        => 'Atención al cliente',
+                    'entrega'         => 'Cumplimiento de entrega',
+                    'publicidad'      => 'Publicidad',
+                    'fuertes'         => 'Puntos fuertes',
+                    'debiles'         => 'Puntos débiles',
+                    'sustentabilidad' => 'Sustentabilidad e impacto ambiental',
+                    'vs_eden'         => 'Frente a Eden Air',
+                ];
+
+                $competidores = [
+                    [
+                        'name' => 'Xiaomi', 'model' => 'Smart Air Purifier 4', 'eden' => false,
+                        'vals' => [
+                            'localizacion'    => 'China · venta global e importación',
+                            'productos'       => 'Purificador con filtro HEPA y app Mi Home',
+                            'precio'           => 'USD 150 – 250',
+                            'pagos'            => 'Tarjeta, MercadoPago (revendedores), transferencia',
+                            'materia'          => 'Plástico ABS, filtro HEPA, sensor láser PM2.5',
+                            'marca'            => 'Reconocida y masiva',
+                            'tecnologia'       => 'Sensor PM2.5, Wi-Fi, app, asistentes de voz',
+                            'embalaje'         => 'Caja de cartón con plásticos de protección',
+                            'clientes'         => 'Hogares y oficinas, público tecnológico',
+                            'atencion'         => 'Vía revendedor / online, en español limitado',
+                            'entrega'          => 'Depende del importador; demoras frecuentes',
+                            'publicidad'       => 'Marketing digital masivo y marketplaces',
+                            'fuertes'          => 'Buena relación precio/calidad y ecosistema',
+                            'debiles'          => 'No mide CO₂; filtros de recambio costosos',
+                            'sustentabilidad'  => 'Bajo consumo, pero filtros descartables generan residuo',
+                            'vs_eden'          => 'Solo purifica: no integra monitoreo + actuadores + dashboard propio',
+                        ],
+                    ],
+                    [
+                        'name' => 'Dyson', 'model' => 'Purifier Cool', 'eden' => false,
+                        'vals' => [
+                            'localizacion'    => 'Reino Unido / Singapur · presencia oficial',
+                            'productos'       => 'Purificador + ventilador con app Dyson Link',
+                            'precio'           => 'USD 450 – 700',
+                            'pagos'            => 'Tarjeta, cuotas, tienda oficial',
+                            'materia'          => 'Policarbonato, filtros HEPA y carbón activado',
+                            'marca'            => 'Premium, alto prestigio',
+                            'tecnologia'       => 'Sensores de partículas y gases, pantalla, Wi-Fi',
+                            'embalaje'         => 'Cartón rígido con espuma de protección',
+                            'clientes'         => 'Segmento premium, alto poder adquisitivo',
+                            'atencion'         => 'Soporte oficial robusto y garantía',
+                            'entrega'          => 'Alto cumplimiento en mercados oficiales',
+                            'publicidad'       => 'Branding premium, TV, influencers, retail',
+                            'fuertes'          => 'Calidad de fabricación; mide gases; diseño icónico',
+                            'debiles'          => 'Precio muy alto; filtros caros; foco solo en purificar',
+                            'sustentabilidad'  => 'Eficiencia energética, pero filtros y repuestos caros',
+                            'vs_eden'          => 'Más caro y enfocado en purificar; no ambienta por espacio',
+                        ],
+                    ],
+                    [
+                        'name' => 'Netatmo', 'model' => 'Healthy Home Coach', 'eden' => false,
+                        'vals' => [
+                            'localizacion'    => 'Francia (grupo Legrand)',
+                            'productos'       => 'Monitor ambiental (CO₂, temp, humedad, ruido)',
+                            'precio'           => 'USD 100 – 130',
+                            'pagos'            => 'Tarjeta, tienda oficial, marketplaces',
+                            'materia'          => 'Aluminio y plástico, sensores ambientales',
+                            'marca'            => 'Reconocida en domótica',
+                            'tecnologia'       => 'Sensores CO₂/temp/humedad/ruido, Wi-Fi, HomeKit',
+                            'embalaje'         => 'Cartón reciclable minimalista',
+                            'clientes'         => 'Hogares conectados / smart home',
+                            'atencion'         => 'Soporte oficial y comunidad',
+                            'entrega'          => 'Buena en mercados con presencia',
+                            'publicidad'       => 'Marketing digital, ecosistema Apple/Google',
+                            'fuertes'          => 'Mide CO₂/temp/humedad e integra domótica',
+                            'debiles'          => 'Solo monitorea: no controla actuadores',
+                            'sustentabilidad'  => 'Bajo consumo, reciclable, sin filtros (poco residuo)',
+                            'vs_eden'          => 'Solo informa; Eden además decide y acciona automáticamente',
+                        ],
+                    ],
+                    [
+                        'name' => 'Airthings', 'model' => 'View Plus', 'eden' => false,
+                        'vals' => [
+                            'localizacion'    => 'Noruega · envío internacional',
+                            'productos'       => 'Monitor de calidad de aire (radón, CO₂, PM, COV)',
+                            'precio'           => 'USD 250 – 300',
+                            'pagos'            => 'Tarjeta, tienda oficial',
+                            'materia'          => 'Plástico (parcial reciclado), multisensor',
+                            'marca'            => 'Especialista en calidad de aire',
+                            'tecnologia'       => 'Multisensor (radón/COV/CO₂/PM2.5), Wi-Fi, e-ink',
+                            'embalaje'         => 'Cartón reciclable',
+                            'clientes'         => 'Hogares/oficinas con foco en salud',
+                            'atencion'         => 'Soporte oficial y dashboards web',
+                            'entrega'          => 'Buena (envío internacional)',
+                            'publicidad'       => 'Nicho salud/aire, contenido técnico',
+                            'fuertes'          => 'Medición muy completa (incluye radón y COV)',
+                            'debiles'          => 'Solo monitorea; precio alto; no actúa',
+                            'sustentabilidad'  => 'Batería de larga duración, reciclable, sin filtros',
+                            'vs_eden'          => 'Mide mucho pero es pasivo; Eden cierra sensar→decidir→actuar',
+                        ],
+                    ],
+                    [
+                        'name' => 'Eden Air', 'model' => 'Eden Air Core', 'eden' => true,
+                        'vals' => [
+                            'localizacion'    => 'Río Tercero, Córdoba (Argentina) · proyecto local',
+                            'productos'       => 'Monitoreo + ambientación automática (dispositivo + dashboard)',
+                            'precio'           => 'USD 5 (precio demo) · todo incluido',
+                            'pagos'            => 'MercadoPago (demo); preparado para tarjeta/transferencia',
+                            'materia'          => 'ESP32, sensores, actuadores y carcasa reutilizable',
+                            'marca'            => 'Identidad propia, tecnológica y sustentable',
+                            'tecnologia'       => 'ESP32 + sensores + actuadores + web propia, multi-dispositivo, API',
+                            'embalaje'         => 'Materiales reciclables y reutilizables',
+                            'clientes'         => 'Hogares, aulas, oficinas y espacios locales',
+                            'atencion'         => 'Cercana, en español y directa del equipo',
+                            'entrega'          => 'Producción y entrega local (cercanía)',
+                            'publicidad'       => 'Web propia, portfolio y enfoque educativo/sustentable',
+                            'fuertes'          => 'Sensa, decide y actúa; dashboard propio; perfiles por ambiente; multi-dispositivo; accesible',
+                            'debiles'          => 'Marca nueva; escala inicial; hardware en etapa de prototipo',
+                            'sustentabilidad'  => 'Bajo consumo, componentes reutilizables y reparables, sin filtros descartables',
+                            'vs_eden'          => '— (producto de referencia)',
+                        ],
+                    ],
+                ];
+                ?>
+
+                <!-- Tabla comparativa (scroll horizontal en pantallas chicas) -->
+                <div class="ea-comp">
+                    <div class="ea-comp-scroll" role="region" aria-label="Cuadro comparativo de competencia" tabindex="0">
+                        <table class="ea-comp-table">
+                            <caption class="ea-comp-caption">Cuadro comparativo de doble entrada — competidores vs. Eden Air</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="ea-comp-corner">Criterio</th>
+                                    <?php foreach ($competidores as $c): ?>
+                                        <th scope="col" class="<?= $c['eden'] ? 'ea-comp-eden' : '' ?>">
+                                            <span class="ea-comp-brand"><?= esc($c['name']) ?></span>
+                                            <span class="ea-comp-model"><?= esc($c['model']) ?></span>
+                                        </th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($compCriterios as $key => $label): ?>
+                                    <tr>
+                                        <th scope="row"><?= esc($label) ?></th>
+                                        <?php foreach ($competidores as $c): ?>
+                                            <td class="<?= $c['eden'] ? 'ea-comp-eden' : '' ?>"><?= esc($c['vals'][$key] ?? '—') ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="ea-comp-note">* Precios <strong>estimativos / a verificar</strong>, según mercado de referencia (importación y tiendas oficiales). Datos orientativos para la comparación académica.</p>
+                </div>
+
+                <!-- Versión móvil: acordeón por competidor -->
+                <div class="ea-comp-cards" aria-label="Comparativa por competidor">
+                    <?php foreach ($competidores as $i => $c): ?>
+                        <details class="ea-comp-acc <?= $c['eden'] ? 'is-eden' : '' ?>" <?= $c['eden'] ? 'open' : '' ?>>
+                            <summary>
+                                <span class="ea-comp-acc-brand"><?= esc($c['name']) ?></span>
+                                <span class="ea-comp-acc-model"><?= esc($c['model']) ?></span>
+                            </summary>
+                            <dl class="ea-comp-acc-list">
+                                <?php foreach ($compCriterios as $key => $label): ?>
+                                    <div><dt><?= esc($label) ?></dt><dd><?= esc($c['vals'][$key] ?? '—') ?></dd></div>
+                                <?php endforeach; ?>
+                            </dl>
+                        </details>
+                    <?php endforeach; ?>
+                    <p class="ea-comp-note">* Precios estimativos / a verificar. Datos orientativos para la comparación académica.</p>
+                </div>
+
+                <!-- Análisis y conclusión (Parte B del TP) -->
+                <div class="ea-pf-grid-2 ea-comp-analysis">
                     <article class="ea-pf-card">
-                        <span class="ea-pf-card__eyebrow">Criterios de comparación</span>
-                        <h3 class="ea-pf-card__title">Sobre qué evaluar</h3>
-                        <ul class="ea-pf-criteria">
-                            <li>Monitoreo ambiental</li>
-                            <li>Automatización</li>
-                            <li>Integración web</li>
-                            <li>Facilidad de uso</li>
-                            <li>Costo estimado</li>
-                            <li>Sustentabilidad</li>
-                            <li>Diseño físico</li>
-                            <li>Diferenciación frente a Eden Air</li>
-                        </ul>
+                        <span class="ea-pf-card__eyebrow">Diferenciación</span>
+                        <h3 class="ea-pf-card__title">Qué hace distinto a Eden Air</h3>
+                        <p class="ea-pf-card__text">Mientras la competencia <em>solo purifica</em> o <em>solo monitorea</em>, Eden Air integra el ciclo completo: <strong>sensa, decide y actúa</strong> sobre el ambiente, y lo administra desde un dashboard propio con perfiles por espacio y soporte para varios dispositivos.</p>
                     </article>
                     <article class="ea-pf-card">
-                        <span class="ea-pf-card__eyebrow">Fortalezas y debilidades</span>
-                        <h3 class="ea-pf-card__title">Comparativa</h3>
-                        <p class="ea-pf-card__text">
-                            Se completará al relevar competidores reales. El objetivo es identificar dónde Eden Air
-                            aporta valor diferencial y dónde necesita ajustar.
-                        </p>
-                        <span class="ea-pf-todo">Pendiente de investigación</span>
+                        <span class="ea-pf-card__eyebrow">Razones de compra</span>
+                        <h3 class="ea-pf-card__title">Por qué elegir Eden Air</h3>
+                        <ul class="ea-pf-criteria">
+                            <li>Sistema integral a un precio accesible</li>
+                            <li>Atención cercana y en español</li>
+                            <li>Configuración de ambientes incluida</li>
+                            <li>Varios dispositivos en una sola cuenta</li>
+                            <li>Enfoque sustentable y de bajo consumo</li>
+                        </ul>
                     </article>
                 </div>
 
-                <div class="ea-pf-empty">
-                    <div class="ea-pf-empty__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-                    </div>
-                    <h4>Investigación de competencia pendiente</h4>
-                    <p>Este bloque será completado en próximas etapas del proyecto. No se incluyen datos sin verificar.</p>
+                <div class="ea-comp-advantage">
+                    <article class="ea-comp-advantage-card">
+                        <span class="ea-pf-card__eyebrow">Ventajas competitivas</span>
+                        <h3 class="ea-pf-card__title">Lo que hoy el cliente no tiene</h3>
+                        <ul class="ea-comp-checks">
+                            <li>Un único sistema que <strong>mide y además actúa</strong> sobre el ambiente.</li>
+                            <li>Automatización ambiental por espacio (confort, ahorro, ventilación).</li>
+                            <li>Perfiles personalizados por ambiente, <strong>sin costo extra</strong>.</li>
+                            <li>Vinculación simple y segura por código de activación.</li>
+                            <li>Arquitectura preparada para crecer (API y multi-dispositivo).</li>
+                        </ul>
+                    </article>
+                    <article class="ea-comp-advantage-card ea-comp-sustain">
+                        <span class="ea-pf-card__eyebrow">Sustentabilidad como ventaja</span>
+                        <h3 class="ea-pf-card__title">Menor impacto, más eficiencia</h3>
+                        <ul class="ea-comp-checks">
+                            <li><strong>Ahorro energético:</strong> los actuadores trabajan solo cuando hacen falta.</li>
+                            <li><strong>Reutilización:</strong> componentes modulares y reparables.</li>
+                            <li><strong>Menos residuos:</strong> sin filtros descartables periódicos.</li>
+                            <li><strong>Materiales reciclables</strong> en carcasa y embalaje.</li>
+                            <li><strong>Uso eficiente</strong> de recursos según necesidad real del ambiente.</li>
+                        </ul>
+                    </article>
+                </div>
+
+                <div class="ea-comp-conclusion">
+                    <p><strong>Conclusión.</strong> Frente a purificadores (Xiaomi, Dyson) y monitores ambientales (Netatmo, Airthings), Eden Air ocupa un espacio propio: combina <em>monitoreo + automatización + dashboard</em> en un sistema local, accesible y sustentable. Su ventaja competitiva surge de ofrecer, en un solo producto y a bajo costo, lo que hoy el cliente necesitaría resolver con varios dispositivos separados.</p>
                 </div>
             </div>
         </section>

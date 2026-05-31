@@ -40,9 +40,11 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE KEY uq_users_usuario (usuario)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Compatibilidad con bases creadas antes de perfil/apellido y recuperacion.
 ALTER TABLE users
-ADD reset_token VARCHAR(64) NULL,
-ADD reset_expires_at DATETIME NULL;
+ADD COLUMN IF NOT EXISTS apellido VARCHAR(120) NOT NULL DEFAULT '' AFTER nombre,
+ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) NULL AFTER password_hash,
+ADD COLUMN IF NOT EXISTS reset_expires_at DATETIME NULL AFTER reset_token;
 
 -- =========================================================
 -- TABLA: spaces
@@ -62,7 +64,9 @@ CREATE TABLE IF NOT EXISTS spaces (
     created_at DATETIME NULL,
     updated_at DATETIME NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY uq_spaces_user_id (user_id),
+    -- Multi-dispositivo: una cuenta puede tener varios ambientes (uno por
+    -- dispositivo). Antes era UNIQUE; ahora es índice normal.
+    KEY idx_spaces_user_id (user_id),
     CONSTRAINT fk_spaces_user
         FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE
@@ -80,10 +84,18 @@ CREATE TABLE IF NOT EXISTS devices (
     user_id INT UNSIGNED NOT NULL,
     space_id INT UNSIGNED NOT NULL,
     name VARCHAR(120) NOT NULL,
+    device_type VARCHAR(60) NULL DEFAULT 'Eden Air Core',
     device_uid VARCHAR(64) NOT NULL,
     api_token VARCHAR(80) NOT NULL,
     is_simulated TINYINT(1) NOT NULL DEFAULT 1,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    -- Estado mostrado en "Mis dispositivos": active | offline | pending | simulated
+    status VARCHAR(20) NULL DEFAULT 'simulated',
+    -- MAC de fábrica: SOLO identificador técnico, nunca credencial.
+    mac_address VARCHAR(32) NULL,
+    -- Código de activación con el que se vinculó el dispositivo.
+    activation_code VARCHAR(40) NULL,
+    notes VARCHAR(255) NULL,
     last_seen_at DATETIME NULL,
     last_command_sync_at DATETIME NULL,
     created_at DATETIME NULL,
@@ -196,6 +208,36 @@ CREATE TABLE IF NOT EXISTS device_commands (
         ON DELETE SET NULL
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- =========================================================
+-- TABLA: device_activation_codes  (Hito 2)
+-- Cada dispositivo trae un codigo unico EDEN-XXXX-XXXX que solo
+-- puede canjearse una vez. Es el metodo recomendado de vinculacion
+-- (mas seguro y facil que usar la MAC como credencial).
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS device_activation_codes (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    code VARCHAR(40) NOT NULL,
+    device_type VARCHAR(60) NOT NULL DEFAULT 'Eden Air Core',
+    default_name VARCHAR(120) NULL,
+    mac_address VARCHAR(32) NULL,           -- dato tecnico, no credencial
+    status VARCHAR(20) NOT NULL DEFAULT 'available',  -- available | claimed | disabled
+    claimed_by_user_id INT UNSIGNED NULL,
+    device_id INT UNSIGNED NULL,
+    claimed_at DATETIME NULL,
+    batch VARCHAR(40) NULL,
+    created_at DATETIME NULL,
+    updated_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_activation_code (code),
+    KEY idx_activation_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Codigo fijo de demo (documentado). El resto se generan desde la migracion.
+INSERT INTO device_activation_codes (code, device_type, default_name, status, batch, created_at, updated_at)
+SELECT 'EDEN-DEMO-2026', 'Eden Air Core', 'Eden Air Core', 'available', 'demo', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM device_activation_codes WHERE code = 'EDEN-DEMO-2026');
 
 -- =========================================================
 -- RESUMEN RAPIDO DE USO
