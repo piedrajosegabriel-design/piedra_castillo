@@ -44,31 +44,32 @@ $statusMeta = static function (string $s): array {
     </style>
 </noscript>
 
-<div class="dashboard-loader" data-dashboard-loader>
-    <div class="dashboard-loader-grid"></div>
-    <div class="dashboard-loader-shell">
-        <div class="dashboard-loader-brand">
-            <svg viewBox="0 0 64 64" width="44" height="44" aria-hidden="true">
-                <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(201,216,112,0.22)" stroke="#bcd2bd" stroke-width="1.5" stroke-linejoin="round"/>
-                <path d="M 20 46 C 28 38, 38 26, 48 14" fill="none" stroke="#ecf2e8" stroke-width="1.5" stroke-linecap="round"/>
-                <circle cx="20" cy="46" r="2.6" fill="#c9d870"/>
-            </svg>
-            <strong class="dashboard-loader-name">Eden<em style="font-style:italic;color:#c9d870;">Air</em></strong>
+<div class="ea-loader dashboard-loader" data-dashboard-loader role="status" aria-live="polite" aria-label="Preparando tu ambiente inteligente">
+    <div class="ea-loader-pattern" aria-hidden="true"></div>
+
+    <div class="ea-loader-inner">
+        <div class="ea-loader-orbit" aria-hidden="true">
+            <span class="ea-loader-ring ea-loader-ring--a"></span>
+            <span class="ea-loader-ring ea-loader-ring--b"></span>
+            <span class="ea-loader-ring ea-loader-ring--c"></span>
+            <span class="ea-loader-particle ea-loader-particle--1"></span>
+            <span class="ea-loader-particle ea-loader-particle--2"></span>
+            <span class="ea-loader-particle ea-loader-particle--3"></span>
+            <span class="ea-loader-logo">
+                <svg viewBox="0 0 64 64" aria-hidden="true">
+                    <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(201,216,112,0.28)" stroke="#ecf2e8" stroke-width="1.6" stroke-linejoin="round"/>
+                    <path d="M 20 46 C 28 38, 38 26, 48 14" fill="none" stroke="#ecf2e8" stroke-width="1.6" stroke-linecap="round"/>
+                    <circle cx="20" cy="46" r="2.8" fill="#c9d870"/>
+                </svg>
+            </span>
         </div>
 
-        <div class="dashboard-loader-scene" aria-hidden="true">
-            <div class="dashboard-loader-core">
-                <div class="dashboard-loader-orbit dashboard-loader-orbit-a"></div>
-                <div class="dashboard-loader-orbit dashboard-loader-orbit-b"></div>
-                <div class="dashboard-loader-orbit dashboard-loader-orbit-c"></div>
-                <div class="dashboard-loader-pulse"><div class="dashboard-loader-emblem"></div></div>
-            </div>
+        <div class="ea-loader-text">
+            <strong class="ea-loader-name">Eden<em>Air</em></strong>
+            <p class="ea-loader-msg">Preparando tu ambiente inteligente…</p>
         </div>
 
-        <div class="dashboard-loader-content">
-            <h1>Preparando el panel</h1>
-            <div class="dashboard-loader-progress" aria-hidden="true"><span></span></div>
-        </div>
+        <div class="ea-loader-progress" aria-hidden="true"><span></span></div>
     </div>
 </div>
 

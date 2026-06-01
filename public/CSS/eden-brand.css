@@ -23,33 +23,61 @@
     --eden-200: #dbe6d9;
     --eden-100: #ecf2e8;
 
-    /* Neutros */
-    --ea-paper: #f4f1ea;
-    --ea-linen: #ece7db;
+    /* Neutros — más claros y aireados (menos peso del verde oscuro) */
+    --ea-paper: #f6f4ec;   /* fondo principal claro */
+    --ea-linen: #eaf1ea;   /* fondo secundario suave, ligero matiz fresco */
     --ea-card: #ffffff;
-    --ea-ink: #14201a;
-    --ea-ink-2: #3b4a40;
-    --ea-mute: #6f7c70;
+    --ea-ink: #14231b;     /* texto principal */
+    --ea-ink-2: #45544a;   /* texto secundario, algo más fresco */
+    --ea-mute: #6e7d73;    /* texto suave */
+
+    /* Fondo alternativo aireado (aqua muy sutil) */
+    --ea-air-bg: #eef7f4;
 
     /* Acentos */
-    --ea-citrus: #c9d870;
-    --ea-breath: #b8d5d0;
-    --ea-clay: #c89c7a;
-    --ea-earth: #a65b3d;
+    --ea-citrus: #c9d870;  /* cítrico moderado */
+    --ea-breath: #b8d5d0;  /* menta suave */
+    --ea-air:    #8fd6c8;  /* aqua / aire limpio (acento fresco nuevo) */
+    --ea-air-ink: #2f7d72; /* aqua legible para texto sobre claro */
+    --ea-clay:   #c89c7a;
+    --ea-earth:  #a65b3d;
 
     /* Estados semánticos */
     --ea-success: #4a7a55;
     --ea-success-soft: rgba(74, 122, 85, 0.14);
-    --ea-info: #6a9b9f;
-    --ea-info-soft: rgba(106, 155, 159, 0.16);
+    --ea-info: #2f8a7e;                          /* información / humedad / aire (aqua legible) */
+    --ea-info-soft: rgba(143, 214, 200, 0.20);
     --ea-warning: #c89c7a;
     --ea-warning-soft: rgba(200, 156, 122, 0.18);
     --ea-danger: #a65b3d;
     --ea-danger-soft: rgba(166, 91, 61, 0.16);
 
+    /* ---- Alias semánticos centralizados (nueva nomenclatura) ---------- */
+    --ea-bg:           var(--ea-paper);
+    --ea-bg-soft:      var(--ea-linen);
+    --ea-bg-air:       var(--ea-air-bg);
+    --ea-surface:      var(--ea-card);
+    --ea-primary:      #2f6b4f;   /* verde primario principal, más fresco que eden-700 */
+    --ea-primary-dark: #143326;   /* verde profundo: contraste, footer, texto fuerte */
+    --ea-primary-med:  #4a7a55;
+    --ea-primary-soft: #a9cdb6;
+    --ea-accent:       var(--ea-citrus);
+    --ea-accent-air:   var(--ea-air);
+    --ea-text:         var(--ea-ink);
+    --ea-text-muted:   var(--ea-mute);
+    --ea-border:       var(--ea-rule);
+
+    /* Alias de compatibilidad con la nomenclatura del brand kit (brief §5).
+       Apuntan a tokens ya existentes para no duplicar valores ni romper estilos. */
+    --ea-bg-main:      var(--ea-paper);
+    --ea-primary-mid:  var(--ea-primary-med);
+    --ea-accent-mint:  var(--ea-breath);
+    --ea-accent-citrus: var(--ea-citrus);
+    --ea-text-soft:    var(--ea-mute);
+
     /* Líneas */
-    --ea-rule: rgba(20, 32, 26, 0.12);
-    --ea-rule-soft: rgba(20, 32, 26, 0.06);
+    --ea-rule: rgba(20, 35, 27, 0.11);
+    --ea-rule-soft: rgba(20, 35, 27, 0.055);
 
     /* Radios */
     --ea-r-xs: 6px;
@@ -84,21 +112,32 @@
 
 /* ---------- Modo oscuro ---------------------------------------------- */
 :root[data-theme="dark"] {
-    --ea-paper: #0d1612;
-    --ea-linen: #121d18;
-    --ea-card: #16221c;
-    --ea-card-soft: #1c2a23;
-    --ea-ink: #ecf2e8;
-    --ea-ink-2: #c2cdbf;
-    --ea-mute: #8a988b;
+    --ea-paper: #0e1f17;       /* fondo principal oscuro (verde profundo, no negro) */
+    --ea-linen: #13261d;       /* fondo secundario oscuro */
+    --ea-card: #1a2c23;        /* card oscura con más lift (evita empastado) */
+    --ea-card-soft: #21342a;
+    --ea-ink: #f4f1ea;         /* texto principal */
+    --ea-ink-2: #c8d4c6;       /* texto secundario más claro y legible */
+    --ea-mute: #93a194;
 
-    --ea-rule: rgba(236, 242, 232, 0.14);
-    --ea-rule-soft: rgba(236, 242, 232, 0.07);
+    --ea-air-bg: #13261d;
 
-    --ea-success-soft: rgba(74, 122, 85, 0.32);
-    --ea-info-soft: rgba(184, 213, 208, 0.18);
+    /* Aqua pop sobre fondos oscuros */
+    --ea-air-ink: #8fd6c8;
+    --ea-info: #8fd6c8;
+
+    --ea-rule: rgba(236, 242, 232, 0.16);
+    --ea-rule-soft: rgba(236, 242, 232, 0.08);
+    --ea-border: rgba(43, 86, 56, 0.85);
+
+    /* Primario más luminoso en oscuro para mantener jerarquía */
+    --ea-primary: #4f9a6f;
+    --ea-primary-soft: rgba(143, 214, 200, 0.2);
+
+    --ea-success-soft: rgba(74, 122, 85, 0.34);
+    --ea-info-soft: rgba(143, 214, 200, 0.18);
     --ea-warning-soft: rgba(200, 156, 122, 0.24);
-    --ea-danger-soft: rgba(166, 91, 61, 0.26);
+    --ea-danger-soft: rgba(166, 91, 61, 0.28);
 
     --ea-shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.45);
     --ea-shadow-md: 0 14px 32px rgba(0, 0, 0, 0.55);
@@ -1026,13 +1065,13 @@ body.ea-nav-open {
 }
 
 .ea-button-primary {
-    --btn-bg: var(--eden-700);
-    --btn-color: var(--eden-100);
+    --btn-bg: var(--ea-primary);
+    --btn-color: #ffffff;
 }
 
 @media (hover: hover) and (pointer: fine) {
     .ea-button-primary:hover {
-        --btn-bg: var(--eden-800);
+        --btn-bg: var(--eden-700);
         transform: translateY(-1px);
         box-shadow: var(--ea-shadow-md);
     }
@@ -1096,7 +1135,7 @@ body.ea-nav-open {
 
 /* CTA de compra destacado — disponible en todas las páginas (landing y panel). */
 .ea-button-buy {
-    --btn-bg: linear-gradient(120deg, var(--eden-700) 0%, var(--eden-600) 52%, #356b46 100%);
+    --btn-bg: linear-gradient(120deg, var(--ea-primary) 0%, #3c7a57 52%, #4e9069 100%);
     --btn-color: #ffffff;
     position: relative;
     font-weight: 600;
@@ -1129,9 +1168,9 @@ body.ea-nav-open {
 }
 @media (hover: hover) and (pointer: fine) {
     .ea-button-buy:hover {
-        --btn-bg: linear-gradient(120deg, var(--eden-800) 0%, var(--eden-700) 55%, #2f6040 100%);
+        --btn-bg: linear-gradient(120deg, var(--eden-700) 0%, var(--ea-primary) 55%, #3c7a57 100%);
         transform: translateY(-2px);
-        box-shadow: 0 16px 34px rgba(28, 64, 41, 0.38), inset 0 0 0 1px rgba(201, 216, 112, 0.5);
+        box-shadow: 0 16px 34px rgba(47, 107, 79, 0.4), inset 0 0 0 1px rgba(201, 216, 112, 0.55);
     }
 }
 @keyframes ea-buy-glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }

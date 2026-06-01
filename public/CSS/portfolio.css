@@ -166,10 +166,12 @@
     border-color: rgba(236, 242, 232, 0.1);
 }
 
-.ea-pf-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--eden-300);
-    box-shadow: var(--ea-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+    .ea-pf-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--eden-300);
+        box-shadow: var(--ea-shadow-md);
+    }
 }
 
 .ea-pf-card__eyebrow {
@@ -548,13 +550,14 @@
     pointer-events: none;
 }
 
-.ea-pf-tile:hover {
-    transform: translateY(-3px);
-    border-color: var(--eden-300);
-    box-shadow: var(--ea-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+    .ea-pf-tile:hover {
+        transform: translateY(-3px);
+        border-color: var(--eden-300);
+        box-shadow: var(--ea-shadow-md);
+    }
+    .ea-pf-tile:hover::before { opacity: 1; }
 }
-
-.ea-pf-tile:hover::before { opacity: 1; }
 
 .ea-pf-tile__head {
     display: flex;
@@ -812,37 +815,51 @@
 
 .ea-pf-journey__step {
     position: relative;
-    padding: 18px 16px 18px 18px;
+    /* pt aumentado para que el badge absoluto no tape el h4 */
+    padding: 48px 16px 18px 16px;
     background: var(--ea-card);
     border: 1px solid var(--ea-rule-soft);
     border-radius: var(--ea-r-md);
     counter-increment: pfj;
-    overflow: hidden;
+    overflow: hidden;          /* mantiene el border-radius limpio */
+    display: flex;
+    flex-direction: column;
 }
 
+/* Badge con número — ahora DENTRO de la card, no sobresaliendo */
 .ea-pf-journey__step::before {
     content: counter(pfj, decimal-leading-zero);
     position: absolute;
-    top: -10px;
-    left: 16px;
-    padding: 3px 9px;
+    top: 14px;                 /* era -10px → recortado por overflow:hidden */
+    left: 14px;
+    padding: 4px 10px;
     border-radius: var(--ea-r-pill);
-    background: var(--eden-700);
-    color: var(--eden-100);
+    background: rgba(20, 50, 38, 0.10); /* tono sutil, contrasta en claro y oscuro */
+    color: var(--ea-primary);
     font-family: var(--ea-font-mono);
     font-size: 10.5px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
+    line-height: 1.4;
+    border: 1px solid var(--ea-rule-soft);
 }
 
+/* Modo oscuro: badge con tono aqua */
+:root[data-theme="dark"] .ea-pf-journey__step::before {
+    background: rgba(143, 214, 200, 0.12);
+    color: var(--ea-air);
+    border-color: rgba(143, 214, 200, 0.22);
+}
+
+/* Conector horizontal entre steps — solo en desktop */
 .ea-pf-journey__step:not(:last-child)::after {
     content: "";
     position: absolute;
-    top: 50%;
-    right: -8px;
-    width: 16px;
-    height: 2px;
-    background: var(--eden-300);
-    transform: translateY(-50%);
+    top: 28px;                 /* centrado con el badge */
+    right: -7px;
+    width: 14px;
+    height: 1px;
+    background: var(--ea-rule);
+    z-index: 2;
 }
 
 @media (max-width: 900px) {
@@ -852,15 +869,19 @@
 .ea-pf-journey__step h4 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 17px;
-    margin: 8px 0 6px;
+    font-size: 16px;
+    margin: 0 0 6px;           /* padding-top de la card maneja el espacio superior */
     letter-spacing: -0.01em;
+    color: var(--ea-ink);
+    line-height: 1.2;
 }
 
 .ea-pf-journey__step p {
     font-size: 13px;
     color: var(--ea-ink-2);
     margin: 0;
+    line-height: 1.5;
+    flex: 1;                   /* empuja el texto hacia arriba, cards con misma altura */
 }
 
 .ea-pf-stack {
@@ -1507,9 +1528,11 @@
     transition: transform 0.22s ease, border-color 0.22s ease;
 }
 
-.ea-pf-stage:hover {
-    transform: translateX(2px);
-    border-color: var(--eden-300);
+@media (hover: hover) and (pointer: fine) {
+    .ea-pf-stage:hover {
+        transform: translateX(2px);
+        border-color: var(--eden-300);
+    }
 }
 
 @media (max-width: 720px) {

@@ -550,7 +550,7 @@ ob_start(); ?>
 
                 <p class="ea-flow-notice">
                     <span class="ea-badge ea-badge--info">Estado del hardware</span>
-                    &nbsp;Integración con ESP32 preparada — próxima etapa del proyecto.
+                    &nbsp;Integración con ESP32 preparada para la próxima etapa del proyecto.
                 </p>
             </div>
         </section>
@@ -602,7 +602,7 @@ ob_start(); ?>
                                         <path d="M3 14h15a3 3 0 1 1-3 3"/>
                                     </svg>
                                 </span>
-                                <div><strong>Calidad de aire</strong><small>0–100 · índice</small></div>
+                                <div><strong>Calidad de aire</strong><small>0-100 · índice</small></div>
                             </div>
                         </div>
                     </article>
