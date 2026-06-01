@@ -2,11 +2,14 @@
 <html lang="es">
 <head>
     <?= view('partials/head', [
-        'title'    => 'EdenAir | Editar datos',
-        'extraCss' => ['CSS/dashboard.css'],
+        'title'     => 'EdenAir · Perfil',
+        'extraCss'  => ['CSS/dashboard.css'],
+        'extraHead' => '<meta name="description" content="Editá tus datos personales y tu contraseña en Eden Air.">'
+            . '<meta name="robots" content="noindex, nofollow">'
+            . '<meta name="color-scheme" content="light dark">',
     ]) ?>
 </head>
-<body class="dashboard-body ea-body ea-dashboard-body dashboard-loading">
+<body class="dashboard-body ea-body ea-dashboard-body dashboard-ready">
 <?php
 $usuario = (isset($usuario) && is_array($usuario)) ? $usuario : [];
 $errors  = session()->getFlashdata('errors') ?? [];
@@ -14,44 +17,23 @@ $nombreCompleto = trim((string) ($usuario['nombre'] ?? '') . ' ' . (string) ($us
 ?>
 
 <div class="ea-dashboard" data-dashboard-app>
-    <aside class="ea-sidebar" id="dashboardSidebar" aria-label="Navegacion principal">
-        <div class="ea-sidebar-brand">
-            <span class="ea-sidebar-mark" aria-hidden="true">
-                <svg viewBox="0 0 32 32" fill="none"><path d="M22.5 7.5C12.8 7.5 7 13.4 7 21c0 1.8.4 3.4 1 4.8C13.6 23 18.6 19 22 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M22.5 7.5c1.6 5-.2 11.4-4.3 14.7-2.7 2.1-5.8 2.7-8.7 1.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="ea-sidebar-word"><b>Eden<em>Air</em></b><span>Cuenta</span></span>
-        </div>
-
-        <div class="ea-sidebar-section">Sistema</div>
-        <a href="<?= site_url('panel') ?>" class="ea-sidebar-item">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.6"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.6"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.6"/></svg></span>
-            <span class="ea-sidebar-label">Dashboard</span>
-        </a>
-        <a href="<?= site_url('panel/perfil') ?>" class="ea-sidebar-item is-active">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span class="ea-sidebar-label">Editar datos</span>
-        </a>
-        <a href="<?= site_url('panel/compra') ?>" class="ea-sidebar-item">
-            <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
-            <span class="ea-sidebar-label">Comprar</span>
-        </a>
-        <div class="ea-sidebar-footer"><span class="ea-sidebar-dot"></span><span class="ea-sidebar-foot-label">Sesion protegida</span></div>
-    </aside>
+    <?= view('partials/dashboard_sidebar', ['active' => 'perfil']) ?>
 
     <main class="ea-main">
         <header class="dashboard-header ea-header">
-            <button type="button" class="ea-header-icon-btn" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15"/></svg>
+            <button type="button" class="ea-burger" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú">
+                <span></span><span></span><span></span>
             </button>
             <div class="ea-header-titles">
-                <h1>Editar datos</h1>
-                <p>Cada cambio exige tu contrasena actual y una confirmacion explicita</p>
+                <h1>Perfil</h1>
+                <p>Tus datos personales y tu contraseña</p>
             </div>
+            <span class="ea-chip ea-chip-status status-success" title="Sesión protegida">
+                <span class="ea-pulse"></span>
+                <span>Sesión segura</span>
+            </span>
             <div class="ea-header-tools">
                 <?= view('partials/theme_toggle') ?>
-                <a href="<?= site_url('logout') ?>" class="ea-header-icon-btn ea-header-logout" title="Cerrar sesion" aria-label="Cerrar sesion">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h12"/></svg>
-                </a>
             </div>
             <div class="ea-header-user" title="<?= esc($nombreCompleto) ?>">
                 <span class="ea-header-avatar"><?= esc(strtoupper(substr((string) ($usuario['nombre'] ?? 'U'), 0, 1))) ?></span>
@@ -70,45 +52,83 @@ $nombreCompleto = trim((string) ($usuario['nombre'] ?? '') . ' ' . (string) ($us
                 <div class="ea-flash ea-flash-danger"><ul><?php foreach ($errors as $error): ?><li><?= esc($error) ?></li><?php endforeach; ?></ul></div>
             <?php endif; ?>
 
-            <div class="ea-sec">
-                <h2>Perfil</h2>
-                <span class="ea-sec-right">verificacion obligatoria</span>
+            <section class="ea-account-intro" aria-labelledby="cuentaTitulo">
+                <span class="ea-badge tone-info"><span class="ea-dot"></span>Cuenta protegida</span>
+                <h2 id="cuentaTitulo" class="ea-serif ea-account-title">Tus datos, en tu control.</h2>
+                <p class="ea-account-lede">Actualizá tu nombre y tu contraseña cuando lo necesites. Los cambios se verifican con tu contraseña actual.</p>
+            </section>
+
+            <div class="ea-account-grid">
+                <article class="ea-card ea-account-card" aria-labelledby="datosTitulo">
+                    <div class="ea-card-head">
+                        <h3 id="datosTitulo">Datos personales</h3>
+                        <span class="ea-mono ea-card-meta">Nombre · Apellido</span>
+                    </div>
+                    <form action="<?= site_url('panel/perfil') ?>" method="POST" class="ea-account-form" data-confirm-form data-confirm-changes data-confirm-message="Vas a actualizar tus datos personales. Para continuar se verificará tu contraseña actual. ¿Confirmás este cambio?">
+                        <?= csrf_field() ?>
+                        <label>
+                            <span>Nombre</span>
+                            <input type="text" name="nombre" value="<?= esc(old('nombre', (string) ($usuario['nombre'] ?? ''))) ?>" data-confirm-label="tu nombre" data-confirm-current="<?= esc((string) ($usuario['nombre'] ?? '')) ?>" autocomplete="given-name" required>
+                        </label>
+                        <label>
+                            <span>Apellido</span>
+                            <input type="text" name="apellido" value="<?= esc(old('apellido', (string) ($usuario['apellido'] ?? ''))) ?>" data-confirm-label="tu apellido" data-confirm-current="<?= esc((string) ($usuario['apellido'] ?? '')) ?>" autocomplete="family-name">
+                        </label>
+                        <?php if (! empty($usuario['usuario'])): ?>
+                            <label>
+                                <span>Nombre de usuario</span>
+                                <input type="text" name="usuario" value="<?= esc(old('usuario', (string) ($usuario['usuario'] ?? ''))) ?>" data-confirm-label="tu nombre de usuario" data-confirm-current="<?= esc((string) ($usuario['usuario'] ?? '')) ?>" autocomplete="username" required>
+                            </label>
+                        <?php endif; ?>
+                        <?php if (! empty($usuario['email'])): ?>
+                            <label>
+                                <span>Email <small>(no editable)</small></span>
+                                <input type="email" value="<?= esc((string) $usuario['email']) ?>" autocomplete="email" readonly aria-readonly="true">
+                            </label>
+                        <?php endif; ?>
+                        <label class="ea-account-wide ea-account-secure">
+                            <span>Contraseña actual <small>(verificación)</small></span>
+                            <input type="password" name="current_password" autocomplete="current-password" placeholder="Ingresá tu contraseña para confirmar" required>
+                        </label>
+                        <div class="ea-account-actions">
+                            <a href="<?= site_url('panel') ?>" class="ea-kbtn">Cancelar</a>
+                            <button type="submit" class="ea-kbtn ea-kbtn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M5 12.5l4 4 10-10"/></svg>
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </article>
+
+                <article class="ea-card ea-account-card" aria-labelledby="passTitulo">
+                    <div class="ea-card-head">
+                        <h3 id="passTitulo">Cambiar contraseña</h3>
+                        <span class="ea-mono ea-card-meta">Actual · Nueva · Confirmación</span>
+                    </div>
+                    <form action="<?= site_url('panel/password') ?>" method="POST" class="ea-account-form" data-confirm-form data-confirm-message="Vas a cambiar tu contraseña de acceso. Ingresá la actual, la nueva y la confirmación.">
+                        <?= csrf_field() ?>
+                        <label class="ea-account-wide">
+                            <span>Contraseña actual</span>
+                            <input type="password" name="current_password" autocomplete="current-password" required>
+                        </label>
+                        <label>
+                            <span>Nueva contraseña</span>
+                            <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+                        </label>
+                        <label>
+                            <span>Confirmar contraseña</span>
+                            <input type="password" name="password_confirm" autocomplete="new-password" minlength="6" required>
+                        </label>
+                        <p class="ea-account-hint">Mínimo 6 caracteres. Te recomendamos combinar letras y números.</p>
+                        <div class="ea-account-actions ea-account-wide">
+                            <button type="submit" class="ea-kbtn ea-kbtn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+                                Actualizar contraseña
+                            </button>
+                        </div>
+                    </form>
+                </article>
             </div>
-
-            <article class="ea-card ea-account-card">
-                <div class="ea-card-head">
-                    <h3>Datos personales</h3>
-                    <span class="ea-mono ea-card-meta">NOMBRE · APELLIDO · USUARIO · EMAIL</span>
-                </div>
-                <form action="<?= site_url('panel/perfil') ?>" method="POST" class="ea-account-form" data-confirm-form data-confirm-changes data-confirm-message="Vas a modificar datos importantes de tu cuenta. Para continuar se verificara tu contrasena actual. ¿Confirmas este cambio?">
-                    <?= csrf_field() ?>
-                    <label>Nombre<input type="text" name="nombre" value="<?= esc(old('nombre', (string) ($usuario['nombre'] ?? ''))) ?>" data-confirm-label="tu nombre" data-confirm-current="<?= esc((string) ($usuario['nombre'] ?? '')) ?>" autocomplete="given-name" required></label>
-                    <label>Apellido<input type="text" name="apellido" value="<?= esc(old('apellido', (string) ($usuario['apellido'] ?? ''))) ?>" data-confirm-label="tu apellido" data-confirm-current="<?= esc((string) ($usuario['apellido'] ?? '')) ?>" autocomplete="family-name"></label>
-                    <label>Nombre de usuario<input type="text" name="usuario" value="<?= esc(old('usuario', (string) ($usuario['usuario'] ?? ''))) ?>" data-confirm-label="tu nombre de usuario" data-confirm-current="<?= esc((string) ($usuario['usuario'] ?? '')) ?>" autocomplete="username" required></label>
-                    <label>Gmail / correo<input type="email" name="email" value="<?= esc(old('email', (string) ($usuario['email'] ?? ''))) ?>" data-confirm-label="tu gmail/correo" data-confirm-current="<?= esc((string) ($usuario['email'] ?? '')) ?>" autocomplete="email" required></label>
-                    <label class="ea-account-wide">Contrasena actual<input type="password" name="current_password" autocomplete="current-password" required></label>
-                    <div class="ea-account-actions">
-                        <a href="<?= site_url('panel') ?>" class="ea-kbtn">Volver</a>
-                        <button type="submit" class="ea-kbtn ea-kbtn-primary">Guardar datos</button>
-                    </div>
-                </form>
-            </article>
-
-            <article class="ea-card ea-account-card">
-                <div class="ea-card-head">
-                    <h3>Cambiar contrasena</h3>
-                    <span class="ea-mono ea-card-meta">ACTUAL · NUEVA · CONFIRMACION</span>
-                </div>
-                <form action="<?= site_url('panel/password') ?>" method="POST" class="ea-account-form" data-confirm-form data-confirm-message="Vas a cambiar la contrasena de acceso a tu cuenta. Ingresa la actual, la nueva y la confirmacion. ¿Confirmas este cambio?">
-                    <?= csrf_field() ?>
-                    <label>Contrasena actual<input type="password" name="current_password" autocomplete="current-password" required></label>
-                    <label>Nueva contrasena<input type="password" name="password" autocomplete="new-password" required></label>
-                    <label>Repetir nueva contrasena<input type="password" name="password_confirm" autocomplete="new-password" required></label>
-                    <div class="ea-account-actions ea-account-wide">
-                        <button type="submit" class="ea-kbtn ea-kbtn-primary">Actualizar contrasena</button>
-                    </div>
-                </form>
-            </article>
         </div>
     </main>
 

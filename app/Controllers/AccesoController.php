@@ -272,14 +272,9 @@ class AccesoController extends BaseController
 
     private function redirigirDespuesDelLogin(int $userId): RedirectResponse
     {
-        $provisioningService = new DeviceProvisioningService();
-
-        if (! $provisioningService->hasConfiguredSpace($userId)) {
-            return $this->redirigirConDato('/panel/ambiente', 'success', 'Inicio de sesion correcto. Ahora elige el ambiente que deseas monitorear.');
-        }
-
-        $provisioningService->ensureUserSetup($userId, [], false);
-
+        // Nuevo flujo (Hito 2): el usuario entra directo al dashboard. La
+        // bienvenida o el panel se decide según tenga o no dispositivos —
+        // ya no se fuerza la selección de ambiente al loguearse.
         return redirect()->to('/panel');
     }
 

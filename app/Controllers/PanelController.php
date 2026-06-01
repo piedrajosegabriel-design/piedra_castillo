@@ -24,16 +24,92 @@ class PanelController extends BaseController
     // =========================================================================
     public function index(): string|RedirectResponse
     {
-        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
-            return $redirect;
+        $userId = $this->usuarioActual();
+
+        // Si la cuenta aún no tiene dispositivos, mostramos la pantalla de
+        // bienvenida (3 CTAs: agregar dispositivo, ver demo o comprar). No se
+        // auto-crea nada en silencio: la demo es una acción explícita.
+        $cantidadDispositivos = (new \App\Models\DeviceModel())
+            ->where('user_id', $userId)
+            ->countAllResults();
+
+        if ($cantidadDispositivos === 0) {
+            $usuario = (new UserModel())->obtenerPorId($userId);
+            return view('panel/bienvenida', [
+                'usuario' => $usuario ?? ['nombre' => 'usuario', 'apellido' => ''],
+            ]);
         }
 
-        $userId = $this->usuarioActual();
-        (new DeviceProvisioningService())->ensureUserSetup($userId, [], false);
+        $activeDeviceId = $this->dispositivoActivo($userId);
 
         return view('panel', [
-            'panel' => (new PanelService())->obtenerVistaPanel($userId),
+            'panel' => (new PanelService())->obtenerVistaPanel($userId, $activeDeviceId),
         ]);
+    }
+
+    /**
+     * Crea un dispositivo + ambiente simulados etiquetados como Demo y
+     * redirige al panel. Es la acción explícita detrás del CTA
+     * "Ver demo del sistema" de la pantalla de bienvenida.
+     */
+    public function iniciarDemo(): RedirectResponse
+    {
+        $userId = $this->usuarioActual();
+
+        $cantidad = (new \App\Models\DeviceModel())
+            ->where('user_id', $userId)
+            ->countAllResults();
+
+        if ($cantidad === 0) {
+            (new DeviceProvisioningService())->ensureUserSetup($userId, [], true);
+        }
+
+        return redirect()->to('/panel')->with('success', 'Cargamos un dispositivo de demostración para que veas el panel en acción.');
+    }
+
+    /**
+     * Cambia el dispositivo activo del panel monitor. El id se valida contra
+     * los dispositivos del usuario antes de guardarlo en sesión.
+     */
+    public function seleccionarDispositivo(): RedirectResponse
+    {
+        $deviceId = (int) $this->request->getPost('device_id');
+        $userId   = $this->usuarioActual();
+
+        if ($deviceId > 0) {
+            $existe = (new \App\Models\DeviceModel())
+                ->where('id', $deviceId)
+                ->where('user_id', $userId)
+                ->countAllResults();
+
+            if ($existe > 0) {
+                session()->set('active_device_id', $deviceId);
+            }
+        }
+
+        return redirect()->to('/panel');
+    }
+
+    /** Devuelve el id de dispositivo activo en sesión si pertenece al usuario. */
+    private function dispositivoActivo(int $userId): ?int
+    {
+        $candidato = (int) session()->get('active_device_id');
+
+        if ($candidato <= 0) {
+            return null;
+        }
+
+        $valido = (new \App\Models\DeviceModel())
+            ->where('id', $candidato)
+            ->where('user_id', $userId)
+            ->countAllResults() > 0;
+
+        if (! $valido) {
+            session()->remove('active_device_id');
+            return null;
+        }
+
+        return $candidato;
     }
 
     public function perfil(): string|RedirectResponse
@@ -256,7 +332,7 @@ class PanelController extends BaseController
     {
         $reglas = [
             'nombre'           => 'required|min_length[2]|max_length[120]',
-            'apellido'         => 'permit_empty|max_length[120]',
+            'apellido'         => 'required|min_length[2]|max_length[120]',
             'email'            => 'required|valid_email|max_length[120]',
             'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
             'current_password' => 'required|max_length[255]',
@@ -370,14 +446,20 @@ class PanelController extends BaseController
 
     // =========================================================================
     // PROTECCION DE ACCESO
+    // Sólo permite ejecutar la acción si el usuario tiene al menos un
+    // dispositivo. Si no, lo manda al panel para ver la pantalla de bienvenida.
     // =========================================================================
     private function redireccionarSiFaltaAmbiente(): ?RedirectResponse
     {
-        if ((new DeviceProvisioningService())->hasConfiguredSpace($this->usuarioActual())) {
+        $cantidad = (new \App\Models\DeviceModel())
+            ->where('user_id', $this->usuarioActual())
+            ->countAllResults();
+
+        if ($cantidad > 0) {
             return null;
         }
 
-        return redirect()->to('/panel/ambiente')
-            ->with('error', 'Primero elige el ambiente que deseas monitorear.');
+        return redirect()->to('/panel')
+            ->with('error', 'Primero vinculá un dispositivo para poder realizar esta acción.');
     }
 }

@@ -7,6 +7,11 @@
 
 /* ---------- Tokens ---------------------------------------------------- */
 :root {
+    /* Easing — strong custom curves used throughout the system */
+    --ea-ease-out:     cubic-bezier(0.23, 1, 0.32, 1);   /* snappy entries, instant response feel */
+    --ea-ease-in-out:  cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement */
+    --ea-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1); /* soft bounce for popovers/reveal */
+
     /* Greens */
     --eden-900: #0e1f17;
     --eden-800: #16301f;
@@ -18,33 +23,61 @@
     --eden-200: #dbe6d9;
     --eden-100: #ecf2e8;
 
-    /* Neutros */
-    --ea-paper: #f4f1ea;
-    --ea-linen: #ece7db;
+    /* Neutros — más claros y aireados (menos peso del verde oscuro) */
+    --ea-paper: #f6f4ec;   /* fondo principal claro */
+    --ea-linen: #eaf1ea;   /* fondo secundario suave, ligero matiz fresco */
     --ea-card: #ffffff;
-    --ea-ink: #14201a;
-    --ea-ink-2: #3b4a40;
-    --ea-mute: #6f7c70;
+    --ea-ink: #14231b;     /* texto principal */
+    --ea-ink-2: #45544a;   /* texto secundario, algo más fresco */
+    --ea-mute: #6e7d73;    /* texto suave */
+
+    /* Fondo alternativo aireado (aqua muy sutil) */
+    --ea-air-bg: #eef7f4;
 
     /* Acentos */
-    --ea-citrus: #c9d870;
-    --ea-breath: #b8d5d0;
-    --ea-clay: #c89c7a;
-    --ea-earth: #a65b3d;
+    --ea-citrus: #c9d870;  /* cítrico moderado */
+    --ea-breath: #b8d5d0;  /* menta suave */
+    --ea-air:    #8fd6c8;  /* aqua / aire limpio (acento fresco nuevo) */
+    --ea-air-ink: #2f7d72; /* aqua legible para texto sobre claro */
+    --ea-clay:   #c89c7a;
+    --ea-earth:  #a65b3d;
 
     /* Estados semánticos */
     --ea-success: #4a7a55;
     --ea-success-soft: rgba(74, 122, 85, 0.14);
-    --ea-info: #6a9b9f;
-    --ea-info-soft: rgba(106, 155, 159, 0.16);
+    --ea-info: #2f8a7e;                          /* información / humedad / aire (aqua legible) */
+    --ea-info-soft: rgba(143, 214, 200, 0.20);
     --ea-warning: #c89c7a;
     --ea-warning-soft: rgba(200, 156, 122, 0.18);
     --ea-danger: #a65b3d;
     --ea-danger-soft: rgba(166, 91, 61, 0.16);
 
+    /* ---- Alias semánticos centralizados (nueva nomenclatura) ---------- */
+    --ea-bg:           var(--ea-paper);
+    --ea-bg-soft:      var(--ea-linen);
+    --ea-bg-air:       var(--ea-air-bg);
+    --ea-surface:      var(--ea-card);
+    --ea-primary:      #2f6b4f;   /* verde primario principal, más fresco que eden-700 */
+    --ea-primary-dark: #143326;   /* verde profundo: contraste, footer, texto fuerte */
+    --ea-primary-med:  #4a7a55;
+    --ea-primary-soft: #a9cdb6;
+    --ea-accent:       var(--ea-citrus);
+    --ea-accent-air:   var(--ea-air);
+    --ea-text:         var(--ea-ink);
+    --ea-text-muted:   var(--ea-mute);
+    --ea-border:       var(--ea-rule);
+
+    /* Alias de compatibilidad con la nomenclatura del brand kit (brief §5).
+       Apuntan a tokens ya existentes para no duplicar valores ni romper estilos. */
+    --ea-bg-main:      var(--ea-paper);
+    --ea-primary-mid:  var(--ea-primary-med);
+    --ea-accent-mint:  var(--ea-breath);
+    --ea-accent-citrus: var(--ea-citrus);
+    --ea-text-soft:    var(--ea-mute);
+
     /* Líneas */
-    --ea-rule: rgba(20, 32, 26, 0.12);
-    --ea-rule-soft: rgba(20, 32, 26, 0.06);
+    --ea-rule: rgba(20, 35, 27, 0.11);
+    --ea-rule-soft: rgba(20, 35, 27, 0.055);
 
     /* Radios */
     --ea-r-xs: 6px;
@@ -79,21 +112,32 @@
 
 /* ---------- Modo oscuro ---------------------------------------------- */
 :root[data-theme="dark"] {
-    --ea-paper: #0d1612;
-    --ea-linen: #121d18;
-    --ea-card: #16221c;
-    --ea-card-soft: #1c2a23;
-    --ea-ink: #ecf2e8;
-    --ea-ink-2: #c2cdbf;
-    --ea-mute: #8a988b;
+    --ea-paper: #0e1f17;       /* fondo principal oscuro (verde profundo, no negro) */
+    --ea-linen: #13261d;       /* fondo secundario oscuro */
+    --ea-card: #1a2c23;        /* card oscura con más lift (evita empastado) */
+    --ea-card-soft: #21342a;
+    --ea-ink: #f4f1ea;         /* texto principal */
+    --ea-ink-2: #c8d4c6;       /* texto secundario más claro y legible */
+    --ea-mute: #93a194;
 
-    --ea-rule: rgba(236, 242, 232, 0.14);
-    --ea-rule-soft: rgba(236, 242, 232, 0.07);
+    --ea-air-bg: #13261d;
 
-    --ea-success-soft: rgba(74, 122, 85, 0.32);
-    --ea-info-soft: rgba(184, 213, 208, 0.18);
+    /* Aqua pop sobre fondos oscuros */
+    --ea-air-ink: #8fd6c8;
+    --ea-info: #8fd6c8;
+
+    --ea-rule: rgba(236, 242, 232, 0.16);
+    --ea-rule-soft: rgba(236, 242, 232, 0.08);
+    --ea-border: rgba(43, 86, 56, 0.85);
+
+    /* Primario más luminoso en oscuro para mantener jerarquía */
+    --ea-primary: #4f9a6f;
+    --ea-primary-soft: rgba(143, 214, 200, 0.2);
+
+    --ea-success-soft: rgba(74, 122, 85, 0.34);
+    --ea-info-soft: rgba(143, 214, 200, 0.18);
     --ea-warning-soft: rgba(200, 156, 122, 0.24);
-    --ea-danger-soft: rgba(166, 91, 61, 0.26);
+    --ea-danger-soft: rgba(166, 91, 61, 0.28);
 
     --ea-shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.45);
     --ea-shadow-md: 0 14px 32px rgba(0, 0, 0, 0.55);
@@ -977,12 +1021,39 @@ body.ea-nav-open {
     line-height: 1;
     text-decoration: none;
     transition:
-        background-color 0.18s ease,
-        border-color 0.18s ease,
-        color 0.18s ease,
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
+        background-color 0.16s var(--ea-ease-out),
+        border-color 0.16s var(--ea-ease-out),
+        color 0.16s var(--ea-ease-out),
+        transform 0.14s var(--ea-ease-out),
+        box-shadow 0.16s var(--ea-ease-out);
     box-shadow: var(--ea-shadow-sm);
+}
+
+/* ---- Press feedback: buttons must feel responsive when pressed ---- */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+        transition-duration: 0.08s;
+    }
+}
+/* Touch devices: scale feedback on tap too (no hover false-positives here since :active is safe) */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+    }
 }
 
 .ea-button:focus-visible,
@@ -994,14 +1065,16 @@ body.ea-nav-open {
 }
 
 .ea-button-primary {
-    --btn-bg: var(--eden-700);
-    --btn-color: var(--eden-100);
+    --btn-bg: var(--ea-primary);
+    --btn-color: #ffffff;
 }
 
-.ea-button-primary:hover {
-    --btn-bg: var(--eden-800);
-    transform: translateY(-1px);
-    box-shadow: var(--ea-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --btn-bg: var(--eden-700);
+        transform: translateY(-1px);
+        box-shadow: var(--ea-shadow-md);
+    }
 }
 
 .ea-button-secondary {
@@ -1015,10 +1088,12 @@ body.ea-nav-open {
     color: var(--ea-ink);
 }
 
-.ea-button-secondary:hover {
-    --btn-bg: var(--eden-100);
-    --btn-border: var(--eden-300);
-    color: var(--eden-700);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --btn-bg: var(--eden-100);
+        --btn-border: var(--eden-300);
+        color: var(--eden-700);
+    }
 }
 
 :root[data-theme="dark"] .ea-button-secondary {
@@ -1026,10 +1101,12 @@ body.ea-nav-open {
     color: var(--eden-100);
 }
 
-:root[data-theme="dark"] .ea-button-secondary:hover {
-    --btn-bg: rgba(74, 122, 85, 0.22);
-    --btn-border: var(--eden-500);
-    color: var(--eden-300);
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --btn-bg: rgba(74, 122, 85, 0.22);
+        --btn-border: var(--eden-500);
+        color: var(--eden-300);
+    }
 }
 
 .ea-button-ghost {
@@ -1040,20 +1117,67 @@ body.ea-nav-open {
     padding: 8px 14px;
 }
 
-.ea-button-ghost:hover {
-    --btn-bg: var(--eden-100);
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover { --btn-bg: var(--eden-100); }
+    :root[data-theme="dark"] .ea-button-ghost:hover { --btn-bg: rgba(74, 122, 85, 0.22); }
 }
 
-:root[data-theme="dark"] .ea-button-ghost {
-    --btn-color: var(--eden-300);
-}
-
-:root[data-theme="dark"] .ea-button-ghost:hover {
-    --btn-bg: rgba(74, 122, 85, 0.22);
-}
+:root[data-theme="dark"] .ea-button-ghost { --btn-color: var(--eden-300); }
 
 .ea-button-block {
     width: 100%;
+}
+
+.ea-button-sm {
+    padding: 7px 13px;
+    font-size: 12.5px;
+}
+
+/* CTA de compra destacado — disponible en todas las páginas (landing y panel). */
+.ea-button-buy {
+    --btn-bg: linear-gradient(120deg, var(--ea-primary) 0%, #3c7a57 52%, #4e9069 100%);
+    --btn-color: #ffffff;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    padding-inline: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 10px 26px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+}
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    opacity: 0.7;
+    animation: ea-buy-glow 3.6s ease-in-out infinite;
+}
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    animation: ea-buy-shine 4.8s ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --btn-bg: linear-gradient(120deg, var(--eden-700) 0%, var(--ea-primary) 55%, #3c7a57 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(47, 107, 79, 0.4), inset 0 0 0 1px rgba(201, 216, 112, 0.55);
+    }
+}
+@keyframes ea-buy-glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }
+@keyframes ea-buy-shine { 0%, 62% { left: -120%; } 88%, 100% { left: 140%; } }
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before { animation: none !important; }
+    .ea-button-buy::after { display: none; }
 }
 
 .ea-button:disabled,
@@ -2164,31 +2288,8 @@ body.dashboard-body {
 :root[data-theme="dark"] .dashboard-body .status-danger { color: #e08465; }
 :root[data-theme="dark"] .dashboard-body .status-info { color: var(--ea-breath); }
 
-/* ---------- Transición circular de tema (View Transitions API) ---------- */
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation-duration: 700ms;
-    animation-timing-function: ease-in-out;
-    mix-blend-mode: normal;
-}
-
-/* El estado viejo se congela; el nuevo se revela desde el toggle */
-::view-transition-old(root) {
-    animation: none;
-}
-
-::view-transition-new(root) {
-    animation: ea-tema-reveal 700ms ease-in-out;
-}
-
-@keyframes ea-tema-reveal {
-    from { clip-path: circle(0px at var(--theme-x, 50%) var(--theme-y, 50%)); }
-    to   { clip-path: circle(var(--theme-radius, 150vmax) at var(--theme-x, 50%) var(--theme-y, 50%)); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation-duration: 0.01ms !important;
-    }
-}
+/* Transición de tema:
+   Antes usábamos la View Transitions API con una expansión circular.
+   El problema: el navegador re-mapeaba el scroll a la nueva instantánea y
+   movía la posición. Lo cambiamos por transiciones CSS de colores sobre el
+   shell — ver `.ea-body`/cards más abajo — que NO afectan el scroll. */

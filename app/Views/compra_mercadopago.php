@@ -2,75 +2,111 @@
 <html lang="es">
 <head>
     <?= view('partials/head', [
-        'title'    => 'EdenAir | Compra',
-        'extraCss' => ['CSS/dashboard.css'],
+        'title'     => 'EdenAir · Plan Inicial',
+        'extraCss'  => ['CSS/dashboard.css'],
+        'extraHead' => '<meta name="description" content="Plan Inicial EdenAir: comenzá a monitorear y mejorar la calidad del ambiente desde solo US$5.">'
+            . '<meta name="robots" content="noindex, nofollow">'
+            . '<meta name="color-scheme" content="light dark">',
     ]) ?>
 </head>
-<body class="dashboard-body ea-body ea-dashboard-body dashboard-loading">
+<body class="dashboard-body ea-body ea-dashboard-body">
 <div class="ea-dashboard" data-dashboard-app>
-    <aside class="ea-sidebar" id="dashboardSidebar" aria-label="Navegacion principal">
-        <div class="ea-sidebar-brand">
-            <span class="ea-sidebar-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M22.5 7.5C12.8 7.5 7 13.4 7 21c0 1.8.4 3.4 1 4.8C13.6 23 18.6 19 22 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M22.5 7.5c1.6 5-.2 11.4-4.3 14.7-2.7 2.1-5.8 2.7-8.7 1.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span class="ea-sidebar-word"><b>Eden<em>Air</em></b><span>Compra</span></span>
-        </div>
-        <div class="ea-sidebar-section">Sistema</div>
-        <a href="<?= site_url('panel') ?>" class="ea-sidebar-item"><span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="9" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.6"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.6"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.6"/></svg></span><span class="ea-sidebar-label">Dashboard</span></a>
-        <a href="<?= site_url('panel/perfil') ?>" class="ea-sidebar-item"><span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 10-16 0"/><circle cx="12" cy="7" r="4"/></svg></span><span class="ea-sidebar-label">Editar datos</span></a>
-        <a href="<?= site_url('panel/compra') ?>" class="ea-sidebar-item is-active"><span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span><span class="ea-sidebar-label">Comprar</span></a>
-        <div class="ea-sidebar-footer"><span class="ea-sidebar-dot"></span><span class="ea-sidebar-foot-label">Interfaz demo</span></div>
-    </aside>
 
+    <?= view('partials/dashboard_sidebar', ['active' => 'compra']) ?>
+
+    <!-- =========================== MAIN =========================== -->
     <main class="ea-main">
+
         <header class="dashboard-header ea-header">
-            <button type="button" class="ea-header-icon-btn" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15"/></svg></button>
-            <div class="ea-header-titles"><h1>Compra</h1><p>Interfaz visual de checkout con estilo Mercado Pago</p></div>
-            <span class="ea-chip ea-chip-status status-success"><span class="ea-pulse"></span><span>Demo segura</span></span>
-            <div class="ea-header-tools"><?= view('partials/theme_toggle') ?><a href="<?= site_url('logout') ?>" class="ea-header-icon-btn ea-header-logout" title="Cerrar sesion" aria-label="Cerrar sesion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h12"/></svg></a></div>
+            <button type="button" class="ea-burger" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú">
+                <span></span><span></span><span></span>
+            </button>
+
+            <div class="ea-header-titles">
+                <h1>Compra</h1>
+                <p>Plan Inicial · acceso a EdenAir</p>
+            </div>
+
+            <span class="ea-chip ea-chip-status status-success" title="Estado del checkout">
+                <span class="ea-pulse"></span>
+                <span>Compra simulada</span>
+            </span>
+
+            <div class="ea-header-tools">
+                <?= view('partials/theme_toggle') ?>
+            </div>
         </header>
 
-        <div class="ea-content">
-            <div class="ea-sec"><h2>Checkout</h2><span class="ea-sec-right">solo interfaz · sin cobro real</span></div>
+        <div class="ea-content ea-plan-content">
 
-            <article class="ea-card ea-checkout-product">
-                <div class="ea-checkout-device" aria-hidden="true">
-                    <span></span>
-                    <i></i>
-                </div>
-                <div class="ea-checkout-copy">
-                    <span class="ea-badge tone-success"><span class="ea-dot"></span>Producto seleccionado</span>
-                    <h2 class="ea-serif">EdenAir Kit Ambiental</h2>
-                    <p>Sensor inteligente para monitorear temperatura, humedad, CO2 y calidad de aire desde el panel.</p>
-                    <div class="ea-checkout-specs">
-                        <span>ESP32</span>
-                        <span>4 sensores</span>
-                        <span>Panel web</span>
+            <!-- ============== Plan card (sin scroll) ============== -->
+            <section class="ea-plan-stage" aria-label="Plan disponible">
+                <article class="ea-plan-card" aria-labelledby="planInicialTitulo">
+                    <span class="ea-plan-glow" aria-hidden="true"></span>
+
+                    <div class="ea-plan-grid">
+                        <div class="ea-plan-left">
+                            <header class="ea-plan-head">
+                                <span class="ea-plan-tag">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M12 2.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 8.8l6.1-.7z"/></svg>
+                                    Recomendado para empezar
+                                </span>
+                                <h2 id="planInicialTitulo" class="ea-plan-title ea-serif">Plan Inicial</h2>
+                                <p class="ea-plan-desc">Ideal para comenzar a monitorear y mejorar la calidad del ambiente.</p>
+                            </header>
+
+                            <div class="ea-plan-price">
+                                <span class="ea-plan-currency">US$</span>
+                                <span class="ea-plan-amount">5</span>
+                                <span class="ea-plan-period">pago único</span>
+                            </div>
+
+                            <div class="ea-plan-cta">
+                                <button type="button" class="ea-plan-btn" data-plan-buy>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+                                    <span>Comprar plan</span>
+                                </button>
+                                <p class="ea-plan-note">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+                                    Compra simulada · sin integración de pago todavía
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="ea-plan-right">
+                            <span class="ea-plan-benefits-label">Incluye</span>
+                            <ul class="ea-plan-benefits" aria-label="Beneficios incluidos">
+                                <?php
+                                $beneficios = [
+                                    'Dashboard principal en tiempo real',
+                                    'Temperatura, humedad, CO₂ y calidad de aire',
+                                    'Historial de mediciones',
+                                    'Recomendaciones automáticas',
+                                    'Modo claro y oscuro',
+                                    'Acceso multi-dispositivo',
+                                ];
+                                foreach ($beneficios as $b): ?>
+                                    <li>
+                                        <span class="ea-plan-check" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M5 12.5l4 4 10-10"/></svg>
+                                        </span>
+                                        <span><?= esc($b) ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </article>
+                </article>
+            </section>
 
-            <article class="ea-card ea-checkout-card">
-                <div class="ea-card-head">
-                    <h3>Resumen de compra</h3>
-                    <span class="ea-mono ea-card-meta">MERCADO PAGO UI</span>
-                </div>
-                <div class="ea-checkout-line"><span>EdenAir Kit Ambiental</span><strong>$ 89.999</strong></div>
-                <div class="ea-checkout-line"><span>Envio</span><strong>Gratis</strong></div>
-                <div class="ea-checkout-total"><span>Total</span><strong>$ 89.999</strong></div>
-                <button type="button" class="ea-mp-button">Pagar con Mercado Pago</button>
-                <p class="ea-checkout-note">Boton de muestra. No se conecta con Mercado Pago ni procesa pagos.</p>
-            </article>
+            <!-- ============== Confirmación simulada ============== -->
+            <div class="ea-plan-toast" data-plan-toast role="status" aria-live="polite">
+                <span class="ea-plan-toast-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M5 12.5l4 4 10-10"/></svg>
+                </span>
+                <span>¡Compra simulada exitosa! Pronto activaremos el cobro real.</span>
+            </div>
 
-            <article class="ea-card ea-checkout-card">
-                <div class="ea-card-head">
-                    <h3>Datos de entrega</h3>
-                    <span class="ea-mono ea-card-meta">DEMO</span>
-                </div>
-                <div class="ea-account-form">
-                    <label>Nombre y apellido<input type="text" value="" placeholder="Comprador demo"></label>
-                    <label>Correo<input type="email" value="" placeholder="correo@gmail.com"></label>
-                    <label class="ea-account-wide">Direccion<input type="text" value="" placeholder="Calle, numero, ciudad"></label>
-                </div>
-            </article>
         </div>
     </main>
 
@@ -79,5 +115,22 @@
 
 <script src="<?= base_url('JS/tema.js') ?>"></script>
 <script src="<?= base_url('JS/dashboard.js') ?>"></script>
+<script>
+    (function () {
+        var btn   = document.querySelector('[data-plan-buy]');
+        var toast = document.querySelector('[data-plan-toast]');
+        if (!btn || !toast) return;
+        var timer;
+        btn.addEventListener('click', function () {
+            toast.classList.add('is-visible');
+            btn.classList.add('is-done');
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                toast.classList.remove('is-visible');
+                btn.classList.remove('is-done');
+            }, 3200);
+        });
+    })();
+</script>
 </body>
 </html>

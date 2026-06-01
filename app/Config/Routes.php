@@ -35,6 +35,20 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->post('perfil', 'PanelController::actualizarPerfil');
     $routes->post('password', 'PanelController::actualizarPassword');
     $routes->get('compra', 'PanelController::compra');
+
+    // Hito 2 — Mis dispositivos + alta por código de activación.
+    $routes->get('dispositivos', 'DispositivosController::index');
+    $routes->get('dispositivos/agregar', 'DispositivosController::agregar');
+    $routes->get('dispositivos/validar', 'DispositivosController::validar');
+    $routes->post('dispositivos', 'DispositivosController::guardar');
+    $routes->post('dispositivo-activo', 'PanelController::seleccionarDispositivo');
+    $routes->post('demo', 'PanelController::iniciarDemo');
+
+    // Ambientes (Hito 2): listado y edición de los espacios del usuario.
+    $routes->get('ambientes', 'AmbientesController::index');
+    $routes->get('ambientes/(:num)/editar', 'AmbientesController::editar/$1');
+    $routes->post('ambientes/(:num)', 'AmbientesController::actualizar/$1');
+
     $routes->post('medicion', 'PanelController::guardarMedicion');
     $routes->post('modo', 'PanelController::cambiarModo');
     $routes->post('actuador', 'PanelController::cambiarActuador');

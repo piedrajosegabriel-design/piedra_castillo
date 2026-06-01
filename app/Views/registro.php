@@ -31,9 +31,8 @@
                 <?= view('partials/logo', ['tone' => 'cream', 'size' => 56, 'variant' => 'horizontal']) ?>
                 <h1 class="ea-auth-title">Empezá tu<br><em>edén.</em></h1>
                 <p class="ea-auth-lede">
-                    Creá tu cuenta para empezar a medir el aire de tu espacio.
-                    Después del primer ingreso vas a poder elegir el tipo de ambiente
-                    y conectar tu módulo ESP32.
+                    Creá tu cuenta para empezar a medir el aire de tu espacio
+                    y conectar tu módulo Eden Air.
                 </p>
             </div>
 
@@ -55,8 +54,8 @@
                 <li>
                     <span></span>
                     <span>
-                        <strong>Ambiente al final</strong>
-                        Después de entrar elegís hogar, oficina, aula o personalizable.
+                        <strong>Dashboard listo</strong>
+                        Al entrar podés vincular tu dispositivo y empezar a monitorear.
                     </span>
                 </li>
             </ul>
@@ -67,7 +66,7 @@
                 <div>
                     <p class="ea-eyebrow">Alta de usuario</p>
                     <h2>Creá tu acceso.</h2>
-                    <p class="ea-lede">El ambiente se configura después del primer login.</p>
+                    <p class="ea-lede">Completá el formulario y entrás directo al dashboard.</p>
                 </div>
 
                 <?php if (session()->getFlashdata('error')): ?>
@@ -154,17 +153,6 @@
                     </div>
 
                     <p id="coincideTexto" class="ea-hint">Esperando confirmación de contraseña.</p>
-
-                    <div class="ea-card ea-card--cream" style="padding: 18px 22px;">
-                        <p class="ea-eyebrow" style="margin-bottom: 6px;">Próximo paso</p>
-                        <strong style="font-family: var(--ea-font-serif); font-size: 20px; letter-spacing: -0.01em;">
-                            Elegís el ambiente después del login.
-                        </strong>
-                        <p class="ea-hint" style="margin-top: 6px;">
-                            Vas a poder seleccionar entre hogar, oficina, aula, dormitorio
-                            o personalizar tus propios rangos ideales.
-                        </p>
-                    </div>
 
                     <button type="submit" class="ea-button ea-button-primary ea-button-block" id="botonRegistro">
                         Crear cuenta
