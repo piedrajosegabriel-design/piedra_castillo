@@ -44,6 +44,9 @@ ALTER TABLE users
 ADD reset_token VARCHAR(64) NULL,
 ADD reset_expires_at DATETIME NULL;
 
+ALTER TABLE users
+ADD COLUMN apellido VARCHAR(120) NOT NULL DEFAULT '' AFTER nombre;
+
 -- =========================================================
 -- TABLA: spaces
 -- Guarda el ambiente del usuario y sus rangos base.
