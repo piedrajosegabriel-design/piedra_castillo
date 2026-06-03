@@ -723,15 +723,15 @@ ob_start(); ?>
                         <header class="ea-buy-card-head">
                             <span class="ea-buy-badge">
                                 <span class="ea-buy-badge-dot" aria-hidden="true"></span>
-                                Precio demo · presentación educativa
+                                Comprá tu dispositivo
                             </span>
                             <h3 class="ea-buy-name">Eden Air Core</h3>
-                            <p class="ea-buy-tagline">Dispositivo inteligente + acceso al dashboard + configuración personalizada de ambientes.</p>
+                            <p class="ea-buy-tagline">El dispositivo inteligente más el acceso completo al dashboard y la configuración personalizada de ambientes.</p>
                         </header>
 
                         <div class="ea-buy-price">
-                            <span class="ea-buy-amount"><span class="ea-buy-cur">USD</span>5</span>
-                            <span class="ea-buy-period">precio de prueba<br>para la demo de tesina</span>
+                            <span class="ea-buy-amount"><span class="ea-buy-cur">$</span>89.999</span>
+                            <span class="ea-buy-period">ARS · pago único<br>compra del producto</span>
                         </div>
 
                         <div class="ea-buy-actions">

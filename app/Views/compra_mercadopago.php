@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <?= view('partials/head', [
-        'title'     => 'EdenAir · Plan Inicial',
+        'title'     => 'EdenAir · Comprar producto',
         'extraCss'  => ['CSS/dashboard.css'],
-        'extraHead' => '<meta name="description" content="Plan Inicial EdenAir: comenzá a monitorear y mejorar la calidad del ambiente desde solo US$5.">'
+        'extraHead' => '<meta name="description" content="Comprá EdenAir: el dispositivo inteligente y el dashboard para monitorear y mejorar la calidad del ambiente.">'
             . '<meta name="robots" content="noindex, nofollow">'
             . '<meta name="color-scheme" content="light dark">',
     ]) ?>
@@ -23,8 +23,8 @@
             </button>
 
             <div class="ea-header-titles">
-                <h1>Compra</h1>
-                <p>Plan Inicial · acceso a EdenAir</p>
+                <h1>Comprar EdenAir</h1>
+                <p>Dispositivo + dashboard · compra del producto</p>
             </div>
 
             <span class="ea-chip ea-chip-status status-success" title="Estado del checkout">
@@ -40,31 +40,31 @@
         <div class="ea-content ea-plan-content">
 
             <!-- ============== Plan card (sin scroll) ============== -->
-            <section class="ea-plan-stage" aria-label="Plan disponible">
-                <article class="ea-plan-card" aria-labelledby="planInicialTitulo">
+            <section class="ea-plan-stage" aria-label="Comprar EdenAir">
+                <article class="ea-plan-card" aria-labelledby="compraTitulo">
                     <span class="ea-plan-glow" aria-hidden="true"></span>
 
                     <div class="ea-plan-grid">
                         <div class="ea-plan-left">
                             <header class="ea-plan-head">
                                 <span class="ea-plan-tag">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M12 2.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 8.8l6.1-.7z"/></svg>
-                                    Recomendado para empezar
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+                                    Comprá tu dispositivo
                                 </span>
-                                <h2 id="planInicialTitulo" class="ea-plan-title ea-serif">Plan Inicial</h2>
-                                <p class="ea-plan-desc">Ideal para comenzar a monitorear y mejorar la calidad del ambiente.</p>
+                                <h2 id="compraTitulo" class="ea-plan-title ea-serif">EdenAir Core</h2>
+                                <p class="ea-plan-desc">El dispositivo inteligente más el acceso completo al dashboard para monitorear y mejorar la calidad del ambiente.</p>
                             </header>
 
                             <div class="ea-plan-price">
-                                <span class="ea-plan-currency">US$</span>
-                                <span class="ea-plan-amount">5</span>
-                                <span class="ea-plan-period">pago único</span>
+                                <span class="ea-plan-currency">$</span>
+                                <span class="ea-plan-amount">89.999</span>
+                                <span class="ea-plan-period">ARS · pago único<br>compra del producto</span>
                             </div>
 
                             <div class="ea-plan-cta">
                                 <button type="button" class="ea-plan-btn" data-plan-buy>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
-                                    <span>Comprar plan</span>
+                                    <span>Comprar EdenAir</span>
                                 </button>
                                 <p class="ea-plan-note">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
@@ -78,12 +78,12 @@
                             <ul class="ea-plan-benefits" aria-label="Beneficios incluidos">
                                 <?php
                                 $beneficios = [
-                                    'Dashboard principal en tiempo real',
+                                    'Dispositivo EdenAir (módulo ESP32) listo para usar',
+                                    'Acceso completo al dashboard en tiempo real',
                                     'Temperatura, humedad, CO₂ y calidad de aire',
-                                    'Historial de mediciones',
-                                    'Recomendaciones automáticas',
-                                    'Modo claro y oscuro',
-                                    'Acceso multi-dispositivo',
+                                    'Historial de mediciones y recomendaciones automáticas',
+                                    'Automatización de ventilación, humidificación y aroma',
+                                    'Configuración de ambientes y multi-dispositivo',
                                 ];
                                 foreach ($beneficios as $b): ?>
                                     <li>

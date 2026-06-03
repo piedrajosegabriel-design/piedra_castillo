@@ -213,6 +213,14 @@ body.dashboard-body { overflow-x: hidden; }
 }
 .ea-loader-logo svg { width: 40px; height: 40px; }
 
+/* Marca Corriente en el loader: squircle propio, sin doble fondo */
+.ea-loader-logo--corriente,
+:root[data-theme="dark"] .ea-loader-logo--corriente {
+    background: transparent;
+    border-radius: 18px;
+}
+.ea-loader-logo--corriente svg { width: 72px; height: 72px; }
+
 @keyframes ea-loader-breathe {
     0%, 100% { transform: scale(1); box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 18px 38px -16px rgba(47,107,79,0.55); }
     50%      { transform: scale(1.05); box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset, 0 22px 46px -16px rgba(47,107,79,0.7); }
@@ -347,6 +355,15 @@ body.dashboard-body { overflow-x: hidden; }
 
 :root[data-theme="dark"] .ea-sidebar-mark { background: var(--eden-500); color: var(--eden-900); }
 .ea-sidebar-mark svg { width: 20px; height: 20px; }
+
+/* Marca oficial Corriente: trae su propio fondo squircle, sin doble marco */
+.ea-sidebar-mark--corriente,
+:root[data-theme="dark"] .ea-sidebar-mark--corriente {
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+}
+.ea-sidebar-mark--corriente svg { width: 34px; height: 34px; }
 
 .ea-sidebar-word { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
 
@@ -950,6 +967,8 @@ body.dashboard-body { overflow-x: hidden; }
 /* =====================================================================
    HERO · Resumen del ambiente
    ===================================================================== */
+/* KPI hero como panel de estado (gradiente de marca, texto claro).
+   El gradiente cambia según el estado general: verde / terracota / crítico. */
 .ea-hero {
     position: relative;
     overflow: hidden;
@@ -958,35 +977,62 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 30px;
     padding: 28px 30px;
     border-radius: var(--ead-radius-lg);
-    border: 1px solid var(--ead-line);
-    background:
-        linear-gradient(135deg, color-mix(in oklab, var(--eden-100) 60%, var(--ead-card-bg)) 0%, var(--ead-card-bg) 52%);
-    box-shadow: var(--ead-shadow-2);
+    border: 1px solid transparent;
+    color: #fff;
+    background: linear-gradient(125deg, var(--ea-primary) 0%, var(--ea-primary-med) 60%, color-mix(in oklab, var(--ea-primary-med) 78%, var(--ea-air)) 100%);
+    box-shadow: 0 18px 42px color-mix(in oklab, var(--ea-primary-dark) 34%, transparent);
+}
+
+.ea-hero.tone-warning {
+    background: linear-gradient(125deg, #a6764e 0%, var(--ea-clay) 58%, color-mix(in oklab, var(--ea-clay) 74%, #e6c19a) 100%);
+    box-shadow: 0 18px 42px color-mix(in oklab, #7a4a23 32%, transparent);
+}
+.ea-hero.tone-danger {
+    background: linear-gradient(125deg, #863c26 0%, var(--ea-earth) 58%, color-mix(in oklab, var(--ea-earth) 76%, #cf7e5c) 100%);
+    box-shadow: 0 18px 42px color-mix(in oklab, #5f2a18 34%, transparent);
 }
 
 :root[data-theme="dark"] .ea-hero {
-    background: linear-gradient(135deg, color-mix(in oklab, var(--eden-700) 28%, var(--ead-card-bg)) 0%, var(--ead-card-bg) 55%);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5);
 }
 
 .ea-hero-glow {
     position: absolute;
-    top: -40%;
-    right: -10%;
-    width: 460px;
-    height: 460px;
+    top: -46%;
+    right: -12%;
+    width: 480px;
+    height: 480px;
     border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--ea-citrus) 30%, transparent) 0%, transparent 62%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, transparent 60%);
     pointer-events: none;
-    opacity: 0.55;
+    opacity: 0.9;
 }
 
-.ea-hero.tone-warning .ea-hero-glow { background: radial-gradient(circle, color-mix(in oklab, var(--ea-clay) 32%, transparent) 0%, transparent 62%); }
-.ea-hero.tone-danger  .ea-hero-glow { background: radial-gradient(circle, color-mix(in oklab, var(--ea-earth) 32%, transparent) 0%, transparent 62%); }
+.ea-hero.tone-warning .ea-hero-glow,
+.ea-hero.tone-danger  .ea-hero-glow { background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%); }
 
 .ea-hero-main { position: relative; display: flex; flex-direction: column; }
 
 .ea-hero-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .ea-hero-status { height: 26px; padding: 0 12px; font-size: 11px; }
+
+/* Badges y tags legibles sobre el gradiente del hero */
+.ea-hero .ea-badge {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.22);
+}
+.ea-hero .ea-mode-tag,
+.ea-hero .ea-mode-tag.is-auto,
+.ea-hero .ea-mode-tag.is-manual {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
+}
+.ea-hero .ea-conn-dot {
+    background: var(--ea-citrus);
+    box-shadow: 0 0 0 3px rgba(201, 216, 112, 0.3);
+}
 
 .ea-mode-tag {
     display: inline-flex;
@@ -1048,7 +1094,7 @@ body.dashboard-body { overflow-x: hidden; }
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.78);
 }
 
 .ea-hero-title {
@@ -1058,14 +1104,12 @@ body.dashboard-body { overflow-x: hidden; }
     font-size: clamp(34px, 4vw, 46px);
     line-height: 1.04;
     letter-spacing: -0.02em;
-    color: var(--eden-800);
+    color: #fff;
 }
-
-:root[data-theme="dark"] .ea-hero-title { color: var(--eden-100); }
 
 .ea-hero-diag {
     margin: 14px 0 0;
-    color: var(--ea-ink-2);
+    color: rgba(255, 255, 255, 0.86);
     font-size: 15px;
     line-height: 1.6;
     max-width: 50ch;
@@ -1074,7 +1118,7 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-hero-foot {
     margin-top: 24px;
     padding-top: 18px;
-    border-top: 1px solid var(--ead-line);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 24px;
@@ -1092,13 +1136,13 @@ body.dashboard-body { overflow-x: hidden; }
     font-size: 9.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.66);
 }
 
 .ea-hero-foot-val {
     font-size: 14px;
     font-weight: 600;
-    color: var(--ea-ink);
+    color: #fff;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -1107,7 +1151,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-hero-foot-val small {
     font-weight: 500;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 12px;
 }
 
@@ -1128,7 +1172,7 @@ body.dashboard-body { overflow-x: hidden; }
     font-family: var(--ea-font-mono);
     font-size: 11.5px;
     margin-left: auto;
-    color: var(--ea-ink-2);
+    color: rgba(255, 255, 255, 0.82);
 }
 
 /* Hero side */
@@ -1151,8 +1195,10 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 8px;
     padding: 14px 16px;
     border-radius: 14px;
-    background: color-mix(in oklab, var(--ead-bg-soft) 70%, var(--ead-card-bg));
-    border: 1px solid var(--ead-line);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 .ea-hero-metric-label {
@@ -1161,27 +1207,27 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 7px;
     font-size: 11px;
     font-weight: 500;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.78);
 }
 
 .ea-hero-metric-label .ea-dot { width: 7px; height: 7px; }
-.ea-hero-metric.tone-success .ea-dot { color: var(--ea-success); }
-.ea-hero-metric.tone-warning .ea-dot { color: var(--ea-warning); }
-.ea-hero-metric.tone-danger  .ea-dot { color: var(--ea-danger); }
-.ea-hero-metric.tone-info    .ea-dot { color: var(--ea-info); }
+.ea-hero-metric.tone-success .ea-dot { color: var(--ea-citrus); }
+.ea-hero-metric.tone-warning .ea-dot { color: #f0c79b; }
+.ea-hero-metric.tone-danger  .ea-dot { color: #f0a587; }
+.ea-hero-metric.tone-info    .ea-dot { color: var(--ea-air); }
 
 .ea-hero-metric-val {
     font-size: 26px;
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1;
-    color: var(--ea-ink);
+    color: #fff;
 }
 
 .ea-hero-metric-val small {
     font-size: 12px;
     font-weight: 500;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.72);
     letter-spacing: 0;
 }
 
@@ -1191,18 +1237,19 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 6px;
     padding: 14px 16px 6px;
     border-radius: 14px;
-    background: color-mix(in oklab, var(--ead-bg-soft) 70%, var(--ead-card-bg));
-    border: 1px solid var(--ead-line);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .ea-hero-trend-label {
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ea-mute);
+    color: rgba(255, 255, 255, 0.72);
 }
 
 .ea-hero-spark { width: 100%; height: 52px; }
+.ea-hero-spark path[stroke] { stroke: var(--ea-citrus); }
 
 /* =====================================================================
    SENSORES (gauges)

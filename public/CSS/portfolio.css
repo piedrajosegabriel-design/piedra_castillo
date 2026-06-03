@@ -120,9 +120,11 @@
 }
 
 .ea-pf-section-num {
+    display: inline-block;
     font-family: var(--ea-font-mono);
     font-size: clamp(40px, 6vw, 80px);
-    line-height: 0.9;
+    line-height: 1.1;
+    padding-block: 0.05em;
     color: var(--eden-500);
     opacity: 0.32;
     letter-spacing: -0.04em;
@@ -667,13 +669,14 @@
     left: 4px;
     right: 4px;
     font-family: var(--ea-font-mono);
-    font-size: 9px;
-    letter-spacing: 0.04em;
+    font-size: 8.5px;
+    letter-spacing: 0.01em;
     color: rgba(255, 255, 255, 0.94);
     background: rgba(0, 0, 0, 0.4);
     padding: 2px 4px;
     border-radius: 4px;
     text-align: center;
+    white-space: nowrap;
 }
 
 .ea-pf-type {
@@ -932,9 +935,11 @@
 }
 
 .ea-pf-metric__num {
+    display: inline-block;
     font-family: var(--ea-font-serif);
     font-size: clamp(28px, 3.4vw, 40px);
-    line-height: 1;
+    line-height: 1.16;
+    padding-block: 0.02em;
     letter-spacing: -0.02em;
     color: var(--eden-700);
 }

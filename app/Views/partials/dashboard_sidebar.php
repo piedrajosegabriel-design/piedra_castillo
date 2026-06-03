@@ -20,10 +20,25 @@ $aria = static fn (string $key): string => $active === $key ? ' aria-current="pa
 ?>
 <aside class="ea-sidebar" id="dashboardSidebar" aria-label="Navegación principal del dashboard">
     <div class="ea-sidebar-brand">
-        <span class="ea-sidebar-mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none">
-                <path d="M22.5 7.5C12.8 7.5 7 13.4 7 21c0 1.8.4 3.4 1 4.8C13.6 23 18.6 19 22 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-                <path d="M22.5 7.5c1.6 5-.2 11.4-4.3 14.7-2.7 2.1-5.8 2.7-8.7 1.9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        <span class="ea-sidebar-mark ea-sidebar-mark--corriente" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="38" height="38" role="img" aria-label="EdenAir">
+                <defs>
+                    <linearGradient id="sb-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCF1EA"/></linearGradient>
+                    <linearGradient id="sb-acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DDEE93"/><stop offset="1" stop-color="#C9D870"/></linearGradient>
+                    <linearGradient id="sb-bg" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#48946F"/><stop offset="1" stop-color="#163829"/></linearGradient>
+                    <radialGradient id="sb-glow" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#8FD6C8" stop-opacity=".55"/><stop offset="1" stop-color="#8FD6C8" stop-opacity="0"/></radialGradient>
+                </defs>
+                <rect x="4" y="4" width="56" height="56" rx="17" fill="url(#sb-bg)"/>
+                <circle cx="32" cy="30" r="22" fill="url(#sb-glow)"/>
+                <rect x="4.8" y="4.8" width="54.4" height="54.4" rx="16.2" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1.1"/>
+                <g transform="translate(32 33) scale(0.62) translate(-32 -32)">
+                    <g fill="none" stroke="url(#sb-p)" stroke-width="5.2" stroke-linecap="round">
+                        <path d="M13 20 H39 a5.5 5.5 0 1 0 -5 -5.4"/>
+                        <path d="M13 32 H47 a6 6 0 1 1 -6 6"/>
+                        <path d="M13 44 H33 a5 5 0 1 0 -4.4 5"/>
+                    </g>
+                    <circle cx="50" cy="20" r="3.6" fill="url(#sb-acc)"/>
+                </g>
             </svg>
         </span>
         <span class="ea-sidebar-word">
@@ -58,7 +73,7 @@ $aria = static fn (string $key): string => $active === $key ? ' aria-current="pa
         </a>
         <a href="<?= site_url('panel/compra') ?>" class="<?= $cls('compra') ?> ea-sidebar-item--cta"<?= $aria('compra') ?> data-ea-buy-cta>
             <span class="ea-sidebar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg></span>
-            <span class="ea-sidebar-label">Plan / Comprar</span>
+            <span class="ea-sidebar-label">Comprar EdenAir</span>
         </a>
     </nav>
 

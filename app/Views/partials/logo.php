@@ -23,23 +23,36 @@ $subtitle   = $subtitle   ?? null;
 $wordmarkSize = max(18, (int) round($size * 0.55));
 
 /**
- * Sistema visual del isotipo "EdenAir Leaf"
- *  - Anillo abierto    → aire en circulación / ambiente / contenedor orgánico
- *  - Hoja estilizada   → naturaleza / vida / pureza
- *  - Vena central      → flujo de aire / trayectoria / respiración
- *  - Punto sensor      → medición / origen del dato / semilla
- *
- *  La punta de la hoja "respira" hacia afuera por la abertura del anillo (≈1h),
- *  y el punto sensor queda anclado en la base (≈7-8h). Composición diagonal
- *  ascendente que transmite movimiento, equilibrio y precisión técnica.
+ * Marca oficial "Corriente" (ráfagas de aire en circulación).
+ * App-icon squircle: fondo verde gradiente + glifo de corriente blanco
+ * + punto de acento cítrico (la medición). Es el mismo símbolo en claro y
+ * oscuro porque lleva su propio fondo: lee siempre premium sobre cualquier
+ * superficie. Fuente: edenair-brandmark.js del brand kit.
  */
+$u       = 'co' . bin2hex(random_bytes(3));
 $markSvg = ''
-    . '<svg viewBox="0 0 64 64" width="' . $size . '" height="' . $size . '" '
-    . 'role="img" aria-label="EdenAir" class="ea-logo-mark ea-logo-mark--' . esc($tone) . '">'
-    . '<path d="M 41 7.5 A 26 26 0 1 0 54.5 45" fill="none" stroke-width="2.5" stroke-linecap="round" class="ea-logo-stroke" />'
-    . '<path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" stroke-width="1.5" stroke-linejoin="round" class="ea-logo-leaf" />'
-    . '<path d="M 20 46 C 28 38, 38 26, 48 14" fill="none" stroke-width="1.5" stroke-linecap="round" class="ea-logo-vein" />'
-    . '<circle cx="20" cy="46" r="2.6" class="ea-logo-dot" />'
+    . '<svg viewBox="0 0 64 64" width="' . $size . '" height="' . $size . '" role="img" aria-label="EdenAir" class="ea-logo-mark ea-logo-mark--corriente">'
+    . '<defs>'
+    . '<linearGradient id="' . $u . '-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCF1EA"/></linearGradient>'
+    . '<linearGradient id="' . $u . '-acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DDEE93"/><stop offset="1" stop-color="#C9D870"/></linearGradient>'
+    . '<linearGradient id="' . $u . '-bg" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#48946F"/><stop offset="1" stop-color="#163829"/></linearGradient>'
+    . '<linearGradient id="' . $u . '-gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".26"/><stop offset=".55" stop-color="#ffffff" stop-opacity="0"/></linearGradient>'
+    . '<radialGradient id="' . $u . '-glow" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#8FD6C8" stop-opacity=".55"/><stop offset="1" stop-color="#8FD6C8" stop-opacity="0"/></radialGradient>'
+    . '<filter id="' . $u . '-sh" x="-45%" y="-45%" width="190%" height="190%"><feDropShadow dx="0" dy="2.2" stdDeviation="1.9" flood-color="rgba(8,28,20,.30)" flood-opacity="1"/></filter>'
+    . '<filter id="' . $u . '-isz" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3.2" stdDeviation="3.4" flood-color="rgba(16,40,28,.45)" flood-opacity="1"/></filter>'
+    . '</defs>'
+    . '<g filter="url(#' . $u . '-isz)"><rect x="4" y="4" width="56" height="56" rx="17" fill="url(#' . $u . '-bg)"/></g>'
+    . '<circle cx="32" cy="30" r="22" fill="url(#' . $u . '-glow)"/>'
+    . '<rect x="4" y="4" width="56" height="56" rx="17" fill="url(#' . $u . '-gloss)"/>'
+    . '<rect x="4.8" y="4.8" width="54.4" height="54.4" rx="16.2" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1.1"/>'
+    . '<g transform="translate(32 33) scale(0.62) translate(-32 -32)">'
+    . '<g filter="url(#' . $u . '-sh)" fill="none" stroke="url(#' . $u . '-p)" stroke-width="5.2" stroke-linecap="round">'
+    . '<path d="M13 20 H39 a5.5 5.5 0 1 0 -5 -5.4"/>'
+    . '<path d="M13 32 H47 a6 6 0 1 1 -6 6"/>'
+    . '<path d="M13 44 H33 a5 5 0 1 0 -4.4 5"/>'
+    . '</g>'
+    . '<circle cx="50" cy="20" r="3.6" fill="url(#' . $u . '-acc)" filter="url(#' . $u . '-sh)"/>'
+    . '</g>'
     . '</svg>';
 
 $wordmark = '<span class="ea-logo-word" style="font-size:' . $wordmarkSize . 'px;">'

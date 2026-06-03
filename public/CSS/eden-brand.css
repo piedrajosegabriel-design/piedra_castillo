@@ -126,9 +126,11 @@
     --ea-air-ink: #8fd6c8;
     --ea-info: #8fd6c8;
 
-    --ea-rule: rgba(236, 242, 232, 0.16);
-    --ea-rule-soft: rgba(236, 242, 232, 0.08);
-    --ea-border: rgba(43, 86, 56, 0.85);
+    /* Bordes y divisores con matiz aqua/verde (no gris): el modo oscuro se
+       ve limpio, cohesivo y "diseñado", nunca embarrado ni grisáceo. */
+    --ea-rule: rgba(143, 214, 200, 0.15);
+    --ea-rule-soft: rgba(143, 214, 200, 0.07);
+    --ea-border: #2b5638;
 
     /* Primario más luminoso en oscuro para mantener jerarquía */
     --ea-primary: #4f9a6f;
@@ -226,6 +228,15 @@ body.ea-body {
     background: var(--ea-paper);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01" on, "ss02" on;
+}
+
+/* Modo oscuro premium: brillos sutiles aqua + cítrico sobre el verde
+   profundo (no un negro plano). Da profundidad sin ensuciar. */
+:root[data-theme="dark"] body.ea-body {
+    background:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%),
+        var(--ea-paper);
 }
 
 .ea-serif {

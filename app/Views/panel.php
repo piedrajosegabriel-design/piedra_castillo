@@ -51,15 +51,25 @@ $statusMeta = static function (string $s): array {
         <div class="ea-loader-orbit" aria-hidden="true">
             <span class="ea-loader-ring ea-loader-ring--a"></span>
             <span class="ea-loader-ring ea-loader-ring--b"></span>
-            <span class="ea-loader-ring ea-loader-ring--c"></span>
-            <span class="ea-loader-particle ea-loader-particle--1"></span>
-            <span class="ea-loader-particle ea-loader-particle--2"></span>
-            <span class="ea-loader-particle ea-loader-particle--3"></span>
-            <span class="ea-loader-logo">
-                <svg viewBox="0 0 64 64" aria-hidden="true">
-                    <path d="M 20 46 C 17 32, 25 18, 48 14 C 44 30, 34 42, 20 46 Z" fill="rgba(201,216,112,0.28)" stroke="#ecf2e8" stroke-width="1.6" stroke-linejoin="round"/>
-                    <path d="M 20 46 C 28 38, 38 26, 48 14" fill="none" stroke="#ecf2e8" stroke-width="1.6" stroke-linecap="round"/>
-                    <circle cx="20" cy="46" r="2.8" fill="#c9d870"/>
+            <span class="ea-loader-logo ea-loader-logo--corriente">
+                <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="ld-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCF1EA"/></linearGradient>
+                        <linearGradient id="ld-acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DDEE93"/><stop offset="1" stop-color="#C9D870"/></linearGradient>
+                        <linearGradient id="ld-bg" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#48946F"/><stop offset="1" stop-color="#163829"/></linearGradient>
+                        <radialGradient id="ld-glow" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#8FD6C8" stop-opacity=".55"/><stop offset="1" stop-color="#8FD6C8" stop-opacity="0"/></radialGradient>
+                    </defs>
+                    <rect x="4" y="4" width="56" height="56" rx="17" fill="url(#ld-bg)"/>
+                    <circle cx="32" cy="30" r="22" fill="url(#ld-glow)"/>
+                    <rect x="4.8" y="4.8" width="54.4" height="54.4" rx="16.2" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1.1"/>
+                    <g transform="translate(32 33) scale(0.62) translate(-32 -32)">
+                        <g fill="none" stroke="url(#ld-p)" stroke-width="5.2" stroke-linecap="round">
+                            <path d="M13 20 H39 a5.5 5.5 0 1 0 -5 -5.4"/>
+                            <path d="M13 32 H47 a6 6 0 1 1 -6 6"/>
+                            <path d="M13 44 H33 a5 5 0 1 0 -4.4 5"/>
+                        </g>
+                        <circle cx="50" cy="20" r="3.6" fill="url(#ld-acc)"/>
+                    </g>
                 </svg>
             </span>
         </div>
