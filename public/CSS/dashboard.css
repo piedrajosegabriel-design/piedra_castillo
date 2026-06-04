@@ -356,14 +356,26 @@ body.dashboard-body { overflow-x: hidden; }
 :root[data-theme="dark"] .ea-sidebar-mark { background: var(--eden-500); color: var(--eden-900); }
 .ea-sidebar-mark svg { width: 20px; height: 20px; }
 
-/* Marca oficial Corriente: trae su propio fondo squircle, sin doble marco */
-.ea-sidebar-mark--corriente,
-:root[data-theme="dark"] .ea-sidebar-mark--corriente {
+/* Marca "e": trazo-corriente sin caja, ancho según su proporción.
+   El degradado se adapta al modo claro/oscuro vía --ea-elogo-*. */
+.ea-sidebar-mark--e,
+:root[data-theme="dark"] .ea-sidebar-mark--e {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
     background: transparent;
     box-shadow: none;
     overflow: visible;
+    --ea-elogo-a: var(--ea-primary-dark);
+    --ea-elogo-b: var(--ea-primary);
+    --ea-elogo-c: #3fae97;
 }
-.ea-sidebar-mark--corriente svg { width: 34px; height: 34px; }
+:root[data-theme="dark"] .ea-sidebar-mark--e {
+    --ea-elogo-a: var(--eden-100);
+    --ea-elogo-b: var(--ea-primary-soft);
+    --ea-elogo-c: var(--ea-air);
+}
+.ea-sidebar-mark--e svg { width: auto; height: 30px; display: block; }
 
 .ea-sidebar-word { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
 
