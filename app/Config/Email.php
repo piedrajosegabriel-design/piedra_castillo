@@ -6,7 +6,7 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'lucianaaymaracastillo79@gmail.com';
+    public string $fromEmail  = 'edenair.safe@gmail.com';
     public string $fromName   = 'Edenair Soporte';
     public string $recipients = '';
 
@@ -38,12 +38,12 @@ class Email extends BaseConfig
     /**
      * SMTP Username
      */
-    public string $SMTPUser = 'lucianaaymaracastillo79@gmail.com';
+    public string $SMTPUser = 'edenair.safe@gmail.com';
 
     /**
      * SMTP Password
      */
-    public string $SMTPPass = 'dwtb echx gebg xlqg';
+    public string $SMTPPass = 'qyoh zwwf dczy iwrk';
 
     /**
      * SMTP Port
