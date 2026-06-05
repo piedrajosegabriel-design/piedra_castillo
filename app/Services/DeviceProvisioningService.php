@@ -26,11 +26,6 @@ class DeviceProvisioningService
         $this->simulationService = new SimulationService();
     }
 
-    public function hasConfiguredSpace(int $userId): bool
-    {
-        return $this->spaceModel->where('user_id', $userId)->countAllResults() > 0;
-    }
-
     public function ensureUserSetup(int $userId, array $spaceInput = [], bool $createSpaceIfMissing = true): array
     {
         $space = $this->spaceModel->where('user_id', $userId)->first();

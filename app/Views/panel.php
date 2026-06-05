@@ -46,40 +46,46 @@ $statusMeta = static function (string $s): array {
 
 <div class="ea-loader dashboard-loader" data-dashboard-loader role="status" aria-live="polite" aria-label="Preparando tu ambiente inteligente">
     <div class="ea-loader-pattern" aria-hidden="true"></div>
+    <div class="ea-loader-grain" aria-hidden="true"></div>
 
     <div class="ea-loader-inner">
+        <span class="ea-loader-eyebrow">
+            <span class="ea-loader-dot" aria-hidden="true"></span>
+            EdenAir · Núcleo ambiental
+        </span>
+
         <div class="ea-loader-orbit" aria-hidden="true">
+            <span class="ea-loader-halo"></span>
             <span class="ea-loader-ring ea-loader-ring--a"></span>
             <span class="ea-loader-ring ea-loader-ring--b"></span>
-            <span class="ea-loader-logo ea-loader-logo--corriente">
-                <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
+            <span class="ea-loader-ring ea-loader-ring--c"></span>
+            <span class="ea-loader-logo ea-loader-logo--e">
+                <svg viewBox="2 16 116 70" aria-hidden="true">
                     <defs>
-                        <linearGradient id="ld-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCF1EA"/></linearGradient>
-                        <linearGradient id="ld-acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DDEE93"/><stop offset="1" stop-color="#C9D870"/></linearGradient>
-                        <linearGradient id="ld-bg" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#48946F"/><stop offset="1" stop-color="#163829"/></linearGradient>
-                        <radialGradient id="ld-glow" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#8FD6C8" stop-opacity=".55"/><stop offset="1" stop-color="#8FD6C8" stop-opacity="0"/></radialGradient>
+                        <linearGradient id="ld-e" x1="0.08" y1="0.1" x2="0.92" y2="0.92">
+                            <stop offset="0" stop-color="#F6F4EC"/>
+                            <stop offset="0.5" stop-color="#BCE9DC"/>
+                            <stop offset="1" stop-color="#5BE5B6"/>
+                        </linearGradient>
                     </defs>
-                    <rect x="4" y="4" width="56" height="56" rx="17" fill="url(#ld-bg)"/>
-                    <circle cx="32" cy="30" r="22" fill="url(#ld-glow)"/>
-                    <rect x="4.8" y="4.8" width="54.4" height="54.4" rx="16.2" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="1.1"/>
-                    <g transform="translate(32 33) scale(0.62) translate(-32 -32)">
-                        <g fill="none" stroke="url(#ld-p)" stroke-width="5.2" stroke-linecap="round">
-                            <path d="M13 20 H39 a5.5 5.5 0 1 0 -5 -5.4"/>
-                            <path d="M13 32 H47 a6 6 0 1 1 -6 6"/>
-                            <path d="M13 44 H33 a5 5 0 1 0 -4.4 5"/>
-                        </g>
-                        <circle cx="50" cy="20" r="3.6" fill="url(#ld-acc)"/>
-                    </g>
+                    <path d="M15 39 C21 30 30 33 36 41 C45 51 60 51 80 52 C86 36 70 24 52 24 C34 24 22 38 24 52 C26 68 42 78 60 76 C76 74 90 70 104 60"
+                          fill="none" stroke="url(#ld-e)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </span>
         </div>
 
         <div class="ea-loader-text">
             <strong class="ea-loader-name">Eden<em>Air</em></strong>
-            <p class="ea-loader-msg">Preparando tu ambiente inteligente…</p>
+            <p class="ea-loader-msg">Preparando tu ambiente inteligente</p>
         </div>
 
         <div class="ea-loader-progress" aria-hidden="true"><span></span></div>
+
+        <ol class="ea-loader-steps" aria-hidden="true">
+            <li class="ea-loader-step"><span class="ea-loader-step__num">01</span><span class="ea-loader-step__lbl">Conectando sensores</span></li>
+            <li class="ea-loader-step"><span class="ea-loader-step__num">02</span><span class="ea-loader-step__lbl">Calibrando aire</span></li>
+            <li class="ea-loader-step"><span class="ea-loader-step__num">03</span><span class="ea-loader-step__lbl">Cargando ambiente</span></li>
+        </ol>
     </div>
 </div>
 

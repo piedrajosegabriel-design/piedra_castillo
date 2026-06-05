@@ -184,7 +184,7 @@ class PanelController extends BaseController
     // =========================================================================
     public function guardarMedicion()
     {
-        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
             return $redirect;
         }
 
@@ -208,7 +208,7 @@ class PanelController extends BaseController
     // =========================================================================
     public function cambiarModo()
     {
-        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
             return $redirect;
         }
 
@@ -230,7 +230,7 @@ class PanelController extends BaseController
     // =========================================================================
     public function cambiarActuador()
     {
-        if ($redirect = $this->redireccionarSiFaltaAmbiente()) {
+        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
             return $redirect;
         }
 
@@ -449,7 +449,7 @@ class PanelController extends BaseController
     // Sólo permite ejecutar la acción si el usuario tiene al menos un
     // dispositivo. Si no, lo manda al panel para ver la pantalla de bienvenida.
     // =========================================================================
-    private function redireccionarSiFaltaAmbiente(): ?RedirectResponse
+    private function redireccionarSiFaltaDispositivo(): ?RedirectResponse
     {
         $cantidad = (new \App\Models\DeviceModel())
             ->where('user_id', $this->usuarioActual())

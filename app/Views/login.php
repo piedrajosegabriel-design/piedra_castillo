@@ -98,8 +98,9 @@
                     </div>
 
                     <p class="ea-hint">
-                        Las credenciales se validan en servidor. Si es tu primera vez,
-                        el siguiente paso será elegir el ambiente.
+                        Las credenciales se validan en servidor. Al entrar vas directo
+                        a tu panel; si todavía no tenés un dispositivo, te guiamos para
+                        vincularlo o probar la demo.
                     </p>
 
                     <button type="submit" class="ea-button ea-button-primary ea-button-block" id="botonLogin">
