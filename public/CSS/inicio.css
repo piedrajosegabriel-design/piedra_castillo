@@ -4,6 +4,28 @@
    Estilos de navbar compartidos (nav-links, mobile-nav) → eden-brand.css
    ===================================================================== */
 
+/* ---------- ScrollSmoother: navbar fijo fuera del wrapper ------------ *
+   Solo en la landing (.ea-landing). El navbar sticky no puede vivir dentro
+   del #smooth-content (que GSAP transforma), así que lo sacamos del wrapper
+   y lo fijamos. El padding-top del contenido reserva su altura, replicando
+   exactamente el layout original (hero = 100svh - nav). */
+.ea-landing .ea-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.ea-landing #smooth-content {
+    padding-top: var(--ea-nav-h, 72px);
+}
+
+/* GSAP fija #smooth-wrapper (inset:0) cuando ScrollSmoother está activo.
+   Sin smoother (reduced-motion / sin GSAP) se comporta como bloque normal. */
+.ea-landing #smooth-wrapper {
+    position: relative;
+}
+
 /* ---------- Hero: viewport-exact + extras animados ------------------ */
 .ea-hero {
     isolation: isolate;

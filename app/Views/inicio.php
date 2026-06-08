@@ -76,6 +76,8 @@ ob_start(); ?>
         </div>
     </nav>
 
+    <div id="smooth-wrapper">
+    <div id="smooth-content">
     <main>
         <section class="ea-hero" id="inicio">
             <span class="ea-hero-glow" aria-hidden="true"></span>
@@ -789,6 +791,8 @@ ob_start(); ?>
     </main>
 
     <?= view('partials/footer') ?>
+    </div><!-- /#smooth-content -->
+    </div><!-- /#smooth-wrapper -->
 </div>
 
 <?php
@@ -799,6 +803,11 @@ ob_start(); ?>
     };
 ?>
 <script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<!-- GSAP gratuito (incluye ScrollSmoother) — scroll suave + animaciones por scroll -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollSmoother.min.js"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/eden-scroll.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script>
 /* Video "Ingeniería interna": reproduce solo cuando está en pantalla.
