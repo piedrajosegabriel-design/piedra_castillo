@@ -3,14 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Services\DeviceProvisioningService;
-use App\Services\EnvironmentPresetService;
 use CodeIgniter\HTTP\RedirectResponse;
 
 class AccesoController extends BaseController
 {
-    private const AMBIENTE_PERSONALIZADO = 'personalizable';
-
     public function inicio(): string
     {
         return view('inicio');
@@ -136,17 +132,6 @@ class AccesoController extends BaseController
         return $this->redirigirDespuesDelLogin((int) $usuario['id']);
     }
 
-    public function seleccionAmbiente(): string|RedirectResponse
-    {
-        if ((new DeviceProvisioningService())->hasConfiguredSpace($this->usuarioActual())) {
-            return redirect()->to('/panel');
-        }
-
-        return view('seleccion_ambiente', [
-            'presets' => (new EnvironmentPresetService())->getPresets(),
-        ]);
-    }
-
     public function guardarRegistro()
     {
         $datos = $this->leerDatosRegistro();
@@ -164,28 +149,7 @@ class AccesoController extends BaseController
         $usuarios->crearUsuario($datos);
 
         return redirect()->to('/login')
-            ->with('success', 'Cuenta creada correctamente. Inicia sesion y elige tu ambiente.');
-    }
-
-    public function guardarAmbiente()
-    {
-        $userId              = $this->usuarioActual();
-        $provisioningService = new DeviceProvisioningService();
-
-        if ($provisioningService->hasConfiguredSpace($userId)) {
-            return redirect()->to('/panel');
-        }
-
-        $datos = $this->leerDatosAmbiente();
-
-        if ($redirect = $this->validarFormularioAmbiente($datos)) {
-            return $redirect;
-        }
-
-        $provisioningService->ensureUserSetup($userId, $datos);
-
-        return redirect()->to('/panel')
-            ->with('success', 'Ambiente configurado correctamente.');
+            ->with('success', 'Cuenta creada correctamente. Inicia sesion para entrar al panel.');
     }
 
     public function logout()
@@ -215,19 +179,6 @@ class AccesoController extends BaseController
         ];
     }
 
-    private function reglasAmbiente(): array
-    {
-        return [
-            'environment_type' => 'required|in_list[oficina,aula,hogar,dormitorio,personalizable]',
-            'custom_name'      => 'permit_empty|max_length[120]',
-            'min_temperature'  => 'permit_empty|decimal',
-            'max_temperature'  => 'permit_empty|decimal',
-            'min_humidity'     => 'permit_empty|decimal',
-            'max_humidity'     => 'permit_empty|decimal',
-            'max_co2'          => 'permit_empty|integer',
-        ];
-    }
-
     private function mensajesRegistro(): array
     {
         return [
@@ -249,7 +200,7 @@ class AccesoController extends BaseController
             return null;
         }
 
-        return $this->redirigirConInputYDato('/login', 'error', 'Completa tu usuario o correo y la contrasena.');
+        return $this->redirigirConInputYDato('/login', 'error', 'Completa tu usuario o correo y la contraseña.');
     }
 
     private function validarCredencialesLogin(?array $usuario, string $password): ?RedirectResponse
@@ -298,31 +249,11 @@ class AccesoController extends BaseController
         ]);
     }
 
-    private function validarFormularioAmbiente(array $datos): ?RedirectResponse
-    {
-        if (! $this->validateData($datos, $this->reglasAmbiente())) {
-            return $this->redirigirConInputYDato('/panel/ambiente', 'errors', $this->validator->getErrors());
-        }
-
-        $errores = $this->validarAmbientePersonalizado($datos);
-
-        if ($errores === []) {
-            return null;
-        }
-
-        return $this->redirigirConInputYDato('/panel/ambiente', 'errors', $errores);
-    }
-
     private function redirigirConInputYDato(string $ruta, string $clave, mixed $valor): RedirectResponse
     {
         return redirect()->to($ruta)
             ->withInput()
             ->with($clave, $valor);
-    }
-
-    private function redirigirConDato(string $ruta, string $clave, mixed $valor): RedirectResponse
-    {
-        return redirect()->to($ruta)->with($clave, $valor);
     }
 
     private function leerDatosLogin(): array
@@ -345,77 +276,6 @@ class AccesoController extends BaseController
         ];
     }
 
-    private function leerDatosAmbiente(): array
-    {
-        $datos = [
-            'environment_type' => (string) $this->request->getPost('environment_type'),
-            'custom_name'      => trim((string) $this->request->getPost('custom_name')),
-            'min_temperature'  => trim((string) $this->request->getPost('min_temperature')),
-            'max_temperature'  => trim((string) $this->request->getPost('max_temperature')),
-            'min_humidity'     => trim((string) $this->request->getPost('min_humidity')),
-            'max_humidity'     => trim((string) $this->request->getPost('max_humidity')),
-            'max_co2'          => trim((string) $this->request->getPost('max_co2')),
-        ];
-
-        if (($datos['environment_type'] ?? '') !== self::AMBIENTE_PERSONALIZADO) {
-            $datos['custom_name']      = '';
-            $datos['min_temperature']  = '';
-            $datos['max_temperature']  = '';
-            $datos['min_humidity']     = '';
-            $datos['max_humidity']     = '';
-            $datos['max_co2']          = '';
-        }
-
-        return $datos;
-    }
-
-    private function validarAmbientePersonalizado(array $datos): array
-    {
-        if (($datos['environment_type'] ?? '') !== self::AMBIENTE_PERSONALIZADO) {
-            return [];
-        }
-
-        $errores = [];
-
-        if ($datos['custom_name'] === '') {
-            $errores['custom_name'] = 'Indica un nombre para el ambiente personalizable.';
-        }
-
-        $this->validarRangoOpcional($datos, 'min_temperature', 'max_temperature', 'temperature_range', 'temperatura', $errores);
-        $this->validarRangoOpcional($datos, 'min_humidity', 'max_humidity', 'humidity_range', 'humedad', $errores);
-
-        if ($datos['max_co2'] !== '' && (int) $datos['max_co2'] <= 0) {
-            $errores['max_co2'] = 'El limite de CO2 debe ser mayor que cero.';
-        }
-
-        return $errores;
-    }
-
-    private function validarRangoOpcional(
-        array $datos,
-        string $minKey,
-        string $maxKey,
-        string $errorKey,
-        string $label,
-        array &$errores
-    ): void {
-        $minimo = $datos[$minKey] ?? '';
-        $maximo = $datos[$maxKey] ?? '';
-
-        if ($minimo === '' && $maximo === '') {
-            return;
-        }
-
-        if ($minimo === '' || $maximo === '') {
-            $errores[$errorKey] = 'Completa el rango de ' . $label . ' o deja ambos valores vacios.';
-            return;
-        }
-
-        if ((float) $minimo >= (float) $maximo) {
-            $errores[$errorKey] = 'El valor minimo de ' . $label . ' debe ser menor que el maximo.';
-        }
-    }
-
     private function iniciarSesion(array $usuario): void
     {
         session()->regenerate(true);
@@ -424,10 +284,5 @@ class AccesoController extends BaseController
             'user_name'    => $usuario['nombre'],
             'is_logged_in' => true,
         ]);
-    }
-
-    private function usuarioActual(): int
-    {
-        return (int) session()->get('user_id');
     }
 }

@@ -15,10 +15,12 @@ $routes->get('portfolio.php', 'PortfolioController::index');
 $routes->group('', ['filter' => 'guest'], static function ($routes) {
     $routes->get('login', 'AccesoController::login');
     $routes->post('login', 'AccesoController::validarLogin');
+
     $routes->get('registro', 'AccesoController::registro');
     $routes->post('registro', 'AccesoController::guardarRegistro');
     $routes->get('register', 'AccesoController::registro');
     $routes->post('register', 'AccesoController::guardarRegistro');
+    
     $routes->get('recuperar', 'AccesoController::recuperar');
     $routes->post('recuperar', 'AccesoController::procesarRecuperacion');
     $routes->get('restablecer/(:any)', 'AccesoController::restablecer/$1');
@@ -28,8 +30,6 @@ $routes->group('', ['filter' => 'guest'], static function ($routes) {
 $routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);
 
 $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
-    $routes->get('ambiente', 'AccesoController::seleccionAmbiente');
-    $routes->post('ambiente', 'AccesoController::guardarAmbiente');
     $routes->get('', 'PanelController::index');
     $routes->get('perfil', 'PanelController::perfil');
     $routes->post('perfil', 'PanelController::actualizarPerfil');

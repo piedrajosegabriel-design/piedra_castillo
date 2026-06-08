@@ -359,25 +359,32 @@ body.ea-body {
    de modo que el mismo SVG se adapta al tono y al modo oscuro.
    --ea-elogo-a → inicio (profundo)
    --ea-elogo-b → medio (verde)
-   --ea-elogo-c → final (aqua / aire) */
+   --ea-elogo-c → final (aqua / aire)
+   --ea-elogo-glow → halo aqua opcional (modo oscuro) */
 .ea-logo-mark--e {
     --ea-elogo-a: var(--ea-primary-dark);  /* #143326 */
     --ea-elogo-b: var(--ea-primary);       /* #2f6b4f */
     --ea-elogo-c: #3fae97;                  /* aqua-verde */
+    --ea-elogo-glow: transparent;
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s var(--ea-ease-out);
 }
 
-/* Tono "ink": adaptable a claro / oscuro */
+/* Tono "ink": en claro mantiene el verde profundo; en oscuro brilla en aqua. */
 :root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-mark--e {
-    --ea-elogo-a: var(--eden-100);
-    --ea-elogo-b: var(--ea-primary-soft);  /* #a9cdb6 */
-    --ea-elogo-c: var(--ea-air);           /* #8fd6c8 */
+    --ea-elogo-a: #F6F4EC;                  /* crema brillante */
+    --ea-elogo-b: #8FD6C8;                  /* aqua vibrante */
+    --ea-elogo-c: #5BE5B6;                  /* aqua-mint luminoso */
+    filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
 }
 
-/* Tono "cream": pensado para fondos oscuros (no depende del tema) */
+/* Tono "cream": pensado para fondos oscuros (no depende del tema).
+   Trazo claro con final aqua intenso + halo sutil para que respire. */
 .ea-logo--tone-cream .ea-logo-mark--e {
-    --ea-elogo-a: var(--eden-100);
-    --ea-elogo-b: var(--eden-300);
-    --ea-elogo-c: var(--ea-air);
+    --ea-elogo-a: #F6F4EC;
+    --ea-elogo-b: #BCE9DC;
+    --ea-elogo-c: #5BE5B6;
+    filter: drop-shadow(0 0 10px rgba(143, 214, 200, 0.30));
 }
 
 /* Tono "moss": variante monocroma verde */
