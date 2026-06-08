@@ -127,7 +127,7 @@ class UserModel extends Model
         return $this->update($userId, [
             'reset_token'      => null,
             'reset_expires_at' => null,
-        ]);
+        ]); 
     }
 
     private function hashToken(string $token): string

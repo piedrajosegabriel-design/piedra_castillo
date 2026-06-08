@@ -200,7 +200,7 @@ class AccesoController extends BaseController
             return null;
         }
 
-        return $this->redirigirConInputYDato('/login', 'error', 'Completa tu usuario o correo y la contrasena.');
+        return $this->redirigirConInputYDato('/login', 'error', 'Completa tu usuario o correo y la contraseña.');
     }
 
     private function validarCredencialesLogin(?array $usuario, string $password): ?RedirectResponse
