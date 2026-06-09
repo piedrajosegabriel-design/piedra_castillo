@@ -503,6 +503,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function syncExperience() {
+            // Con ScrollSmoother activo, el pin + scrub del video lo maneja
+            // inicio-gsap.js (ScrollTrigger). Acá bailamos para no pelear por
+            // currentTime ni por la visibilidad de los textos.
+            if (window.__eaSmoother) return;
             var vh = window.innerHeight || document.documentElement.clientHeight;
             var scrollable = expSectionH - vh;
             if (scrollable <= 0) return;
