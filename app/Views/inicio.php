@@ -31,7 +31,6 @@ ob_start(); ?>
     ]) ?>
 </head>
 <body class="ea-body ea-landing">
-<div class="ea-shell">
     <?= view('partials/navbar', [
         'subtitle'  => 'Monitoreo ambiental',
         'conSesion' => $conSesion,
@@ -75,6 +74,17 @@ ob_start(); ?>
             <?php endif; ?>
         </div>
     </nav>
+
+    <!-- Indicador de progreso de scroll (reemplaza el scrollbar nativo).
+         Vertical 2px a la derecha (desktop) / horizontal arriba (mobile).
+         Va FUERA del #smooth-wrapper porque es position:fixed. -->
+    <div class="ea-scrollbar" aria-hidden="true">
+        <span class="ea-scrollbar-fill" data-ea-scroll-progress></span>
+    </div>
+
+<div id="smooth-wrapper">
+<div id="smooth-content">
+<div class="ea-shell">
 
     <main>
         <section class="ea-hero" id="inicio">
@@ -208,11 +218,11 @@ ob_start(); ?>
 
         <?php
             // Cache-bust automático según mtime de cada archivo
-            $eaMp4Path  = FCPATH . 'videos/eden-air-scroll-optimized.mp4';
+            $eaMp4Path  = FCPATH . 'videos/eden-air-scroll-seek.mp4';
             $eaWebmPath = FCPATH . 'videos/eden-air-scroll-optimized.webm';
             $eaMp4Ver   = is_file($eaMp4Path)  ? filemtime($eaMp4Path)  : time();
             $eaWebmVer  = is_file($eaWebmPath) ? filemtime($eaWebmPath) : time();
-            $eaMp4Url   = base_url('videos/eden-air-scroll-optimized.mp4')  . '?v=' . $eaMp4Ver;
+            $eaMp4Url   = base_url('videos/eden-air-scroll-seek.mp4')  . '?v=' . $eaMp4Ver;
             $eaWebmUrl  = base_url('videos/eden-air-scroll-optimized.webm') . '?v=' . $eaWebmVer;
             $eaPosterPath = FCPATH . 'videos/eden-air-poster.jpg';
         ?>
@@ -789,7 +799,9 @@ ob_start(); ?>
     </main>
 
     <?= view('partials/footer') ?>
-</div>
+</div><!-- /.ea-shell -->
+</div><!-- /#smooth-content -->
+</div><!-- /#smooth-wrapper -->
 
 <?php
     $eaJsBust = function (string $relativePath): string {
@@ -798,8 +810,13 @@ ob_start(); ?>
         return base_url($relativePath) . '?v=' . $v;
     };
 ?>
+<!-- GSAP + ScrollTrigger + ScrollSmoother (CDN cdnjs) — todos libres desde GSAP 3.13 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/inicio-gsap.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script>
 /* Video "Ingeniería interna": reproduce solo cuando está en pantalla.
    Ahorra CPU/batería y respeta prefers-reduced-motion. */
