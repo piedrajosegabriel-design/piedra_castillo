@@ -2317,3 +2317,83 @@ body.dashboard-body {
    El problema: el navegador re-mapeaba el scroll a la nueva instantánea y
    movía la posición. Lo cambiamos por transiciones CSS de colores sobre el
    shell — ver `.ea-body`/cards más abajo — que NO afectan el scroll. */
+
+/* ============================================================
+   Barra de scroll moderna flotante (EdenAir)
+   La inyecta JS/ea-scrollbar.js en la landing y el panel. Thumb fino tipo
+   píldora, redondeado, sin track ni marco; aparece al scrollear/hover y se
+   desvanece al quedar quieto. Es arrastrable.
+
+   El scrollbar nativo del documento sólo se oculta cuando esta barra está
+   activa (html.ea-floatbar-on), para no afectar al resto de páginas. El
+   scrollbar interno del sidebar del panel queda intacto (su selector es
+   propio: .ea-sidebar::-webkit-scrollbar).
+   ============================================================ */
+html.ea-floatbar-on { scrollbar-width: none; }                  /* Firefox */
+html.ea-floatbar-on::-webkit-scrollbar { width: 0; height: 0; } /* WebKit  */
+
+.ea-floatbar {
+    position: fixed;
+    top: 8px;
+    right: 4px;
+    bottom: 8px;
+    width: 12px;             /* zona de agarre; el thumb visible es más fino */
+    z-index: 90;             /* sobre navbar/menús (≤60), bajo el loader (100) */
+    pointer-events: none;    /* el track nunca bloquea clicks */
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+.ea-floatbar.is-active { opacity: 1; }
+
+.ea-floatbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 2px;
+    width: 4px;
+    min-height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--ea-air, #8fd6c8) 92%, transparent),
+        color-mix(in srgb, var(--ea-primary, #2f6b4f) 92%, transparent)
+    );
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 2px 10px -3px color-mix(in srgb, var(--ea-primary, #2f6b4f) 55%, transparent);
+    pointer-events: auto;    /* sólo el thumb captura el arrastre */
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+    transition: width 0.18s ease, right 0.18s ease, background 0.2s ease;
+}
+.ea-floatbar-thumb:hover,
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    width: 7px;
+    right: 0;
+}
+.ea-floatbar.is-dragging .ea-floatbar-thumb { cursor: grabbing; }
+
+:root[data-theme="dark"] .ea-floatbar-thumb {
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--ea-air, #8fd6c8) 96%, transparent),
+        color-mix(in srgb, var(--eden-500, #4a7a55) 94%, transparent)
+    );
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 2px 12px -3px color-mix(in srgb, var(--ea-air, #8fd6c8) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-floatbar,
+    .ea-floatbar-thumb { transition: none; }
+    .ea-floatbar.is-active { opacity: 0.85; }
+}
+
+/* Táctil: dejamos el scroll nativo del sistema (overlay y autodesvanecido).
+   Ocultamos la barra custom y restauramos el scrollbar nativo. */
+@media (hover: none) and (pointer: coarse) {
+    .ea-floatbar { display: none; }
+    html.ea-floatbar-on { scrollbar-width: auto; }
+    html.ea-floatbar-on::-webkit-scrollbar { width: auto; height: auto; }
+}

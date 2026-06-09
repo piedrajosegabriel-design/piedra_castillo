@@ -2598,57 +2598,9 @@ body.ea-has-smooth #smooth-content {
     padding-top: var(--ea-nav-h, 72px);
 }
 
-/* ============================================================
-   Indicador de progreso de scroll (reemplaza el scrollbar nativo)
-   Este CSS solo se carga en la landing, así que tocar html/body es seguro.
-   ============================================================ */
-html { scrollbar-width: none; }                 /* Firefox */
-html::-webkit-scrollbar { width: 0; height: 0; } /* Chrome / Safari / Edge */
-body.ea-landing { -ms-overflow-style: none; }    /* Edge/IE legacy */
-
-.ea-scrollbar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 2px;
-    height: 100vh;
-    height: 100svh;
-    z-index: 60;                  /* por encima de navbar (40) / menús (45/50) */
-    background: color-mix(in srgb, var(--ea-primary) 14%, transparent);
-    pointer-events: none;         /* nunca bloquea clicks */
-}
-.ea-scrollbar-fill {
-    --ea-sp: 0;                   /* 0 → 1; lo anima GSAP con scrub */
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform: scaleY(var(--ea-sp));
-    transform-origin: top center;
-    background: linear-gradient(to bottom, var(--ea-air), var(--ea-primary));
-    will-change: transform;
-}
-
-/* Mobile: barra de lectura horizontal, arriba del todo */
-@media (max-width: 760px) {
-    .ea-scrollbar {
-        top: 0;
-        left: 0;
-        right: auto;
-        width: 100%;
-        height: 3px;
-    }
-    .ea-scrollbar-fill {
-        transform: scaleX(var(--ea-sp));
-        transform-origin: left center;
-        background: linear-gradient(to right, var(--ea-air), var(--ea-primary));
-    }
-}
-
-/* Reduced-motion: la línea aparece estática (llena), sin animar.
-   GSAP tampoco corre (gate por matchMedia), así que --ea-sp queda fijo. */
-@media (prefers-reduced-motion: reduce) {
-    .ea-scrollbar-fill { --ea-sp: 1; }
-}
+/* La barra de scroll moderna (thumb flotante) y el ocultado del scrollbar
+   nativo se definen en eden-brand.css (compartido landing + panel) y los
+   maneja JS/ea-scrollbar.js. */
 
 /* Con ScrollSmoother activo, el stage del video deja de ser sticky
    (sticky se rompe dentro del transform); lo pinea ScrollTrigger. */

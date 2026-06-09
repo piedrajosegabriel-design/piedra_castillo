@@ -5,6 +5,25 @@
 
 .ea-portfolio { overflow-x: clip; }
 
+/* ---------- ScrollSmoother: navbar fijo fuera del wrapper ------------
+   El navbar (sticky por defecto) no puede vivir dentro del #smooth-content
+   que GSAP transforma, así que en el portfolio lo sacamos del wrapper y lo
+   fijamos siempre; el padding-top del contenido reserva su altura. Sin
+   smoother (reduced-motion / sin GSAP) el layout es idéntico. */
+.ea-portfolio .ea-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+.ea-portfolio #smooth-content {
+    padding-top: var(--ea-nav-h, 80px);
+}
+.ea-portfolio #smooth-wrapper {
+    position: relative;
+    width: 100%;
+}
+
 .ea-pf { position: relative; }
 
 /* Sutil grilla técnica que vive bajo todo el portfolio. */

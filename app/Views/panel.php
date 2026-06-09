@@ -97,11 +97,8 @@ $statusMeta = static function (string $s): array {
         'devicesCount' => count($panel['devices_list'] ?? []),
     ]) ?>
 
-    <!-- =========================== MAIN =========================== -->
-    <main class="ea-main">
-
-        <!-- =========================== HEADER =========================== -->
-        <header class="dashboard-header ea-header">
+    <!-- =========================== HEADER (fuera del smooth-wrapper) =========================== -->
+    <header class="dashboard-header ea-header">
             <button type="button" class="ea-burger" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú">
                 <span></span><span></span><span></span>
             </button>
@@ -162,7 +159,12 @@ $statusMeta = static function (string $s): array {
                     <small><?= esc((string) ($view['modeLabel'] ?? '')) ?></small>
                 </span>
             </div>
-        </header>
+    </header>
+
+    <!-- smooth-wrapper: ScrollSmoother transforma #smooth-content para dar el scroll suave -->
+    <div id="smooth-wrapper">
+        <div id="smooth-content">
+            <main class="ea-main">
 
         <!-- =========================== CONTENT =========================== -->
         <div class="ea-content">
@@ -574,12 +576,21 @@ $statusMeta = static function (string $s): array {
             </details>
 
         </div>
-    </main>
+            </main>
+        </div><!-- /#smooth-content -->
+    </div><!-- /#smooth-wrapper -->
 
     <div class="ea-sidebar-backdrop" data-sidebar-backdrop></div>
 </div>
 
 <script src="<?= base_url('JS/tema.js') ?>"></script>
 <script src="<?= base_url('JS/dashboard.js') ?>"></script>
+<!-- GSAP · ScrollSmoother (scroll suave) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="<?= base_url('JS/dashboard-gsap.js') ?>"></script>
+<!-- Barra de scroll moderna flotante (misma que la landing) -->
+<script src="<?= base_url('JS/ea-scrollbar.js') ?>"></script>
 </body>
 </html>

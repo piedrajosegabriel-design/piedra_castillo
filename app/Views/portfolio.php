@@ -39,7 +39,6 @@ $sitemap = [
     ]) ?>
 </head>
 <body class="ea-body ea-landing ea-portfolio" data-ea-portfolio>
-<div class="ea-shell">
     <?= view('partials/navbar', [
         'subtitle'        => 'Portfolio del proyecto',
         'conSesion'       => $conSesion,
@@ -83,6 +82,12 @@ $sitemap = [
         </div>
     </nav>
 
+<!-- Scroll suave (ScrollSmoother): el navbar y los menús fixed quedan FUERA
+     del #smooth-wrapper. La barra de scroll moderna la inyecta
+     JS/ea-scrollbar.js, también fuera del wrapper. -->
+<div id="smooth-wrapper">
+<div id="smooth-content">
+<div class="ea-shell">
     <main class="ea-pf">
         <!-- ============================================================
              00 · Página principal — Hero inmersivo
@@ -1266,7 +1271,9 @@ $sitemap = [
     </main>
 
     <?= view('partials/footer') ?>
-</div>
+</div><!-- /.ea-shell -->
+</div><!-- /#smooth-content -->
+</div><!-- /#smooth-wrapper -->
 
 <?php
     $eaJsBust = static function (string $relativePath): string {
@@ -1275,8 +1282,14 @@ $sitemap = [
         return base_url($relativePath) . '?v=' . $v;
     };
 ?>
+<!-- GSAP + ScrollTrigger + ScrollSmoother (CDN cdnjs) — todos libres desde GSAP 3.13 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/portfolio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/portfolio-gsap.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/ea-scrollbar.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 </body>
 </html>

@@ -2752,9 +2752,77 @@ body.dashboard-body { overflow-x: hidden; }
    ===================================================================== */
 @media print {
     .ea-sidebar, .ea-header, .dashboard-loader { display: none !important; }
-    .ea-dashboard { grid-template-columns: 1fr; }
+    .ea-dashboard #smooth-wrapper { margin-left: 0; }
     .ea-content { padding: 12px; }
     .ea-card, .ea-hero, .ea-sensor-card { break-inside: avoid; box-shadow: none; }
+}
+
+/* =====================================================================
+   LAYOUT FIJO — sidebar y header siempre position:fixed
+   Reemplaza el layout de CSS grid. Necesario para que ScrollSmoother
+   funcione: los elementos sticky/fixed no pueden vivir dentro de
+   #smooth-content porque el transform de GSAP los rompe.
+   ===================================================================== */
+
+/* Shell: ya no necesita el grid — sidebar y header salen del flujo */
+.ea-dashboard { display: block; }
+.ea-dashboard.sidebar-closed { grid-template-columns: unset; }
+
+/* ---- Sidebar: fija en TODAS las resoluciones ----------------------- */
+.ea-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--ead-sb-w);
+    z-index: 50;
+    transition: width 0.25s ease, transform 0.25s ease;
+}
+.ea-dashboard.sidebar-closed .ea-sidebar { width: var(--ead-sb-w-collapsed); }
+
+/* ---- Header: fijo, desplazado por el ancho del sidebar ------------- */
+.ea-header,
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: var(--ead-sb-w);
+    right: 0;
+    transition: left 0.25s ease;
+}
+.ea-dashboard.sidebar-closed .ea-header,
+.ea-dashboard.sidebar-closed .dashboard-header { left: var(--ead-sb-w-collapsed); }
+
+/* ---- Smooth wrapper: margen izquierdo compensa el sidebar fijo ----- */
+.ea-dashboard #smooth-wrapper {
+    margin-left: var(--ead-sb-w);
+    min-height: 100vh;
+    transition: margin-left 0.25s ease;
+}
+.ea-dashboard.sidebar-closed #smooth-wrapper { margin-left: var(--ead-sb-w-collapsed); }
+
+/* El padding-top lo maneja dashboard-gsap.js dinámicamente (altura real
+   del header). El valor CSS sirve de fallback antes de que cargue el JS. */
+.ea-dashboard #smooth-content { padding-top: var(--ead-header-h); }
+
+/* ea-main ya no contiene el header → no necesita flex-column */
+.ea-main { display: block; }
+
+/* ---- Mobile (≤960px) ----------------------------------------------- */
+@media (max-width: 960px) {
+    .ea-dashboard { display: block; }
+
+    /* Header cubre todo el ancho en mobile */
+    .ea-header,
+    .dashboard-header { left: 0; transition: none; }
+    .ea-dashboard.sidebar-closed .ea-header,
+    .ea-dashboard.sidebar-closed .dashboard-header { left: 0; }
+
+    /* Smooth wrapper sin margen en mobile */
+    .ea-dashboard #smooth-wrapper { margin-left: 0; transition: none; }
+    .ea-dashboard.sidebar-closed #smooth-wrapper { margin-left: 0; }
+
+    /* Sidebar mobile: ancho fijo, solo anima transform (deslizar desde la izq.) */
+    .ea-sidebar { width: 284px; transition: transform 0.25s ease; }
+    .ea-dashboard.sidebar-closed .ea-sidebar { width: 284px; }
 }
 
 /* =====================================================================

@@ -39,10 +39,10 @@ class AccesoController extends BaseController
         $usuario  = $usuarios->buscarParaLogin($email);
 
         if ($usuario) {
-            $token     = bin2hex(random_bytes(32));
-            $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-            $enlace    = site_url('restablecer/' . $token);
-            $nombre    = (string) ($usuario['nombre'] ?? 'Usuario');
+            $token     = bin2hex(random_bytes(32)); // Token Seguro
+            $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes')); // Vence en 15 min
+            $enlace    = site_url('restablecer/' . $token); //Link enviado por email
+            $nombre    = (string) ($usuario['nombre'] ?? 'Usuario'); // Nombre o valor por defecto
 
             $usuarios->guardarToken((int) $usuario['id'], $token, $expiresAt);
 

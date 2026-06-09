@@ -75,19 +75,12 @@ ob_start(); ?>
         </div>
     </nav>
 
-    <!-- Indicador de progreso de scroll (reemplaza el scrollbar nativo).
-         Vertical 2px a la derecha (desktop) / horizontal arriba (mobile).
-         Va FUERA del #smooth-wrapper porque es position:fixed. -->
-    <div class="ea-scrollbar" aria-hidden="true">
-        <span class="ea-scrollbar-fill" data-ea-scroll-progress></span>
-    </div>
-
+<!-- Scroll suave (ScrollSmoother): el navbar y los menús fixed van FUERA
+     del #smooth-wrapper. La barra de scroll moderna la inyecta
+     JS/ea-scrollbar.js, también fuera del wrapper. -->
 <div id="smooth-wrapper">
 <div id="smooth-content">
 <div class="ea-shell">
-
-    <div id="smooth-wrapper">
-    <div id="smooth-content">
     <main>
         <section class="ea-hero" id="inicio">
             <span class="ea-hero-glow" aria-hidden="true"></span>
@@ -801,7 +794,9 @@ ob_start(); ?>
     </main>
 
     <?= view('partials/footer') ?>
-</div>
+</div><!-- /.ea-shell -->
+</div><!-- /#smooth-content -->
+</div><!-- /#smooth-wrapper -->
 
 <?php
     $eaJsBust = function (string $relativePath): string {
@@ -815,13 +810,9 @@ ob_start(); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<!-- GSAP gratuito (incluye ScrollSmoother) — scroll suave + animaciones por scroll -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollSmoother.min.js"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/eden-scroll.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script src="<?= htmlspecialchars($eaJsBust('JS/inicio-gsap.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars($eaJsBust('JS/ea-scrollbar.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <script>
 /* Video "Ingeniería interna": reproduce solo cuando está en pantalla.
    Ahorra CPU/batería y respeta prefers-reduced-motion. */

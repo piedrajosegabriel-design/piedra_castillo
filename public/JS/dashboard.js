@@ -74,6 +74,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function scrollToTarget(target) {
         if (!target) return;
+        if (window.__eaSmoother) {
+            var y = window.__eaSmoother.offset(target, "top top") - getHeaderOffset();
+            if (y < 0) y = 0;
+            window.__eaSmoother.scrollTo(y, !reducedMotionQuery.matches);
+            return;
+        }
         var rect = target.getBoundingClientRect();
         var top = window.scrollY + rect.top - getHeaderOffset();
         if (top < 0) top = 0;
@@ -336,7 +342,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (Number.isNaN(scrollTop)) return;
 
         window.setTimeout(function () {
-            window.scrollTo(0, scrollTop);
+            if (window.__eaSmoother) {
+                window.__eaSmoother.scrollTop(scrollTop);
+            } else {
+                window.scrollTo(0, scrollTop);
+            }
         }, 0);
     }
 

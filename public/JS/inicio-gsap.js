@@ -85,23 +85,8 @@
             // Fase de captura → corre antes que el listener (bubble) de inicio.js.
             document.addEventListener("click", onAnchorCapture, true);
 
-            // ---- Barra de progreso de scroll (reemplaza el scrollbar nativo) ----
-            // Anima la custom property --ea-sp de 0 a 1 con scrub. El CSS la usa
-            // como scaleY (desktop, línea vertical derecha) o scaleX (mobile,
-            // barra horizontal arriba), así un solo tween cubre ambas orientaciones.
-            var progressFill = document.querySelector("[data-ea-scroll-progress]");
-            if (progressFill && window.ScrollTrigger) {
-                gsap.to(progressFill, {
-                    "--ea-sp": 1,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: content,      // #smooth-content abarca todo el scroll
-                        start: "top top",
-                        end: "bottom bottom",
-                        scrub: true
-                    }
-                });
-            }
+            // La barra de scroll moderna (thumb flotante) la maneja
+            // JS/ea-scrollbar.js, que funciona con y sin ScrollSmoother.
 
             // ---- Video "Experience": pin + scrub con ScrollTrigger ----
             // Reemplaza el sticky + scrollY de inicio.js (que se rompe con el
