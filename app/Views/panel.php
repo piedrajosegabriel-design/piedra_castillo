@@ -11,14 +11,20 @@
 </head>
 <body class="dashboard-body ea-body ea-dashboard-body dashboard-loading">
 <?php
-/**
- * Vista del panel principal.
- *
- * Todo el cálculo (tonos, sparkline, valores actuales, defaults para datos
- * faltantes, reglas de automatización visibles, etc.) está en
- * App\Services\PanelService::obtenerVistaPanel(). Esta vista sólo recorre el
- * array y dibuja.
- */
+/* =============================================================================
+   VISTA: panel.php — DASHBOARD del usuario (ruta /panel, requiere sesión)
+   CSS:  public/CSS/dashboard.css (+ eden-brand.css global)
+   JS:   dashboard.js (loader, sidebar, toggles) · dashboard-gsap.js
+         (scroll suave + reveals) · tema.js · ea-scrollbar.js
+   IMPORTANTE: esta vista NO calcula nada. Todo (tonos, sparkline, valores,
+   defaults si faltan datos, reglas visibles) viene cocinado de
+   App\Services\PanelService::obtenerVistaPanel() en $panel['view'].
+   Acá solo se recorre el array y se dibuja.
+   ESTRUCTURA de la página (en orden):
+     loader → sidebar → header → flashes → banner de vinculación →
+     hero resumen → sensores → estado del sistema → actuadores +
+     automatizaciones → lecturas (tabla) → info técnica (details)
+   ============================================================================= */
 $panel  = (isset($panel) && is_array($panel)) ? $panel : [];
 $view   = (isset($panel['view']) && is_array($panel['view'])) ? $panel['view'] : [];
 $api    = (isset($panel['api']) && is_array($panel['api'])) ? $panel['api'] : ($view['api'] ?? []);
@@ -37,6 +43,10 @@ $statusMeta = static function (string $s): array {
 };
 ?>
 
+<!-- ===== Fallback SIN JavaScript =====
+     Este <style> vive acá adentro a propósito: solo aplica si el navegador
+     no ejecuta JS (<noscript>). Oculta el loader y muestra el dashboard
+     directo. NO moverlo a dashboard.css: perdería la condición noscript. -->
 <noscript>
     <style>
         .dashboard-loading .dashboard-loader { display: none; }
@@ -44,6 +54,11 @@ $statusMeta = static function (string $s): array {
     </style>
 </noscript>
 
+<!-- ===== ESTRUCTURA: loader de entrada =====
+     Pantalla de carga con el logo animado y 3 pasos. -->
+<!-- ===== ANIMACIÓN (CSS + JS): los anillos/halo se animan por CSS
+     (dashboard.css) y dashboard.js la oculta cuando la página está lista
+     (saca la clase dashboard-loading del body). -->
 <div class="ea-loader dashboard-loader" data-dashboard-loader role="status" aria-live="polite" aria-label="Preparando tu ambiente inteligente">
     <div class="ea-loader-pattern" aria-hidden="true"></div>
     <div class="ea-loader-grain" aria-hidden="true"></div>
@@ -161,7 +176,9 @@ $statusMeta = static function (string $s): array {
             </div>
     </header>
 
-    <!-- smooth-wrapper: ScrollSmoother transforma #smooth-content para dar el scroll suave -->
+    <!-- ===== ANIMACIÓN (GSAP/ScrollSmoother): scroll suave =====
+         dashboard-gsap.js envuelve el contenido en #smooth-wrapper/#smooth-content
+         para el scroll suave. El header y el sidebar quedan FUERA (son fixed). -->
     <div id="smooth-wrapper">
         <div id="smooth-content">
             <main class="ea-main">
@@ -203,7 +220,11 @@ $statusMeta = static function (string $s): array {
                 </section>
             <?php endif; ?>
 
-            <!-- ============== HERO · Resumen del ambiente ============== -->
+            <!-- ===== ESTRUCTURA: HERO · resumen del ambiente (#dashboard) =====
+                 Estado general + saludo + métricas rápidas + sparkline 24h.
+                 El tono (success/warning/danger) tiñe toda la sección. -->
+            <!-- ===== ANIMACIÓN (GSAP): la clase ea-reveal hace la entrada
+                 con fade/slide (definida en dashboard-gsap.js). -->
             <section class="ea-hero ea-reveal tone-<?= esc($tone) ?>" id="dashboard">
                 <div class="ea-hero-glow" aria-hidden="true"></div>
 
@@ -275,7 +296,9 @@ $statusMeta = static function (string $s): array {
                 </div>
             </section>
 
-            <!-- ============== Sensores ============== -->
+            <!-- ===== ESTRUCTURA: SENSORES (#sensores) =====
+                 4 tarjetas (temp, humedad, aire, CO₂) con gauge: la banda
+                 verde es la "zona ideal" del ambiente y el pin la lectura. -->
             <div class="ea-sec" id="sensores">
                 <h2>Sensores</h2>
                 <span class="ea-sec-right">4 activos · lecturas en tiempo real</span>
@@ -327,7 +350,9 @@ $statusMeta = static function (string $s): array {
                 <?php endforeach; ?>
             </div>
 
-            <!-- ============== Estado del sistema ============== -->
+            <!-- ===== ESTRUCTURA: ESTADO DEL SISTEMA (#configuracion) =====
+                 Stats de conexión + el switch de modo automático/manual
+                 (formulario POST a panel/modo). -->
             <div class="ea-sec" id="configuracion">
                 <h2>Estado del sistema</h2>
                 <span class="ea-sec-right">ESP32 · <span class="ea-mono">integración preparada</span></span>
@@ -373,6 +398,9 @@ $statusMeta = static function (string $s): array {
                 </div>
             </article>
 
+            <!-- ===== ESTRUCTURA: ACTUADORES + AUTOMATIZACIONES =====
+                 Dos tarjetas lado a lado. Los toggles de actuadores solo
+                 aparecen en modo manual (en automático son badges ON/OFF). -->
             <div class="ea-ops-grid">
                 <!-- Actuadores -->
                 <article class="ea-card ea-actuators-card">
@@ -467,7 +495,9 @@ $statusMeta = static function (string $s): array {
                 </article>
             </div>
 
-            <!-- ============== Lecturas ============== -->
+            <!-- ===== ESTRUCTURA: LECTURAS (#historial) =====
+                 Tabla con el historial; muestra 3 filas y el resto se
+                 despliega con el botón "Ver más" (dashboard.js). -->
             <div class="ea-sec" id="historial">
                 <h2>Lecturas</h2>
                 <span class="ea-sec-right"><span class="ea-mono"><?= esc((string) count($view['historyRows'] ?? [])) ?> registros recientes</span></span>
@@ -551,7 +581,9 @@ $statusMeta = static function (string $s): array {
                 </div>
             </article>
 
-            <!-- Información técnica colapsable -->
+            <!-- ===== ESTRUCTURA: INFORMACIÓN TÉCNICA (colapsable) =====
+                 <details> nativo del navegador (sin JS): endpoints de la API
+                 del ESP32 y vista previa del token del dispositivo. -->
             <details class="ea-card ea-tech-details">
                 <summary>
                     <span class="ea-tech-summary">
@@ -583,6 +615,10 @@ $statusMeta = static function (string $s): array {
     <div class="ea-sidebar-backdrop" data-sidebar-backdrop></div>
 </div>
 
+<!-- ===== SCRIPTS DE LA PÁGINA =====
+     tema.js (claro/oscuro) → dashboard.js (loader, sidebar, ver más,
+     preserve-scroll) → GSAP (CDN) → dashboard-gsap.js (scroll suave +
+     reveals) → ea-scrollbar.js (barra flotante). -->
 <script src="<?= base_url('JS/tema.js') ?>"></script>
 <script src="<?= base_url('JS/dashboard.js') ?>"></script>
 <!-- GSAP · ScrollSmoother (scroll suave) -->

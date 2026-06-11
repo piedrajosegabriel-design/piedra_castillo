@@ -1,4 +1,19 @@
 <?php
+/* =============================================================================
+   VISTA: portfolio.php — PORTFOLIO PÚBLICO del proyecto (ruta "/portfolio")
+   CSS:  public/CSS/portfolio.css (+ eden-brand.css global)
+   JS:   portfolio.js (menú, scrollspy, gráficos Chart.js) ·
+         portfolio-gsap.js (animaciones de scroll) · ea-scrollbar.js
+   CÓMO LEER ESTA VISTA:
+   · ESTRUCTURA → las secciones ya vienen numeradas con banners
+     "NN · Nombre" (00 hero, 01 imagen corporativa ... 06 plan operativo).
+     Los arrays de acá abajo ($landingLinks, $internalSections, $sitemap)
+     alimentan menú, scrollspy y mapa del sitio: tocás acá y se actualiza todo.
+   · ANIMACIÓN (GSAP/ScrollTrigger) → todo elemento con data-reveal aparece
+     al entrar en pantalla y data-reveal-child entra en cascada; lo define
+     portfolio-gsap.js. Los gráficos de la sección 04 los dibuja Chart.js
+     desde portfolio.js.
+   ============================================================================= */
 $conSesion = (bool) session()->get('user_id');
 
 $landingLinks = [
@@ -1275,6 +1290,10 @@ $sitemap = [
 </div><!-- /#smooth-content -->
 </div><!-- /#smooth-wrapper -->
 
+<!-- ===== SCRIPTS DE LA PÁGINA =====
+     GSAP (CDN) → tema.js → Chart.js (CDN, gráficos de la encuesta) →
+     portfolio.js (interacción) → portfolio-gsap.js (animaciones) →
+     ea-scrollbar.js. $eaJsBust agrega ?v=mtime para invalidar caché. -->
 <?php
     $eaJsBust = static function (string $relativePath): string {
         $abs = FCPATH . $relativePath;

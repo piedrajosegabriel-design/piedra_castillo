@@ -2,6 +2,24 @@
    EdenAir — Index / página pública
    Interacciones visuales del hero, carrusel y scroll reveal.
    Estilos de navbar compartidos (nav-links, mobile-nav) → eden-brand.css
+
+   QUÉ ES ESTE ARCHIVO: el CSS exclusivo de la LANDING (inicio.php).
+   Lo global (tokens, navbar, botones, footer) está en eden-brand.css.
+
+   ÍNDICE (en orden de aparición en la página):
+     1. ScrollSmoother: navbar fijo fuera del wrapper
+     2. Hero (decorados, hojas flotantes, readout)
+     3. Sección "Qué es" + feature cards
+     4. Sensores / Actuadores (grid + tonos)
+     5. Sección Automatización (reglas)
+     6. CTA final · Scroll reveal global
+     7. Hero — Núcleo 3D flotante + HUD (línea ~1070)
+     8. Experience — video fullscreen por scroll (línea ~1550)
+     9. Bridge — puente narrativo (línea ~1850)
+    10. Environmental Control Core — diagrama orbital (línea ~2000)
+    11. HITO 2 — compra + "Ingeniería interna" (línea ~2330)
+    12. ScrollSmoother FASE 1 (final del archivo)
+   Cada bloque grande cierra con su responsive y prefers-reduced-motion.
    ===================================================================== */
 
 /* ---------- ScrollSmoother: navbar fijo fuera del wrapper ------------ *

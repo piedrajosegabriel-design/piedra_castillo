@@ -1,6 +1,28 @@
 /* =====================================================================
    EdenAir — Sistema visual de marca
    Tokens, tipografía, layout y componentes reutilizables (.ea-*)
+
+   QUÉ ES ESTE ARCHIVO: el CSS GLOBAL del proyecto. Se carga en TODAS
+   las páginas (lo incluye partials/head.php). Acá viven las variables
+   (colores, espaciados, easing), el modo oscuro y los componentes
+   compartidos. Los estilos propios de cada página están en su archivo:
+   inicio.css · portfolio.css · dashboard.css.
+
+   ÍNDICE (buscá el banner "----------" con estos nombres):
+     1. Tokens (variables :root: colores, easing, sombras)
+     2. Modo oscuro ([data-theme="dark"])
+     3. Reset suave + Base (body, tipografía)
+     4. Layout shell (.ea-shell, .ea-page)
+     5. Logo / wordmark
+     6. Navbar + mega menú del portfolio + drawer móvil
+     7. Botones (.ea-button y variantes)
+     8. Cards / Page header / Badges
+     9. Forms / Messages / Tables
+    10. Stats / sensor card · Hero público · Feature grid
+    11. Auth (login/registro) + strength meter
+    12. Environment selector · Footer · Utility
+    13. Overrides para dashboard.css (re-skin paleta EdenAir)
+    14. Barra de scroll moderna flotante
    ===================================================================== */
 
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");

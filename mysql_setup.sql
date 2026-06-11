@@ -46,8 +46,6 @@ ADD COLUMN IF NOT EXISTS apellido VARCHAR(120) NOT NULL DEFAULT '' AFTER nombre,
 ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) NULL AFTER password_hash,
 ADD COLUMN IF NOT EXISTS reset_expires_at DATETIME NULL AFTER reset_token;
 
-ALTER TABLE users
-ADD COLUMN apellido VARCHAR(120) NOT NULL DEFAULT '' AFTER nombre;
 
 -- =========================================================
 -- TABLA: spaces

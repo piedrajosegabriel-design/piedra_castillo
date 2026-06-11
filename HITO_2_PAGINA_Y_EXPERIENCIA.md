@@ -10,6 +10,14 @@ hay un **glosario** con términos y líneas de código importantes.
 > `HITO_1_BACKEND_Y_BASE_DE_DATOS.md`. Para la lógica de negocio (cálculos,
 > reglas, vinculación) ver `services.md`.
 
+> **Cómo estudiar el frontend en el código.** Las vistas principales
+> (`inicio.php`, `portfolio.php`, `panel.php`) están marcadas con dos tipos
+> de comentario: `<!-- ===== ESTRUCTURA: ... ===== -->` señala qué es cada
+> bloque de HTML, y `<!-- ===== ANIMACIÓN: ... ===== -->` señala qué se anima
+> y desde qué archivo JS. Además, cada archivo CSS empieza con un **ÍNDICE**
+> de sus secciones. El detalle de esa organización está en la sección
+> [1.bis Organización del CSS y el JS](#1bis-organización-del-css-y-el-js).
+
 ---
 
 ## 0. La nueva lógica de usuario (lo más importante)
@@ -78,6 +86,58 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 **Archivos:** `public/CSS/eden-brand.css` (tokens, logo, botones premium,
 modo oscuro), `public/CSS/inicio.css` (landing), `public/CSS/dashboard.css`
 (dashboard, welcome, wizard, switcher, banner claim).
+
+---
+
+## 1.bis Organización del CSS y el JS
+
+### CSS: un archivo global + un archivo por página (decisión de arquitectura)
+
+El proyecto usa el patrón **"global + por página"**, que es la mejor práctica
+para un sitio multipágina sin bundler como este:
+
+| Archivo | Alcance | Qué tiene |
+|---|---|---|
+| `eden-brand.css` | **Global** — lo carga `partials/head.php` en todas las páginas | Tokens (variables de color/easing), modo oscuro, navbar, botones, forms, footer: todo lo compartido. |
+| `inicio.css` | Solo la **landing** | Hero, núcleo 3D, video por scroll, secciones de la página pública. |
+| `portfolio.css` | Solo el **portfolio** | Las secciones numeradas 00–06 del recorrido. |
+| `dashboard.css` | Toda el **área privada** | Panel, sidebar, sensores, wizard de dispositivos, ambientes, perfil, compra. |
+
+**Por qué así y no "un CSS por vista":** las vistas privadas (panel, perfil,
+dispositivos, ambientes…) comparten el mismo shell (sidebar + header + cards),
+así que partir `dashboard.css` en 7 archivos duplicaría estilos o exigiría más
+requests sin beneficio. Y lo común de verdad (botones, navbar) ya está aislado
+en `eden-brand.css`. Cada página termina cargando **exactamente 2 CSS**:
+el global + el suyo.
+
+**Para encontrar el CSS de cualquier cosa:** abrí el archivo de la página y
+mirá el **ÍNDICE comentado del inicio** — lista las secciones en orden con su
+línea aproximada. Los separadores internos (`/* ===== NOMBRE ===== */`) se
+buscan con Ctrl+F.
+
+**Excepciones documentadas (estilos embebidos en vistas):**
+- `panel.php` tiene un `<style>` dentro de `<noscript>`: es el fallback sin
+  JavaScript (oculta el loader). No puede moverse a un archivo porque perdería
+  la condición *noscript*.
+- `partials/theme_toggle.php` lleva sus estilos adentro a propósito: el toggle
+  es autocontenido y funciona en cualquier página sin depender de otro CSS.
+
+### JS: misma lógica, por página
+
+| Archivo | Página | Rol |
+|---|---|---|
+| `tema.js` | todas | Modo claro/oscuro (lee/escribe `localStorage`). |
+| `ea-scrollbar.js` | landing, portfolio, panel | Barra de scroll flotante custom. |
+| `inicio.js` / `inicio-gsap.js` | landing | Menú + datos del hero / animaciones GSAP-ScrollTrigger. |
+| `eden-core-3d.js` | landing | Núcleo 3D del hero (Three.js, módulo ES). |
+| `portfolio.js` / `portfolio-gsap.js` | portfolio | Scrollspy + gráficos Chart.js / animaciones. |
+| `dashboard.js` / `dashboard-gsap.js` | área privada | Loader, sidebar, "ver más" / scroll suave + reveals. |
+| `login.js`, `registro.js`, `panel.js`, `ambiente.js` | sus vistas | Interacciones puntuales de cada formulario. |
+
+**Convención `*-gsap.js`:** la interacción "funcional" (menús, formularios)
+vive en el JS base de la página; **todo lo que es animación** vive en el
+archivo `-gsap` correspondiente. Si una animación falla o se quiere tocar,
+siempre se busca en el `-gsap` de esa página.
 
 ---
 

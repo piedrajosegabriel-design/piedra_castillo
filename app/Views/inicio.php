@@ -1,4 +1,15 @@
 <?php
+/* =============================================================================
+   VISTA: inicio.php — LANDING PÚBLICA de EdenAir (ruta "/")
+   CSS:  public/CSS/inicio.css (+ eden-brand.css global, cargado por el head)
+   JS:   inicio.js (menú, fetch sensores) · inicio-gsap.js (animaciones de
+         scroll) · eden-core-3d.js (núcleo 3D del hero) · ea-scrollbar.js
+   CÓMO LEER ESTA VISTA: cada sección está marcada con un comentario
+   <!-- ===== ESTRUCTURA: ... ===== --> y, si tiene animación, otro
+   <!-- ===== ANIMACIÓN: ... ===== -->. Las animaciones NO viven acá:
+   viven en los JS, que buscan los atributos data-* (data-reveal,
+   data-eden-core, data-ea-experience...) que ves en el HTML.
+   ============================================================================= */
 $conSesion = (bool) session()->get('user_id');
 
 // Acciones del navbar: el CTA de compra tiene más peso visual que el login.
@@ -44,6 +55,8 @@ ob_start(); ?>
         ],
     ]) ?>
 
+    <!-- ===== ESTRUCTURA: botón hamburguesa + menú móvil =====
+         La apertura/cierre la maneja inicio.js vía data-ea-nav-toggle. -->
     <button type="button" class="ea-nav-toggle" data-ea-nav-toggle aria-expanded="false" aria-controls="ea-mobile-nav" aria-label="Abrir menú de navegación">
         <span class="ea-nav-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
@@ -82,6 +95,14 @@ ob_start(); ?>
 <div id="smooth-content">
 <div class="ea-shell">
     <main>
+        <!-- ===== ESTRUCTURA: sección HERO (#inicio) =====
+             Columna izquierda: tagline + título + CTAs.
+             Columna derecha: el núcleo 3D con sus tarjetas HUD. -->
+        <!-- ===== ANIMACIÓN (CSS + GSAP + Three.js) =====
+             · glow/orbits/leaves: decorado animado por CSS (inicio.css)
+             · data-eden-core: eden-core-3d.js monta el modelo .glb en el
+               canvas y actualiza las tarjetas HUD con /api/sensores
+             · la entrada del hero la anima inicio-gsap.js -->
         <section class="ea-hero" id="inicio">
             <span class="ea-hero-glow" aria-hidden="true"></span>
             <div class="ea-hero-orbits" aria-hidden="true">
@@ -197,6 +218,11 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección PUENTE ("La experiencia") =====
+             Transición visual entre el hero y el video scrolleable. -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal =====
+             data-reveal hace que la sección aparezca con fade/slide al
+             entrar en pantalla (lo define inicio-gsap.js). -->
         <section class="ea-bridge" aria-hidden="true" data-reveal>
             <span class="ea-bridge-grad" aria-hidden="true"></span>
             <span class="ea-bridge-glow" aria-hidden="true"></span>
@@ -211,6 +237,12 @@ ob_start(); ?>
             <span class="ea-bridge-fade" aria-hidden="true"></span>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección EXPERIENCIA (#experience) =====
+             Video a pantalla completa + 5 textos superpuestos (data-step). -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): video "scrubbing" =====
+             inicio-gsap.js PINEA esta sección y mapea el avance del scroll
+             al tiempo del video (scroll = línea de tiempo). Los textos
+             entran y salen según el paso (data-step 0..4). -->
         <?php
             // Cache-bust automático según mtime de cada archivo
             $eaMp4Path  = FCPATH . 'videos/eden-air-scroll-seek.mp4';
@@ -278,6 +310,10 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección QUÉ ES (#que-es) =====
+             Grilla de 6 tarjetas de características del producto. -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal en la sección
+             + data-reveal-child en cada tarjeta (entran escalonadas). -->
         <section class="ea-section" id="que-es" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
@@ -354,6 +390,12 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección NÚCLEO/BENEFICIOS (#beneficios) =====
+             Diagrama orbital: anillos SVG + centro + 7 módulos posicionados
+             por ángulo con variables CSS (--ang / --r). -->
+        <!-- ===== ANIMACIÓN (CSS + GSAP): los anillos pulsan por CSS
+             (.ea-core-pulse) y data-ea-core/data-reveal disparan la
+             aparición orquestada desde inicio-gsap.js. -->
         <section class="ea-core-section" id="beneficios" data-reveal>
             <span class="ea-core-bg" aria-hidden="true"></span>
 
@@ -450,6 +492,11 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección TECNOLOGÍA INTERNA (#tecnologia-interna)
+             Video "exploded view" del dispositivo + 4 tarjetas en las esquinas. -->
+        <!-- ===== ANIMACIÓN: el video se reproduce en loop SOLO cuando está
+             visible (IntersectionObserver, script al pie de esta vista) y
+             respeta prefers-reduced-motion. data-reveal para la entrada. -->
         <?php
             // Video "exploded view" del interior del dispositivo (sin audio, optimizado).
             $eaTechMp4Path  = FCPATH . 'videos/eden-air-exploded.mp4';
@@ -518,6 +565,10 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección FUNCIONAMIENTO (#funcionamiento) =====
+             Los 5 pasos del flujo: Sensa → Transmite → Registra → Decide → Actúa. -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal + cada paso
+             con data-reveal-child (aparición en cascada). -->
         <section class="ea-section" id="funcionamiento" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
@@ -560,6 +611,9 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección SENSORES Y ACTUADORES (#sensores) =====
+             Dos bloques espejados: qué se mide / qué se controla. -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal + data-reveal-child. -->
         <section class="ea-section" id="sensores" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
@@ -660,6 +714,9 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección AUTOMATIZACIÓN (#automatizacion) =====
+             Las 4 reglas del sistema como tarjetas condición → acción. -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal + data-reveal-child. -->
         <section class="ea-section" id="automatizacion" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
@@ -716,6 +773,10 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: sección COMPRAR (#comprar) =====
+             Tarjeta de precio + lista de "qué incluye". Los CTAs cambian
+             según haya sesión o no ($conSesion). -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal + data-reveal-child. -->
         <section class="ea-section ea-buy-section" id="comprar" data-reveal aria-labelledby="ea-buy-title">
             <div class="ea-page">
                 <div class="ea-section-head">
@@ -774,6 +835,8 @@ ob_start(); ?>
             </div>
         </section>
 
+        <!-- ===== ESTRUCTURA: CTA FINAL ("Empezá ahora") ===== -->
+        <!-- ===== ANIMACIÓN (GSAP/ScrollTrigger): data-reveal. -->
         <section class="ea-section" data-reveal>
             <div class="ea-page">
                 <div class="ea-cta">
@@ -798,6 +861,11 @@ ob_start(); ?>
 </div><!-- /#smooth-content -->
 </div><!-- /#smooth-wrapper -->
 
+<!-- ===== SCRIPTS DE LA PÁGINA =====
+     Orden de carga: librerías GSAP (CDN) → tema.js (claro/oscuro) →
+     inicio.js (menú + datos) → inicio-gsap.js (todas las animaciones de
+     scroll) → ea-scrollbar.js (barra custom) → eden-core-3d.js (módulo
+     Three.js del hero). $eaJsBust agrega ?v=mtime para invalidar caché. -->
 <?php
     $eaJsBust = function (string $relativePath): string {
         $abs = FCPATH . $relativePath;

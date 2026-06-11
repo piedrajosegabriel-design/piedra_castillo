@@ -1,6 +1,20 @@
 /* =====================================================================
    EdenAir — Portfolio público (rediseño "interactive project journey")
    Reutiliza tokens de eden-brand.css. Compatible modo claro/oscuro.
+
+   QUÉ ES ESTE ARCHIVO: el CSS exclusivo del PORTFOLIO (portfolio.php).
+   Sigue el mismo orden que las secciones numeradas de la vista.
+
+   ÍNDICE:
+     · Tipos compartidos / Cards reutilizables / Status pills
+     · HERO — Página principal (sección 00)
+     · SITEMAP — mapa del recorrido
+     · 01 Imagen corporativa (bento) · 02 Quiénes somos
+     · 03 Acerca de Eden Air (storytelling)
+     · 04 Análisis de mercado (research dashboard, línea ~1000)
+     · 05 Competencia · 06 Plan operativo
+     · Cierre · Drawer móvil · Scroll reveal
+     · HITO 2 — cuadro comparativo de competencia (final del archivo)
    ===================================================================== */
 
 .ea-portfolio { overflow-x: clip; }

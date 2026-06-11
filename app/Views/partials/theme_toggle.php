@@ -35,6 +35,13 @@ $label  = isset($label)  && is_string($label)  ? $label  : 'Cambiar tema';
     </span>
 </label>
 
+<!-- ===== ESTILOS DEL TOGGLE (embebidos a propósito) =====
+     Este <style> viaja CON el partial: así el toggle se ve bien en cualquier
+     página que lo incluya sin depender de un CSS externo. Como va en el
+     <body> (después de los CSS del <head>), gana los empates de cascada y
+     dashboard.css lo ajusta con selectores más específicos donde hace falta.
+     Si la página incluye dos toggles (navbar + menú móvil) el bloque se
+     repite, pero es CSS idéntico: no tiene efecto visual. -->
 <style>
     .ea-theme-switch {
         display: inline-flex;

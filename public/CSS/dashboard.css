@@ -3,6 +3,23 @@
    Shell (sidebar + header), hero resumen, sensores (gauges), estado del
    sistema, actuadores, automatizaciones, lecturas, loader y modo oscuro.
    Depende de los tokens definidos en eden-brand.css.
+
+   QUÉ ES ESTE ARCHIVO: el CSS de TODA el área privada (panel.php,
+   perfil, compra, dispositivos, ambientes, bienvenida).
+
+   ÍNDICE (buscá el banner "=====" con estos nombres):
+     · Tokens locales / Body
+     · LOADER "Preparando tu ambiente" (línea ~110)
+     · APP SHELL · SIDEBAR · HEADER · CONTENT
+     · CARDS · BADGES · BUTTONS compartidos
+     · HERO Resumen (línea ~1170) · SENSORES gauges (~1450)
+     · ESTADO DEL SISTEMA · ACTUADORES · AUTOMATIZACIONES · LECTURAS
+     · TECH DETAILS · ACCOUNT (perfil) · PLAN DE COMPRA
+     · THEME TOGGLE · RESPONSIVE · PRINT
+     · LAYOUT FIJO (sidebar/header fixed, línea ~2780)
+     · REDUCED MOTION
+     · HITO 2 — Mis dispositivos + wizard (línea ~2860)
+     · HITO 2 — switcher/claim banner (~3150) · bienvenida (~3270)
    ===================================================================== */
 
 /* ---------- Tokens locales del dashboard ----------------------------- */
