@@ -19,6 +19,11 @@ use RuntimeException;
  */
 class DispositivosController extends BaseController
 {
+    // =========================================================================
+    // LISTADO — "Mis dispositivos"
+    // =========================================================================
+
+    /** Lista los dispositivos del usuario con su estado legible. */
     public function index(): string
     {
         $servicio = new DeviceClaimService();
@@ -28,6 +33,13 @@ class DispositivosController extends BaseController
         ]);
     }
 
+    // =========================================================================
+    // ALTA DE DISPOSITIVO — wizard "Conectá tu Eden Air"
+    // agregar() prepara los datos del formulario; validar() chequea el código
+    // en vivo (paso 1); guardar() procesa el POST final y vincula.
+    // =========================================================================
+
+    /** Prepara el wizard: tipos de dispositivo, catálogo de espacios y ambientes ya creados. */
     public function agregar(): string
     {
         $servicio = new DeviceClaimService();
@@ -71,6 +83,11 @@ class DispositivosController extends BaseController
         ]);
     }
 
+    /**
+     * Procesa el POST final del wizard.
+     * Flujo: leer datos → validar formulario → validar el ambiente elegido
+     * (existente o nuevo) → vincular vía DeviceClaimService (transacción).
+     */
     public function guardar(): RedirectResponse
     {
         $datos = [
@@ -128,8 +145,35 @@ class DispositivosController extends BaseController
             ->with('success', '“' . $resultado['device']['name'] . '” quedó vinculado a tu cuenta.');
     }
 
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+
+    /** Devuelve el user_id guardado en sesión por el login. */
     private function usuarioActual(): int
     {
         return (int) session()->get('user_id');
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Métodos públicos (responden a rutas):
+   - index()    → lista "Mis dispositivos" (datos de DeviceClaimService::listarDeUsuario)
+   - agregar()  → muestra el wizard de alta con tipos, espacios y ambientes existentes
+   - validar()  → chequeo en vivo del código de activación; responde JSON (GET, sin CSRF)
+   - guardar()  → canjea el código y crea dispositivo + ambiente (o reusa uno)
+
+   Helpers privados:
+   - usuarioActual() → user_id de la sesión
+
+   Servicios y funciones usados acá:
+   - DeviceClaimService::inspeccionarCodigo() → estado del código (ok/canjeado/inválido)
+   - DeviceClaimService::vincular()           → hace el alta completa en transacción;
+                                                lanza RuntimeException si algo falla
+   - EnvironmentPresetService::getDisplayName()/getEnvironmentLabel() → nombres legibles
+   - array_map(fn, $array)   → (PHP) transforma cada elemento del array
+   - try/catch RuntimeException → captura el error del service y lo muestra como flash
+   - $this->response->setJSON() → respuesta JSON para el fetch del wizard
+   ============================================================================ */

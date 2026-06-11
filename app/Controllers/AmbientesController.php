@@ -13,6 +13,11 @@ use CodeIgniter\HTTP\RedirectResponse;
  */
 class AmbientesController extends BaseController
 {
+    // =========================================================================
+    // LISTADO DE AMBIENTES
+    // =========================================================================
+
+    /** Lista los ambientes del usuario con sus rangos y dispositivos asignados. */
     public function index(): string
     {
         $userId = $this->usuarioActual();
@@ -46,6 +51,14 @@ class AmbientesController extends BaseController
         ]);
     }
 
+    // =========================================================================
+    // EDICIÓN DE UN AMBIENTE
+    // Ambos métodos validan pertenencia: el ambiente debe existir Y ser del
+    // usuario logueado. Sin ese chequeo, cualquiera podría editar ambientes
+    // ajenos cambiando el id de la URL.
+    // =========================================================================
+
+    /** Muestra el formulario de edición de rangos. */
     public function editar(int $id): string|RedirectResponse
     {
         $userId  = $this->usuarioActual();
@@ -61,6 +74,10 @@ class AmbientesController extends BaseController
         ]);
     }
 
+    /**
+     * Guarda los rangos editados. Validaciones de coherencia:
+     * min < max (temperatura y humedad) y CO₂ máximo positivo.
+     */
     public function actualizar(int $id): RedirectResponse
     {
         $userId   = $this->usuarioActual();
@@ -98,8 +115,35 @@ class AmbientesController extends BaseController
         return redirect()->to('/panel/ambientes')->with('success', 'Ambiente actualizado.');
     }
 
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+
+    /** Devuelve el user_id guardado en sesión por el login. */
     private function usuarioActual(): int
     {
         return (int) session()->get('user_id');
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Métodos públicos (responden a rutas):
+   - index()          → lista ambientes con rangos formateados y sus dispositivos
+   - editar($id)      → muestra el form de edición (valida pertenencia)
+   - actualizar($id)  → guarda los rangos (valida coherencia min/max y CO₂)
+
+   Helpers privados:
+   - usuarioActual()  → user_id de la sesión
+
+   Métodos de Model (CI4) usados acá:
+   - find($id)        → busca un registro por su clave primaria
+   - findAll()        → devuelve todas las filas que cumplen los where()
+   - where()/orderBy()→ arman la consulta SQL de a partes (query builder)
+   - update($id, $datos) → UPDATE de los campos permitidos en allowedFields
+
+   Funciones de PHP usadas acá:
+   - array_map()      → transforma cada fila cruda en un array listo para la vista
+   - sprintf('%.0f°') → formatea números (0 decimales) dentro de un texto
+   ============================================================================ */

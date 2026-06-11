@@ -10,8 +10,15 @@ namespace App\Controllers;
  */
 class PortfolioController extends BaseController
 {
+    /** Renderiza la vista del portfolio (app/Views/portfolio.php). */
     public function index(): string
     {
         return view('portfolio');
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+   - index()       → responde a GET /portfolio; solo muestra la vista
+   - view('x')     → (CI4) renderiza app/Views/x.php y devuelve el HTML
+   ============================================================================ */

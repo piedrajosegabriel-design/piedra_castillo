@@ -4,14 +4,28 @@ use CodeIgniter\Router\RouteCollection;
 
 /**
  * @var RouteCollection $routes
+ *
+ * Mapa de rutas de EdenAir, agrupado por QUIÉN puede entrar:
+ *   1) Públicas            → cualquiera (landing, portfolio, api/sensores)
+ *   2) Grupo 'guest'       → solo SIN sesión (login, registro, recuperación)
+ *   3) Grupo 'panel'       → solo CON sesión (filtro 'auth'): el área privada
+ *   4) Grupo 'api/devices' → el ESP32 (autentica por token, no por sesión)
  */
 
+// =============================================================================
+// 1) RUTAS PÚBLICAS — accesibles sin login
+// =============================================================================
 $routes->get('/', 'AccesoController::inicio');
 
 // Portfolio público
 $routes->get('portfolio',     'PortfolioController::index');
 $routes->get('portfolio.php', 'PortfolioController::index');
 
+// =============================================================================
+// 2) GRUPO GUEST — solo para usuarios SIN sesión.
+// El filtro 'guest' (app/Filters/GuestFilter.php) redirige a /panel si ya
+// hay sesión iniciada: un usuario logueado no debería ver el login.
+// =============================================================================
 $routes->group('', ['filter' => 'guest'], static function ($routes) {
     $routes->get('login', 'AccesoController::login');
     $routes->post('login', 'AccesoController::validarLogin');
@@ -29,6 +43,11 @@ $routes->group('', ['filter' => 'guest'], static function ($routes) {
 
 $routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);
 
+// =============================================================================
+// 3) GRUPO PANEL — el área privada. El filtro 'auth'
+// (app/Filters/AuthFilter.php) corta el paso si no hay sesión.
+// Todas estas URLs quedan prefijadas con /panel.
+// =============================================================================
 $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->get('', 'PanelController::index');
     $routes->get('perfil', 'PanelController::perfil');
@@ -54,8 +73,14 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->post('actuador', 'PanelController::cambiarActuador');
 });
 
+// Alias: /dashboard muestra lo mismo que /panel.
 $routes->get('dashboard', 'PanelController::index', ['filter' => 'auth']);
 
+// =============================================================================
+// 4) API REST PARA EL ESP32 — sin filtro 'auth' (el dispositivo no tiene
+// sesión): autentica con su token en DeviceApiController. Exenta de CSRF.
+// (:segment) captura el device_uid de la URL; (:num) el id del comando.
+// =============================================================================
 $routes->group('api/devices', static function ($routes) {
     $routes->post('(:segment)/measurements', 'Api\DeviceApiController::storeMeasurement/$1');
     $routes->get('(:segment)/commands/pending', 'Api\DeviceApiController::pendingCommands/$1');
@@ -88,3 +113,25 @@ $routes->get('api/sensores', static function () {
         ],
     ]);
 });
+
+/* ============================================================================
+   GLOSARIO DE ESTE ARCHIVO
+
+   Métodos de RouteCollection (CI4):
+   - $routes->get('ruta', 'Controller::metodo')  → registra una ruta GET
+   - $routes->post(...)                          → ídem para POST
+   - $routes->group('prefijo', $opciones, $fn)   → agrupa rutas bajo un prefijo
+                                                   de URL y/o un filtro común
+   - ['filter' => 'auth'|'guest']                → filtro que corre ANTES del
+                                                   controller (app/Filters/)
+
+   Comodines en las rutas:
+   - (:num)     → solo números        → llega como parámetro ($1, $2...)
+   - (:any)     → cualquier cosa (incluye /) — usado para el token de reset
+   - (:segment) → un segmento de URL (sin /) — usado para el device_uid
+
+   Otros:
+   - service('response')->setJSON()  → respuesta JSON sin pasar por un controller
+   - static fn / static function     → closures sin acceso a $this (más livianas)
+   - mt_rand()/mt_getrandmax()       → aleatorio para los datos simulados del hero
+   ============================================================================ */

@@ -10,10 +10,25 @@ use App\Services\PanelService;
 use App\Services\SimulationService;
 use CodeIgniter\HTTP\RedirectResponse;
 
+/**
+ * PanelController — el corazón del área privada (dashboard).
+ *
+ * Maneja: el panel principal (bienvenida o monitor según haya dispositivos),
+ * la demo, el switcher de dispositivo activo, el perfil del usuario,
+ * la carga manual de mediciones, el cambio de modo (automático/manual)
+ * y el control de actuadores.
+ *
+ * Patrón general de los métodos POST: cada paso que puede fallar devuelve
+ * un RedirectResponse (guard clause); si devuelve null, el flujo sigue.
+ * La lógica pesada vive en los services (PanelService, CommandService,
+ * SimulationService, AutomationService) — este controller solo orquesta.
+ */
 class PanelController extends BaseController
 {
     // =========================================================================
     // LISTAS BLANCAS
+    // Valores permitidos para modo y actuadores. Todo lo que llega por POST
+    // se compara contra estas constantes: si no está acá, se rechaza.
     // =========================================================================
     private const MODOS = ['automatic', 'manual'];
     private const ACTUADORES = ['fan', 'aromatizer', 'alert_led'];
@@ -67,6 +82,10 @@ class PanelController extends BaseController
         return redirect()->to('/panel')->with('success', 'Cargamos un dispositivo de demostración para que veas el panel en acción.');
     }
 
+    // =========================================================================
+    // DISPOSITIVO ACTIVO (switcher del panel)
+    // =========================================================================
+
     /**
      * Cambia el dispositivo activo del panel monitor. El id se valida contra
      * los dispositivos del usuario antes de guardarlo en sesión.
@@ -112,6 +131,13 @@ class PanelController extends BaseController
         return $candidato;
     }
 
+    // =========================================================================
+    // PERFIL DE USUARIO Y COMPRA
+    // Ver/editar datos personales y contraseña. Ambos cambios exigen
+    // confirmar la contraseña actual (validarAutenticacionPerfil).
+    // =========================================================================
+
+    /** Muestra el perfil; si el usuario ya no existe en la base, cierra sesión. */
     public function perfil(): string|RedirectResponse
     {
         $usuario = (new UserModel())->obtenerPorId($this->usuarioActual());
@@ -174,6 +200,7 @@ class PanelController extends BaseController
         return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
     }
 
+    /** Página estática de compra (checkout simulado con MercadoPago). */
     public function compra(): string
     {
         return view('compra_mercadopago');
@@ -463,3 +490,41 @@ class PanelController extends BaseController
             ->with('error', 'Primero vinculá un dispositivo para poder realizar esta acción.');
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Métodos públicos (responden a rutas):
+   - index()                 → bienvenida (0 dispositivos) o panel monitor (≥1)
+   - iniciarDemo()           → crea dispositivo+ambiente simulados (CTA "Ver demo")
+   - seleccionarDispositivo()→ guarda en sesión el dispositivo activo del switcher
+   - perfil()                → muestra los datos del usuario
+   - actualizarPerfil()      → guarda nombre/apellido/email/usuario (pide contraseña)
+   - actualizarPassword()    → cambia la contraseña (pide la actual)
+   - compra()                → página de compra simulada
+   - guardarMedicion()       → registra una medición manual y corre automatización
+   - cambiarModo()           → cambia automatic/manual vía CommandService
+   - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual)
+
+   Helpers privados:
+   - dispositivoActivo()     → valida el active_device_id de sesión (pertenencia)
+   - crearPanel()            → asegura setup del usuario y pide datos a PanelService
+   - obtenerContexto()       → devuelve device_raw y space_raw del panel
+   - leerDatos*()            → leen el POST (medición, perfil, password)
+   - reglasMedicion()        → reglas de validación de la medición manual
+   - validarFormulario*()    → corren la validación; null = OK, redirect = error
+   - validarAutenticacionPerfil() → exige la contraseña actual para confirmar cambios
+   - modoValido()/accionActuadorValida() → chequeo contra las listas blancas
+   - estaEnModoManual()      → lee operating_mode del estado del dispositivo
+   - crearMensajeCambioModo()→ arma el flash; en automático corre la automatización
+   - redirigirAlPanelConError()/ConExito() → redirect a /panel con mensaje flash
+   - redirigirConInputYDato()→ redirect + withInput + flash
+   - usuarioActual()         → user_id guardado en sesión
+   - redireccionarSiFaltaDispositivo() → guard: sin dispositivos no hay acciones
+
+   Funciones del framework (CI4) usadas acá:
+   - view() / redirect() / session() / $this->request->getPost()
+   - countAllResults()       → (Model) cuenta filas que cumplen los where()
+   - $this->validateData()   → valida un array contra reglas CI4
+   - in_array($v, $lista, true) → (PHP) pertenencia estricta a la lista blanca
+   ============================================================================ */

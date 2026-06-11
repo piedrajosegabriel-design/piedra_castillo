@@ -16,6 +16,29 @@ defenderlo archivo por archivo, variable por variable y función por función.
 > documenta en `HITO_2_PAGINA_Y_EXPERIENCIA.md`; la lógica de negocio
 > (servicios) en `services.md`.
 
+> **Cómo estudiar el código:** cada controller, model, filtro y el archivo de
+> rutas tiene ahora (a) **banners de sección** que agrupan los métodos por tema,
+> (b) comentarios didácticos sobre la lógica no obvia y (c) un **GLOSARIO al
+> final del archivo** que explica qué hace cada método propio y cada función
+> de CI4/PHP usada ahí. Este documento da la visión general; el glosario de
+> cada archivo da el detalle línea a línea.
+
+## Índice
+
+1. [Qué es EdenAir y con qué está hecho](#1-qué-es-edenair-y-con-qué-está-hecho)
+2. [Arquitectura general (MVC + Servicios)](#2-arquitectura-general-mvc--servicios)
+3. [Organización del backend (carpetas)](#3-organización-del-backend-carpetas)
+4. [Autenticación y la NUEVA lógica de entrada](#4-autenticación-y-la-nueva-lógica-de-entrada)
+5. [Filtros de acceso](#5-filtros-de-acceso-appfilters)
+6. [Rutas](#6-rutas-appconfigroutesphp)
+7. [Controladores](#7-controladores-appcontrollers)
+8. [Modelos](#8-modelos-appmodels)
+9. [Servicios (resumen)](#9-servicios-resumen)
+10. [Sesiones y seguridad](#10-sesiones-y-seguridad)
+11. [Validaciones](#11-validaciones-qué-controla-el-sistema)
+12. [Base de datos (detallada)](#12-base-de-datos-sección-detallada)
+13. [Glosario y líneas de código importantes](#13-glosario-y-líneas-de-código-importantes)
+
 ---
 
 ## 1. Qué es EdenAir y con qué está hecho
@@ -87,6 +110,31 @@ ordenada y fácil de mantener.
 
 Este es el cambio conceptual más importante del proyecto y atraviesa varios
 archivos. Conviene entenderlo antes que el resto.
+
+**El viaje completo de un login, de punta a punta:**
+
+```
+POST /login
+   │
+   ▼ Routes.php: grupo 'guest' → AccesoController::validarLogin
+   │
+   ▼ GuestFilter::before()   → no hay sesión, deja pasar
+   │
+   ▼ AccesoController::validarLogin()
+   │     leerDatosLogin() → validarFormularioLogin() → buscarParaLogin()
+   │     → password_verify() → iniciarSesion() (regenera la sesión)
+   │
+   ▼ redirect()->to('/panel')
+   │
+   ▼ Routes.php: grupo 'panel' → AuthFilter::before() → hay sesión, pasa
+   │
+   ▼ PanelController::index()
+   │     ¿cuántos dispositivos tiene el usuario?
+   │        0  → view('panel/bienvenida')      ← pantalla con 3 CTAs
+   │        ≥1 → PanelService::obtenerVistaPanel() → view('panel')
+   ▼
+HTML del dashboard en el navegador
+```
 
 ### 4.1 Qué pasa al iniciar sesión
 
@@ -236,6 +284,23 @@ Sin filtro `auth` (autentican con token de dispositivo), exentas de CSRF.
 Todos extienden `BaseController`. Acceden a `$this->request`,
 `$this->validateData()`, `$this->validator`, `$this->response`.
 
+**Patrón común de los métodos POST (guard clauses):** cada paso que puede
+fallar (validación, credenciales, pertenencia) devuelve un
+`RedirectResponse`; si devuelve `null`, el flujo sigue al paso siguiente:
+
+```php
+if ($redirect = $this->validarFormularioLogin($datos)) {
+    return $redirect;       // falló → corto acá y redirijo con error
+}
+// validó → sigo con el próximo paso
+```
+
+### 7.0 `BaseController` (abstracto)
+No responde a ninguna ruta: es la **clase base** de la que heredan todos los
+demás. Carga los helpers comunes (`form`, `url`) y deja `initController()`
+como punto de extensión para precargar servicios compartidos. CI4 le inyecta
+`$this->request`, `$this->response` y el logger.
+
 ### 7.1 `AccesoController`
 **Responsabilidad:** todo lo público y de cuenta — landing, login, registro,
 recuperación/restablecimiento de contraseña y logout. *(Ya no maneja ambiente.)*
@@ -327,6 +392,15 @@ dispositivo**, no por sesión.
 `api_token`) y lo compara con `devices.api_token`. Si no coincide, lanza
 `InvalidArgumentException` → respuesta `401`. Cada llamada actualiza
 `last_seen_at` / `last_command_sync_at` con `actualizarActividadDispositivo()`.
+
+**Códigos HTTP que devuelve la API:** `200` (éxito), `401` (token inválido),
+`404` (comando inexistente), `422` (payload de medición incompleto o fuera de
+rango).
+
+### 7.6 `PortfolioController`
+El más simple de todos: un único `index()` que renderiza la vista pública
+`portfolio.php` (el portfolio académico del proyecto). Sin modelos ni
+servicios.
 
 ---
 

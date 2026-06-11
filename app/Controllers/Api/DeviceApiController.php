@@ -9,6 +9,18 @@ use App\Services\CommandService;
 use App\Services\SimulationService;
 use CodeIgniter\HTTP\ResponseInterface;
 
+/**
+ * DeviceApiController — la API REST que consume el ESP32 (hardware).
+ *
+ * A diferencia del resto del sistema, acá NO hay sesión de usuario:
+ * el dispositivo se autentica con su token secreto (header X-Device-Token)
+ * que se compara contra devices.api_token. Estas rutas están exentas de CSRF.
+ *
+ * Los 3 endpoints (ver Routes.php, grupo api/devices):
+ *   POST .../measurements        → el ESP32 sube una medición
+ *   GET  .../commands/pending    → el ESP32 pregunta qué comandos ejecutar
+ *   POST .../commands/N/executed → el ESP32 confirma que ejecutó un comando
+ */
 class DeviceApiController extends BaseController
 {
     // =========================================================================
@@ -219,3 +231,32 @@ class DeviceApiController extends BaseController
         ];
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Endpoints públicos (rutas api/devices/...):
+   - storeMeasurement($uid)          → recibe y guarda una medición del ESP32;
+                                       corre la automatización y responde JSON
+   - pendingCommands($uid)           → lista los comandos pendientes del dispositivo
+   - markCommandExecuted($uid, $id)  → marca un comando como ejecutado
+
+   Helpers privados:
+   - resolveAuthenticatedDevice()    → busca el device por device_uid y compara
+                                       el token; si falla lanza excepción → 401
+   - getJsonPayload()                → lee el body JSON (o cae a POST clásico)
+   - validarPayloadMedicion()        → campos obligatorios + índice aire 0–100
+   - actualizarActividadDispositivo()→ actualiza last_seen_at (y sync de comandos)
+   - responderNoAutorizado()         → JSON de error con HTTP 401
+   - responderErroresValidacion()    → JSON de error con HTTP 422
+   - responderNoEncontrado()         → JSON de error con HTTP 404
+   - formatCommand()                 → da forma al comando para el JSON de salida
+
+   Conceptos clave:
+   - device_uid  → identificador PÚBLICO del dispositivo (va en la URL)
+   - api_token   → secreto PRIVADO del dispositivo (va en el header)
+   - getHeaderLine('X-Device-Token') → (CI4) lee un header HTTP del request
+   - getJSON(true)                   → (CI4) decodifica el body JSON a array
+   - setStatusCode()/setJSON()       → (CI4) arman la respuesta HTTP de la API
+   - json_decode($texto, true)       → (PHP) convierte texto JSON en array
+   ============================================================================ */

@@ -58,3 +58,13 @@ class DeviceActivationCodeModel extends Model
         ]);
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+   - normalizar($codigo)  → estático: mayúsculas + sin espacios, para que
+                            "eden 1234" y "EDEN1234" se traten igual
+   - buscarPorCodigo()    → fila del código (ya normalizado) o null
+   - marcarCanjeado()     → status='claimed' + quién lo canjeó y cuándo
+   - status posibles      → 'available' (libre), 'claimed' (usado), 'disabled'
+   - preg_replace('/\s+/','',$c) → (PHP) elimina todos los espacios del texto
+   ============================================================================ */
