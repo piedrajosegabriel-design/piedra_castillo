@@ -5,11 +5,28 @@ namespace App\Services;
 use App\Models\DeviceCommandModel;
 use App\Models\DeviceStateModel;
 
+/* ============================================================
+   CommandService
+   QUÉ HACE: administra la COLA de comandos hacia el dispositivo
+   y mantiene sincronizado su estado (device_states). Todo cambio
+   de modo o de actuador pasa por acá: se registra como comando
+   (auditoría de quién pidió qué y por qué) y, al ejecutarse, se
+   refleja en el estado actual del dispositivo.
+   SE RELACIONA CON: DeviceCommandModel y DeviceStateModel (sus
+   dos tablas). Lo usan AutomationService (comandos automáticos),
+   PanelController (modo y control manual), DeviceApiController
+   (el ESP32 consulta pendientes y confirma ejecución) y
+   PanelService (lee el estado para el dashboard).
+   ============================================================ */
 class CommandService
 {
+    // -------------------------------------------------------------------------
+    // Dependencias y mapeo actuador → columna de device_states
+    // -------------------------------------------------------------------------
     private DeviceCommandModel $commandModel;
     private DeviceStateModel $stateModel;
 
+    // Traduce el command_type al nombre de la columna que guarda su estado.
     private array $actuatorMap = [
         'fan'        => 'fan_state',
         'aromatizer' => 'aromatizer_state',
@@ -22,6 +39,16 @@ class CommandService
         $this->stateModel   = new DeviceStateModel();
     }
 
+    // -------------------------------------------------------------------------
+    // Cambio de modo (automatic / manual)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Cambia el modo de operación. El cambio se registra como comando ya
+     * ejecutado (es instantáneo, no espera al ESP32) y se actualiza el estado.
+     * Al pasar a manual se cancelan los comandos automáticos pendientes:
+     * desde ese momento manda el usuario.
+     */
     public function changeOperatingMode(int $deviceId, string $mode, ?int $userId, string $source = 'web'): array
     {
         $state = $this->getStateByDeviceId($deviceId);
@@ -30,6 +57,7 @@ class CommandService
             throw new \RuntimeException('No se encontro el estado del dispositivo.');
         }
 
+        // Si ya está en ese modo, no hay nada que hacer.
         if (($state['operating_mode'] ?? 'automatic') === $mode) {
             return $state;
         }
@@ -60,6 +88,15 @@ class CommandService
         return $this->getStateByDeviceId($deviceId) ?? $state;
     }
 
+    // -------------------------------------------------------------------------
+    // Comandos MANUALES (botones del panel web)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Encola un comando manual y lo ejecuta al instante (en el simulador no
+     * hay hardware real que esperar). Antes cancela los pendientes del mismo
+     * tipo para que no queden órdenes contradictorias en la cola.
+     */
     public function queueAndExecuteManualCommand(
         int $deviceId,
         string $commandType,
@@ -84,6 +121,16 @@ class CommandService
         return $this->commandModel->find($commandId);
     }
 
+    // -------------------------------------------------------------------------
+    // Comandos AUTOMÁTICOS (los encola AutomationService)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Encola un comando de automatización SOLO si hace falta:
+     * - si el actuador ya está en el valor pedido → null (nada que hacer)
+     * - si ya existe el mismo comando pendiente   → devuelve ese (no duplica)
+     * - si hay pendientes contradictorios del mismo tipo → los cancela primero
+     */
     public function queueAutomationCommand(int $deviceId, string $commandType, string $targetValue, string $reason): ?array
     {
         $state = $this->getStateByDeviceId($deviceId);
@@ -122,6 +169,11 @@ class CommandService
         return $this->commandModel->find($commandId);
     }
 
+    // -------------------------------------------------------------------------
+    // Lectura y ejecución de la cola
+    // -------------------------------------------------------------------------
+
+    /** Comandos pendientes en orden de llegada (los consulta el ESP32). */
     public function getPendingCommands(int $deviceId): array
     {
         return $this->commandModel
@@ -131,6 +183,7 @@ class CommandService
             ->findAll();
     }
 
+    /** Ejecuta TODOS los pendientes de una (lo usa el dispositivo simulado). */
     public function applyPendingCommands(int $deviceId, string $executor = 'simulated-device'): array
     {
         $pending  = $this->getPendingCommands($deviceId);
@@ -147,6 +200,11 @@ class CommandService
         return $executed;
     }
 
+    /**
+     * Marca un comando como ejecutado Y actualiza el estado del dispositivo
+     * (la columna del actuador correspondiente + el motivo). Es idempotente:
+     * si ya estaba ejecutado, lo devuelve tal cual sin tocar nada.
+     */
     public function markCommandAsExecuted(int $deviceId, int $commandId, string $executor = 'device-api'): ?array
     {
         $command = $this->commandModel->find($commandId);
@@ -193,6 +251,11 @@ class CommandService
         return $this->commandModel->find($commandId);
     }
 
+    // -------------------------------------------------------------------------
+    // Cancelaciones y consultas de estado
+    // -------------------------------------------------------------------------
+
+    /** Cancela los pendientes de la automatización (al pasar a modo manual). */
     public function cancelPendingAutomationCommands(int $deviceId): void
     {
         $pending = $this->commandModel
@@ -206,11 +269,13 @@ class CommandService
         }
     }
 
+    /** Fila de device_states del dispositivo (o null si no existe). */
     public function getStateByDeviceId(int $deviceId): ?array
     {
         return $this->stateModel->where('device_id', $deviceId)->first();
     }
 
+    /** Cancela los pendientes de UN tipo (antes de encolar uno nuevo). */
     private function cancelPendingByType(int $deviceId, string $commandType): void
     {
         $pending = $this->commandModel
@@ -224,6 +289,7 @@ class CommandService
         }
     }
 
+    /** Extrae el 'reason' del payload JSON; si no hay, arma uno genérico. */
     private function buildReasonFromCommand(array $command): string
     {
         $payload = json_decode((string) ($command['payload'] ?? ''), true);
@@ -240,3 +306,32 @@ class CommandService
         );
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Públicos:
+   - changeOperatingMode()       → cambia automatic/manual; registra el comando
+                                   como ejecutado y actualiza device_states
+   - queueAndExecuteManualCommand() → comando manual: encola + ejecuta al toque
+   - queueAutomationCommand()    → comando automático: solo si cambia algo y
+                                   sin duplicar pendientes
+   - getPendingCommands()        → cola pendiente del dispositivo (para la API)
+   - applyPendingCommands()      → ejecuta todos los pendientes (simulador)
+   - markCommandAsExecuted()     → comando → 'executed' + refleja el cambio en
+                                   device_states (idempotente)
+   - cancelPendingAutomationCommands() → al pasar a manual, limpia la cola
+   - getStateByDeviceId()        → estado actual (fila de device_states)
+
+   Privados:
+   - cancelPendingByType()       → cancela pendientes de un mismo command_type
+   - buildReasonFromCommand()    → saca el 'reason' del payload JSON
+
+   Conceptos:
+   - $actuatorMap                → command_type → columna de device_states
+                                   (fan → fan_state, etc.)
+   - 'idempotente'               → llamarlo dos veces da el mismo resultado
+                                   que llamarlo una (no rompe ni duplica)
+   - json_encode/json_decode     → (PHP) array ↔ texto JSON para el payload
+   - insert()/update()/find()/where()/first()/findAll() → (CI4 Model) CRUD
+   ============================================================================ */

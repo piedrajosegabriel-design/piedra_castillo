@@ -14,6 +14,27 @@ método por método y variable por variable. Complementa a
 > servicio usa **modelos** para leer/escribir en MySQL, y la **vista** solo
 > recorre esos datos y los dibuja.
 
+> **Cómo estudiar los services en el código.** Cada archivo de
+> `app/Services/` empieza con un **encabezado** (QUÉ HACE / SE RELACIONA CON),
+> está dividido en **secciones comentadas** por tema y termina con un
+> **GLOSARIO** de todos sus métodos. Este documento da la visión de conjunto;
+> el encabezado y el glosario de cada archivo te acompañan mientras leés el
+> código.
+
+## Índice
+
+1. [Qué es un "service" en este proyecto](#1-qué-es-un-service-en-este-proyecto)
+2. [Mapa general (los 7 servicios)](#2-mapa-general-los-7-servicios) · conexiones · quién instancia a quién · el viaje de una medición
+3. [EnvironmentPresetService](#3-environmentpresetservice) — presets de ambiente
+4. [CommandService](#4-commandservice) — cola de comandos y estado
+5. [AutomationService](#5-automationservice) — reglas automáticas
+6. [SimulationService](#6-simulationservice) — mediciones simuladas
+7. [DeviceProvisioningService](#7-deviceprovisioningservice) — setup/demo
+8. [DeviceClaimService](#8-deviceclaimservice) — alta por código
+9. [PanelService](#9-panelservice) — armado del dashboard
+10. [Resumen de conexiones](#10-resumen-de-conexiones-servicio--modelos)
+11. [Notas finales](#11-notas-finales)
+
 ---
 
 ## 1. Qué es un "service" en este proyecto
@@ -86,6 +107,47 @@ Cada service:
 | DeviceProvisioningService | `PanelController`, `DatabaseSeeder` |
 | DeviceClaimService | `DispositivosController` |
 | PanelService | `PanelController` |
+
+### 2.3. El viaje de una medición (los services trabajando juntos)
+
+El mejor ejemplo para entender cómo colaboran es seguir **una medición** desde
+que nace hasta que mueve un actuador:
+
+```
+El ESP32 envía una lectura            (o el usuario carga una manual en /panel)
+        │
+        ▼
+DeviceApiController / PanelController
+        │
+        ▼
+SimulationService::createMeasurement()
+   1. busca la última medición (ancla para completar faltantes)
+   2. genera el payload final y lo INSERTA en `measurements`
+   3. llama a la automatización ──────────────┐
+                                              ▼
+                AutomationService::processMeasurement()
+                   · ¿modo automatic? si no, no hace nada
+                   · REGLA 1: temp/hum/CO₂ altos → fan on
+                   · REGLA 2: aire < 60          → aromatizer on
+                   · REGLA 3: desvío grave       → alert_led on
+                   · por cada cambio necesario ──┐
+                                                 ▼
+                       CommandService::queueAutomationCommand()
+                          · si el actuador ya está así → no hace nada
+                          · si no → INSERT en `device_commands` (pending)
+        ┌────────────────────────────────────────┘
+        ▼
+El ESP32 pregunta GET .../commands/pending  → recibe la orden
+El ESP32 confirma POST .../commands/N/executed
+        │
+        ▼
+CommandService::markCommandAsExecuted()
+   · comando → 'executed' + actualiza `device_states` (fan_state = on...)
+        │
+        ▼
+La próxima vez que se abre /panel, PanelService lee ese estado
+y el dashboard muestra el actuador encendido y el porqué (last_reason).
+```
 
 ---
 

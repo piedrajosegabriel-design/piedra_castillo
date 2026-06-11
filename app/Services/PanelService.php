@@ -7,8 +7,31 @@ use App\Models\MeasurementModel;
 use App\Models\SpaceModel;
 use App\Models\UserModel;
 
+/* ============================================================
+   PanelService
+   QUÉ HACE: es el "armador" del dashboard. Junta todo lo que la
+   vista panel.php necesita — usuario, ambiente, dispositivo,
+   estado, métricas, gráficos, actuadores, historial y alertas —
+   y lo entrega YA COCINADO (textos formateados, tonos de color,
+   porcentajes), para que la vista solo itere y dibuje sin hacer
+   cálculos. Es el service más grande del proyecto.
+   Estructura interna:
+     1. obtenerVistaPanel()/obtenerDatos() → los datos crudos+organizados
+     2. crearGraficos/crearMetricas/crearActuadores/crearAlertas
+        → cada bloque visual del panel
+     3. tonoXxx() → semáforos (success/warning/danger) por variable
+     4. armarBloqueVista() → el paquete final para la vista, con
+        defaults de ejemplo si faltan datos
+   SE RELACIONA CON: UserModel, SpaceModel, DeviceModel,
+   MeasurementModel (lectura), CommandService (estado del
+   dispositivo) y EnvironmentPresetService (nombres legibles).
+   Lo usa PanelController.
+   ============================================================ */
 class PanelService
 {
+    // -------------------------------------------------------------------------
+    // Dependencias
+    // -------------------------------------------------------------------------
     private UserModel $usuarios;
     private SpaceModel $espacios;
     private DeviceModel $dispositivos;
@@ -26,6 +49,10 @@ class PanelService
         $this->presets      = new EnvironmentPresetService();
     }
 
+    // =========================================================================
+    // 1) PUNTO DE ENTRADA — datos del panel
+    // =========================================================================
+
     /**
      * Devuelve los datos del panel + un bloque "view" con todo listo para que
      * la vista panel.php sólo itere y dibuje (sin lógica PHP encima).
@@ -40,6 +67,11 @@ class PanelService
         return $datos;
     }
 
+    /**
+     * Recolecta y organiza TODOS los datos del panel: usuario, dispositivos,
+     * ambiente, estado, última medición e historial (6 lecturas), y los
+     * agrupa en bloques con clave propia (user, space, device, metrics...).
+     */
     public function obtenerDatos(int $userId, ?int $activeDeviceId = null): array
     {
         $usuario      = $this->usuarios->find($userId);
@@ -156,6 +188,14 @@ class PanelService
         ];
     }
 
+    // =========================================================================
+    // 2) BLOQUES VISUALES — gráficos, métricas, actuadores, alertas
+    // =========================================================================
+
+    /**
+     * Los 4 gráficos de barras (temperatura, humedad, CO₂, calidad de aire).
+     * Cada uno lleva valor actual, tono, rango ideal y los puntos escalados.
+     */
     private function crearGraficos(array $historial, array $espacio): array
     {
         if ($historial === []) {
@@ -228,6 +268,10 @@ class PanelService
         ];
     }
 
+    /**
+     * Las 4 tarjetas de métricas de la última medición. Cada una compara el
+     * valor contra los rangos del ambiente → estado (texto) + tono (color).
+     */
     private function crearMetricas(?array $medicion, array $espacio): array
     {
         if (! $medicion) {
@@ -281,6 +325,7 @@ class PanelService
         ];
     }
 
+    /** Las 3 tarjetas de actuadores según el estado actual del dispositivo. */
     private function crearActuadores(?array $estado): array
     {
         if (! $estado) {
@@ -307,6 +352,7 @@ class PanelService
         ];
     }
 
+    /** Una medición cruda → textos listos para la tabla del historial. */
     private function formatearMedicion(?array $medicion): ?array
     {
         if (! $medicion) {
@@ -324,6 +370,10 @@ class PanelService
         ];
     }
 
+    /**
+     * Lista de alertas según la última medición: una por cada variable fuera
+     * de rango. Sin mediciones → alerta informativa; todo en rango → éxito.
+     */
     private function crearAlertas(?array $medicion, array $espacio): array
     {
         if (! $medicion) {
@@ -379,6 +429,11 @@ class PanelService
         return $alertas;
     }
 
+    /**
+     * Convierte el historial en puntos de gráfico: cada valor se vuelve un
+     * porcentaje de la escala (altura de la barra) con su tono y etiqueta.
+     * $formateador y $tono son callables: cada gráfico pasa los suyos.
+     */
     private function crearPuntosGrafico(
         array $historial,
         string $campo,
@@ -400,6 +455,11 @@ class PanelService
             ];
         }, $historial);
     }
+
+    // =========================================================================
+    // 3) SEMÁFOROS — tono (color) según el valor de cada variable
+    //    success = en rango · warning = desvío leve · danger = desvío grave
+    // =========================================================================
 
     private function tonoTemperatura(float $valor, array $espacio): string
     {
@@ -449,6 +509,11 @@ class PanelService
         return 'success';
     }
 
+    // =========================================================================
+    // 4) FORMATEO — etiquetas y fechas legibles
+    // =========================================================================
+
+    /** Origen técnico de la medición → etiqueta legible para la tabla. */
     private function etiquetaOrigen(string $origen): string
     {
         return match ($origen) {
@@ -460,6 +525,7 @@ class PanelService
         };
     }
 
+    /** Fecha SQL → 'dd/mm/aaaa hh:mm', o el texto de respaldo si no hay. */
     private function fechaHumana(?string $fecha, string $fallback = 'Sin fecha'): string
     {
         if ($fecha === null || $fecha === '') {
@@ -470,9 +536,11 @@ class PanelService
     }
 
     // =========================================================================
-    // BLOQUE PARA LA VISTA panel.php
+    // 5) BLOQUE PARA LA VISTA panel.php
     // Toda la lógica de "default si no hay datos" + cálculos de tonos,
     // sparkline y sensorCards que antes vivía en panel.php se centraliza acá.
+    // Devuelve un array plano de variables listas (userName, sensorCards,
+    // automationRules, sparkPath...) que la vista consume directamente.
     // =========================================================================
     private function armarBloqueVista(array $datos): array
     {
@@ -683,6 +751,11 @@ class PanelService
         ];
     }
 
+    // =========================================================================
+    // 6) HELPERS NUMÉRICOS del bloque de vista
+    // =========================================================================
+
+    /** Saca el número de un texto tipo '24.6 C' (sirve para re-calcular). */
     private function extraerNumero(mixed $valor, float $default = 0.0): float
     {
         if (is_int($valor) || is_float($valor)) {
@@ -696,6 +769,7 @@ class PanelService
         return $default;
     }
 
+    /** Busca un gráfico por título y devuelve solo sus valores numéricos. */
     private function extraerSerieGrafico(array $charts, string $titulo): array
     {
         foreach ($charts as $chart) {
@@ -709,6 +783,11 @@ class PanelService
         return [];
     }
 
+    /**
+     * Convierte una serie de valores en un path SVG ("M x y L x y ...") para
+     * la mini-curva (sparkline) del panel: 220 px de ancho, valores
+     * normalizados entre y=10 (máximo) e y=50 (mínimo).
+     */
     private function construirSparkPath(array $values): string
     {
         if ($values === []) {
@@ -731,3 +810,45 @@ class PanelService
         return implode(' ', $cmds);
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Públicos:
+   - obtenerVistaPanel($userId, $activeDeviceId)
+       → obtenerDatos() + el bloque 'view' (lo que usa PanelController::index)
+   - obtenerDatos($userId, $activeDeviceId)
+       → recolecta todo y lo organiza en bloques: user, space, device, state,
+         resumen, metrics, charts, actuators, latest_measurement, history,
+         alerts, api, space_raw, device_raw, devices_list
+
+   Bloques visuales (privados):
+   - crearGraficos()    → los 4 gráficos de barras con puntos escalados
+   - crearMetricas()    → las 4 tarjetas de la última medición
+   - crearActuadores()/crearActuador() → tarjetas de fan/aromatizer/alert_led
+   - crearAlertas()     → alertas según qué variable salió de rango
+   - crearPuntosGrafico() → valores → porcentajes de barra (recibe callables)
+   - formatearMedicion()  → fila cruda → textos para la tabla
+
+   Semáforos (privados):
+   - tonoTemperatura()/tonoHumedad()/tonoCo2()/tonoAire()
+       → 'success' | 'warning' | 'danger' según el desvío
+
+   Formateo (privados):
+   - etiquetaOrigen()   → 'api' → 'API', 'seed' → 'Inicial', etc.
+   - fechaHumana()      → fecha SQL → 'dd/mm/aaaa hh:mm'
+
+   Bloque de vista (privados):
+   - armarBloqueVista() → TODAS las variables listas para panel.php, con
+                          datos de ejemplo si la cuenta aún no tiene lecturas
+   - extraerNumero()    → float desde un texto ('24.6 C' → 24.6)
+   - extraerSerieGrafico() → valores numéricos de un gráfico por título
+   - construirSparkPath()  → serie → path SVG de la mini-curva
+
+   Funciones/conceptos:
+   - callable / fn() => ...  → (PHP) funciones pasadas como parámetro
+   - number_format($v, 1)    → número con 1 decimal como texto
+   - array_map/array_filter  → transformar / filtrar arrays
+   - end($array)             → el último elemento (el valor más reciente)
+   - max(min())              → "clamp" para encerrar porcentajes en 0–100
+   ============================================================================ */

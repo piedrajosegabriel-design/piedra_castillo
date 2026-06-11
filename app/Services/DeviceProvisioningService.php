@@ -7,8 +7,23 @@ use App\Models\DeviceStateModel;
 use App\Models\MeasurementModel;
 use App\Models\SpaceModel;
 
+/* ============================================================
+   DeviceProvisioningService
+   QUÉ HACE: prepara la cuenta de un usuario para que el panel
+   tenga TODO lo que necesita: un ambiente, un dispositivo, un
+   estado inicial y un historial de mediciones. Si algo falta,
+   lo crea (versión simulada); si ya existe, lo respeta.
+   Es la acción detrás del botón "Ver demo del sistema".
+   SE RELACIONA CON: SpaceModel, DeviceModel, DeviceStateModel,
+   MeasurementModel (tablas), EnvironmentPresetService (rangos
+   del ambiente) y SimulationService (historial inicial).
+   Lo usa PanelController (iniciarDemo y crearPanel).
+   ============================================================ */
 class DeviceProvisioningService
 {
+    // -------------------------------------------------------------------------
+    // Dependencias
+    // -------------------------------------------------------------------------
     private SpaceModel $spaceModel;
     private DeviceModel $deviceModel;
     private DeviceStateModel $deviceStateModel;
@@ -26,8 +41,16 @@ class DeviceProvisioningService
         $this->simulationService = new SimulationService();
     }
 
+    // -------------------------------------------------------------------------
+    // Setup completo del usuario (el único método público)
+    // Patrón "ensure": cada bloque pregunta "¿existe?" y crea solo si falta.
+    // -------------------------------------------------------------------------
+
     public function ensureUserSetup(int $userId, array $spaceInput = [], bool $createSpaceIfMissing = true): array
     {
+        // 1) AMBIENTE: el primero del usuario, o uno nuevo con preset 'hogar'.
+        //    Con $createSpaceIfMissing=false NO se crea nada en silencio
+        //    (se usa así desde el panel, donde la demo es acción explícita).
         $space = $this->spaceModel->where('user_id', $userId)->first();
 
         if (! $space) {
@@ -44,6 +67,8 @@ class DeviceProvisioningService
             $space = $this->spaceModel->find($spaceId);
         }
 
+        // 2) DISPOSITIVO: si no hay ninguno, se crea uno simulado con
+        //    credenciales aleatorias (uid SIM-XXXX + api_token).
         $device = $this->deviceModel->where('user_id', $userId)->first();
 
         if (! $device) {
@@ -59,6 +84,7 @@ class DeviceProvisioningService
             $device = $this->deviceModel->find($deviceId);
         }
 
+        // 3) ESTADO: arranca en automático con todos los actuadores apagados.
         $state = $this->deviceStateModel->where('device_id', $device['id'])->first();
 
         if (! $state) {
@@ -74,6 +100,8 @@ class DeviceProvisioningService
             $state = $this->deviceStateModel->find($stateId);
         }
 
+        // 4) HISTORIAL: si no hay mediciones, se siembran 6 simuladas para
+        //    que el dashboard no aparezca vacío.
         $hasMeasurements = $this->measurementModel
             ->where('device_id', $device['id'])
             ->countAllResults() > 0;
@@ -89,3 +117,15 @@ class DeviceProvisioningService
         ];
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+   - ensureUserSetup($userId, $spaceInput, $createSpaceIfMissing)
+       → garantiza ambiente + dispositivo + estado + historial; devuelve los
+         tres primeros. Con $createSpaceIfMissing=false lanza RuntimeException
+         si el usuario no tiene ambiente (en vez de crearlo en silencio).
+   - buildSpaceData()       → (EnvironmentPresetService) rangos según preset
+   - seedHistoryForDevice() → (SimulationService) siembra mediciones iniciales
+   - where()->first()       → (CI4) la primera fila que cumple la condición
+   - array_merge($a, $b)    → (PHP) combina arrays (acá: user_id + datos preset)
+   ============================================================================ */

@@ -4,8 +4,24 @@ namespace App\Services;
 
 use App\Models\MeasurementModel;
 
+/* ============================================================
+   SimulationService
+   QUÉ HACE: genera las mediciones del sistema. Tiene dos roles:
+   (a) sembrar un historial inicial simulado para que el panel
+   nunca aparezca vacío, y (b) crear CADA medición nueva (venga
+   del ESP32, del formulario web o de la simulación), completando
+   los valores faltantes con números realistas que "caminan" cerca
+   de la última lectura, y disparando la automatización después.
+   SE RELACIONA CON: MeasurementModel (escribe las mediciones) y
+   AutomationService (procesa cada medición creada). Lo usan
+   PanelController, DeviceApiController, DeviceClaimService y
+   DeviceProvisioningService.
+   ============================================================ */
 class SimulationService
 {
+    // -------------------------------------------------------------------------
+    // Dependencias
+    // -------------------------------------------------------------------------
     private MeasurementModel $measurementModel;
     private AutomationService $automationService;
 
@@ -15,8 +31,17 @@ class SimulationService
         $this->automationService = new AutomationService();
     }
 
+    // -------------------------------------------------------------------------
+    // Siembra de historial inicial
+    // -------------------------------------------------------------------------
+
+    /**
+     * Crea $count mediciones simuladas "hacia atrás en el tiempo" (una por
+     * hora) para que el panel tenga gráficos e historial desde el primer día.
+     */
     public function seedHistoryForDevice(array $device, array $space, int $count = 6): void
     {
+        // El bucle va de la más vieja a la más nueva (-5h, -4h, ... -0h).
         for ($i = $count - 1; $i >= 0; $i--) {
             $payload = $this->generateMeasurementPayload($space, null, [
                 'captured_at' => date('Y-m-d H:i:s', strtotime("-{$i} hours")),
@@ -38,8 +63,19 @@ class SimulationService
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Creación de una medición (el camino de TODAS las mediciones nuevas)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Crea una medición y dispara la automatización.
+     * $input puede traer valores reales (API/form); lo que falte se completa
+     * con datos simulados a partir de la última medición.
+     */
     public function createMeasurement(array $device, array $space, string $source = 'web', array $input = []): array
     {
+        // La última medición sirve de "ancla" para que los valores simulados
+        // varíen suavemente en vez de saltar a cualquier número.
         $lastMeasurement = $this->measurementModel
             ->where('device_id', $device['id'])
             ->orderBy('captured_at', 'DESC')
@@ -61,6 +97,8 @@ class SimulationService
             'captured_at'       => $payload['captured_at'],
         ]);
 
+        // Cada medición nueva pasa por la automatización: acá es donde el
+        // sistema decide si prender/apagar actuadores.
         $measurement = $this->measurementModel->find($measurementId);
         $automation  = $this->automationService->processMeasurement($device, $space, $measurement);
 
@@ -70,8 +108,18 @@ class SimulationService
         ];
     }
 
+    // -------------------------------------------------------------------------
+    // Generación de valores (la "física" de la simulación)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Arma el payload completo de una medición. Por cada variable:
+     * si vino en $input se respeta (acotada a su rango físico); si no,
+     * se genera un valor cercano al anterior (o al punto medio del ambiente).
+     */
     private function generateMeasurementPayload(array $space, ?array $lastMeasurement, array $input): array
     {
+        // Puntos de partida: el medio del rango ideal del ambiente.
         $midTemp = (((float) $space['min_temperature']) + ((float) $space['max_temperature'])) / 2;
         $midHum  = (((float) $space['min_humidity']) + ((float) $space['max_humidity'])) / 2;
         $baseCo2 = max(420, (int) $space['max_co2'] - 160);
@@ -118,6 +166,12 @@ class SimulationService
         ];
     }
 
+    /**
+     * Índice de calidad de aire (20–100): arranca en 100 y descuenta puntos
+     * por cada desvío (temperatura lejos del medio, humedad fuera de rango,
+     * CO₂ sobre el límite). Es una fórmula propia y simple, pensada para
+     * que el número "reaccione" de forma creíble.
+     */
     private function calculateAirQualityIndex(float $temperature, float $humidity, int $co2, array $space): int
     {
         $score = 100;
@@ -140,6 +194,7 @@ class SimulationService
         return max(20, min(100, $score));
     }
 
+    /** Etiqueta legible del índice: 85+ Excelente, 70+ Buena, 55+ Aceptable. */
     private function getAirQualityLabel(int $score): string
     {
         if ($score >= 85) {
@@ -157,6 +212,10 @@ class SimulationService
         return 'Mala';
     }
 
+    /**
+     * Valor decimal: si vino un dato real lo acota a [min, max]; si no,
+     * "camina" desde el último valor con un paso aleatorio de ±variation.
+     */
     private function resolveDecimal(mixed $value, mixed $lastValue, float $min, float $max, float $variation): float
     {
         if ($value !== null && $value !== '') {
@@ -169,6 +228,7 @@ class SimulationService
         return max($min, min($max, $base + $offset));
     }
 
+    /** Igual que resolveDecimal pero para enteros (CO₂). */
     private function resolveInteger(mixed $value, mixed $lastValue, int $min, int $max, int $variation): int
     {
         if ($value !== null && $value !== '') {
@@ -180,3 +240,27 @@ class SimulationService
         return max($min, min($max, (int) $lastValue + $offset));
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Públicos:
+   - seedHistoryForDevice($device, $space, $count = 6)
+       → inserta $count mediciones 'seed', una por hora hacia atrás
+   - createMeasurement($device, $space, $source, $input)
+       → crea UNA medición (completa faltantes con simulación) y corre
+         la automatización; devuelve ['measurement' => ..., 'automation' => ...]
+
+   Privados:
+   - generateMeasurementPayload() → arma todos los valores de la medición
+   - calculateAirQualityIndex()   → score 20–100 según los desvíos
+   - getAirQualityLabel()         → score → Excelente/Buena/Aceptable/Mala
+   - resolveDecimal()/resolveInteger() → dato real acotado, o paso aleatorio
+                                         desde el último valor
+
+   Funciones clave:
+   - max($min, min($max, $v))  → (PHP) "clamp": encierra $v entre min y max
+   - random_int(-100, 100)/100 → paso aleatorio proporcional a la variación
+   - strtotime("-{$i} hours")  → fecha de hace $i horas (para la siembra)
+   - round($v, 1)              → redondeo a 1 decimal
+   ============================================================================ */

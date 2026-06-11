@@ -8,18 +8,24 @@ use App\Models\DeviceStateModel;
 use App\Models\SpaceModel;
 use RuntimeException;
 
-/**
- * Vinculación de dispositivos por código de activación (claim code).
- *
- * Flujo recomendado (ver docs/HITO_2_IMPLEMENTACION.md):
- *   1. El dispositivo trae un código único EDEN-XXXX-XXXX.
- *   2. El usuario lo ingresa (o escanea el QR) en "Agregar dispositivo".
- *   3. Se valida que exista y no haya sido usado.
- *   4. El usuario le pone nombre, tipo y ambiente.
- *   5. El código queda marcado como usado y el dispositivo asociado a la cuenta.
- *
- * La MAC es sólo un dato técnico interno, nunca una credencial.
- */
+/* ============================================================
+   DeviceClaimService
+   QUÉ HACE: gestiona la vinculación de un dispositivo físico a
+   una cuenta mediante su código de activación (claim code).
+   Flujo (ver docs/HITO_2_IMPLEMENTACION.md):
+     1. El dispositivo trae un código único EDEN-XXXX-XXXX.
+     2. El usuario lo ingresa (o escanea el QR) en "Agregar dispositivo".
+     3. Se valida que exista y no haya sido usado (inspeccionarCodigo).
+     4. El usuario le pone nombre, tipo y ambiente.
+     5. vincular() crea TODO en una transacción: ambiente (nuevo o
+        reusado) + dispositivo + estado inicial + historial simulado,
+        y marca el código como canjeado.
+   La MAC es sólo un dato técnico interno, nunca una credencial.
+   SE RELACIONA CON: DeviceActivationCodeModel, DeviceModel,
+   SpaceModel, DeviceStateModel (tablas), EnvironmentPresetService
+   (rangos del ambiente nuevo) y SimulationService (historial
+   inicial). Lo usa DispositivosController.
+   ============================================================ */
 class DeviceClaimService
 {
     /** Tipos de dispositivo ofrecidos en el alta. */
@@ -61,6 +67,10 @@ class DeviceClaimService
         $this->simulation = new SimulationService();
     }
 
+    // -------------------------------------------------------------------------
+    // Catálogos para el wizard de alta
+    // -------------------------------------------------------------------------
+
     public function tiposDispositivo(): array
     {
         return self::TIPOS;
@@ -81,9 +91,15 @@ class DeviceClaimService
         return array_key_exists($espacio, self::ESPACIOS);
     }
 
+    // -------------------------------------------------------------------------
+    // Inspección del código (paso 1 del wizard, sin canjear)
+    // -------------------------------------------------------------------------
+
     /**
      * Inspecciona un código sin canjearlo. Pensado para feedback visual del
-     * formulario (paso 1 del asistente).
+     * formulario (paso 1 del asistente). Va descartando casos de error en
+     * orden: vacío → formato inválido → inexistente → usado → deshabilitado;
+     * si sobrevive a todos, está disponible.
      *
      * @return array{ok: bool, estado: string, mensaje: string, code: ?array}
      */
@@ -121,8 +137,16 @@ class DeviceClaimService
         ];
     }
 
+    // -------------------------------------------------------------------------
+    // Canje del código (el alta completa, en transacción)
+    // -------------------------------------------------------------------------
+
     /**
      * Canjea el código y crea el dispositivo + ambiente + estado.
+     *
+     * Todo dentro de una TRANSACCIÓN (transStart/transComplete): si algún
+     * paso falla, la base vuelve atrás completa y no quedan datos a medias
+     * (ej: un dispositivo sin estado, o un código canjeado sin dispositivo).
      *
      * @param array{code:string, name:string, device_type:string, space:string, space_custom?:string, notes?:string} $datos
      * @return array{device: array, space: array}
@@ -220,6 +244,10 @@ class DeviceClaimService
         return ['device' => $device, 'space' => $space];
     }
 
+    // -------------------------------------------------------------------------
+    // Listado para "Mis dispositivos"
+    // -------------------------------------------------------------------------
+
     /**
      * Lista los dispositivos del usuario con metadatos listos para la vista
      * "Mis dispositivos" (etiqueta y tono de estado incluidos).
@@ -263,3 +291,29 @@ class DeviceClaimService
         };
     }
 }
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Catálogos:
+   - tiposDispositivo()/espacios() → constantes TIPOS y ESPACIOS para el wizard
+   - esTipoValido()/esEspacioValido() → ¿la clave existe en el catálogo?
+
+   Núcleo:
+   - inspeccionarCodigo($codigo)  → estado del código SIN canjearlo:
+                                    vacio/formato/inexistente/usado/
+                                    deshabilitado/disponible
+   - vincular($userId, $datos)    → el alta completa en transacción:
+                                    ambiente + dispositivo + estado +
+                                    historial + código canjeado
+   - listarDeUsuario($userId)     → dispositivos con etiquetas listas para la vista
+   - estadoLegible($status, ...)  → [texto, tono] para cada estado
+
+   Funciones clave:
+   - preg_match('/^EDEN-...$/')   → (PHP) valida el formato del código
+   - db_connect()->transStart()/transComplete()/transStatus()
+                                  → (CI4) transacción: todo o nada
+   - bin2hex(random_bytes(n))     → genera device_uid y api_token aleatorios
+   - match ($status) { ... }      → (PHP 8) switch que devuelve un valor
+   - array_map() / ?: / ??        → transformación y valores por defecto
+   ============================================================================ */
