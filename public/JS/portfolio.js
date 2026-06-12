@@ -146,7 +146,11 @@
                             obs.unobserve(entry.target);
                         }
                     });
-                }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
+                /* threshold 0: las secciones largas (análisis de mercado mide
+                   ~12.000px en mobile) nunca llegan a un ratio de 0.08 porque
+                   el viewport es una fracción mínima de su altura → quedaban
+                   con opacity:0 para siempre en el celular. */
+                }, { threshold: 0, rootMargin: "0px 0px -6% 0px" });
                 reveals.forEach(function (el) { obs.observe(el); });
             }
         }

@@ -67,6 +67,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function syncScrollOffsetVar() {
         var offset = getHeaderOffset();
         document.documentElement.style.setProperty("--ea-scroll-offset", offset + "px");
+        // Altura real del header → padding-top de .ea-main (el 64px del CSS
+        // es solo fallback; el header puede crecer si el título hace wrap).
+        if (header) {
+            var h = Math.ceil(header.getBoundingClientRect().height);
+            document.documentElement.style.setProperty("--ead-header-h", h + "px");
+        }
     }
 
     syncScrollOffsetVar();

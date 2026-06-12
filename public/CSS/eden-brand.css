@@ -1075,6 +1075,18 @@ body.ea-nav-open {
     box-shadow: var(--ea-shadow-sm);
 }
 
+/* ---- Touch: zona táctil mínima de 44px en pantallas chicas ---- */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary,
+    .ea-button-ghost {
+        min-height: 44px;
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
 /* ---- Press feedback: buttons must feel responsive when pressed ---- */
 @media (hover: hover) and (pointer: fine) {
     .ea-button:active,

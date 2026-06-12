@@ -48,16 +48,9 @@
             document.body.classList.add("ea-has-smooth");
             document.documentElement.style.scrollBehavior = "auto";
 
-            // Ajustar padding-top de #smooth-content a la altura real del header
-            function syncContentPadding() {
-                var hdr = document.querySelector(".ea-header, .dashboard-header");
-                if (hdr) {
-                    content.style.paddingTop = Math.ceil(hdr.getBoundingClientRect().height) + "px";
-                    if (window.ScrollTrigger) window.ScrollTrigger.refresh();
-                }
-            }
-            syncContentPadding();
-            window.addEventListener("resize", syncContentPadding);
+            // El offset del header ya no se setea acá: vive en CSS
+            // (.ea-main { padding-top: var(--ead-header-h) }) y dashboard.js
+            // sincroniza la variable con la altura real en load/resize.
 
             // Cuando el sidebar se colapsa / expande, el ancho del layout cambia
             // → refrescar ScrollTrigger después de que la transición CSS termine (0.25s)
@@ -74,7 +67,6 @@
             }
 
             return function () {
-                window.removeEventListener("resize", syncContentPadding);
                 document.body.classList.remove("ea-has-smooth");
                 document.documentElement.style.scrollBehavior = "";
                 window.__eaSmoother = null;

@@ -31,9 +31,10 @@
     --ead-radius:    16px;
     --ead-radius-sm: 11px;
     --ead-radius-lg: 22px;
-    --ead-pad:    22px;
-    --ead-pad-sm: 16px;
-    --ead-gap:    18px;
+    /* Espaciado fluido: escala con el viewport entre mobile y desktop */
+    --ead-pad:    clamp(16px, 2.4vw, 22px);
+    --ead-pad-sm: clamp(13px, 1.8vw, 16px);
+    --ead-gap:    clamp(14px, 2vw, 18px);
 
     --ead-line:        rgba(14, 31, 23, 0.08);
     --ead-line-strong: rgba(14, 31, 23, 0.14);
@@ -820,9 +821,13 @@ body.dashboard-body { overflow-x: hidden; }
     margin: 0;
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: clamp(18px, 1.7vw, 22px);
     letter-spacing: -0.015em;
     color: var(--ea-ink);
+    /* Truncar en vez de pisar los chips cuando no hay lugar */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ea-header-titles p {
@@ -940,7 +945,7 @@ body.dashboard-body { overflow-x: hidden; }
    CONTENT
    ===================================================================== */
 .ea-content {
-    padding: 26px 26px 64px;
+    padding: clamp(16px, 2.6vw, 26px) clamp(14px, 2.6vw, 26px) clamp(44px, 6vw, 64px);
     display: flex;
     flex-direction: column;
     gap: var(--ead-gap);
@@ -1143,7 +1148,8 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-card-head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    flex-wrap: wrap; /* en pantallas angostas las acciones bajan de línea en vez de desbordar */
+    gap: 8px 10px;
     padding: 16px var(--ead-pad-sm) 12px;
 }
 
@@ -1297,7 +1303,7 @@ body.dashboard-body { overflow-x: hidden; }
     margin: 8px 0 0;
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: clamp(34px, 4vw, 46px);
+    font-size: clamp(28px, 5vw, 46px);
     line-height: 1.04;
     letter-spacing: -0.02em;
     color: #fff;
@@ -1515,7 +1521,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-sensor-num {
     font-family: var(--ea-font-serif);
-    font-size: 38px;
+    font-size: clamp(30px, 3.4vw, 38px);
     font-weight: 400;
     letter-spacing: -0.025em;
     line-height: 1;
@@ -2394,7 +2400,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-plan-amount {
     font-family: var(--ea-font-serif);
-    font-size: 64px;
+    font-size: clamp(48px, 10vw, 64px);
     line-height: 0.95;
     font-weight: 700;
     color: var(--eden-800);
@@ -2724,18 +2730,40 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-dashboard.sidebar-open .ea-sidebar-foot-label { display: revert; }
 
     .ea-header { padding: 10px 16px; }
-    .ea-header-titles h1 { font-size: 18px; }
-    .ea-content { padding: 18px 16px 56px; }
 
     .ea-sensor-grid { grid-template-columns: repeat(2, 1fr); }
     .ea-system-stats { grid-template-columns: repeat(2, 1fr); }
     .ea-ops-grid { grid-template-columns: 1fr; }
+
+    /* ---- Zonas táctiles cómodas (mínimo 44px) ---- */
+    .ea-burger { width: 44px; height: 44px; }
+    .ea-sidebar-item,
+    .ea-sidebar-logout { min-height: 44px; }
+    .ea-kbtn { height: auto; min-height: 44px; padding-top: 6px; padding-bottom: 6px; }
+    .ea-device-switcher select { min-height: 44px; }
+    .ea-mode-opt { min-height: 44px; }
+    /* El switch de tema agranda su zona de toque sin mover el layout */
+    .ea-header .ea-theme-switch { padding: 8px 4px; margin: -8px -4px; }
 }
 
 @media (max-width: 680px) {
     .ea-chip-update { display: none; }
+
+    /* Header en dos filas: fila 1 = burger + título + tema + usuario;
+       fila 2 = chips informativos / selector de dispositivo. Así nada se
+       superpone ni se corta. La altura real la sincroniza dashboard.js. */
+    .ea-header,
+    .dashboard-header { flex-wrap: wrap; }
+    .ea-header::after,
+    .dashboard-header::after { content: ""; order: 4; flex-basis: 100%; height: 0; }
+    .ea-burger { order: 0; }
+    .ea-header-titles { order: 1; }
+    .ea-header-tools { order: 2; margin-left: auto; }
+    .ea-header-user { order: 3; }
+    .ea-header .ea-chip,
+    .ea-header .ea-device-switcher { order: 5; margin-top: 2px; }
+
     .ea-hero { padding: 22px; }
-    .ea-hero-title { font-size: 32px; }
     .ea-hero-side { flex-direction: column; }
     .ea-hero-trend { flex: 1; }
     .ea-hero-metrics { grid-template-columns: 1fr 1fr; }
@@ -2749,12 +2777,9 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-sensor-grid { grid-template-columns: 1fr; }
     .ea-system-stats { grid-template-columns: 1fr; }
     .ea-hero-metrics { grid-template-columns: 1fr; }
-    .ea-hero-title { font-size: 28px; }
     .ea-hero-foot { grid-template-columns: 1fr; }
-    .ea-sensor-num { font-size: 32px; }
     .ea-readings-foot { flex-wrap: wrap; justify-content: flex-start; }
     .ea-plan-card { padding: 24px 20px; border-radius: var(--ead-radius); }
-    .ea-plan-amount { font-size: 54px; }
     .ea-plan-period { align-self: baseline; flex-basis: 100%; margin-bottom: 0; }
     .ea-plan-price { flex-wrap: wrap; }
     .ea-plan-toast { left: 16px; right: 16px; bottom: 18px; transform: translateY(16px); justify-content: center; }
@@ -2769,7 +2794,7 @@ body.dashboard-body { overflow-x: hidden; }
    ===================================================================== */
 @media print {
     .ea-sidebar, .ea-header, .dashboard-loader { display: none !important; }
-    .ea-dashboard #smooth-wrapper { margin-left: 0; }
+    .ea-main { margin-left: 0; padding-top: 0; }
     .ea-content { padding: 12px; }
     .ea-card, .ea-hero, .ea-sensor-card { break-inside: avoid; box-shadow: none; }
 }
@@ -2792,7 +2817,8 @@ body.dashboard-body { overflow-x: hidden; }
     left: 0;
     width: var(--ead-sb-w);
     z-index: 50;
-    transition: width 0.25s ease, transform 0.25s ease;
+    /* Mismo timing que .ea-main y .ea-header para que el shell se mueva en bloque */
+    transition: width 0.25s var(--ea-ease-out, ease), transform 0.25s var(--ea-ease-out, ease);
 }
 .ea-dashboard.sidebar-closed .ea-sidebar { width: var(--ead-sb-w-collapsed); }
 
@@ -2803,25 +2829,29 @@ body.dashboard-body { overflow-x: hidden; }
     top: 0;
     left: var(--ead-sb-w);
     right: 0;
-    transition: left 0.25s ease;
+    transition: left 0.25s var(--ea-ease-out, ease);
 }
 .ea-dashboard.sidebar-closed .ea-header,
 .ea-dashboard.sidebar-closed .dashboard-header { left: var(--ead-sb-w-collapsed); }
 
-/* ---- Smooth wrapper: margen izquierdo compensa el sidebar fijo ----- */
-.ea-dashboard #smooth-wrapper {
+/* ---- Main: compensa el sidebar (margen) y el header (padding) ------
+   La compensación vive en .ea-main porque existe en TODAS las vistas
+   internas, con o sin ScrollSmoother. No puede vivir en #smooth-wrapper:
+   ScrollSmoother le pisa inset/width con estilos inline (position:fixed;
+   inset:0; width:100%), así que un margin-left ahí lo desplaza sin
+   achicarlo y recorta el contenido por la derecha.
+   --ead-header-h la sincroniza dashboard.js con la altura real. ------- */
+.ea-main {
+    display: block;
     margin-left: var(--ead-sb-w);
+    padding-top: var(--ead-header-h);
     min-height: 100vh;
-    transition: margin-left 0.25s ease;
+    transition: margin-left 0.25s var(--ea-ease-out, ease);
 }
-.ea-dashboard.sidebar-closed #smooth-wrapper { margin-left: var(--ead-sb-w-collapsed); }
+.ea-dashboard.sidebar-closed .ea-main { margin-left: var(--ead-sb-w-collapsed); }
 
-/* El padding-top lo maneja dashboard-gsap.js dinámicamente (altura real
-   del header). El valor CSS sirve de fallback antes de que cargue el JS. */
-.ea-dashboard #smooth-content { padding-top: var(--ead-header-h); }
-
-/* ea-main ya no contiene el header → no necesita flex-column */
-.ea-main { display: block; }
+/* El wrapper/content de ScrollSmoother ya no llevan compensación propia */
+.ea-dashboard #smooth-wrapper { min-height: 100vh; }
 
 /* ---- Mobile (≤960px) ----------------------------------------------- */
 @media (max-width: 960px) {
@@ -2833,13 +2863,13 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-dashboard.sidebar-closed .ea-header,
     .ea-dashboard.sidebar-closed .dashboard-header { left: 0; }
 
-    /* Smooth wrapper sin margen en mobile */
-    .ea-dashboard #smooth-wrapper { margin-left: 0; transition: none; }
-    .ea-dashboard.sidebar-closed #smooth-wrapper { margin-left: 0; }
+    /* Main sin margen en mobile (el sidebar es un drawer superpuesto) */
+    .ea-main { margin-left: 0; transition: none; }
+    .ea-dashboard.sidebar-closed .ea-main { margin-left: 0; }
 
-    /* Sidebar mobile: ancho fijo, solo anima transform (deslizar desde la izq.) */
-    .ea-sidebar { width: 284px; transition: transform 0.25s ease; }
-    .ea-dashboard.sidebar-closed .ea-sidebar { width: 284px; }
+    /* Sidebar mobile: drawer; en pantallas muy angostas deja ver el backdrop */
+    .ea-sidebar { width: min(284px, 86vw); transition: transform 0.25s var(--ea-ease-out, ease); }
+    .ea-dashboard.sidebar-closed .ea-sidebar { width: min(284px, 86vw); }
 }
 
 /* =====================================================================
@@ -2875,7 +2905,7 @@ body.dashboard-body { overflow-x: hidden; }
     flex-wrap: wrap;
     margin-bottom: 22px;
 }
-.ea-dev-toolbar-title { font-family: var(--ea-font-serif); font-size: 22px; margin: 0 0 4px; color: var(--ea-ink); }
+.ea-dev-toolbar-title { font-family: var(--ea-font-serif); font-size: clamp(19px, 2vw, 22px); margin: 0 0 4px; color: var(--ea-ink); }
 .ea-dev-toolbar-sub { margin: 0; max-width: 56ch; color: var(--ea-mute); font-size: 14px; line-height: 1.5; }
 
 /* ---------- Grid de dispositivos ---------- */
@@ -3056,8 +3086,17 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-wizard-steps li.is-active span { background: var(--eden-700); color: var(--eden-100); }
 .ea-wizard-steps li.is-done span { background: var(--ea-success-soft); color: var(--eden-500); }
 
+/* Stepper en pantallas angostas: solo se lee la etiqueta del paso activo;
+   los demás quedan como círculos numerados (sin desbordar a 320px). */
+@media (max-width: 520px) {
+    .ea-wizard-steps { gap: 6px; }
+    .ea-wizard-steps li { font-size: 0; gap: 0; justify-content: center; }
+    .ea-wizard-steps li span { font-size: 12px; }
+    .ea-wizard-steps li.is-active { font-size: 12.5px; gap: 8px; flex: 2.4; }
+}
+
 .ea-wizard-form {
-    padding: 26px;
+    padding: clamp(16px, 4vw, 26px);
     border-radius: var(--ea-r-lg, 22px);
     background: var(--ea-card);
     border: 1px solid var(--ea-rule);

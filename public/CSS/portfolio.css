@@ -1055,6 +1055,11 @@
     border-top: 1px dashed var(--ea-rule);
 }
 
+/* Los hijos del grid pueden achicarse: sin esto, una tabla con min-width
+   (ej. .ea-pf-table, 640px) infla el track 1fr y desborda la sección
+   entera en mobile — y ScrollSmoother recorta lo que sobresale. */
+.ea-pf-block > * { min-width: 0; }
+
 @media (max-width: 820px) { .ea-pf-block { grid-template-columns: 1fr; } }
 
 .ea-pf-block__label {
