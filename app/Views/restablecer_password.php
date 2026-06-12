@@ -28,9 +28,9 @@
 
             <div>
                 <?= view('partials/logo', ['tone' => 'cream', 'size' => 56, 'variant' => 'horizontal']) ?>
-                <h1 class="ea-auth-title">Elegi una<br><em>nueva clave.</em></h1>
+                <h1 class="ea-auth-title">Elegí una<br><em>nueva clave.</em></h1>
                 <p class="ea-auth-lede">
-                    Estas a un paso de recuperar tu cuenta. Ingresa una contraseña nueva y segura para volver a entrar a tu panel.
+                    Estás a un paso de recuperar tu cuenta. Ingresá una contraseña nueva y segura para volver a entrar a tu panel.
                 </p>
             </div>
 
@@ -56,8 +56,8 @@
             <div class="ea-auth-card">
                 <div>
                     <p class="ea-eyebrow">Restablecer acceso</p>
-                    <h2>Crea una nueva contraseña.</h2>
-                    <p class="ea-lede">Usa al menos 8 caracteres con una mayúscula, una minúscula y un número.</p>
+                    <h2>Creá una nueva contraseña.</h2>
+                    <p class="ea-lede">Usá al menos 8 caracteres con una mayúscula, una minúscula y un número.</p>
                 </div>
 
                 <?php if (session()->getFlashdata('error')): ?>
@@ -68,7 +68,7 @@
                 <?php if ($errores): ?>
                     <div class="ea-message ea-message--error">
                         <div>
-                            <strong>Revisa los siguientes campos:</strong>
+                            <strong>Revisá los siguientes campos:</strong>
                             <ul>
                                 <?php foreach ($errores as $error): ?>
                                     <li><?= esc($error) ?></li>
@@ -85,7 +85,7 @@
                         <label for="password">Nueva contraseña</label>
                         <div class="ea-password">
                             <input type="password" id="password" name="password"
-                                   placeholder="Ingresa tu nueva contrasena"
+                                   placeholder="Ingresá tu nueva contraseña"
                                    autocomplete="new-password" minlength="8" required>
                             <button type="button" class="ea-button ea-button-secondary" data-toggle-password="#password">Mostrar</button>
                         </div>
@@ -95,14 +95,14 @@
                         <label for="password_confirm">Confirmar contraseña</label>
                         <div class="ea-password">
                             <input type="password" id="password_confirm" name="password_confirm"
-                                   placeholder="Repite tu nueva contrasena"
+                                   placeholder="Repetí tu nueva contraseña"
                                    autocomplete="new-password" minlength="8" required>
                             <button type="button" class="ea-button ea-button-secondary" data-toggle-password="#password_confirm">Mostrar</button>
                         </div>
                     </div>
 
                     <p class="ea-hint">
-                        Cuando confirmes el cambio, el token quedara invalídado y deberas iniciar sesión con la nueva contraseña.
+                        Cuando confirmes el cambio, el token quedará invalidado y deberás iniciar sesión con la nueva contraseña.
                     </p>
 
                     <button type="submit" class="ea-button ea-button-primary ea-button-block">

@@ -38,7 +38,7 @@
                 <li>
                     <span></span>
                     <span>
-                        <strong>Proceso Cifrado</strong>
+                        <strong>Proceso cifrado</strong>
                         Generamos un token de un solo uso que expira automáticamente para proteger tus datos.
                     </span>
                 </li>

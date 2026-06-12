@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablecer contrasena</title>
+    <title>Restablecer contraseña</title>
 </head>
 <body style="margin:0; padding:0; background:#f4f1ea; font-family:Arial, Helvetica, sans-serif; color:#14201a;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f1ea; margin:0; padding:0;">
@@ -24,7 +24,7 @@
                                             Eden<span style="font-family:Georgia, 'Times New Roman', serif; font-style:italic; font-weight:400;">Air</span>
                                         </div>
                                         <div style="margin-top:7px; font-size:12px; line-height:1.4; color:#bcd2bd; text-transform:uppercase; letter-spacing:1.6px;">
-                                            Recuperacion de cuenta
+                                            Recuperación de cuenta
                                         </div>
                                     </td>
                                 </tr>
@@ -38,7 +38,7 @@
                                 Seguridad
                             </div>
                             <h1 style="margin:18px 0 0 0; color:#14201a; font-family:Georgia, 'Times New Roman', serif; font-size:35px; line-height:1.08; font-weight:400; letter-spacing:0;">
-                                Recupera tu acceso.
+                                Recuperá tu acceso.
                             </h1>
                         </td>
                     </tr>
@@ -49,7 +49,7 @@
                                 Hola <?= esc($nombre) ?>,
                             </p>
                             <p style="margin:14px 0 0 0; color:#3b4a40; font-size:16px; line-height:1.65;">
-                                Recibimos una solicitud para crear una nueva contrasena para tu cuenta de EdenAir. Para continuar, usa este enlace temporal.
+                                Recibimos una solicitud para crear una nueva contraseña para tu cuenta de EdenAir. Para continuar, usá este enlace temporal.
                             </p>
                         </td>
                     </tr>
@@ -57,7 +57,7 @@
                     <tr>
                         <td align="left" style="padding:30px 38px 28px 38px; background:#fbfaf5;">
                             <a href="<?= esc($enlace, 'attr') ?>" style="display:inline-block; background:#1c4029; color:#ecf2e8; text-decoration:none; font-size:15px; line-height:1; font-weight:800; padding:16px 24px; border-radius:999px;">
-                                Restablecer contrasena
+                                Restablecer contraseña
                             </a>
                         </td>
                     </tr>
@@ -71,7 +71,7 @@
                                             El enlace vence en <?= esc((string) $minutos) ?> minutos.
                                         </p>
                                         <p style="margin:7px 0 0 0; color:#3b4a40; font-size:14px; line-height:1.6;">
-                                            Despues de usarlo, el token queda anulado. Si no pediste este cambio, podes ignorar este correo.
+                                            Después de usarlo, el token queda anulado. Si no pediste este cambio, podés ignorar este correo.
                                         </p>
                                     </td>
                                 </tr>
@@ -82,7 +82,7 @@
                     <tr>
                         <td style="padding:0 38px 38px 38px; background:#fbfaf5;">
                             <p style="margin:0; color:#6f7c70; font-size:13px; line-height:1.6;">
-                                Si el boton no funciona, abri este enlace:
+                                Si el botón no funciona, abrí este enlace:
                             </p>
                             <p style="margin:8px 0 0 0; color:#6f7c70; font-size:12px; line-height:1.5; word-break:break-all;">
                                 <a href="<?= esc($enlace, 'attr') ?>" style="color:#1c4029; text-decoration:underline;"><?= esc($enlace) ?></a>
@@ -93,7 +93,7 @@
                     <tr>
                         <td style="background:#ece7db; border-top:1px solid #dbe6d9; padding:22px 38px;">
                             <p style="margin:0; color:#6f7c70; font-size:12px; line-height:1.6;">
-                                EdenAir - Respira mejor, vivi mas comodo.
+                                EdenAir - Respirá mejor, viví más cómodo.
                             </p>
                         </td>
                     </tr>
