@@ -9,8 +9,11 @@
 !/writable/uploads/index.html
 !/writable/debugbar/index.html
 
-# Local env
+# Configuracion local: es distinta en cada maquina (sobre todo el puerto de
+# MySQL), asi que NO se versiona. La plantilla .env.example si se versiona:
+# es la lista de que claves hay que completar.
 .env
+!.env.example
 
 # IDE / OS
 .vscode/
@@ -20,3 +23,11 @@ Thumbs.db
 
 # Logs sueltos en raíz
 *.log
+
+# Cache de Python (lo genera Thonny/Python al compilar)
+__pycache__/
+*.pyc
+
+# Archivos que la ESP32 se genera sola (no son del repo)
+firmware/wifi.json
+firmware/credenciales.json
