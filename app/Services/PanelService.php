@@ -9,26 +9,51 @@ use App\Models\UserModel;
 
 /* ============================================================
    PanelService
-   QUÉ HACE: es el "armador" del dashboard. Junta todo lo que la
-   vista panel.php necesita — usuario, ambiente, dispositivo,
-   estado, métricas, gráficos, actuadores, historial y alertas —
-   y lo entrega YA COCINADO (textos formateados, tonos de color,
-   porcentajes), para que la vista solo itere y dibuje sin hacer
-   cálculos. Es el service más grande del proyecto.
-   Estructura interna:
-     1. obtenerVistaPanel()/obtenerDatos() → los datos crudos+organizados
-     2. crearGraficos/crearMetricas/crearActuadores/crearAlertas
-        → cada bloque visual del panel
-     3. tonoXxx() → semáforos (success/warning/danger) por variable
-     4. armarBloqueVista() → el paquete final para la vista, con
-        defaults de ejemplo si faltan datos
+   QUÉ HACE: arma el dashboard. Lee la última medición del
+   dispositivo activo y devuelve TODO ya cocinado para que
+   panel.php solo recorra arrays y dibuje.
+
+   REGLA DE ORO DE ESTE ARCHIVO: los números viajan como números
+   hasta el último momento. El texto ("24.6 °C") se arma recién
+   cuando se entrega a la vista, nunca antes — así no hay que
+   volver a leer un número desde un texto.
+
+   Camino de los datos (una sola pasada):
+     contexto()   → usuario, dispositivo, ambiente, estado, historial
+     lecturas()   → los 4 valores crudos de la última medición
+     evaluar()    → un semáforo por variable (ÚNICO umbral del panel)
+     sensores()/actuadores()/reglas()/historial() → los bloques visuales
+     armarVista() → el paquete plano que consume la vista
+
    SE RELACIONA CON: UserModel, SpaceModel, DeviceModel,
-   MeasurementModel (lectura), CommandService (estado del
-   dispositivo) y EnvironmentPresetService (nombres legibles).
+   MeasurementModel, CommandService (estado del dispositivo) y
+   EnvironmentPresetService (nombres legibles del ambiente).
    Lo usa PanelController.
    ============================================================ */
 class PanelService
 {
+    // =========================================================================
+    // UMBRALES — el único lugar del panel donde se decide qué está "fuera de
+    // rango". Los usan por igual las tarjetas de sensores, las reglas de
+    // automatización, el estado general y la tabla de lecturas.
+    // =========================================================================
+
+    /** Margen (en °C y en puntos de humedad) a partir del cual el desvío es grave. */
+    private const MARGEN_TEMP  = 2.0;
+    private const MARGEN_HUM   = 10.0;
+    private const MARGEN_CO2   = 250;
+
+    /** Calidad de aire (0–100, más alto es mejor). */
+    private const AIRE_MALO    = 55;
+    private const AIRE_REGULAR = 70;
+
+    /** Escalas de los medidores (mínimo y máximo del gauge de cada variable). */
+    private const ESCALA_TEMP = [10.0, 35.0];
+    private const ESCALA_CO2  = [0.0, 1500.0];
+
+    /** Cuántas lecturas trae la tabla del historial. */
+    private const LECTURAS = 6;
+
     // -------------------------------------------------------------------------
     // Dependencias
     // -------------------------------------------------------------------------
@@ -50,122 +75,74 @@ class PanelService
     }
 
     // =========================================================================
-    // 1) PUNTO DE ENTRADA — datos del panel
+    // 1) PUNTOS DE ENTRADA
     // =========================================================================
 
-    /**
-     * Devuelve los datos del panel + un bloque "view" con todo listo para que
-     * la vista panel.php sólo itere y dibuje (sin lógica PHP encima).
-     *
-     * @return array
-     */
+    /** Datos crudos + el bloque `view` listo para dibujar. Lo usa el panel. */
     public function obtenerVistaPanel(int $userId, ?int $activeDeviceId = null): array
     {
         $datos = $this->obtenerDatos($userId, $activeDeviceId);
-        $datos['view'] = $this->armarBloqueVista($datos);
+        $datos['view'] = $this->armarVista($datos);
 
         return $datos;
     }
 
     /**
-     * Recolecta y organiza TODOS los datos del panel: usuario, dispositivos,
-     * ambiente, estado, última medición e historial (6 lecturas), y los
-     * agrupa en bloques con clave propia (user, space, device, metrics...).
+     * Contexto crudo de la cuenta: dispositivo activo, su ambiente, su estado
+     * y sus últimas mediciones. Lo usa PanelController para las acciones
+     * (necesita `device_raw` y `space_raw`).
      */
     public function obtenerDatos(int $userId, ?int $activeDeviceId = null): array
     {
+        return $this->contexto($userId, $activeDeviceId);
+    }
+
+    // =========================================================================
+    // 2) CONTEXTO — las únicas consultas a la base de todo el panel
+    // =========================================================================
+    private function contexto(int $userId, ?int $activeDeviceId): array
+    {
         $usuario      = $this->usuarios->find($userId);
-        $dispositivos = $this->dispositivos
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'ASC')
-            ->findAll();
+        $dispositivos = $this->dispositivos->obtenerDeUsuario($userId);
 
         if (! $usuario || $dispositivos === []) {
             throw new \RuntimeException('No fue posible preparar el panel del usuario.');
         }
 
-        // Multi-dispositivo: si el usuario eligió uno activo y le pertenece, lo
-        // usamos; si no, el primero. La lista completa se devuelve en `devices`
-        // para alimentar el switcher de la vista.
+        // Dispositivo del switcher si le pertenece; si no, el primero.
         $dispositivo = $dispositivos[0];
-        if ($activeDeviceId !== null) {
-            foreach ($dispositivos as $d) {
-                if ((int) $d['id'] === $activeDeviceId) {
-                    $dispositivo = $d;
-                    break;
-                }
+        foreach ($dispositivos as $d) {
+            if ($activeDeviceId !== null && (int) $d['id'] === $activeDeviceId) {
+                $dispositivo = $d;
+                break;
             }
         }
+
         $espacio = $this->espacios->find((int) $dispositivo['space_id']);
 
         if (! $espacio) {
             throw new \RuntimeException('No fue posible preparar el panel del usuario.');
         }
 
-        $estado = $this->comandos->getStateByDeviceId((int) $dispositivo['id']);
-        $ultimaMedicion = $this->mediciones
-            ->where('device_id', $dispositivo['id'])
-            ->orderBy('captured_at', 'DESC')
-            ->first();
+        // Una sola consulta de mediciones: la primera fila ES la última lectura.
         $historial = $this->mediciones
             ->where('device_id', $dispositivo['id'])
             ->orderBy('captured_at', 'DESC')
-            ->limit(6)
+            ->limit(self::LECTURAS)
             ->findAll();
 
         return [
-            'user' => [
-                'id'     => (int) $usuario['id'],
-                'nombre' => $usuario['nombre'],
-            ],
-            'space' => [
-                'tipo'        => $espacio['environment_type'],
-                'tipo_label'  => $this->presets->getEnvironmentLabel((string) $espacio['environment_type']),
-                'nombre'      => $this->presets->getDisplayName($espacio),
-                'resumen'     => sprintf(
-                    '%.1f a %.1f C | %.0f a %.0f %% | CO2 hasta %d ppm',
-                    (float) $espacio['min_temperature'],
-                    (float) $espacio['max_temperature'],
-                    (float) $espacio['min_humidity'],
-                    (float) $espacio['max_humidity'],
-                    (int) $espacio['max_co2']
-                ),
-                'perfil' => [
-                    'min_temperature' => (float) $espacio['min_temperature'],
-                    'max_temperature' => (float) $espacio['max_temperature'],
-                    'min_humidity'    => (float) $espacio['min_humidity'],
-                    'max_humidity'    => (float) $espacio['max_humidity'],
-                    'max_co2'         => (int) $espacio['max_co2'],
-                ],
-            ],
-            'device' => [
-                'nombre'          => $dispositivo['name'],
-                'uid'             => $dispositivo['device_uid'],
-                'token'           => $dispositivo['api_token'],
-                'ultimo_envio'    => $this->fechaHumana($dispositivo['last_seen_at'] ?? null, 'Sin envíos todavía'),
-                'ultima_consulta' => $this->fechaHumana($dispositivo['last_command_sync_at'] ?? null, 'Sin consultas todavía'),
-            ],
-            'state' => [
-                'modo'       => $estado['operating_mode'] ?? 'automatic',
-                'modo_label' => ($estado['operating_mode'] ?? 'automatic') === 'manual' ? 'Manual' : 'Automático',
-                'detalle'    => $estado['last_reason'] ?? 'Sin cambios recientes.',
-            ],
-            'resumen' => [
-                'mediciones'     => $this->mediciones->where('device_id', $dispositivo['id'])->countAllResults(),
-                'ultima_lectura' => $ultimaMedicion ? $this->fechaHumana($ultimaMedicion['captured_at']) : 'Sin lecturas',
-            ],
-            'metrics' => $this->crearMetricas($ultimaMedicion, $espacio),
-            'charts' => $this->crearGraficos($historial, $espacio),
-            'actuators' => $this->crearActuadores($estado),
-            'latest_measurement' => $this->formatearMedicion($ultimaMedicion),
-            'history' => array_map(fn (array $fila) => $this->formatearMedicion($fila), $historial),
-            'alerts' => $this->crearAlertas($ultimaMedicion, $espacio),
-            'api' => [
-                'routes_file'      => 'app/Config/Routes.php',
-                'controller_file'  => 'app/Controllers/Api/DeviceApiController.php',
-                'measurements_url' => site_url('api/devices/' . $dispositivo['device_uid'] . '/measurements'),
-                'commands_url'     => site_url('api/devices/' . $dispositivo['device_uid'] . '/commands/pending'),
-                'executed_url'     => site_url('api/devices/' . $dispositivo['device_uid'] . '/commands/{id}/executed'),
+            'usuario'    => $usuario,
+            'dispositivo' => $dispositivo,
+            'espacio'    => $espacio,
+            'estado'     => $this->comandos->getStateByDeviceId((int) $dispositivo['id']),
+            'ultima'     => $historial[0] ?? null,
+            'historial'  => $historial,
+            // Nombre del ambiente y rangos, usados por la vista y el controller.
+            'space'      => [
+                'nombre'     => $this->presets->getDisplayName($espacio),
+                'tipo_label' => $this->presets->getEnvironmentLabel((string) $espacio['environment_type']),
+                'perfil'     => $this->perfil($espacio),
             ],
             'space_raw'  => $espacio,
             'device_raw' => [
@@ -173,354 +150,403 @@ class PanelService
                 'user_id'  => (int) $usuario['id'],
                 'space_id' => (int) $espacio['id'],
             ] + $dispositivo,
-            // Lista corta para el switcher del header del panel.
-            'devices_list' => array_map(function (array $d) use ($dispositivo): array {
-                $tipoEsp = (string) ($d['environment_type'] ?? 'hogar');
-                return [
-                    'id'         => (int) $d['id'],
-                    'name'       => (string) $d['name'],
-                    'space'      => $this->presets->getDisplayName(
-                        $this->espacios->find((int) $d['space_id']) ?? []
-                    ),
-                    'is_active'  => (int) $d['id'] === (int) $dispositivo['id'],
-                ];
-            }, $dispositivos),
+            // El JOIN de obtenerDeUsuario() ya trae el ambiente de cada
+            // dispositivo: no hace falta una consulta por fila.
+            'devices_list' => array_map(fn (array $d): array => [
+                'id'        => (int) $d['id'],
+                'name'      => (string) $d['name'],
+                'space'     => $this->presets->getDisplayName($d),
+                'is_active' => (int) $d['id'] === (int) $dispositivo['id'],
+            ], $dispositivos),
         ];
     }
 
-    // =========================================================================
-    // 2) BLOQUES VISUALES — gráficos, métricas, actuadores, alertas
-    // =========================================================================
-
-    /**
-     * Los 4 gráficos de barras (temperatura, humedad, CO₂, calidad de aire).
-     * Cada uno lleva valor actual, tono, rango ideal y los puntos escalados.
-     */
-    private function crearGraficos(array $historial, array $espacio): array
+    /** Rangos ideales del ambiente, ya casteados. */
+    private function perfil(array $espacio): array
     {
-        if ($historial === []) {
-            return [];
-        }
-
-        $puntos = array_reverse($historial);
-        $temperaturas = array_map(static fn (array $fila) => (float) $fila['temperature'], $puntos);
-        $humedades = array_map(static fn (array $fila) => (float) $fila['humidity'], $puntos);
-        $co2 = array_map(static fn (array $fila) => (int) $fila['co2_ppm'], $puntos);
-        $aire = array_map(static fn (array $fila) => (int) $fila['air_quality_index'], $puntos);
-
         return [
-            [
-                'titulo' => 'Temperatura',
-                'detalle' => 'Últimas lecturas registradas.',
-                'actual' => number_format(end($temperaturas), 1) . ' C',
-                'tono' => $this->tonoTemperatura((float) end($temperaturas), $espacio),
-                'rango' => sprintf('Rango ideal: %.1f a %.1f C', (float) $espacio['min_temperature'], (float) $espacio['max_temperature']),
-                'puntos' => $this->crearPuntosGrafico(
-                    $puntos,
-                    'temperature',
-                    max(max($temperaturas), (float) $espacio['max_temperature']) + 5,
-                    static fn (float $valor) => number_format($valor, 1),
-                    fn (float $valor) => $this->tonoTemperatura($valor, $espacio)
-                ),
-            ],
-            [
-                'titulo' => 'Humedad',
-                'detalle' => 'Comparación simple del ambiente.',
-                'actual' => number_format(end($humedades), 1) . ' %',
-                'tono' => $this->tonoHumedad((float) end($humedades), $espacio),
-                'rango' => sprintf('Rango ideal: %.0f a %.0f %%', (float) $espacio['min_humidity'], (float) $espacio['max_humidity']),
-                'puntos' => $this->crearPuntosGrafico(
-                    $puntos,
-                    'humidity',
-                    100,
-                    static fn (float $valor) => number_format($valor, 1),
-                    fn (float $valor) => $this->tonoHumedad($valor, $espacio)
-                ),
-            ],
-            [
-                'titulo' => 'CO2',
-                'detalle' => 'Nivel de concentración en el espacio.',
-                'actual' => (int) end($co2) . ' ppm',
-                'tono' => $this->tonoCo2((int) end($co2), $espacio),
-                'rango' => 'Límite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
-                'puntos' => $this->crearPuntosGrafico(
-                    $puntos,
-                    'co2_ppm',
-                    max(max($co2), (int) $espacio['max_co2']) + 300,
-                    static fn (float $valor) => (string) (int) round($valor),
-                    fn (float $valor) => $this->tonoCo2((int) round($valor), $espacio)
-                ),
-            ],
-            [
-                'titulo' => 'Calidad del aire',
-                'detalle' => 'Mientras más alto, mejor estado.',
-                'actual' => (int) end($aire) . '/100',
-                'tono' => $this->tonoAire((int) end($aire)),
-                'rango' => 'Escala simple: de 0 a 100',
-                'puntos' => $this->crearPuntosGrafico(
-                    $puntos,
-                    'air_quality_index',
-                    100,
-                    static fn (float $valor) => (string) (int) round($valor),
-                    fn (float $valor) => $this->tonoAire((int) round($valor))
-                ),
-            ],
+            'min_temperature' => (float) $espacio['min_temperature'],
+            'max_temperature' => (float) $espacio['max_temperature'],
+            'min_humidity'    => (float) $espacio['min_humidity'],
+            'max_humidity'    => (float) $espacio['max_humidity'],
+            'max_co2'         => (int) $espacio['max_co2'],
         ];
     }
 
-    /**
-     * Las 4 tarjetas de métricas de la última medición. Cada una compara el
-     * valor contra los rangos del ambiente → estado (texto) + tono (color).
-     */
-    private function crearMetricas(?array $medicion, array $espacio): array
+    // =========================================================================
+    // 3) LECTURAS Y SEMÁFOROS
+    // Acá viven los números. `evaluar*()` es el único criterio de color del
+    // panel: si mañana cambia un umbral, se cambia en un solo lugar.
+    // =========================================================================
+
+    /** Los 4 valores de una medición como números (null si no hay lectura). */
+    private function lecturas(?array $medicion): array
     {
         if (! $medicion) {
-            return [];
+            return ['temp' => null, 'hum' => null, 'co2' => null, 'aire' => null, 'etiqueta_aire' => 'Sin datos'];
         }
 
-        $temperatura = (float) $medicion['temperature'];
-        $humedad     = (float) $medicion['humidity'];
-        $co2         = (int) $medicion['co2_ppm'];
-        $aire        = (int) $medicion['air_quality_index'];
+        return [
+            'temp'          => (float) $medicion['temperature'],
+            'hum'           => (float) $medicion['humidity'],
+            'co2'           => (int) $medicion['co2_ppm'],
+            'aire'          => (int) $medicion['air_quality_index'],
+            'etiqueta_aire' => (string) $medicion['air_quality_label'],
+        ];
+    }
+
+    private function evaluarTemp(?float $valor, array $perfil): string
+    {
+        if ($valor === null) {
+            return 'neutral';
+        }
+
+        $min = $perfil['min_temperature'];
+        $max = $perfil['max_temperature'];
+
+        if ($valor > $max + self::MARGEN_TEMP || $valor < $min - self::MARGEN_TEMP) {
+            return 'danger';
+        }
+
+        return ($valor > $max || $valor < $min) ? 'warning' : 'success';
+    }
+
+    private function evaluarHumedad(?float $valor, array $perfil): string
+    {
+        if ($valor === null) {
+            return 'neutral';
+        }
+
+        $min = $perfil['min_humidity'];
+        $max = $perfil['max_humidity'];
+
+        if ($valor > $max + self::MARGEN_HUM || $valor < $min - self::MARGEN_HUM) {
+            return 'danger';
+        }
+
+        return ($valor > $max || $valor < $min) ? 'warning' : 'success';
+    }
+
+    private function evaluarCo2(?int $valor, array $perfil): string
+    {
+        if ($valor === null) {
+            return 'neutral';
+        }
+
+        if ($valor > $perfil['max_co2'] + self::MARGEN_CO2) {
+            return 'danger';
+        }
+
+        return $valor > $perfil['max_co2'] ? 'warning' : 'success';
+    }
+
+    private function evaluarAire(?int $valor): string
+    {
+        if ($valor === null) {
+            return 'neutral';
+        }
+
+        if ($valor < self::AIRE_MALO) {
+            return 'danger';
+        }
+
+        return $valor < self::AIRE_REGULAR ? 'warning' : 'success';
+    }
+
+    /** El peor de varios tonos manda: danger > warning > success. */
+    private function tonoGeneral(array $tonos): string
+    {
+        if (in_array('danger', $tonos, true)) {
+            return 'danger';
+        }
+
+        return in_array('warning', $tonos, true) ? 'warning' : 'success';
+    }
+
+    /** Posición (0–100 %) de un valor dentro de la escala de su medidor. */
+    private function posicion(?float $valor, float $min, float $max): float
+    {
+        if ($valor === null || $max <= $min) {
+            return 0.0;
+        }
+
+        return max(0.0, min(100.0, ($valor - $min) / ($max - $min) * 100));
+    }
+
+    // =========================================================================
+    // 4) BLOQUES VISUALES
+    // =========================================================================
+
+    /**
+     * Las 4 tarjetas de sensor: valor, unidad, tono, rango ideal en texto y
+     * la posición del pin + la banda verde del medidor (todo en % de escala).
+     */
+    private function sensores(array $lec, array $perfil, array $tonos): array
+    {
+        [$tempMin, $tempMax] = self::ESCALA_TEMP;
+        [$co2Min, $co2Max]   = self::ESCALA_CO2;
 
         return [
             [
-                'titulo' => 'Temperatura',
-                'valor'  => number_format($temperatura, 1) . ' C',
-                'estado' => $temperatura < (float) $espacio['min_temperature']
-                    ? 'Baja'
-                    : ($temperatura > (float) $espacio['max_temperature'] ? 'Alta' : 'En rango'),
-                'tono'   => $temperatura > (float) $espacio['max_temperature']
-                    ? 'danger'
-                    : ($temperatura < (float) $espacio['min_temperature'] ? 'warning' : 'success'),
-                'detalle' => sprintf('Ideal entre %.1f y %.1f C', (float) $espacio['min_temperature'], (float) $espacio['max_temperature']),
+                'icono'    => 'temp',
+                'titulo'   => 'Temperatura',
+                'valor'    => $lec['temp'] === null ? '--' : number_format($lec['temp'], 1),
+                'unidad'   => '°C',
+                'tono'     => $tonos['temp'],
+                'rango'    => sprintf('Ideal %.1f–%.1f °C', $perfil['min_temperature'], $perfil['max_temperature']),
+                'pct'      => $this->posicion($lec['temp'], $tempMin, $tempMax),
+                'bandLow'  => $this->posicion($perfil['min_temperature'], $tempMin, $tempMax),
+                'bandHigh' => $this->posicion($perfil['max_temperature'], $tempMin, $tempMax),
+                'accent'   => 'eden',
             ],
             [
-                'titulo' => 'Humedad',
-                'valor'  => number_format($humedad, 1) . ' %',
-                'estado' => $humedad < (float) $espacio['min_humidity']
-                    ? 'Baja'
-                    : ($humedad > (float) $espacio['max_humidity'] ? 'Alta' : 'Estable'),
-                'tono'   => ($humedad < (float) $espacio['min_humidity'] || $humedad > (float) $espacio['max_humidity'])
-                    ? 'warning'
-                    : 'success',
-                'detalle' => sprintf('Ideal entre %.0f y %.0f %%', (float) $espacio['min_humidity'], (float) $espacio['max_humidity']),
+                'icono'    => 'hum',
+                'titulo'   => 'Humedad',
+                'valor'    => $lec['hum'] === null ? '--' : (string) (int) round($lec['hum']),
+                'unidad'   => '%',
+                'tono'     => $tonos['hum'],
+                'rango'    => sprintf('Ideal %.0f–%.0f %%', $perfil['min_humidity'], $perfil['max_humidity']),
+                'pct'      => $this->posicion($lec['hum'], 0, 100),
+                'bandLow'  => $perfil['min_humidity'],
+                'bandHigh' => $perfil['max_humidity'],
+                'accent'   => 'breath',
             ],
             [
-                'titulo' => 'CO2',
-                'valor'  => $co2 . ' ppm',
-                'estado' => $co2 > (int) $espacio['max_co2'] ? 'Elevado' : 'Controlado',
-                'tono'   => $co2 > ((int) $espacio['max_co2'] + 250)
-                    ? 'danger'
-                    : ($co2 > (int) $espacio['max_co2'] ? 'warning' : 'success'),
-                'detalle' => 'Límite recomendado: ' . (int) $espacio['max_co2'] . ' ppm',
+                'icono'    => 'air',
+                'titulo'   => 'Calidad de aire',
+                'valor'    => $lec['aire'] === null ? '--' : (string) $lec['aire'],
+                'unidad'   => '/100 · ' . mb_strtolower($lec['etiqueta_aire']),
+                'tono'     => $tonos['aire'],
+                'rango'    => 'Buena a partir de ' . self::AIRE_REGULAR . '/100',
+                'pct'      => $this->posicion($lec['aire'] === null ? null : (float) $lec['aire'], 0, 100),
+                'bandLow'  => (float) self::AIRE_REGULAR,
+                'bandHigh' => 100.0,
+                'accent'   => 'citrus',
             ],
             [
-                'titulo' => 'Calidad del aire',
-                'valor'  => $aire . '/100',
-                'estado' => $medicion['air_quality_label'],
-                'tono'   => $aire < 55 ? 'danger' : ($aire < 70 ? 'warning' : 'success'),
-                'detalle' => 'Etiqueta actual: ' . $medicion['air_quality_label'],
+                'icono'    => 'co2',
+                'titulo'   => 'CO₂',
+                'valor'    => $lec['co2'] === null ? '--' : (string) $lec['co2'],
+                'unidad'   => 'ppm',
+                'tono'     => $tonos['co2'],
+                'rango'    => 'Límite ' . $perfil['max_co2'] . ' ppm',
+                'pct'      => $this->posicion($lec['co2'] === null ? null : (float) $lec['co2'], $co2Min, $co2Max),
+                'bandLow'  => 0.0,
+                'bandHigh' => $this->posicion((float) $perfil['max_co2'], $co2Min, $co2Max),
+                'accent'   => 'clay',
             ],
         ];
     }
 
     /** Las 3 tarjetas de actuadores según el estado actual del dispositivo. */
-    private function crearActuadores(?array $estado): array
+    private function actuadores(?array $estado): array
     {
-        if (! $estado) {
-            return [];
+        $definicion = [
+            ['fan',        'Aire acondicionado', 'Refresca el ambiente cuando sube la temperatura o el CO₂.'],
+            ['aromatizer', 'Aromatizador',       'Acompaña cuando la calidad del aire baja.'],
+            ['alert_led',  'Luz de alerta',      'Marca visualmente una condición fuera de rango.'],
+        ];
+
+        $salida = [];
+
+        foreach ($definicion as [$clave, $titulo, $detalle]) {
+            $encendido = ($estado[$clave . '_state'] ?? 'off') === 'on';
+
+            $salida[] = [
+                'clave'     => $clave,
+                'titulo'    => $titulo,
+                'detalle'   => $detalle,
+                'encendido' => $encendido,
+                'tono'      => $encendido
+                    ? ($clave === 'alert_led' ? 'danger' : ($clave === 'fan' ? 'info' : 'success'))
+                    : 'neutral',
+            ];
         }
 
-        return [
-            $this->crearActuador('fan', 'Aire acondicionado', $estado['fan_state'] ?? 'off', 'Refresca el ambiente cuando sube la temperatura o el CO2.'),
-            $this->crearActuador('aromatizer', 'Aromatizador', $estado['aromatizer_state'] ?? 'off', 'Apoya cuando la calidad del aire baja.'),
-            $this->crearActuador('alert_led', 'Luz de alerta', $estado['alert_led_state'] ?? 'off', 'Marca visualmente una condición fuera de rango.'),
-        ];
+        return $salida;
     }
 
-    private function crearActuador(string $clave, string $titulo, string $valor, string $detalle): array
+    /**
+     * Reglas de automatización mostradas en el panel. Usan los mismos umbrales
+     * que los sensores, así lo que se ve en la tarjeta coincide siempre con el
+     * color de la lectura.
+     */
+    private function reglas(array $lec, array $perfil): array
     {
         return [
-            'clave'  => $clave,
-            'titulo' => $titulo,
-            'estado' => $valor === 'on' ? 'Encendido' : 'Apagado',
-            'tono'   => $valor === 'on'
-                ? ($clave === 'alert_led' ? 'danger' : ($clave === 'fan' ? 'info' : 'success'))
-                : 'neutral',
-            'detalle' => $detalle,
-        ];
-    }
-
-    /** Una medición cruda → textos listos para la tabla del historial. */
-    private function formatearMedicion(?array $medicion): ?array
-    {
-        if (! $medicion) {
-            return null;
-        }
-
-        return [
-            'temperatura' => number_format((float) $medicion['temperature'], 1) . ' C',
-            'humedad'     => number_format((float) $medicion['humidity'], 1) . ' %',
-            'co2'         => (int) $medicion['co2_ppm'] . ' ppm',
-            'aire'        => $medicion['air_quality_label'] . ' (' . (int) $medicion['air_quality_index'] . '/100)',
-            'origen'      => $this->etiquetaOrigen((string) $medicion['source']),
-            'notas'       => trim((string) ($medicion['notes'] ?? '')),
-            'fecha'       => $this->fechaHumana($medicion['captured_at']),
+            [
+                'cuando' => 'el CO₂ supera ' . $perfil['max_co2'] . ' ppm',
+                'accion' => 'Encender ventilación',
+                'activa' => $lec['co2'] !== null && $lec['co2'] > $perfil['max_co2'],
+            ],
+            [
+                'cuando' => sprintf('la temperatura supera %.1f °C', $perfil['max_temperature']),
+                'accion' => 'Encender aire acondicionado',
+                'activa' => $lec['temp'] !== null && $lec['temp'] > $perfil['max_temperature'],
+            ],
+            [
+                'cuando' => 'la calidad de aire baja de ' . self::AIRE_REGULAR . '/100',
+                'accion' => 'Encender aromatizador',
+                'activa' => $lec['aire'] !== null && $lec['aire'] < self::AIRE_REGULAR,
+            ],
+            [
+                'cuando' => 'una lectura queda muy fuera de rango',
+                'accion' => 'Encender luz de alerta',
+                'activa' => $lec['aire'] !== null && (
+                    $lec['co2'] > $perfil['max_co2'] + self::MARGEN_CO2
+                    || $lec['temp'] > $perfil['max_temperature'] + self::MARGEN_TEMP
+                    || $lec['aire'] < self::AIRE_MALO
+                ),
+            ],
         ];
     }
 
     /**
-     * Lista de alertas según la última medición: una por cada variable fuera
-     * de rango. Sin mediciones → alerta informativa; todo en rango → éxito.
+     * Filas de la tabla de lecturas: textos listos + el tono de la fila,
+     * calculado con los mismos umbrales que el resto del panel.
      */
-    private function crearAlertas(?array $medicion, array $espacio): array
+    private function historial(array $historial, array $perfil): array
     {
-        if (! $medicion) {
-            return [[
-                'tono'   => 'info',
-                'titulo' => 'Sin mediciones aún',
-                'texto'  => 'Registra una medición para empezar a ver el estado del ambiente.',
-            ]];
-        }
+        return array_map(function (array $fila) use ($perfil): array {
+            $lec = $this->lecturas($fila);
 
-        $alertas = [];
-
-        if ((float) $medicion['temperature'] > (float) $espacio['max_temperature']) {
-            $alertas[] = [
-                'tono'   => 'danger',
-                'titulo' => 'Temperatura alta',
-                'texto'  => 'Conviene favorecer el aire acondicionado o el refresco del ambiente.',
-            ];
-        }
-
-        if ((float) $medicion['humidity'] > (float) $espacio['max_humidity']) {
-            $alertas[] = [
-                'tono'   => 'warning',
-                'titulo' => 'Humedad alta',
-                'texto'  => 'El ambiente está por encima del rango recomendado.',
-            ];
-        }
-
-        if ((int) $medicion['co2_ppm'] > (int) $espacio['max_co2']) {
-            $alertas[] = [
-                'tono'   => 'warning',
-                'titulo' => 'CO2 elevado',
-                'texto'  => 'El aire acondicionado puede ser necesario para recuperar el rango ideal.',
-            ];
-        }
-
-        if ((int) $medicion['air_quality_index'] < 60) {
-            $alertas[] = [
-                'tono'   => 'warning',
-                'titulo' => 'Calidad del aire comprometida',
-                'texto'  => 'Conviene revisar el ambiente y sus acciones de control.',
-            ];
-        }
-
-        if ($alertas === []) {
-            $alertas[] = [
-                'tono'   => 'success',
-                'titulo' => 'Estado estable',
-                'texto'  => 'Las últimas mediciones se mantienen dentro del rango esperado.',
-            ];
-        }
-
-        return $alertas;
-    }
-
-    /**
-     * Convierte el historial en puntos de gráfico: cada valor se vuelve un
-     * porcentaje de la escala (altura de la barra) con su tono y etiqueta.
-     * $formateador y $tono son callables: cada gráfico pasa los suyos.
-     */
-    private function crearPuntosGrafico(
-        array $historial,
-        string $campo,
-        float $maximo,
-        callable $formateador,
-        callable $tono
-    ): array {
-        $escala = $maximo > 0 ? $maximo : 1;
-
-        return array_map(function (array $fila) use ($campo, $escala, $formateador, $tono): array {
-            $valor = (float) $fila[$campo];
-            $porcentaje = (int) round(($valor / $escala) * 100);
+            $tono = $this->tonoGeneral([
+                $this->evaluarTemp($lec['temp'], $perfil),
+                $this->evaluarCo2($lec['co2'], $perfil),
+                $this->evaluarAire($lec['aire']),
+            ]);
 
             return [
-                'valor'      => $formateador($valor),
-                'porcentaje' => max(10, min($porcentaje, 100)),
-                'tono'       => $tono($valor),
-                'etiqueta'   => date('H:i', strtotime($fila['captured_at'])),
+                'fecha'       => $this->fechaHumana($fila['captured_at']),
+                'origen'      => $this->etiquetaOrigen((string) $fila['source']),
+                'temperatura' => number_format((float) $lec['temp'], 1) . ' °C',
+                'humedad'     => (int) round((float) $lec['hum']) . ' %',
+                'aire'        => $lec['etiqueta_aire'] . ' (' . $lec['aire'] . '/100)',
+                'co2'         => $lec['co2'] . ' ppm',
+                'tono'        => $tono,
             ];
         }, $historial);
     }
 
-    // =========================================================================
-    // 3) SEMÁFOROS — tono (color) según el valor de cada variable
-    //    success = en rango · warning = desvío leve · danger = desvío grave
-    // =========================================================================
-
-    private function tonoTemperatura(float $valor, array $espacio): string
+    /**
+     * Mini-curva de temperatura (sparkline) como path SVG: 220 px de ancho,
+     * el valor más alto arriba (y=10) y el más bajo abajo (y=50).
+     */
+    private function sparkPath(array $historial): string
     {
-        if ($valor > (float) $espacio['max_temperature']) {
-            return 'danger';
+        $valores = array_map(
+            static fn (array $fila): float => (float) $fila['temperature'],
+            array_reverse($historial)
+        );
+
+        if (count($valores) < 2) {
+            return '';
         }
 
-        if ($valor < (float) $espacio['min_temperature']) {
-            return 'warning';
+        $min   = min($valores);
+        $rango = max(0.001, max($valores) - $min);
+        $pasoX = 220 / (count($valores) - 1);
+        $cmds  = [];
+
+        foreach ($valores as $i => $v) {
+            $x      = round($i * $pasoX, 2);
+            $y      = round(50 - (($v - $min) / $rango) * 40, 2);
+            $cmds[] = ($i === 0 ? 'M' : 'L') . $x . ' ' . $y;
         }
 
-        return 'success';
-    }
-
-    private function tonoHumedad(float $valor, array $espacio): string
-    {
-        if ($valor < (float) $espacio['min_humidity'] || $valor > (float) $espacio['max_humidity']) {
-            return 'warning';
-        }
-
-        return 'success';
-    }
-
-    private function tonoCo2(int $valor, array $espacio): string
-    {
-        if ($valor > ((int) $espacio['max_co2'] + 250)) {
-            return 'danger';
-        }
-
-        if ($valor > (int) $espacio['max_co2']) {
-            return 'warning';
-        }
-
-        return 'success';
-    }
-
-    private function tonoAire(int $valor): string
-    {
-        if ($valor < 55) {
-            return 'danger';
-        }
-
-        if ($valor < 70) {
-            return 'warning';
-        }
-
-        return 'success';
+        return implode(' ', $cmds);
     }
 
     // =========================================================================
-    // 4) FORMATEO — etiquetas y fechas legibles
+    // 5) PAQUETE FINAL PARA panel.php
+    // =========================================================================
+    private function armarVista(array $ctx): array
+    {
+        $perfil = $ctx['space']['perfil'];
+        $lec    = $this->lecturas($ctx['ultima']);
+
+        $tonos = [
+            'temp' => $this->evaluarTemp($lec['temp'], $perfil),
+            'hum'  => $this->evaluarHumedad($lec['hum'], $perfil),
+            'co2'  => $this->evaluarCo2($lec['co2'], $perfil),
+            'aire' => $this->evaluarAire($lec['aire']),
+        ];
+
+        $fueraDeRango = count(array_filter(
+            $tonos,
+            static fn (string $t): bool => $t === 'warning' || $t === 'danger'
+        ));
+
+        // Sin mediciones todavía: el dispositivo está vinculado pero aún no
+        // mandó nada. No es un problema del ambiente, así que no se pinta de
+        // rojo: se avisa y se espera.
+        $sinLecturas = $ctx['ultima'] === null;
+
+        $tono   = $sinLecturas ? 'neutral' : $this->tonoGeneral(array_values($tonos));
+        $manual = ($ctx['estado']['operating_mode'] ?? 'automatic') === 'manual';
+
+        $actuadores = $this->actuadores($ctx['estado']);
+        $reglas     = $this->reglas($lec, $perfil);
+        $nombre     = (string) $ctx['usuario']['nombre'];
+
+        return [
+            // Identidad y contexto
+            'userName'     => $nombre,
+            'userInitial'  => strtoupper(mb_substr($nombre, 0, 1) ?: 'U'),
+            'spaceName'    => $ctx['space']['nombre'],
+            'spaceLabel'   => $ctx['space']['tipo_label'],
+            'deviceName'   => (string) $ctx['dispositivo']['name'],
+            'deviceUid'    => (string) $ctx['dispositivo']['device_uid'],
+            'deviceLastSeen' => $this->fechaHumana($ctx['dispositivo']['last_seen_at'] ?? null, 'Sin envíos todavía'),
+
+            // Estado general (el titular del panel)
+            'tono'         => $tono,
+            'estadoLabel'  => match ($tono) {
+                'danger'  => 'Crítico',
+                'warning' => 'Advertencia',
+                'neutral' => 'Sin datos',
+                default   => 'Normal',
+            },
+            'estadoTitulo' => match ($tono) {
+                'danger'  => 'Condición crítica',
+                'warning' => 'Atención requerida',
+                'neutral' => 'Esperando la primera lectura',
+                default   => 'Ambiente estable',
+            },
+            'estadoDetalle' => match (true) {
+                $sinLecturas    => 'El dispositivo ya está vinculado. En cuanto envíe su primera medición vas a verla acá.',
+                $fueraDeRango > 0 => 'Hay ' . $fueraDeRango . ' lectura' . ($fueraDeRango === 1 ? '' : 's') . ' fuera del rango de este ambiente.',
+                default         => 'Las cuatro variables se mantienen dentro del rango de este ambiente.',
+            },
+            'ultimaLectura' => $ctx['ultima'] ? $this->fechaHumana($ctx['ultima']['captured_at']) : 'Sin lecturas',
+
+            // Modo de operación
+            'modoManual' => $manual,
+            'modoLabel'  => $manual ? 'Manual' : 'Automático',
+
+            // Bloques
+            'sensores'         => $this->sensores($lec, $perfil, $tonos),
+            'actuadores'       => $actuadores,
+            'actuadoresActivos' => count(array_filter($actuadores, static fn (array $a): bool => $a['encendido'])),
+            'reglas'           => $reglas,
+            'reglasActivas'    => count(array_filter($reglas, static fn (array $r): bool => $r['activa'])),
+            'historial'        => $this->historial($ctx['historial'], $perfil),
+            'sparkPath'        => $this->sparkPath($ctx['historial']),
+        ];
+    }
+
+    // =========================================================================
+    // 6) FORMATEO
     // =========================================================================
 
     /** Origen técnico de la medición → etiqueta legible para la tabla. */
     private function etiquetaOrigen(string $origen): string
     {
         return match ($origen) {
-            'web'        => 'Web',
-            'automation' => 'Automatizacion',
-            'api'        => 'API',
-            'seed'       => 'Inicial',
+            'web'        => 'Panel',
+            'automation' => 'Automatización',
+            'api'        => 'Dispositivo',
+            'seed', 'sim' => 'Inicial',
             default      => ucfirst($origen),
         };
     }
@@ -534,321 +560,43 @@ class PanelService
 
         return date('d/m/Y H:i', strtotime($fecha));
     }
-
-    // =========================================================================
-    // 5) BLOQUE PARA LA VISTA panel.php
-    // Toda la lógica de "default si no hay datos" + cálculos de tonos,
-    // sparkline y sensorCards que antes vivía en panel.php se centraliza acá.
-    // Devuelve un array plano de variables listas (userName, sensorCards,
-    // automationRules, sparkPath...) que la vista consume directamente.
-    // =========================================================================
-    private function armarBloqueVista(array $datos): array
-    {
-        $user    = $datos['user']    ?? [];
-        $space   = $datos['space']   ?? [];
-        $device  = $datos['device']  ?? [];
-        $state   = $datos['state']   ?? [];
-        $metrics = $datos['metrics'] ?? [];
-        $alerts  = $datos['alerts']  ?? [];
-        $charts  = $datos['charts']  ?? [];
-        $api     = $datos['api']     ?? [];
-
-        $perfil = is_array($space['perfil'] ?? null) ? $space['perfil'] : [];
-
-        $userName    = (string) ($user['nombre'] ?? 'Usuario');
-        $spaceName   = (string) ($space['nombre'] ?? 'Ambiente principal');
-        $spaceLabel  = (string) ($space['tipo_label'] ?? 'Monitoreo ambiental');
-        $deviceUid   = (string) ($device['uid'] ?? 'EA-ENV-01');
-        $deviceToken = (string) ($device['token'] ?? 'Token disponible al enlazar el dispositivo.');
-
-        $modeKey    = (string) ($state['modo'] ?? 'automatic');
-        $modoManual = $modeKey === 'manual';
-        $modeLabel  = $modoManual ? 'Manual' : 'Automático';
-
-        $defaultTempDetail = isset($perfil['min_temperature'], $perfil['max_temperature'])
-            ? sprintf('Rango %.1f–%.1f °C', (float) $perfil['min_temperature'], (float) $perfil['max_temperature'])
-            : 'Rango sugerido 22.0–26.0 °C';
-        $defaultHumidityDetail = isset($perfil['min_humidity'], $perfil['max_humidity'])
-            ? sprintf('Óptimo %.0f–%.0f %%', (float) $perfil['min_humidity'], (float) $perfil['max_humidity'])
-            : 'Óptimo 45–60 %';
-        $defaultCo2Detail = isset($perfil['max_co2'])
-            ? 'Límite ' . (int) $perfil['max_co2'] . ' ppm'
-            : 'Límite recomendado 900 ppm';
-
-        $defaultMetrics = [
-            ['titulo' => 'Temperatura',      'valor' => '24.6 C',  'estado' => 'En rango',   'tono' => 'success', 'detalle' => $defaultTempDetail],
-            ['titulo' => 'Humedad',          'valor' => '58 %',    'estado' => 'Estable',    'tono' => 'success', 'detalle' => $defaultHumidityDetail],
-            ['titulo' => 'CO2',              'valor' => '640 ppm', 'estado' => 'Controlado', 'tono' => 'info',    'detalle' => $defaultCo2Detail],
-            ['titulo' => 'Calidad del aire', 'valor' => '78/100',  'estado' => 'Bueno',      'tono' => 'success', 'detalle' => 'Aire en franja cómoda.'],
-        ];
-
-        if ($metrics === []) {
-            $metrics = $defaultMetrics;
-        }
-
-        $metricIndex = [];
-        foreach ($metrics as $metric) {
-            $titulo = strtolower((string) ($metric['titulo'] ?? ''));
-            if ($titulo !== '') {
-                $metricIndex[$titulo] = $metric;
-            }
-        }
-
-        $tempMetric     = $metricIndex['temperatura']      ?? $defaultMetrics[0];
-        $humidityMetric = $metricIndex['humedad']          ?? $defaultMetrics[1];
-        $co2Metric      = $metricIndex['co2']              ?? $defaultMetrics[2];
-        $airMetric      = $metricIndex['calidad del aire'] ?? $defaultMetrics[3];
-
-        $currentTemp     = $this->extraerNumero($tempMetric['valor'] ?? null, 24.6);
-        $currentHumidity = max(0, min(100, (int) round($this->extraerNumero($humidityMetric['valor'] ?? null, 58))));
-        $currentCo2      = max(0, (int) round($this->extraerNumero($co2Metric['valor'] ?? null, 640)));
-        $currentAir      = max(0, min(100, (int) round($this->extraerNumero($airMetric['valor'] ?? null, 78))));
-
-        $airStateLabel = $currentAir >= 70 ? 'Buena' : ($currentAir >= 55 ? 'Regular' : 'Mala');
-        $airTone       = $currentAir >= 70 ? 'success' : ($currentAir >= 55 ? 'warning' : 'danger');
-
-        $metricTones = [
-            (string) ($tempMetric['tono']     ?? 'success'),
-            (string) ($humidityMetric['tono'] ?? 'success'),
-            (string) ($co2Metric['tono']      ?? 'info'),
-            $airTone,
-        ];
-        $dangerCount  = count(array_filter($metricTones, static fn (string $t): bool => $t === 'danger'));
-        $warningCount = count(array_filter($metricTones, static fn (string $t): bool => in_array($t, ['warning', 'danger'], true)));
-        $baseTone     = $dangerCount > 0 ? 'danger' : ($warningCount > 0 ? 'warning' : 'success');
-
-        $defaultAlerts = [
-            ['tono' => $baseTone,                                         'titulo' => 'Resumen del ambiente', 'texto' => 'La vista informa el estado del ambiente seleccionado.'],
-            ['tono' => (string) ($tempMetric['tono']     ?? 'success'),   'titulo' => 'Temperatura',          'texto' => (string) ($tempMetric['detalle']     ?? $defaultTempDetail)],
-            ['tono' => (string) ($humidityMetric['tono'] ?? 'success'),   'titulo' => 'Humedad',              'texto' => (string) ($humidityMetric['detalle'] ?? $defaultHumidityDetail)],
-        ];
-        $alertsFinal   = $alerts !== [] ? $alerts : $defaultAlerts;
-        $criticalCount = count(array_filter($alertsFinal, static fn (array $a): bool => in_array((string) ($a['tono'] ?? 'neutral'), ['warning', 'danger'], true)));
-
-        $generalTone   = $criticalCount > 1 ? 'danger' : ($criticalCount === 1 ? 'warning' : $baseTone);
-        $generalLabel  = $generalTone === 'success' ? 'Normal' : ($generalTone === 'warning' ? 'Advertencia' : ($generalTone === 'danger' ? 'Crítico' : 'Activo'));
-        $generalTitle  = $generalTone === 'success' ? 'Ambiente estable' : ($generalTone === 'warning' ? 'Atención requerida' : ($generalTone === 'danger' ? 'Condición crítica' : 'Ambiente monitorizado'));
-        $generalDetail = $criticalCount > 0
-            ? 'Hay ' . $criticalCount . ' lectura' . ($criticalCount === 1 ? '' : 's') . ' fuera de rango. Revise sensores y actuadores.'
-            : 'Las variables principales se mantienen dentro de los rangos seguros.';
-
-        $defaultActuators = [
-            ['clave' => 'fan',        'titulo' => 'Aire acondicionado', 'estado' => 'Encendido', 'tono' => 'info',    'detalle' => 'Refresca el ambiente cuando sube la temperatura o el CO₂.'],
-            ['clave' => 'aromatizer', 'titulo' => 'Aromatizador',       'estado' => 'Apagado',   'tono' => 'neutral', 'detalle' => 'Acompaña la sensación general del ambiente.'],
-            ['clave' => 'alert_led',  'titulo' => 'LED de alerta',      'estado' => 'Apagado',   'tono' => 'neutral', 'detalle' => 'Referencia visual cuando una condición sale del rango.'],
-        ];
-        $actuators       = ($datos['actuators'] ?? []) !== [] ? $datos['actuators'] : $defaultActuators;
-        $activeActuators = count(array_filter($actuators, static fn (array $a): bool => strtolower((string) ($a['estado'] ?? 'apagado')) !== 'apagado'));
-
-        $latestIsSample = ($datos['latest_measurement'] ?? null) === null;
-        $latest = $datos['latest_measurement'] ?? [
-            'fecha'       => 'Hoy 18:00',
-            'temperatura' => number_format($currentTemp, 1) . ' °C',
-            'humedad'     => $currentHumidity . ' %',
-            'co2'         => $currentCo2 . ' ppm',
-            'aire'        => $airStateLabel . ' (' . $currentAir . '/100)',
-            'origen'      => 'Panel web',
-            'notas'       => 'Dato de ejemplo visual.',
-        ];
-
-        $historyIsSample = ($datos['history'] ?? []) === [];
-        $historyRows = $historyIsSample ? [
-            ['fecha' => '14/05/2026 08:00', 'temperatura' => '23.8 °C',                                       'humedad' => '55 %',                       'co2' => '610 ppm',         'aire' => 'Buena (80/100)',                                          'origen' => 'Web'],
-            ['fecha' => '14/05/2026 10:00', 'temperatura' => '24.1 °C',                                       'humedad' => '57 %',                       'co2' => '640 ppm',         'aire' => 'Buena (78/100)',                                          'origen' => 'API'],
-            ['fecha' => '14/05/2026 12:00', 'temperatura' => '24.5 °C',                                       'humedad' => '59 %',                       'co2' => '680 ppm',         'aire' => 'Buena (74/100)',                                          'origen' => 'API'],
-            ['fecha' => '14/05/2026 14:00', 'temperatura' => '24.9 °C',                                       'humedad' => '60 %',                       'co2' => '710 ppm',         'aire' => 'Regular (68/100)',                                        'origen' => 'API'],
-            ['fecha' => '14/05/2026 16:00', 'temperatura' => '25.1 °C',                                       'humedad' => '59 %',                       'co2' => '740 ppm',         'aire' => 'Regular (66/100)',                                        'origen' => 'API'],
-            ['fecha' => '14/05/2026 18:00', 'temperatura' => number_format($currentTemp, 1) . ' °C',          'humedad' => $currentHumidity . ' %',      'co2' => $currentCo2 . ' ppm', 'aire' => $airStateLabel . ' (' . $currentAir . '/100)',           'origen' => 'Web'],
-        ] : $datos['history'];
-
-        $minTempProf = isset($perfil['min_temperature']) ? (float) $perfil['min_temperature'] : 22.0;
-        $maxTempProf = isset($perfil['max_temperature']) ? (float) $perfil['max_temperature'] : 26.0;
-        $minHumProf  = isset($perfil['min_humidity'])    ? (float) $perfil['min_humidity']    : 45.0;
-        $maxHumProf  = isset($perfil['max_humidity'])    ? (float) $perfil['max_humidity']    : 60.0;
-        $maxCo2Prof  = isset($perfil['max_co2'])         ? (int)   $perfil['max_co2']         : 900;
-
-        $tempPct = max(0, min(100, ($currentTemp - 10) / (35 - 10) * 100));
-        $co2Pct  = max(0, min(100, $currentCo2 / 1500 * 100));
-
-        $clamp = static fn (float $v): float => max(0.0, min(100.0, $v));
-
-        // Zona ideal proyectada sobre la misma escala que el porcentaje de cada gauge.
-        $tempBandLow  = $clamp(($minTempProf - 10) / 25 * 100);
-        $tempBandHigh = $clamp(($maxTempProf - 10) / 25 * 100);
-        $co2BandHigh  = $clamp($maxCo2Prof / 1500 * 100);
-
-        $tempStatus = ($currentTemp < $minTempProf - 1 || $currentTemp > $maxTempProf + 2) ? 'danger'
-            : (($currentTemp < $minTempProf || $currentTemp > $maxTempProf) ? 'warning' : 'success');
-        $humStatus  = ($currentHumidity < $minHumProf - 5 || $currentHumidity > $maxHumProf + 5) ? 'danger'
-            : (($currentHumidity < $minHumProf || $currentHumidity > $maxHumProf) ? 'warning' : 'success');
-        $co2Status  = $currentCo2 > $maxCo2Prof + 250 ? 'danger' : ($currentCo2 > $maxCo2Prof ? 'warning' : 'success');
-
-        $sensorCards = [
-            ['icon' => 'temp', 'titulo' => 'Temperatura',     'valor' => number_format($currentTemp, 1), 'unidad' => '°C',                    'estado' => $tempStatus, 'detalle' => $defaultTempDetail,             'pct' => $tempPct,         'bandLow' => $tempBandLow,       'bandHigh' => $tempBandHigh,      'accent' => 'eden'],
-            ['icon' => 'hum',  'titulo' => 'Humedad',         'valor' => (string) $currentHumidity,      'unidad' => '%',                     'estado' => $humStatus,  'detalle' => $defaultHumidityDetail,         'pct' => $currentHumidity, 'bandLow' => $clamp($minHumProf), 'bandHigh' => $clamp($maxHumProf), 'accent' => 'breath'],
-            ['icon' => 'air',  'titulo' => 'Calidad de aire', 'valor' => $airStateLabel,                 'unidad' => 'AQI ' . $currentAir,    'estado' => $airTone,    'detalle' => 'Lectura combinada del aire.',  'pct' => $currentAir,      'bandLow' => 70.0,               'bandHigh' => 100.0,              'accent' => 'citrus'],
-            ['icon' => 'co2',  'titulo' => 'CO₂',             'valor' => (string) $currentCo2,           'unidad' => 'ppm',                   'estado' => $co2Status,  'detalle' => $defaultCo2Detail,              'pct' => $co2Pct,          'bandLow' => 0.0,                'bandHigh' => $co2BandHigh,       'accent' => 'clay'],
-        ];
-
-        $automationRules = [
-            ['icon' => 'co2',   'when' => 'CO₂ > ' . $maxCo2Prof . ' ppm',                              'then' => 'Encender ventilación',        'active' => $currentCo2 > $maxCo2Prof],
-            ['icon' => 'temp',  'when' => 'Temperatura > ' . number_format($maxTempProf, 1) . ' °C',    'then' => 'Encender aire acondicionado', 'active' => $currentTemp > $maxTempProf],
-            ['icon' => 'hum',   'when' => 'Humedad < ' . number_format($minHumProf, 0) . ' %',          'then' => 'Sugerir humidificador',       'active' => $currentHumidity < $minHumProf, 'pending' => true],
-            ['icon' => 'air',   'when' => 'Calidad de aire < 60/100',                                   'then' => 'Encender aromatizador',       'active' => $currentAir < 60],
-            ['icon' => 'alert', 'when' => 'Lectura fuera de rango crítico',                             'then' => 'Encender LED de alerta',      'active' => ($currentTemp > $maxTempProf + 2) || ($currentCo2 > $maxCo2Prof + 250) || ($currentAir < 45)],
-        ];
-        $automationActiveCount = count(array_filter($automationRules, static fn ($r) => ! empty($r['active'])));
-
-        $tempSeries = $this->extraerSerieGrafico($charts, 'temperatura');
-        if ($tempSeries === []) {
-            $tempSeries = [22.8, 23.4, 24.1, 24.9, 25.2, 24.6, 24.4, 24.2];
-        }
-
-        return [
-            'userName'              => $userName,
-            'userInitial'           => strtoupper(mb_substr($userName, 0, 1)),
-            'spaceName'             => $spaceName,
-            'spaceLabel'            => $spaceLabel,
-            'deviceName'            => (string) ($device['nombre']         ?? 'Módulo EdenAir'),
-            'deviceUid'             => $deviceUid,
-            'deviceToken'           => $deviceToken,
-            'deviceTokenPreview'    => strlen($deviceToken) > 8
-                ? substr($deviceToken, 0, 4) . str_repeat('*', 8) . substr($deviceToken, -4)
-                : $deviceToken,
-            'deviceLastSeen'        => (string) ($device['ultimo_envio']    ?? 'Sin envíos todavía'),
-            'deviceLastSync'        => (string) ($device['ultima_consulta'] ?? 'Sin consultas todavía'),
-            'modeKey'               => $modeKey,
-            'modoManual'            => $modoManual,
-            'modeLabel'             => $modeLabel,
-            'modeDetail'            => (string) ($state['detalle'] ?? 'El sistema está listo para operar con supervisión ambiental.'),
-            'currentTemp'           => $currentTemp,
-            'currentHumidity'       => $currentHumidity,
-            'currentCo2'            => $currentCo2,
-            'currentAir'            => $currentAir,
-            'airStateLabel'         => $airStateLabel,
-            'airTone'               => $airTone,
-            'generalTone'           => $generalTone,
-            'generalLabel'          => $generalLabel,
-            'generalTitle'          => $generalTitle,
-            'generalDetail'         => $generalDetail,
-            'alerts'                => $alertsFinal,
-            'criticalCount'         => $criticalCount,
-            'sensorCards'           => $sensorCards,
-            'actuators'             => $actuators,
-            'activeActuators'       => $activeActuators,
-            'automationRules'       => $automationRules,
-            'automationActiveCount' => $automationActiveCount,
-            'historyRows'           => $historyRows,
-            'historyIsSample'       => $historyIsSample,
-            'latest'                => $latest,
-            'latestIsSample'        => $latestIsSample,
-            'lastUpdate'            => (string) ($latest['fecha'] ?? 'Hoy'),
-            'sparkPath'             => $this->construirSparkPath($tempSeries),
-            'api'                   => $api,
-            'peakCo2'               => max($currentCo2, 980),
-            'minHumidityRecent'     => max(40, $currentHumidity - 3),
-            'maxTempRecent'         => number_format(max((float) $currentTemp, 25.4), 1),
-        ];
-    }
-
-    // =========================================================================
-    // 6) HELPERS NUMÉRICOS del bloque de vista
-    // =========================================================================
-
-    /** Saca el número de un texto tipo '24.6 C' (sirve para re-calcular). */
-    private function extraerNumero(mixed $valor, float $default = 0.0): float
-    {
-        if (is_int($valor) || is_float($valor)) {
-            return (float) $valor;
-        }
-
-        if (is_string($valor) && preg_match('/-?\d+(?:[.,]\d+)?/', $valor, $matches) === 1) {
-            return (float) str_replace(',', '.', $matches[0]);
-        }
-
-        return $default;
-    }
-
-    /** Busca un gráfico por título y devuelve solo sus valores numéricos. */
-    private function extraerSerieGrafico(array $charts, string $titulo): array
-    {
-        foreach ($charts as $chart) {
-            if (strtolower((string) ($chart['titulo'] ?? '')) === $titulo) {
-                $puntos = isset($chart['puntos']) && is_array($chart['puntos']) ? $chart['puntos'] : [];
-
-                return array_map(fn ($p) => $this->extraerNumero($p['valor'] ?? null), $puntos);
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * Convierte una serie de valores en un path SVG ("M x y L x y ...") para
-     * la mini-curva (sparkline) del panel: 220 px de ancho, valores
-     * normalizados entre y=10 (máximo) e y=50 (mínimo).
-     */
-    private function construirSparkPath(array $values): string
-    {
-        if ($values === []) {
-            return '';
-        }
-
-        $min   = min($values);
-        $max   = max($values);
-        $range = max(0.001, $max - $min);
-        $count = count($values);
-        $stepX = $count > 1 ? 220 / ($count - 1) : 0;
-        $cmds  = [];
-
-        foreach ($values as $i => $v) {
-            $x      = round($i * $stepX, 2);
-            $y      = round(50 - (($v - $min) / $range) * 40, 2);
-            $cmds[] = ($i === 0 ? 'M' : 'L') . $x . ' ' . $y;
-        }
-
-        return implode(' ', $cmds);
-    }
 }
 
 /* ============================================================================
    GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
 
    Públicos:
-   - obtenerVistaPanel($userId, $activeDeviceId)
-       → obtenerDatos() + el bloque 'view' (lo que usa PanelController::index)
-   - obtenerDatos($userId, $activeDeviceId)
-       → recolecta todo y lo organiza en bloques: user, space, device, state,
-         resumen, metrics, charts, actuators, latest_measurement, history,
-         alerts, api, space_raw, device_raw, devices_list
+   - obtenerVistaPanel($userId, $activeDeviceId) → contexto + bloque `view`
+   - obtenerDatos($userId, $activeDeviceId)      → solo el contexto crudo
+                                                   (device_raw/space_raw para
+                                                   las acciones del controller)
+
+   Datos (privados):
+   - contexto()   → las únicas consultas a la base: usuario, dispositivos,
+                    ambiente, estado y las últimas 6 mediciones
+   - perfil()     → los rangos del ambiente ya casteados
+   - lecturas()   → los 4 valores de una medición como números (o null)
+
+   Semáforos (privados) — ÚNICO criterio de color del panel:
+   - evaluarTemp()/evaluarHumedad()/evaluarCo2()/evaluarAire()
+       → 'success' (en rango) | 'warning' (fuera) | 'danger' (muy fuera)
+   - tonoGeneral() → el peor tono de una lista
+   - posicion()    → valor → % dentro de la escala del medidor
 
    Bloques visuales (privados):
-   - crearGraficos()    → los 4 gráficos de barras con puntos escalados
-   - crearMetricas()    → las 4 tarjetas de la última medición
-   - crearActuadores()/crearActuador() → tarjetas de fan/aromatizer/alert_led
-   - crearAlertas()     → alertas según qué variable salió de rango
-   - crearPuntosGrafico() → valores → porcentajes de barra (recibe callables)
-   - formatearMedicion()  → fila cruda → textos para la tabla
+   - sensores()   → las 4 tarjetas con medidor
+   - actuadores() → fan / aromatizer / alert_led con su estado
+   - reglas()     → automatizaciones (mismos umbrales que los sensores)
+   - historial()  → filas de la tabla con su tono
+   - sparkPath()  → serie de temperatura → path SVG de la mini-curva
 
-   Semáforos (privados):
-   - tonoTemperatura()/tonoHumedad()/tonoCo2()/tonoAire()
-       → 'success' | 'warning' | 'danger' según el desvío
-
-   Formateo (privados):
-   - etiquetaOrigen()   → 'api' → 'API', 'seed' → 'Inicial', etc.
-   - fechaHumana()      → fecha SQL → 'dd/mm/aaaa hh:mm'
-
-   Bloque de vista (privados):
-   - armarBloqueVista() → TODAS las variables listas para panel.php, con
-                          datos de ejemplo si la cuenta aún no tiene lecturas
-   - extraerNumero()    → float desde un texto ('24.6 C' → 24.6)
-   - extraerSerieGrafico() → valores numéricos de un gráfico por título
-   - construirSparkPath()  → serie → path SVG de la mini-curva
+   Armado y formateo (privados):
+   - armarVista()     → el paquete plano que consume panel.php
+   - etiquetaOrigen() → 'api' → 'Dispositivo', 'seed' → 'Inicial'
+   - fechaHumana()    → fecha SQL → 'dd/mm/aaaa hh:mm'
 
    Funciones/conceptos:
-   - callable / fn() => ...  → (PHP) funciones pasadas como parámetro
-   - number_format($v, 1)    → número con 1 decimal como texto
-   - array_map/array_filter  → transformar / filtrar arrays
-   - end($array)             → el último elemento (el valor más reciente)
-   - max(min())              → "clamp" para encerrar porcentajes en 0–100
+   - match($x) { ... }        → (PHP 8) switch que devuelve un valor
+   - array_filter/array_map   → filtrar / transformar arrays
+   - max(0, min(100, $v))     → "clamp": encierra un valor entre 0 y 100
    ============================================================================ */

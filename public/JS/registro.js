@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     var formRegistro = document.getElementById("formRegistro");
-    var ambiente = document.getElementById("environment_type");
-    var bloquePersonalizado = document.getElementById("bloquePersonalizado");
     var password = document.getElementById("registroPassword");
     var confirmacion = document.getElementById("confirmPassword");
     var botonVer = document.getElementById("verPasswordRegistro");
@@ -9,14 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var textoFuerza = document.getElementById("fuerzaTexto");
     var textoCoincide = document.getElementById("coincideTexto");
     var botonRegistro = document.getElementById("botonRegistro");
-
-    function mostrarBloquePersonalizado() {
-        if (!ambiente || !bloquePersonalizado) {
-            return;
-        }
-
-        bloquePersonalizado.classList.toggle("oculto", ambiente.value !== "personalizable");
-    }
 
     function puntajePassword(valor) {
         var puntaje = 0;
@@ -73,11 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         textoCoincide.textContent = "Las contraseñas no coinciden.";
         textoCoincide.style.color = "#be5159";
-    }
-
-    if (ambiente) {
-        ambiente.addEventListener("change", mostrarBloquePersonalizado);
-        mostrarBloquePersonalizado();
     }
 
     if (botonVer && password) {

@@ -11,61 +11,11 @@
     ]) ?>
 
     <main class="ea-auth">
-        <aside class="ea-auth-aside">
-            <svg class="ea-auth-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <?php for ($i = 0; $i < 12; $i++):
-                    $y = ($i + 1) * (100 / 13);
-                    $phase = ($i % 3) * 8;
-                    $amp = 4 + ($i % 4); ?>
-                    <path d="M -4 <?= $y ?> C 20 <?= $y - $amp ?>, 40 <?= $y + $amp + $phase * 0.2 ?>, 60 <?= $y - $amp ?> C 80 <?= $y + $amp ?>, 100 <?= $y - $amp - $phase * 0.2 ?>, 104 <?= $y ?>"
-                        fill="none" stroke="rgba(236,242,232,0.16)" stroke-width="0.6" />
-                <?php endfor; ?>
-            </svg>
-
-            <div class="ea-auth-meta">
-                <span>EdenAir / Alta de usuario</span>
-                <span>v 1.0 · 2026</span>
-            </div>
-
-            <div>
-                <?= view('partials/logo', ['tone' => 'cream', 'size' => 56, 'variant' => 'horizontal']) ?>
-                <h1 class="ea-auth-title">Empezá tu<br><em>edén.</em></h1>
-                <p class="ea-auth-lede">
-                    Creá tu cuenta para empezar a medir el aire de tu espacio
-                    y conectar tu módulo Eden Air.
-                </p>
-            </div>
-
-            <ul class="ea-auth-points">
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Formulario directo</strong>
-                        Solo los datos necesarios para empezar.
-                    </span>
-                </li>
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Contraseña segura</strong>
-                        Mínimo 8 caracteres, mayúsculas, minúsculas y números.
-                    </span>
-                </li>
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Dashboard listo</strong>
-                        Al entrar podés vincular tu dispositivo y empezar a monitorear.
-                    </span>
-                </li>
-            </ul>
-        </aside>
-
         <section class="ea-auth-main">
             <div class="ea-auth-card">
                 <div>
                     <p class="ea-eyebrow">Alta de usuario</p>
-                    <h2>Creá tu acceso.</h2>
+                    <h1>Creá tu acceso.</h1>
                     <p class="ea-lede">Completá el formulario y entrás directo al dashboard.</p>
                 </div>
 

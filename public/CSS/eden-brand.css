@@ -1814,113 +1814,18 @@ body.ea-nav-open {
     color: var(--eden-300);
 }
 
-/* ---------- Auth (login/registro/seleccion) -------------------------- */
+/* ---------- Auth (login / registro / recuperación) --------------------
+   Una sola columna: el formulario centrado, sin panel decorativo. */
 .ea-auth {
     min-height: calc(100vh - 88px);
-    display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    align-items: stretch;
-}
-
-.ea-auth-aside {
-    position: relative;
-    overflow: hidden;
-    background: var(--eden-800);
-    color: var(--eden-100);
-    padding: clamp(32px, 5vw, 64px);
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 32px;
-}
-
-.ea-auth-aside::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at 20% 110%, rgba(201, 216, 112, 0.18), transparent 60%),
-        radial-gradient(circle at 90% 10%, rgba(188, 210, 189, 0.16), transparent 55%);
-    pointer-events: none;
-}
-
-.ea-auth-aside > * {
-    position: relative;
-    z-index: 1;
-}
-
-.ea-auth-title {
-    font-family: var(--ea-font-serif);
-    font-weight: 400;
-    font-size: clamp(34px, 4.6vw, 52px);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
-    margin: 14px 0 14px;
-}
-
-.ea-auth-title em {
-    font-style: italic;
-    color: var(--ea-citrus);
-}
-
-.ea-auth-lede {
-    font-size: 16px;
-    color: rgba(236, 242, 232, 0.78);
-    max-width: 44ch;
-    line-height: 1.55;
-}
-
-.ea-auth-points {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    color: rgba(236, 242, 232, 0.78);
-}
-
-.ea-auth-points li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 14px;
-    align-items: baseline;
-    font-size: 14.5px;
-}
-
-.ea-auth-points li::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--eden-300);
-    margin-top: 6px;
-}
-
-.ea-auth-points strong {
-    color: var(--eden-100);
-    display: block;
-    margin-bottom: 2px;
-    font-family: var(--ea-font-sans);
-    font-weight: 600;
-}
-
-.ea-auth-meta {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--ea-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(236, 242, 232, 0.5);
-}
-
-.ea-auth-pattern {
-    position: absolute;
-    inset: 0;
-    opacity: 0.32;
-    pointer-events: none;
+    align-items: center;
+    justify-content: center;
 }
 
 .ea-auth-main {
-    padding: clamp(32px, 5vw, 64px);
+    width: 100%;
+    padding: clamp(32px, 5vw, 64px) 24px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1937,6 +1842,7 @@ body.ea-nav-open {
     gap: var(--ea-gap-md);
 }
 
+.ea-auth-card h1,
 .ea-auth-card h2 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
@@ -1977,11 +1883,8 @@ body.ea-nav-open {
 }
 
 @media (max-width: 960px) {
-    .ea-auth {
-        grid-template-columns: 1fr;
-    }
-    .ea-auth-aside {
-        padding: 40px 24px;
+    .ea-auth-main {
+        padding: 40px 20px;
     }
 }
 

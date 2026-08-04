@@ -14,32 +14,32 @@
 /* =============================================================================
    VISTA: panel.php — DASHBOARD del usuario (ruta /panel, requiere sesión)
    CSS:  public/CSS/dashboard.css (+ eden-brand.css global)
-   JS:   dashboard.js (loader, sidebar, toggles) · dashboard-gsap.js
-         (scroll suave + reveals) · tema.js · ea-scrollbar.js
-   IMPORTANTE: esta vista NO calcula nada. Todo (tonos, sparkline, valores,
-   defaults si faltan datos, reglas visibles) viene cocinado de
-   App\Services\PanelService::obtenerVistaPanel() en $panel['view'].
-   Acá solo se recorre el array y se dibuja.
-   ESTRUCTURA de la página (en orden):
-     loader → sidebar → header → flashes → banner de vinculación →
-     hero resumen → sensores → estado del sistema → actuadores +
-     automatizaciones → lecturas (tabla) → info técnica (details)
+   JS:   dashboard.js (loader, sidebar, ver más) · dashboard-gsap.js (scroll
+         suave + reveals) · tema.js · ea-scrollbar.js
+
+   ESTA VISTA NO CALCULA NADA: valores, tonos, textos y porcentajes vienen
+   cocinados de App\Services\PanelService::obtenerVistaPanel() en $panel['view'].
+
+   ESTRUCTURA (cada dato aparece UNA sola vez):
+     loader → sidebar → header (navegación) → flashes
+     1. HERO      · el diagnóstico: cómo está el ambiente ahora
+     2. SENSORES  · los 4 valores medidos, con su rango ideal
+     3. CONTROL   · actuadores + modo de operación + automatizaciones
+     4. LECTURAS  · historial reciente
    ============================================================================= */
 $panel  = (isset($panel) && is_array($panel)) ? $panel : [];
 $view   = (isset($panel['view']) && is_array($panel['view'])) ? $panel['view'] : [];
-$api    = (isset($panel['api']) && is_array($panel['api'])) ? $panel['api'] : ($view['api'] ?? []);
 $errors = session()->getFlashdata('errors') ?? [];
 
-$tone      = (string) ($view['generalTone'] ?? 'success');
+$tone       = (string) ($view['tono'] ?? 'success');
 $modoManual = ! empty($view['modoManual']);
 
-/** Etiqueta + tono legibles para un estado de sensor. */
-$statusMeta = static function (string $s): array {
-    return match ($s) {
-        'danger'  => ['Crítico', 'danger'],
-        'warning' => ['Atención', 'warning'],
-        default   => ['Normal', 'success'],
-    };
+/** Etiqueta corta para un tono de sensor (el color ya lo pone la clase). */
+$tonoLabel = static fn (string $t): string => match ($t) {
+    'danger'  => 'Crítico',
+    'warning' => 'Atención',
+    'neutral' => 'Sin datos',
+    default   => 'Normal',
 };
 ?>
 
@@ -95,12 +95,6 @@ $statusMeta = static function (string $s): array {
         </div>
 
         <div class="ea-loader-progress" aria-hidden="true"><span></span></div>
-
-        <ol class="ea-loader-steps" aria-hidden="true">
-            <li class="ea-loader-step"><span class="ea-loader-step__num">01</span><span class="ea-loader-step__lbl">Conectando sensores</span></li>
-            <li class="ea-loader-step"><span class="ea-loader-step__num">02</span><span class="ea-loader-step__lbl">Calibrando aire</span></li>
-            <li class="ea-loader-step"><span class="ea-loader-step__num">03</span><span class="ea-loader-step__lbl">Cargando ambiente</span></li>
-        </ol>
     </div>
 </div>
 
@@ -112,23 +106,23 @@ $statusMeta = static function (string $s): array {
         'devicesCount' => count($panel['devices_list'] ?? []),
     ]) ?>
 
-    <!-- =========================== HEADER (fuera del smooth-wrapper) =========================== -->
+    <!-- =========================== HEADER =====================================
+         Solo navegación e identidad: qué ambiente estoy viendo, con qué
+         dispositivo, y quién soy. El estado del ambiente NO va acá: es el
+         titular del hero y repetirlo dos veces cansa la lectura. -->
     <header class="dashboard-header ea-header">
             <button type="button" class="ea-burger" data-sidebar-toggle aria-controls="dashboardSidebar" aria-expanded="true" aria-label="Mostrar u ocultar menú">
                 <span></span><span></span><span></span>
             </button>
 
             <div class="ea-header-titles">
-                <h1>Resumen</h1>
-                <p><?= esc((string) ($view['spaceName'] ?? '')) ?> · <?= esc((string) ($view['spaceLabel'] ?? '')) ?></p>
+                <h1><?= esc((string) ($view['spaceName'] ?? 'Mi ambiente')) ?></h1>
+                <p><?= esc((string) ($view['spaceLabel'] ?? '')) ?></p>
             </div>
 
             <?php
             $devicesList = (array) ($panel['devices_list'] ?? []);
-            $activeDeviceName = '';
-            foreach ($devicesList as $_d) {
-                if (! empty($_d['is_active'])) { $activeDeviceName = (string) $_d['name']; break; }
-            }
+            $activeDeviceName = (string) ($view['deviceName'] ?? '');
             ?>
             <?php if (count($devicesList) > 1): ?>
                 <form method="post" action="<?= site_url('panel/dispositivo-activo') ?>" class="ea-device-switcher" data-preserve-scroll>
@@ -153,16 +147,6 @@ $statusMeta = static function (string $s): array {
                 </span>
             <?php endif; ?>
 
-            <span class="ea-chip ea-chip-status status-<?= esc($tone) ?>" title="Estado general del ambiente">
-                <span class="ea-pulse"></span>
-                <span><?= esc((string) ($view['generalLabel'] ?? '')) ?></span>
-            </span>
-
-            <span class="ea-chip ea-chip-update" title="Última actualización">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M20 12a8 8 0 11-2.5-5.8"/><path d="M20 4v4h-4"/></svg>
-                <span class="ea-mono"><?= esc((string) ($view['lastUpdate'] ?? 'Hoy')) ?></span>
-            </span>
-
             <div class="ea-header-tools">
                 <?= view('partials/theme_toggle') ?>
             </div>
@@ -171,7 +155,7 @@ $statusMeta = static function (string $s): array {
                 <span class="ea-header-avatar"><?= esc((string) ($view['userInitial'] ?? 'U')) ?></span>
                 <span class="ea-header-name">
                     <?= esc((string) ($view['userName'] ?? '')) ?>
-                    <small><?= esc((string) ($view['modeLabel'] ?? '')) ?></small>
+                    <small>Cuenta Eden Air</small>
                 </span>
             </div>
     </header>
@@ -183,7 +167,6 @@ $statusMeta = static function (string $s): array {
         <div id="smooth-content">
             <main class="ea-main">
 
-        <!-- =========================== CONTENT =========================== -->
         <div class="ea-content">
 
             <?php if (session()->getFlashdata('success')): ?>
@@ -198,90 +181,46 @@ $statusMeta = static function (string $s): array {
                 </div>
             <?php endif; ?>
 
-            <?php
-            // Si el usuario solo tiene el dispositivo simulado auto-creado, lo
-            // invitamos a vincular su Eden Air real. No bloquea: es informativo.
-            $deviceRaw       = (array) ($panel['device_raw'] ?? []);
-            $totalDispositivos = count((array) ($panel['devices_list'] ?? []));
-            $esSoloSimulado  = $totalDispositivos === 1
-                && (int) ($deviceRaw['is_simulated'] ?? 0) === 1
-                && empty($deviceRaw['activation_code']);
-            ?>
-            <?php if ($esSoloSimulado): ?>
-                <section class="ea-claim-banner" aria-label="Vinculá tu dispositivo Eden Air">
-                    <div class="ea-claim-banner-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="13" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9 8.5l2.3 2.3L15 7"/></svg>
-                    </div>
-                    <div class="ea-claim-banner-text">
-                        <strong>¿Ya tenés tu Eden Air?</strong>
-                        <span>Vinculá tu dispositivo real con su código de activación y administrá uno o varios desde tu cuenta.</span>
-                    </div>
-                    <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-primary ea-button-buy ea-button-sm">Vincular dispositivo</a>
-                </section>
-            <?php endif; ?>
-
-            <!-- ===== ESTRUCTURA: HERO · resumen del ambiente (#dashboard) =====
-                 Estado general + saludo + métricas rápidas + sparkline 24h.
-                 El tono (success/warning/danger) tiñe toda la sección. -->
-            <!-- ===== ANIMACIÓN (GSAP): la clase ea-reveal hace la entrada
-                 con fade/slide (definida en dashboard-gsap.js). -->
+            <!-- ===== 1. HERO · el diagnóstico ===================================
+                 Una sola frase que responde "¿cómo está mi ambiente?", más la
+                 tendencia de temperatura. Los valores medidos NO se repiten
+                 acá: viven en las tarjetas de sensores, justo abajo. -->
             <section class="ea-hero ea-reveal tone-<?= esc($tone) ?>" id="dashboard">
                 <div class="ea-hero-glow" aria-hidden="true"></div>
 
                 <div class="ea-hero-main">
                     <div class="ea-hero-top">
-                        <span class="ea-badge tone-<?= esc($tone) ?> ea-hero-status"><span class="ea-dot"></span><?= esc((string) ($view['generalLabel'] ?? '')) ?></span>
+                        <span class="ea-badge tone-<?= esc($tone) ?> ea-hero-status"><span class="ea-dot"></span><?= esc((string) ($view['estadoLabel'] ?? '')) ?></span>
                         <span class="ea-hero-mode ea-mode-tag <?= $modoManual ? 'is-manual' : 'is-auto' ?>">
                             <span class="ea-mode-tag-dot" aria-hidden="true"></span>
-                            <?= $modoManual ? 'Modo manual' : 'Modo automático' ?>
+                            Modo <?= $modoManual ? 'manual' : 'automático' ?>
                         </span>
                     </div>
 
                     <p class="ea-hero-eyebrow">Hola, <?= esc((string) ($view['userName'] ?? 'bienvenido')) ?></p>
-                    <h2 class="ea-serif ea-hero-title"><?= esc((string) ($view['generalTitle'] ?? '')) ?></h2>
-                    <p class="ea-hero-diag"><?= esc((string) ($view['generalDetail'] ?? '')) ?></p>
+                    <h2 class="ea-serif ea-hero-title"><?= esc((string) ($view['estadoTitulo'] ?? '')) ?></h2>
+                    <p class="ea-hero-diag"><?= esc((string) ($view['estadoDetalle'] ?? '')) ?></p>
 
                     <div class="ea-hero-foot">
                         <span class="ea-hero-foot-item">
-                            <span class="ea-hero-foot-label">Actualizado</span>
-                            <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['lastUpdate'] ?? 'Hoy')) ?></span>
+                            <span class="ea-hero-foot-label">Última lectura</span>
+                            <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['ultimaLectura'] ?? '—')) ?></span>
                         </span>
                         <span class="ea-hero-foot-item">
-                            <span class="ea-hero-foot-label">Actuadores activos</span>
-                            <span class="ea-hero-foot-val"><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?></span>
-                        </span>
-                        <span class="ea-hero-foot-item">
-                            <span class="ea-hero-foot-label">Reglas activas</span>
-                            <span class="ea-hero-foot-val"><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?><small>/<?= esc((string) count($view['automationRules'] ?? [])) ?></small></span>
+                            <span class="ea-hero-foot-label">Dispositivo</span>
+                            <span class="ea-hero-foot-val"><?= esc((string) ($view['deviceName'] ?? '—')) ?></span>
                         </span>
                         <span class="ea-hero-foot-item ea-hero-foot-conn">
                             <span class="ea-conn-dot"></span>
-                            <span class="ea-hero-foot-label">En línea</span>
+                            <span class="ea-hero-foot-label">Identificador</span>
                             <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['deviceUid'] ?? '')) ?></span>
                         </span>
                     </div>
                 </div>
 
                 <div class="ea-hero-side">
-                    <?php
-                    $heroMetrics = [
-                        ['Temperatura', number_format((float) ($view['currentTemp'] ?? 0), 1), '°C',  (string) ($view['sensorCards'][0]['estado'] ?? 'success')],
-                        ['Humedad',     (string) (int) ($view['currentHumidity'] ?? 0),         '%',   (string) ($view['sensorCards'][1]['estado'] ?? 'success')],
-                        ['CO₂',         (string) (int) ($view['currentCo2'] ?? 0),              'ppm', (string) ($view['sensorCards'][3]['estado'] ?? 'success')],
-                        ['Calidad',     (string) ($view['airStateLabel'] ?? '—'),               'AQI ' . (int) ($view['currentAir'] ?? 0), (string) ($view['airTone'] ?? 'success')],
-                    ];
-                    ?>
-                    <div class="ea-hero-metrics">
-                        <?php foreach ($heroMetrics as [$mLabel, $mVal, $mUnit, $mTone]): ?>
-                            <div class="ea-hero-metric tone-<?= esc($mTone) ?>">
-                                <span class="ea-hero-metric-label"><span class="ea-dot"></span><?= esc($mLabel) ?></span>
-                                <span class="ea-hero-metric-val"><?= esc($mVal) ?> <small><?= esc($mUnit) ?></small></span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
                     <div class="ea-hero-trend">
-                        <span class="ea-mono ea-hero-trend-label">Tendencia · 24 h</span>
+                        <span class="ea-mono ea-hero-trend-label">Temperatura · últimas <?= esc((string) count($view['historial'] ?? [])) ?> lecturas</span>
                         <svg viewBox="0 0 220 60" class="ea-hero-spark" preserveAspectRatio="none" aria-hidden="true">
                             <defs>
                                 <linearGradient id="ea-spark-grad" x1="0" x2="0" y1="0" y2="1">
@@ -296,18 +235,18 @@ $statusMeta = static function (string $s): array {
                 </div>
             </section>
 
-            <!-- ===== ESTRUCTURA: SENSORES (#sensores) =====
-                 4 tarjetas (temp, humedad, aire, CO₂) con gauge: la banda
-                 verde es la "zona ideal" del ambiente y el pin la lectura. -->
+            <!-- ===== 2. SENSORES ================================================
+                 El único lugar donde aparecen los valores medidos. La banda
+                 verde del medidor es el rango ideal del ambiente; el pin, la
+                 lectura actual. -->
             <div class="ea-sec" id="sensores">
                 <h2>Sensores</h2>
-                <span class="ea-sec-right">4 activos · lecturas en tiempo real</span>
+                <span class="ea-sec-right">Comparados con el rango de <?= esc((string) ($view['spaceName'] ?? 'tu ambiente')) ?></span>
             </div>
 
             <div class="ea-sensor-grid">
-                <?php foreach (($view['sensorCards'] ?? []) as $sensor):
-                    $sStatus = (string) ($sensor['estado'] ?? 'success');
-                    [$sLabel, $sTone] = $statusMeta($sStatus);
+                <?php foreach (($view['sensores'] ?? []) as $sensor):
+                    $sTono    = (string) ($sensor['tono'] ?? 'success');
                     $bandLow  = (float) ($sensor['bandLow'] ?? 0);
                     $bandHigh = (float) ($sensor['bandHigh'] ?? 100);
                     $bandW    = max(0.0, $bandHigh - $bandLow);
@@ -316,7 +255,7 @@ $statusMeta = static function (string $s): array {
                     <article class="ea-sensor-card accent-<?= esc((string) ($sensor['accent'] ?? 'eden')) ?>">
                         <div class="ea-sensor-head">
                             <span class="ea-sensor-icon" aria-hidden="true">
-                                <?php switch ($sensor['icon'] ?? 'temp'):
+                                <?php switch ($sensor['icono'] ?? 'temp'):
                                     case 'temp': ?>
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14V5a2 2 0 014 0v9a4 4 0 11-4 0z"/><path d="M12 8v6"/></svg>
                                 <?php break; case 'hum': ?>
@@ -328,21 +267,21 @@ $statusMeta = static function (string $s): array {
                                 <?php break; endswitch; ?>
                             </span>
                             <span class="ea-sensor-title"><?= esc((string) ($sensor['titulo'] ?? '')) ?></span>
-                            <span class="ea-badge tone-<?= esc($sTone) ?> ea-sensor-badge"><span class="ea-dot"></span><?= esc($sLabel) ?></span>
+                            <span class="ea-badge tone-<?= esc($sTono) ?> ea-sensor-badge"><span class="ea-dot"></span><?= esc($tonoLabel($sTono)) ?></span>
                         </div>
 
                         <div class="ea-sensor-value">
-                            <span class="ea-sensor-num"><?= esc((string) ($sensor['valor'] ?? '')) ?></span>
+                            <span class="ea-sensor-num"><?= esc((string) ($sensor['valor'] ?? '--')) ?></span>
                             <span class="ea-mono ea-sensor-unit"><?= esc((string) ($sensor['unidad'] ?? '')) ?></span>
                         </div>
 
                         <div class="ea-sensor-foot">
                             <div class="ea-gauge" role="img" aria-label="Lectura comparada con el rango ideal">
                                 <span class="ea-gauge-band" style="left: <?= esc((string) round($bandLow, 1)) ?>%; width: <?= esc((string) round($bandW, 1)) ?>%;"></span>
-                                <span class="ea-gauge-pin tone-<?= esc($sTone) ?>" style="left: <?= esc((string) round($pin, 1)) ?>%;"></span>
+                                <span class="ea-gauge-pin tone-<?= esc($sTono) ?>" style="left: <?= esc((string) round($pin, 1)) ?>%;"></span>
                             </div>
                             <div class="ea-sensor-hint">
-                                <span><?= esc((string) ($sensor['detalle'] ?? '')) ?></span>
+                                <span><?= esc((string) ($sensor['rango'] ?? '')) ?></span>
                                 <span class="ea-gauge-legend"><i></i>zona ideal</span>
                             </div>
                         </div>
@@ -350,41 +289,25 @@ $statusMeta = static function (string $s): array {
                 <?php endforeach; ?>
             </div>
 
-            <!-- ===== ESTRUCTURA: ESTADO DEL SISTEMA (#configuracion) =====
-                 Stats de conexión + el switch de modo automático/manual
-                 (formulario POST a panel/modo). -->
+            <!-- ===== 3. CONTROL =================================================
+                 Actuadores (con el selector de modo en su cabecera, porque es
+                 lo que decide si podés tocarlos) + las reglas que los mueven
+                 solos. Antes esto estaba repartido en tres tarjetas. -->
             <div class="ea-sec" id="configuracion">
-                <h2>Estado del sistema</h2>
-                <span class="ea-sec-right">ESP32 · <span class="ea-mono">integración preparada</span></span>
+                <h2>Control</h2>
+                <span class="ea-sec-right">Qué está encendido y con qué criterio</span>
             </div>
 
-            <article class="ea-card ea-system-card">
-                <div class="ea-system-stats">
-                    <div class="ea-system-stat">
-                        <span class="ea-system-ico is-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg></span>
-                        <div><strong>Sistema en línea</strong><small>Servicios operativos</small></div>
+            <div class="ea-ops-grid">
+                <article class="ea-card ea-actuators-card">
+                    <div class="ea-card-head">
+                        <h3>Actuadores</h3>
+                        <span class="ea-mono ea-card-meta"><?= esc((string) (int) ($view['actuadoresActivos'] ?? 0)) ?> de <?= esc((string) count($view['actuadores'] ?? [])) ?> encendidos</span>
                     </div>
-                    <div class="ea-system-stat">
-                        <span class="ea-system-ico is-ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 9h6v6H9z"/><path d="M5 9H2M5 15H2M22 9h-3M22 15h-3M9 5V2M15 5V2M9 22v-3M15 22v-3"/></svg></span>
-                        <div><strong>ESP32 preparada</strong><small>Último envío <?= esc((string) ($view['deviceLastSeen'] ?? '—')) ?></small></div>
-                    </div>
-                    <div class="ea-system-stat">
-                        <span class="ea-system-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
-                        <div><strong><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?> actuadores activos</strong><small><?= esc((string) (count($view['actuators'] ?? []) - (int) ($view['activeActuators'] ?? 0))) ?> en espera</small></div>
-                    </div>
-                    <div class="ea-system-stat">
-                        <span class="ea-system-ico tone-<?= esc($tone) ?>" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg></span>
-                        <div><strong><?= esc((string) (int) ($view['criticalCount'] ?? 0)) ?> alertas</strong><small><?= ((int) ($view['criticalCount'] ?? 0)) > 0 ? 'Requieren revisión' : 'Todo bajo control' ?></small></div>
-                    </div>
-                </div>
 
-                <div class="ea-mode-panel <?= $modoManual ? 'is-manual' : 'is-auto' ?>">
-                    <div class="ea-mode-copy">
-                        <span class="ea-mode-eyebrow">Modo de operación</span>
-                        <strong><?= $modoManual ? 'Manual' : 'Automático' ?></strong>
-                        <small><?= $modoManual ? 'Vos decidís: usá los interruptores para encender o apagar cada actuador.' : 'El sistema enciende los actuadores cuando una variable sale del rango.' ?></small>
-                    </div>
-                    <form action="<?= site_url('panel/modo') ?>" method="POST" data-preserve-scroll class="ea-mode-switch" role="group" aria-label="Modo de operación">
+                    <!-- Selector de modo: en automático manda el sistema, en
+                         manual mandás vos (y recién ahí aparecen los switches). -->
+                    <form action="<?= site_url('panel/modo') ?>" method="POST" data-preserve-scroll class="ea-mode-switch <?= $modoManual ? 'is-manual' : '' ?>" role="group" aria-label="Modo de operación">
                         <?= csrf_field() ?>
                         <button type="submit" name="mode" value="automatic" class="ea-mode-opt <?= $modoManual ? '' : 'is-active' ?>" <?= $modoManual ? '' : 'aria-current="true"' ?>>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M12 3v3"/><path d="M5.6 5.6l2.1 2.1"/><path d="M3 12h3"/><path d="M5.6 18.4l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
@@ -395,42 +318,26 @@ $statusMeta = static function (string $s): array {
                             Manual
                         </button>
                     </form>
-                </div>
-            </article>
-
-            <!-- ===== ESTRUCTURA: ACTUADORES + AUTOMATIZACIONES =====
-                 Dos tarjetas lado a lado. Los toggles de actuadores solo
-                 aparecen en modo manual (en automático son badges ON/OFF). -->
-            <div class="ea-ops-grid">
-                <!-- Actuadores -->
-                <article class="ea-card ea-actuators-card">
-                    <div class="ea-card-head">
-                        <h3>Actuadores</h3>
-                        <span class="ea-mono ea-card-meta"><?= esc((string) (int) ($view['activeActuators'] ?? 0)) ?> ON · <?= esc((string) (count($view['actuators'] ?? []) - (int) ($view['activeActuators'] ?? 0))) ?> OFF</span>
-                    </div>
 
                     <ul class="ea-actuators-list">
-                        <?php foreach (($view['actuators'] ?? []) as $act):
-                            $on      = strtolower((string) ($act['estado'] ?? 'apagado')) !== 'apagado';
-                            $key     = (string) ($act['clave'] ?? 'fan');
-                            $iconKey = $key === 'aromatizer' ? 'spray' : ($key === 'alert_led' ? 'led' : ($key === 'humid' ? 'drop' : 'fan'));
+                        <?php foreach (($view['actuadores'] ?? []) as $act):
+                            $on  = ! empty($act['encendido']);
+                            $key = (string) ($act['clave'] ?? 'fan');
                         ?>
                             <li class="ea-actuator-row">
                                 <span class="ea-actuator-icon <?= $on ? 'is-on' : '' ?>" aria-hidden="true">
-                                    <?php switch ($iconKey):
+                                    <?php switch ($key):
                                         case 'fan': ?>
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><path d="M12 10.4c0-3 1.2-5.4 3.5-5.4S18 7 16.5 9.4c-1 1.5-3 2-4.5 1"/><path d="M13.6 12c3 0 5.4 1.2 5.4 3.5S17 18 14.6 16.5c-1.5-1-2-3-1-4.5"/><path d="M12 13.6c0 3-1.2 5.4-3.5 5.4S6 17 7.5 14.6c1-1.5 3-2 4.5-1"/><path d="M10.4 12c-3 0-5.4-1.2-5.4-3.5S7 6 9.4 7.5c1.5 1 2 3 1 4.5"/></svg>
-                                    <?php break; case 'spray': ?>
+                                    <?php break; case 'aromatizer': ?>
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="9" width="8" height="12" rx="1.6"/><path d="M10 9V6h4v3"/><path d="M18 6h2M18 9h3M18 12h2"/></svg>
-                                    <?php break; case 'led': ?>
+                                    <?php break; default: ?>
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M7 13a5 5 0 1110 0c0 2-1 3-2 4H9c-1-1-2-2-2-4z"/><path d="M12 5V3"/></svg>
-                                    <?php break; case 'drop': ?>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c3.5 4 6 7.2 6 10.5a6 6 0 11-12 0c0-3.3 2.5-6.5 6-10.5z"/></svg>
                                     <?php break; endswitch; ?>
                                 </span>
                                 <div class="ea-actuator-body">
                                     <strong class="ea-actuator-name"><?= esc((string) ($act['titulo'] ?? 'Actuador')) ?></strong>
-                                    <span class="ea-actuator-reason"><?= esc((string) ($act['detalle'] ?? 'Sin detalle disponible.')) ?></span>
+                                    <span class="ea-actuator-reason"><?= esc((string) ($act['detalle'] ?? '')) ?></span>
                                 </div>
                                 <span class="ea-actuator-state">
                                     <?php if ($modoManual): ?>
@@ -449,81 +356,58 @@ $statusMeta = static function (string $s): array {
                             </li>
                         <?php endforeach; ?>
                     </ul>
-
-                    <p class="ea-actuators-note">
-                        <?= $modoManual
-                            ? 'Modo manual: usá los interruptores para forzar cada actuador.'
-                            : 'Modo automático: el sistema enciende cada actuador según las reglas. Pasá a manual para forzarlos.' ?>
-                    </p>
                 </article>
 
-                <!-- Automatizaciones -->
                 <article class="ea-card ea-rules-card" id="automatizaciones">
                     <div class="ea-card-head">
                         <h3>Automatizaciones</h3>
-                        <span class="ea-mono ea-card-meta"><?= esc((string) (int) ($view['automationActiveCount'] ?? 0)) ?>/<?= esc((string) count($view['automationRules'] ?? [])) ?> activas</span>
+                        <span class="ea-mono ea-card-meta"><?= esc((string) (int) ($view['reglasActivas'] ?? 0)) ?> de <?= esc((string) count($view['reglas'] ?? [])) ?> aplicándose</span>
                     </div>
 
                     <ul class="ea-rules-list">
-                        <?php foreach (($view['automationRules'] ?? []) as $rule):
-                            $active  = ! empty($rule['active']);
-                            $pending = ! empty($rule['pending']);
-                            $isAlert = ($rule['icon'] ?? '') === 'alert';
-
-                            if ($active && $isAlert) {
-                                $rState = 'danger'; $rLabel = 'Requiere atención';
-                            } elseif ($active) {
-                                $rState = 'success'; $rLabel = 'Activa';
-                            } elseif ($pending) {
-                                $rState = 'info'; $rLabel = 'Preparada';
-                            } else {
-                                $rState = 'neutral'; $rLabel = 'En espera';
-                            }
+                        <?php foreach (($view['reglas'] ?? []) as $regla):
+                            $activa = ! empty($regla['activa']);
                         ?>
                             <li class="ea-rule">
-                                <span class="ea-rule-state tone-<?= esc($rState) ?>" aria-hidden="true"></span>
+                                <span class="ea-rule-state tone-<?= $activa ? 'success' : 'neutral' ?>" aria-hidden="true"></span>
                                 <div class="ea-rule-body">
                                     <p class="ea-rule-text">
-                                        Cuando <strong><?= esc((string) ($rule['when'] ?? '')) ?></strong>,
-                                        <span><?= esc(mb_strtolower((string) ($rule['then'] ?? ''))) ?>.</span>
+                                        Cuando <strong><?= esc((string) ($regla['cuando'] ?? '')) ?></strong>,
+                                        <span><?= esc(mb_strtolower((string) ($regla['accion'] ?? ''))) ?>.</span>
                                     </p>
                                 </div>
-                                <span class="ea-badge tone-<?= esc($rState) ?> ea-rule-badge"><span class="ea-dot"></span><?= esc($rLabel) ?></span>
+                                <span class="ea-badge tone-<?= $activa ? 'success' : 'neutral' ?> ea-rule-badge"><span class="ea-dot"></span><?= $activa ? 'Aplicándose' : 'En espera' ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
+
+                    <p class="ea-actuators-note">
+                        <?= $modoManual
+                            ? 'En modo manual las reglas quedan en pausa: los actuadores hacen lo que vos indiques.'
+                            : 'En modo automático estas reglas encienden y apagan los actuadores solas.' ?>
+                    </p>
                 </article>
             </div>
 
-            <!-- ===== ESTRUCTURA: LECTURAS (#historial) =====
-                 Tabla con el historial; muestra 3 filas y el resto se
-                 despliega con el botón "Ver más" (dashboard.js). -->
+            <!-- ===== 4. LECTURAS ================================================
+                 Historial reciente. Se muestran 3 filas y el resto se despliega
+                 con "Ver más" (dashboard.js). -->
             <div class="ea-sec" id="historial">
                 <h2>Lecturas</h2>
-                <span class="ea-sec-right"><span class="ea-mono"><?= esc((string) count($view['historyRows'] ?? [])) ?> registros recientes</span></span>
+                <span class="ea-sec-right"><span class="ea-mono"><?= esc((string) count($view['historial'] ?? [])) ?> registros recientes</span></span>
             </div>
 
             <?php
-            $historyRows = $view['historyRows'] ?? [];
-            $maxCo2Prof  = isset($panel['space']['perfil']['max_co2']) ? (int) $panel['space']['perfil']['max_co2'] : 900;
+            $filas       = (array) ($view['historial'] ?? []);
             $visibleRows = 3;
             ?>
             <article class="ea-card ea-readings-card" data-readings>
-                <div class="ea-card-head">
-                    <h3>Últimas lecturas</h3>
-                    <span class="ea-badge tone-<?= ! empty($view['historyIsSample']) ? 'warning' : 'success' ?> ea-card-meta-badge"><span class="ea-dot"></span><?= ! empty($view['historyIsSample']) ? 'Datos de ejemplo' : 'Datos reales' ?></span>
-                    <span class="ea-kbtn ea-card-head-action" aria-disabled="true" title="Disponible próximamente">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>
-                        Exportar
-                    </span>
-                </div>
-
                 <div class="ea-readings-wrap">
                     <table class="ea-table">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Dispositivo</th>
+                                <th>Origen</th>
                                 <th class="ea-num">Temp.</th>
                                 <th class="ea-num">Humedad</th>
                                 <th>Calidad</th>
@@ -532,80 +416,42 @@ $statusMeta = static function (string $s): array {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($historyRows === []): ?>
+                            <?php if ($filas === []): ?>
                                 <tr><td colspan="7" class="ea-table-empty">
                                     <div class="ea-empty">
                                         <strong>Sin lecturas registradas todavía.</strong>
-                                        <p>Cuando el dispositivo principal envíe datos, las lecturas aparecerán acá.</p>
+                                        <p>Cuando el dispositivo envíe datos, las lecturas aparecerán acá.</p>
                                     </div>
                                 </td></tr>
-                            <?php else:
-                                foreach ($historyRows as $i => $row):
-                                    $rowCo2Raw = (string) ($row['co2'] ?? '');
-                                    preg_match('/-?\d+(?:[.,]\d+)?/', $rowCo2Raw, $m);
-                                    $rowCo2   = isset($m[0]) ? (float) str_replace(',', '.', $m[0]) : 0.0;
-                                    $rowState = $rowCo2 > $maxCo2Prof + 200 ? 'danger' : ($rowCo2 > $maxCo2Prof ? 'warning' : 'success');
-                                    [$rowLabel] = $statusMeta($rowState);
-                            ?>
+                            <?php else: foreach ($filas as $i => $fila): ?>
                                 <tr class="<?= $i >= $visibleRows ? 'is-extra' : '' ?>">
-                                    <td class="ea-mono ea-table-time"><?= esc((string) ($row['fecha'] ?? '--')) ?></td>
+                                    <td class="ea-mono ea-table-time"><?= esc((string) ($fila['fecha'] ?? '--')) ?></td>
                                     <td>
                                         <span class="ea-table-dev">
                                             <span class="ea-table-dev-dot"></span>
-                                            <span class="ea-mono"><?= esc((string) ($row['origen'] ?? 'edenair-node-01')) ?></span>
+                                            <span class="ea-mono"><?= esc((string) ($fila['origen'] ?? '--')) ?></span>
                                         </span>
                                     </td>
-                                    <td class="ea-num ea-mono"><?= esc((string) ($row['temperatura'] ?? '--')) ?></td>
-                                    <td class="ea-num ea-mono"><?= esc((string) ($row['humedad'] ?? '--')) ?></td>
-                                    <td><?= esc((string) ($row['aire'] ?? '--')) ?></td>
-                                    <td class="ea-num ea-mono"><?= esc((string) ($row['co2'] ?? '--')) ?></td>
-                                    <td><span class="ea-badge tone-<?= esc($rowState) ?>"><span class="ea-dot"></span><?= esc($rowLabel) ?></span></td>
+                                    <td class="ea-num ea-mono"><?= esc((string) ($fila['temperatura'] ?? '--')) ?></td>
+                                    <td class="ea-num ea-mono"><?= esc((string) ($fila['humedad'] ?? '--')) ?></td>
+                                    <td><?= esc((string) ($fila['aire'] ?? '--')) ?></td>
+                                    <td class="ea-num ea-mono"><?= esc((string) ($fila['co2'] ?? '--')) ?></td>
+                                    <td><span class="ea-badge tone-<?= esc((string) ($fila['tono'] ?? 'success')) ?>"><span class="ea-dot"></span><?= esc($tonoLabel((string) ($fila['tono'] ?? 'success'))) ?></span></td>
                                 </tr>
                             <?php endforeach; endif; ?>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="ea-readings-foot">
-                    <?php if (count($historyRows) > $visibleRows): ?>
-                        <button type="button" class="ea-kbtn ea-kbtn-primary ea-readings-more" data-readings-toggle data-less="Ver menos" data-more="Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más" aria-expanded="false" aria-controls="historial">
+                <?php if (count($filas) > $visibleRows): ?>
+                    <div class="ea-readings-foot">
+                        <button type="button" class="ea-kbtn ea-kbtn-primary ea-readings-more" data-readings-toggle data-less="Ver menos" data-more="Ver <?= esc((string) (count($filas) - $visibleRows)) ?> más" aria-expanded="false" aria-controls="historial">
                             <svg class="ea-readings-more-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                            <span data-readings-label>Ver <?= esc((string) (count($historyRows) - $visibleRows)) ?> más</span>
+                            <span data-readings-label>Ver <?= esc((string) (count($filas) - $visibleRows)) ?> más</span>
                         </button>
-                    <?php else: ?>
-                        <span class="ea-mono">Mostrando <?= esc((string) count($historyRows)) ?> registros</span>
-                    <?php endif; ?>
-                    <span class="ea-readings-note <?= ! empty($view['latestIsSample']) ? 'is-sample' : '' ?>">
-                        <?= ! empty($view['latestIsSample']) ? 'Datos de ejemplo' : 'Última: ' . esc((string) ($view['latest']['fecha'] ?? '')) ?>
-                    </span>
-                </div>
+                    </div>
+                <?php endif; ?>
             </article>
-
-            <!-- ===== ESTRUCTURA: INFORMACIÓN TÉCNICA (colapsable) =====
-                 <details> nativo del navegador (sin JS): endpoints de la API
-                 del ESP32 y vista previa del token del dispositivo. -->
-            <details class="ea-card ea-tech-details">
-                <summary>
-                    <span class="ea-tech-summary">
-                        <strong>Información técnica · API REST</strong>
-                        <small>Endpoints preparados para la integración con ESP32</small>
-                    </span>
-                    <span class="ea-mono ea-tech-id"><?= esc((string) ($view['deviceUid'] ?? '')) ?></span>
-                </summary>
-                <div class="ea-tech-grid">
-                    <div><span class="ea-mono">Routes</span><code><?= esc((string) ($api['routes_file'] ?? 'app/Config/Routes.php')) ?></code></div>
-                    <div><span class="ea-mono">Controller</span><code><?= esc((string) ($api['controller_file'] ?? 'app/Controllers/Api/DeviceApiController.php')) ?></code></div>
-                    <div><span class="ea-mono">Mediciones</span><code><?= esc((string) ($api['measurements_url'] ?? site_url('api/devices/' . ($view['deviceUid'] ?? '') . '/measurements'))) ?></code></div>
-                    <div><span class="ea-mono">Comandos</span><code><?= esc((string) ($api['commands_url'] ?? site_url('api/devices/' . ($view['deviceUid'] ?? '') . '/commands/pending'))) ?></code></div>
-                    <div><span class="ea-mono">Ejecutado</span><code><?= esc((string) ($api['executed_url'] ?? site_url('api/devices/' . ($view['deviceUid'] ?? '') . '/commands/{id}/executed'))) ?></code></div>
-                    <div><span class="ea-mono">Token</span><code><?= esc((string) ($view['deviceTokenPreview'] ?? '')) ?></code></div>
-                </div>
-                <div class="ea-tech-foot">
-                    <span><strong>Dispositivo</strong> <?= esc((string) ($view['deviceName'] ?? '')) ?></span>
-                    <span><strong>Último envío</strong> <?= esc((string) ($view['deviceLastSeen'] ?? '')) ?></span>
-                    <span><strong>Última consulta</strong> <?= esc((string) ($view['deviceLastSync'] ?? '')) ?></span>
-                </div>
-            </details>
 
         </div>
             </main>

@@ -12,7 +12,7 @@ use CodeIgniter\Database\Migration;
  *   con el que se vinculó).
  * - Crea `device_activation_codes`: cada dispositivo físico vendido / maqueta
  *   trae un código único EDEN-XXXX-XXXX que sólo puede canjearse una vez.
- * - Siembra códigos de ejemplo para la demo (incluye EDEN-DEMO-2026).
+ * - Carga el lote inicial de códigos disponibles (incluye EDEN-CORE-2026).
  *
  * Idempotente: usa guardas fieldExists()/tableExists() para poder re-ejecutarse.
  */
@@ -143,7 +143,7 @@ class CreateDeviceClaimSchema extends Migration
             $this->forge->addKey('status');
             $this->forge->createTable('device_activation_codes');
 
-            $this->seedDemoCodes();
+            $this->sembrarLoteInicial();
         }
     }
 
@@ -163,26 +163,28 @@ class CreateDeviceClaimSchema extends Migration
     }
 
     /**
-     * Códigos de ejemplo para la demo educativa. Mezcla un código fijo
-     * documentado (EDEN-DEMO-2026) con varios códigos aleatorios disponibles.
+     * Lote inicial de códigos de activación (batch `lote-inicial`): representa
+     * las unidades fabricadas y listas para vincular. Mezcla un código fijo
+     * documentado (EDEN-CORE-2026) con varios códigos aleatorios disponibles.
      */
-    private function seedDemoCodes(): void
+    private function sembrarLoteInicial(): void
     {
         $ahora = date('Y-m-d H:i:s');
         $filas = [
             [
-                'code'         => 'EDEN-DEMO-2026',
+                'code'         => 'EDEN-CORE-2026',
                 'device_type'  => 'Eden Air Core',
                 'default_name' => 'Eden Air Core',
-                'mac_address'  => 'AA:BB:CC:00:DE:01',
+                // La MAC la graba el equipo real al aprovisionarse, no se inventa acá.
+                'mac_address'  => null,
                 'status'       => 'available',
-                'batch'        => 'demo',
+                'batch'        => 'lote-inicial',
                 'created_at'   => $ahora,
                 'updated_at'   => $ahora,
             ],
         ];
 
-        // Códigos extra para poder vincular más de un dispositivo en la demo.
+        // Códigos extra: una cuenta puede vincular más de un dispositivo.
         $tipos = ['Eden Air Core', 'Monitor ambiental', 'Ambientador inteligente', 'Prototipo educativo'];
         for ($i = 0; $i < 8; $i++) {
             $filas[] = [
@@ -191,7 +193,7 @@ class CreateDeviceClaimSchema extends Migration
                 'default_name' => null,
                 'mac_address'  => null,
                 'status'       => 'available',
-                'batch'        => 'demo',
+                'batch'        => 'lote-inicial',
                 'created_at'   => $ahora,
                 'updated_at'   => $ahora,
             ];
