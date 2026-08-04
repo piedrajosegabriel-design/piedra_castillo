@@ -55,20 +55,21 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->post('password', 'PanelController::actualizarPassword');
     $routes->get('compra', 'PanelController::compra');
 
-    // Hito 2 — Mis dispositivos + alta por código de activación.
+    // Mis dispositivos + conexión de un equipo nuevo por QR.
+    // No hay formulario de alta: el equipo se da de alta solo contra la API
+    // mientras la ventana de vinculación está abierta.
     $routes->get('dispositivos', 'DispositivosController::index');
-    $routes->get('dispositivos/agregar', 'DispositivosController::agregar');
-    $routes->get('dispositivos/validar', 'DispositivosController::validar');
-    $routes->post('dispositivos', 'DispositivosController::guardar');
+    $routes->get('dispositivos/conectar', 'DispositivosController::conectar');
+    $routes->post('dispositivos/conectar', 'DispositivosController::iniciar');
+    $routes->get('dispositivos/conectar/estado', 'DispositivosController::estadoVinculacion');
+    $routes->post('dispositivos/conectar/cancelar', 'DispositivosController::cancelar');
     $routes->post('dispositivo-activo', 'PanelController::seleccionarDispositivo');
-    $routes->post('demo', 'PanelController::iniciarDemo');
 
     // Ambientes (Hito 2): listado y edición de los espacios del usuario.
     $routes->get('ambientes', 'AmbientesController::index');
     $routes->get('ambientes/(:num)/editar', 'AmbientesController::editar/$1');
     $routes->post('ambientes/(:num)', 'AmbientesController::actualizar/$1');
 
-    $routes->post('medicion', 'PanelController::guardarMedicion');
     $routes->post('modo', 'PanelController::cambiarModo');
     $routes->post('actuador', 'PanelController::cambiarActuador');
 });
@@ -82,34 +83,49 @@ $routes->get('dashboard', 'PanelController::index', ['filter' => 'auth']);
 // (:segment) captura el device_uid de la URL; (:num) el id del comando.
 // =============================================================================
 $routes->group('api/devices', static function ($routes) {
+    // Vinculación: el equipo se presenta con su MAC y recibe sus credenciales
+    // si hay una ventana abierta. Es el único sin token (viene a buscarlo).
+    $routes->post('pair', 'Api\DeviceApiController::pair');
+
+    // Configuración: con qué umbrales tiene que decidir el equipo.
+    $routes->get('(:segment)/config', 'Api\DeviceApiController::config/$1');
+
     $routes->post('(:segment)/measurements', 'Api\DeviceApiController::storeMeasurement/$1');
     $routes->get('(:segment)/commands/pending', 'Api\DeviceApiController::pendingCommands/$1');
     $routes->post('(:segment)/commands/(:num)/executed', 'Api\DeviceApiController::markCommandExecuted/$1/$2');
 });
 
 // Endpoint público de lectura ambiental usado por el core 3D del hero.
-// Datos simulados — preparado para cablear medición real más adelante.
+// Devuelve la ÚLTIMA medición real cargada por cualquier dispositivo Eden Air:
+// el visitante de la landing ve aire medido de verdad, no números de relleno.
+// Si todavía no hay ninguna medición, responde 'sin_datos' y el hero muestra
+// sus valores de reposo.
 $routes->get('api/sensores', static function () {
-    $rand = static fn (float $min, float $max): float => $min + mt_rand() / mt_getrandmax() * ($max - $min);
+    $medicion = (new \App\Models\MeasurementModel())
+        ->orderBy('captured_at', 'DESC')
+        ->first();
 
-    $temperatura = round($rand(21.5, 23.5), 0);
-    $humedad     = (int) round($rand(45, 52));
-    $co2ppm      = (int) round($rand(520, 720));
-    $calidad     = (int) round($rand(82, 95));
+    if (! $medicion) {
+        return service('response')->setJSON([
+            'status'    => 'sin_datos',
+            'timestamp' => date('c'),
+            'sensores'  => null,
+        ]);
+    }
 
-    $co2Estado = $co2ppm < 800 ? 'OK' : 'Alto';
-    $calidadEt = $calidad >= 90 ? 'Excelente' : ($calidad >= 75 ? 'Buena' : 'Regular');
+    $temperatura = (float) $medicion['temperature'];
+    $humedad     = (int) round((float) $medicion['humidity']);
+    $co2ppm      = (int) $medicion['co2_ppm'];
+    $calidad     = (int) $medicion['air_quality_index'];
 
     return service('response')->setJSON([
         'status'    => 'success',
-        'timestamp' => date('c'),
+        'timestamp' => date('c', strtotime((string) $medicion['captured_at'])),
         'sensores'  => [
-            'temperatura'    => ['valor' => $temperatura, 'unidad' => '°C', 'texto' => $temperatura . ' °C'],
-            'humedad'        => ['valor' => $humedad,     'unidad' => '%',  'texto' => $humedad . ' %'],
-            'co2'            => ['valor' => $co2ppm,      'unidad' => 'ppm','texto' => $co2Estado],
-            'calidad_aire'   => ['valor' => $calidad,     'unidad' => '/100','texto' => $calidadEt],
-            'ventilador'     => ['valor' => 'activo',     'texto' => 'Activo'],
-            'humidificacion' => ['valor' => 'optima',     'texto' => 'Óptima'],
+            'temperatura'  => ['valor' => $temperatura, 'unidad' => '°C',   'texto' => number_format($temperatura, 1) . ' °C'],
+            'humedad'      => ['valor' => $humedad,     'unidad' => '%',    'texto' => $humedad . ' %'],
+            'co2'          => ['valor' => $co2ppm,      'unidad' => 'ppm',  'texto' => $co2ppm < 800 ? 'OK' : 'Alto'],
+            'calidad_aire' => ['valor' => $calidad,     'unidad' => '/100', 'texto' => (string) $medicion['air_quality_label']],
         ],
     ]);
 });

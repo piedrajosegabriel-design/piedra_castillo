@@ -2,20 +2,24 @@
 
 namespace App\Controllers;
 
-use App\Services\DeviceClaimService;
-use CodeIgniter\HTTP\RedirectResponse;
+use App\Services\DevicePairingService;
 use CodeIgniter\HTTP\ResponseInterface;
-use RuntimeException;
 
 /**
- * Gestión de dispositivos del usuario: listado ("Mis dispositivos") y alta por
- * código de activación (asistente "Conectá tu Eden Air").
+ * Gestión de dispositivos del usuario: listado ("Mis dispositivos") y conexión
+ * de un equipo nuevo por QR.
+ *
+ * No hay código de activación ni formulario de alta: el usuario aprieta
+ * "Conectar", la web abre una ventana de vinculación y muestra el QR generado
+ * en el momento. El equipo que se presente durante esa ventana queda dado de
+ * alta solo (ver DevicePairingService).
  *
  * Rutas (grupo panel, filtro auth):
- *   GET  panel/dispositivos            -> index()
- *   GET  panel/dispositivos/agregar    -> agregar()
- *   GET  panel/dispositivos/validar    -> validar()  (live check, JSON, sin CSRF)
- *   POST panel/dispositivos            -> guardar()
+ *   GET  panel/dispositivos                  -> index()
+ *   GET  panel/dispositivos/conectar         -> conectar()
+ *   POST panel/dispositivos/conectar         -> iniciar()   (JSON: abre la ventana)
+ *   GET  panel/dispositivos/conectar/estado  -> estadoVinculacion() (JSON, sondeo)
+ *   POST panel/dispositivos/conectar/cancelar-> cancelar()   (JSON)
  */
 class DispositivosController extends BaseController
 {
@@ -26,7 +30,7 @@ class DispositivosController extends BaseController
     /** Lista los dispositivos del usuario con su estado legible. */
     public function index(): string
     {
-        $servicio = new DeviceClaimService();
+        $servicio = new DevicePairingService();
 
         return view('dispositivos/index', [
             'dispositivos' => $servicio->listarDeUsuario($this->usuarioActual()),
@@ -34,115 +38,65 @@ class DispositivosController extends BaseController
     }
 
     // =========================================================================
-    // ALTA DE DISPOSITIVO — wizard "Conectá tu Eden Air"
-    // agregar() prepara los datos del formulario; validar() chequea el código
-    // en vivo (paso 1); guardar() procesa el POST final y vincula.
+    // CONEXIÓN POR QR
+    // conectar() dibuja la pantalla; iniciar() abre la ventana y devuelve el QR;
+    // estadoVinculacion() es el sondeo que espera al equipo.
     // =========================================================================
 
-    /** Prepara el wizard: tipos de dispositivo, catálogo de espacios y ambientes ya creados. */
-    public function agregar(): string
+    /** Pantalla "Conectá tu Eden Air": un botón y, al apretarlo, el QR. */
+    public function conectar(): string
     {
-        $servicio = new DeviceClaimService();
-        $userId   = $this->usuarioActual();
-        $presets  = new \App\Services\EnvironmentPresetService();
-
-        $ambientesExistentes = (new \App\Models\SpaceModel())
-            ->where('user_id', $userId)
-            ->orderBy('id', 'ASC')
-            ->findAll();
-
-        $ambientesExistentes = array_map(function (array $s) use ($presets): array {
-            return [
-                'id'    => (int) $s['id'],
-                'label' => $presets->getDisplayName($s),
-                'tipo'  => $presets->getEnvironmentLabel((string) ($s['environment_type'] ?? 'hogar')),
-            ];
-        }, $ambientesExistentes);
-
-        return view('dispositivos/agregar', [
-            'tipos'              => $servicio->tiposDispositivo(),
-            'espacios'           => $servicio->espacios(),
-            'ambientesExistentes'=> $ambientesExistentes,
+        return view('dispositivos/conectar', [
+            'ssid'    => DevicePairingService::ssid(),
+            'minutos' => DevicePairingService::MINUTOS_VENTANA,
         ]);
     }
 
     /**
-     * Validación en vivo del código (paso 1 del asistente). GET → exento de CSRF.
+     * Abre la ventana de vinculación y devuelve el QR ya dibujado.
+     * Es lo que corre al hacer clic en "Conectar".
      */
-    public function validar(): ResponseInterface
+    public function iniciar(): ResponseInterface
     {
-        $codigo     = (string) $this->request->getGet('code');
-        $inspeccion = (new DeviceClaimService())->inspeccionarCodigo($codigo);
+        $paquete = (new DevicePairingService())->abrirVentana(
+            $this->usuarioActual(),
+            $this->request->getIPAddress()
+        );
+
+        // csrf_hash() es el token NUEVO: el proyecto lo regenera en cada
+        // request, así que el JS lo guarda para el próximo POST.
+        return $this->response->setJSON(['ok' => true, 'csrf' => csrf_hash()] + $paquete);
+    }
+
+    /**
+     * Sondeo de la página mientras espera al equipo. GET → exento de CSRF.
+     */
+    public function estadoVinculacion(): ResponseInterface
+    {
+        $token  = (string) $this->request->getGet('token');
+        $estado = (new DevicePairingService())->estado($token, $this->usuarioActual());
 
         return $this->response->setJSON([
-            'ok'           => $inspeccion['ok'],
-            'estado'       => $inspeccion['estado'],
-            'mensaje'      => $inspeccion['mensaje'],
-            'device_type'  => $inspeccion['code']['device_type'] ?? null,
-            'default_name' => $inspeccion['code']['default_name'] ?? null,
+            'estado'    => $estado['estado'],
+            'mensaje'   => $estado['mensaje'],
+            'expira_en' => $estado['expira_en'],
+            'device'    => $estado['device'] ? [
+                'id'     => (int) $estado['device']['id'],
+                'nombre' => (string) $estado['device']['name'],
+                'uid'    => (string) $estado['device']['device_uid'],
+            ] : null,
         ]);
     }
 
-    /**
-     * Procesa el POST final del wizard.
-     * Flujo: leer datos → validar formulario → validar el ambiente elegido
-     * (existente o nuevo) → vincular vía DeviceClaimService (transacción).
-     */
-    public function guardar(): RedirectResponse
+    /** Cierra la ventana cuando el usuario cancela o se va de la pantalla. */
+    public function cancelar(): ResponseInterface
     {
-        $datos = [
-            'code'         => (string) $this->request->getPost('code'),
-            'name'         => trim((string) $this->request->getPost('name')),
-            'device_type'  => (string) $this->request->getPost('device_type'),
-            'space_mode'   => (string) $this->request->getPost('space_mode'),
-            'space_id'     => (int)    $this->request->getPost('space_id'),
-            'space'        => (string) $this->request->getPost('space'),
-            'space_custom' => trim((string) $this->request->getPost('space_custom')),
-            'notes'        => trim((string) $this->request->getPost('notes')),
-        ];
+        (new DevicePairingService())->cancelar(
+            (string) $this->request->getPost('token'),
+            $this->usuarioActual()
+        );
 
-        $reglas = [
-            'code'        => 'required|max_length[40]',
-            'name'        => 'required|min_length[2]|max_length[60]',
-            'device_type' => 'required|max_length[60]',
-            'notes'       => 'permit_empty|max_length[255]',
-        ];
-
-        if (! $this->validateData($datos, $reglas)) {
-            return redirect()->to('/panel/dispositivos/agregar')
-                ->withInput()
-                ->with('errors', $this->validator->getErrors());
-        }
-
-        $servicio = new DeviceClaimService();
-
-        // Validar selección de ambiente: existente o nuevo.
-        if ($datos['space_mode'] === 'existing') {
-            if ($datos['space_id'] <= 0) {
-                return redirect()->to('/panel/dispositivos/agregar')
-                    ->withInput()
-                    ->with('error', 'Seleccioná un ambiente existente para el dispositivo.');
-            }
-            // El servicio valida pertenencia.
-        } else {
-            // Modo "nuevo": el `space` viene del catálogo.
-            if (! $servicio->esEspacioValido($datos['space'])) {
-                return redirect()->to('/panel/dispositivos/agregar')
-                    ->withInput()
-                    ->with('error', 'Seleccioná un ambiente válido para el dispositivo.');
-            }
-        }
-
-        try {
-            $resultado = $servicio->vincular($this->usuarioActual(), $datos);
-        } catch (RuntimeException $e) {
-            return redirect()->to('/panel/dispositivos/agregar')
-                ->withInput()
-                ->with('error', $e->getMessage());
-        }
-
-        return redirect()->to('/panel/dispositivos')
-            ->with('success', '“' . $resultado['device']['name'] . '” quedó vinculado a tu cuenta.');
+        return $this->response->setJSON(['ok' => true, 'csrf' => csrf_hash()]);
     }
 
     // =========================================================================
@@ -160,20 +114,21 @@ class DispositivosController extends BaseController
    GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
 
    Métodos públicos (responden a rutas):
-   - index()    → lista "Mis dispositivos" (datos de DeviceClaimService::listarDeUsuario)
-   - agregar()  → muestra el wizard de alta con tipos, espacios y ambientes existentes
-   - validar()  → chequeo en vivo del código de activación; responde JSON (GET, sin CSRF)
-   - guardar()  → canjea el código y crea dispositivo + ambiente (o reusa uno)
+   - index()              → lista "Mis dispositivos"
+   - conectar()           → pantalla con el botón "Conectar"
+   - iniciar()            → abre la ventana de vinculación y devuelve el SVG
+                            del QR (JSON). Es el clic en "Conectar".
+   - estadoVinculacion()  → sondeo: ¿ya apareció el equipo? (JSON, GET sin CSRF)
+   - cancelar()           → cierra la ventana antes de tiempo (JSON)
 
    Helpers privados:
-   - usuarioActual() → user_id de la sesión
+   - usuarioActual()      → user_id de la sesión
 
    Servicios y funciones usados acá:
-   - DeviceClaimService::inspeccionarCodigo() → estado del código (ok/canjeado/inválido)
-   - DeviceClaimService::vincular()           → hace el alta completa en transacción;
-                                                lanza RuntimeException si algo falla
-   - EnvironmentPresetService::getDisplayName()/getEnvironmentLabel() → nombres legibles
-   - array_map(fn, $array)   → (PHP) transforma cada elemento del array
-   - try/catch RuntimeException → captura el error del service y lo muestra como flash
-   - $this->response->setJSON() → respuesta JSON para el fetch del wizard
+   - DevicePairingService::abrirVentana()  → ventana + QR dibujado
+   - DevicePairingService::estado()        → estado de la ventana
+   - DevicePairingService::listarDeUsuario()→ datos para el listado
+   - $this->request->getIPAddress()        → (CI4) IP del navegador; sirve para
+                                             desempatar si hay varias ventanas
+   - $this->response->setJSON()            → respuesta JSON para el fetch
    ============================================================================ */

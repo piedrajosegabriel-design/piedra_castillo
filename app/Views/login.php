@@ -11,60 +11,11 @@
     ]) ?>
 
     <main class="ea-auth">
-        <aside class="ea-auth-aside">
-            <svg class="ea-auth-pattern" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <?php for ($i = 1; $i <= 14; $i++):
-                    $r = $i * 4 + 4;
-                    $wobble = 1 + ($i % 3) * 0.4; ?>
-                    <path d="M <?= 50 - $r ?> 55 C <?= 50 - $r ?> <?= 55 - $r * $wobble ?>, <?= 50 + $r ?> <?= 55 - $r * $wobble * 0.9 ?>, <?= 50 + $r ?> 55 C <?= 50 + $r ?> <?= 55 + $r * 0.9 ?>, <?= 50 - $r ?> <?= 55 + $r ?>, <?= 50 - $r ?> 55 Z"
-                          fill="none" stroke="rgba(236,242,232,0.18)" stroke-width="0.4" />
-                <?php endfor; ?>
-            </svg>
-
-            <div class="ea-auth-meta">
-                <span>EdenAir / Acceso</span>
-                <span>v 1.0 · 2026</span>
-            </div>
-
-            <div>
-                <?= view('partials/logo', ['tone' => 'cream', 'size' => 56, 'variant' => 'horizontal']) ?>
-                <h1 class="ea-auth-title">Bienvenido<br><em>de vuelta.</em></h1>
-                <p class="ea-auth-lede">
-                    Respirá mejor, viví más cómodo. Accedé al panel para ver el estado
-                    del ambiente, controlar los actuadores y revisar el historial.
-                </p>
-            </div>
-
-            <ul class="ea-auth-points">
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Autenticación segura</strong>
-                        Hash de contraseña y sesión regenerada al ingresar.
-                    </span>
-                </li>
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Entrada simple</strong>
-                        Usuario o correo, sin pasos de más.
-                    </span>
-                </li>
-                <li>
-                    <span></span>
-                    <span>
-                        <strong>Primer ingreso guiado</strong>
-                        Si todavía no elegiste ambiente, el sistema te acompaña.
-                    </span>
-                </li>
-            </ul>
-        </aside>
-
         <section class="ea-auth-main">
             <div class="ea-auth-card">
                 <div>
                     <p class="ea-eyebrow">Ingreso</p>
-                    <h2>Accedé a tu panel.</h2>
+                    <h1>Accedé a tu panel.</h1>
                     <p class="ea-lede">Usá tu nombre de usuario o correo electrónico.</p>
                 </div>
 
@@ -99,8 +50,8 @@
 
                     <p class="ea-hint">
                         Las credenciales se validan en servidor. Al entrar vas directo
-                        a tu panel; si todavía no tenés un dispositivo, te guiamos para
-                        vincularlo o probar la demo.
+                        a tu panel; si todavía no tenés un dispositivo, lo conectás
+                        escaneando un QR, sin códigos ni configuración manual.
                     </p>
 
                     <button type="submit" class="ea-button ea-button-primary ea-button-block" id="botonLogin">

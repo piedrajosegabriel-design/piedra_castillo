@@ -1047,8 +1047,8 @@ $sitemap = [
                         'vals' => [
                             'localizacion'    => 'Río Tercero, Córdoba (Argentina) · proyecto local',
                             'productos'       => 'Monitoreo + ambientación automática (dispositivo + dashboard)',
-                            'precio'           => 'USD 5 (precio demo) · todo incluido',
-                            'pagos'            => 'MercadoPago (demo); preparado para tarjeta/transferencia',
+                            'precio'           => 'USD 5 (precio de referencia) · todo incluido',
+                            'pagos'            => 'MercadoPago; preparado para tarjeta/transferencia',
                             'materia'          => 'ESP32, sensores, actuadores y carcasa reutilizable',
                             'marca'            => 'Identidad propia, tecnológica y sustentable',
                             'tecnologia'       => 'ESP32 + sensores + actuadores + web propia, multi-dispositivo, API',
@@ -1143,7 +1143,7 @@ $sitemap = [
                             <li>Un único sistema que <strong>mide y además actúa</strong> sobre el ambiente.</li>
                             <li>Automatización ambiental por espacio (confort, ahorro, ventilación).</li>
                             <li>Perfiles personalizados por ambiente, <strong>sin costo extra</strong>.</li>
-                            <li>Vinculación simple y segura por código de activación.</li>
+                            <li>Vinculación directa: se escanea un QR y el equipo se da de alta solo.</li>
                             <li>Arquitectura preparada para crecer (API y multi-dispositivo).</li>
                         </ul>
                     </article>

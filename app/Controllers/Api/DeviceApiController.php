@@ -6,7 +6,9 @@ use App\Controllers\BaseController;
 use App\Models\DeviceModel;
 use App\Models\SpaceModel;
 use App\Services\CommandService;
-use App\Services\SimulationService;
+use App\Services\DeviceConfigService;
+use App\Services\DevicePairingService;
+use App\Services\MeasurementService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -16,13 +18,91 @@ use CodeIgniter\HTTP\ResponseInterface;
  * el dispositivo se autentica con su token secreto (header X-Device-Token)
  * que se compara contra devices.api_token. Estas rutas están exentas de CSRF.
  *
- * Los 3 endpoints (ver Routes.php, grupo api/devices):
+ * Los endpoints (ver Routes.php, grupo api/devices):
+ *   POST pair                    → el ESP32 se da de alta y recibe credenciales
  *   POST .../measurements        → el ESP32 sube una medición
  *   GET  .../commands/pending    → el ESP32 pregunta qué comandos ejecutar
  *   POST .../commands/N/executed → el ESP32 confirma que ejecutó un comando
+ *
+ * Cuerpo esperado en measurements (lo que da el sensor SCD41):
+ *   { "temperature": 24.6, "humidity": 58.2, "co2_ppm": 812 }
+ * El índice de calidad de aire lo calcula el servidor; el dispositivo puede
+ * mandarlo (air_quality_index, 0–100) pero no está obligado.
  */
 class DeviceApiController extends BaseController
 {
+    // =========================================================================
+    // VINCULACIÓN
+    // El equipo, apenas se conecta al WiFi de la casa, se presenta acá con su
+    // MAC y pide sus credenciales. Es el único endpoint que NO exige token:
+    // justamente viene a buscarlo.
+    //
+    // No manda ningún código: queda asociado a la cuenta que en ese momento
+    // tenga abierta la ventana de vinculación (el usuario apretó "Conectar").
+    //
+    // Cuerpo esperado:  { "mac": "A1:B2:C3:D4:E5:F6", "firmware": "1.0.0" }
+    // =========================================================================
+    public function pair()
+    {
+        $payload = $this->getJsonPayload();
+
+        $resultado = (new DevicePairingService())->registrarDispositivo([
+            'mac'      => (string) ($payload['mac'] ?? ''),
+            'firmware' => (string) ($payload['firmware'] ?? ''),
+            'nombre'   => (string) ($payload['nombre'] ?? ''),
+        ], $this->request->getIPAddress());
+
+        if ($resultado['estado'] === 'invalido') {
+            return $this->responderErroresValidacion(['mac' => $resultado['mensaje']]);
+        }
+
+        // Nadie está esperando este equipo todavía: no es un error del hardware,
+        // es que el dueño aún no apretó "Conectar". El firmware reintenta.
+        if ($resultado['estado'] === 'sin_ventana') {
+            return $this->response->setStatusCode(ResponseInterface::HTTP_ACCEPTED)->setJSON([
+                'status'          => 'esperando_vinculacion',
+                'message'         => $resultado['mensaje'],
+                'reintentar_en'   => 15,   // segundos sugeridos hasta el próximo intento
+            ]);
+        }
+
+        $device = $resultado['device'];
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'message'         => $resultado['mensaje'],
+            'device_uid'      => $device['device_uid'],
+            'api_token'       => $device['api_token'],
+            'device_name'     => $device['name'],
+            'intervalo_envio' => 300,   // segundos sugeridos entre mediciones
+        ]);
+    }
+
+    // =========================================================================
+    // CONFIGURACIÓN DEL DISPOSITIVO
+    // El equipo pide con qué reglas tiene que decidir: los umbrales del
+    // ambiente, los márgenes de alerta y el modo (automático / manual).
+    //
+    // El servidor NO decide cuándo prender un actuador; eso lo hace el ESP32.
+    // Acá solo le decimos con qué números comparar. Así el usuario puede
+    // cambiar los rangos desde /panel/ambientes sin reprogramar la placa, y
+    // el equipo sigue funcionando aunque se corte internet.
+    // =========================================================================
+    public function config(string $deviceUid)
+    {
+        try {
+            [$device, $space] = $this->resolveAuthenticatedDevice($deviceUid);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->responderNoAutorizado($exception->getMessage());
+        }
+
+        $this->actualizarActividadDispositivo((int) $device['id']);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+        ] + (new DeviceConfigService())->paraDispositivo($device, $space));
+    }
+
     // =========================================================================
     // API DE MEDICIONES
     // =========================================================================
@@ -35,13 +115,15 @@ class DeviceApiController extends BaseController
         }
 
         $payload = $this->getJsonPayload();
-        $errors  = $this->validarPayloadMedicion($payload);
 
-        if ($errors !== []) {
-            return $this->responderErroresValidacion($errors);
+        // El dispositivo manda lo que mide (temperatura, humedad, CO₂). Si algo
+        // falta o es imposible, MeasurementService corta con una excepción: el
+        // servidor NO completa datos por su cuenta.
+        try {
+            $result = (new MeasurementService())->registrar($device, $space, $payload, 'api');
+        } catch (\InvalidArgumentException $exception) {
+            return $this->responderErroresValidacion(['payload' => $exception->getMessage()]);
         }
-
-        $result = (new SimulationService())->createMeasurement($device, $space, 'api', $payload);
 
         $this->actualizarActividadDispositivo((int) $device['id']);
 
@@ -49,7 +131,9 @@ class DeviceApiController extends BaseController
             'status'      => 'success',
             'message'     => 'Medicion recibida correctamente.',
             'measurement' => $result['measurement'],
-            'automation'  => $result['automation'],
+            // Qué actuadores cambiaron de estado respecto de lo que el
+            // servidor tenía registrado. Vacío = no cambió nada.
+            'actuadores'  => $result['actuadores'],
         ]);
     }
 
@@ -142,26 +226,6 @@ class DeviceApiController extends BaseController
         return $this->request->getPost();
     }
 
-    private function validarPayloadMedicion(array $payload): array
-    {
-        $errors = [];
-
-        foreach (['temperature', 'humidity', 'co2_ppm', 'air_quality_index'] as $field) {
-            if (! isset($payload[$field]) || $payload[$field] === '') {
-                $errors[$field] = 'El campo ' . $field . ' es obligatorio.';
-            }
-        }
-
-        if (
-            isset($payload['air_quality_index'])
-            && ((int) $payload['air_quality_index'] < 0 || (int) $payload['air_quality_index'] > 100)
-        ) {
-            $errors['air_quality_index'] = 'La calidad del aire debe estar entre 0 y 100.';
-        }
-
-        return $errors;
-    }
-
     // =========================================================================
     // ACTIVIDAD DEL DISPOSITIVO
     // =========================================================================
@@ -236,6 +300,10 @@ class DeviceApiController extends BaseController
    GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
 
    Endpoints públicos (rutas api/devices/...):
+   - pair()                          → alta del equipo por MAC durante la
+                                       ventana de vinculación; devuelve
+                                       device_uid + api_token. 202 si todavía
+                                       nadie apretó "Conectar" en la web.
    - storeMeasurement($uid)          → recibe y guarda una medición del ESP32;
                                        corre la automatización y responde JSON
    - pendingCommands($uid)           → lista los comandos pendientes del dispositivo
@@ -245,7 +313,7 @@ class DeviceApiController extends BaseController
    - resolveAuthenticatedDevice()    → busca el device por device_uid y compara
                                        el token; si falla lanza excepción → 401
    - getJsonPayload()                → lee el body JSON (o cae a POST clásico)
-   - validarPayloadMedicion()        → campos obligatorios + índice aire 0–100
+   - (la validación de la medición vive en MeasurementService::registrar)
    - actualizarActividadDispositivo()→ actualiza last_seen_at (y sync de comandos)
    - responderNoAutorizado()         → JSON de error con HTTP 401
    - responderErroresValidacion()    → JSON de error con HTTP 422

@@ -7,9 +7,10 @@ use CodeIgniter\Model;
 /**
  * DeviceModel — tabla `devices`: los dispositivos EdenAir (ESP32) del usuario.
  *
- * Cada fila es un equipo físico (o simulado/demo) vinculado a una cuenta
- * y a un ambiente (space). Guarda sus credenciales de API (device_uid público
- * + api_token secreto) y metadatos de actividad.
+ * Cada fila es un equipo vinculado a una cuenta y a un ambiente (space).
+ * El alta la hace el propio equipo al presentarse a la API durante una ventana
+ * de vinculación (ver DevicePairingService). Guarda sus credenciales de API
+ * (device_uid público + api_token secreto) y metadatos de actividad.
  */
 class DeviceModel extends Model
 {
@@ -36,7 +37,6 @@ class DeviceModel extends Model
         'is_active',
         'status',
         'mac_address',
-        'activation_code',
         'notes',
         'last_seen_at',
         'last_command_sync_at',

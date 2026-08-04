@@ -93,9 +93,8 @@ CREATE TABLE IF NOT EXISTS devices (
     -- Estado mostrado en "Mis dispositivos": active | offline | pending | simulated
     status VARCHAR(20) NULL DEFAULT 'simulated',
     -- MAC de fábrica: SOLO identificador técnico, nunca credencial.
+    -- La graba el propio equipo la primera vez que se presenta a la API.
     mac_address VARCHAR(32) NULL,
-    -- Código de activación con el que se vinculó el dispositivo.
-    activation_code VARCHAR(40) NULL,
     notes VARCHAR(255) NULL,
     last_seen_at DATETIME NULL,
     last_command_sync_at DATETIME NULL,
@@ -211,34 +210,86 @@ CREATE TABLE IF NOT EXISTS device_commands (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- =========================================================
--- TABLA: device_activation_codes  (Hito 2)
--- Cada dispositivo trae un codigo unico EDEN-XXXX-XXXX que solo
--- puede canjearse una vez. Es el metodo recomendado de vinculacion
--- (mas seguro y facil que usar la MAC como credencial).
+-- TABLA: device_pairings  (ventanas de vinculacion)
+-- El usuario aprieta "Conectar" y se abre una ventana de unos
+-- minutos. La web muestra un QR con las credenciales del WiFi de
+-- configuracion del equipo; el equipo que se presente a la API
+-- durante esa ventana queda asociado a esa cuenta.
+-- No hay codigos que tipear ni nada que buscar en la caja.
 -- =========================================================
 
-CREATE TABLE IF NOT EXISTS device_activation_codes (
+CREATE TABLE IF NOT EXISTS device_pairings (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    code VARCHAR(40) NOT NULL,
-    device_type VARCHAR(60) NOT NULL DEFAULT 'Eden Air Core',
-    default_name VARCHAR(120) NULL,
-    mac_address VARCHAR(32) NULL,           -- dato tecnico, no credencial
-    status VARCHAR(20) NOT NULL DEFAULT 'available',  -- available | claimed | disabled
-    claimed_by_user_id INT UNSIGNED NULL,
+    user_id INT UNSIGNED NOT NULL,
+    -- Con este token el navegador pregunta "ya aparecio mi equipo?".
+    token VARCHAR(64) NOT NULL,
+    -- Credenciales que viajan adentro del QR (el WiFi que publica el equipo).
+    ap_ssid VARCHAR(64) NOT NULL,
+    ap_password VARCHAR(64) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'esperando',  -- esperando | vinculado | expirado | cancelado
     device_id INT UNSIGNED NULL,
-    claimed_at DATETIME NULL,
-    batch VARCHAR(40) NULL,
+    -- IP del navegador que abrio la ventana: desempata si hay varias abiertas.
+    client_ip VARCHAR(45) NULL,
+    expires_at DATETIME NOT NULL,
+    completed_at DATETIME NULL,
     created_at DATETIME NULL,
     updated_at DATETIME NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY uq_activation_code (code),
-    KEY idx_activation_status (status)
+    UNIQUE KEY uq_pairing_token (token),
+    KEY idx_pairing_estado (status, expires_at),
+    KEY idx_pairing_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Codigo fijo de demo (documentado). El resto se generan desde la migracion.
-INSERT INTO device_activation_codes (code, device_type, default_name, status, batch, created_at, updated_at)
-SELECT 'EDEN-DEMO-2026', 'Eden Air Core', 'Eden Air Core', 'available', 'demo', NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM device_activation_codes WHERE code = 'EDEN-DEMO-2026');
+-- =========================================================
+-- TABLA: migrations  (control interno de CodeIgniter)
+-- CodeIgniter anota aca que migraciones ya corrio en esta base.
+-- Se crea y se completa a mano para que una base armada con este
+-- archivo quede en el MISMO estado que una armada con
+-- `php spark migrate`. Sin esto, CodeIgniter creeria que no corrio
+-- ninguna e intentaria aplicarlas todas sobre un esquema ya completo.
+--
+-- Si agregas una migracion nueva, sumale una fila aca tambien.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS migrations (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    version VARCHAR(255) NOT NULL,
+    class VARCHAR(255) NOT NULL,
+    `group` VARCHAR(255) NOT NULL,
+    namespace VARCHAR(255) NOT NULL,
+    time INT(11) NOT NULL,
+    batch INT(11) UNSIGNED NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO migrations (version, class, `group`, namespace, time, batch)
+SELECT * FROM (
+    SELECT '2026-05-06-000001' v, 'App\\Database\\Migrations\\CreateTesinaSimulationSchema' c, 'default' g, 'App' n, UNIX_TIMESTAMP() t, 1 b
+    UNION ALL SELECT '2026-05-29-000001', 'App\\Database\\Migrations\\AddApellidoToUsers',           'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-05-31-000001', 'App\\Database\\Migrations\\EnsureUserAccountColumns',     'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-05-31-000002', 'App\\Database\\Migrations\\CreateDeviceClaimSchema',      'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-05-31-000003', 'App\\Database\\Migrations\\AllowMultipleSpacesPerUser',   'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-08-02-000001', 'App\\Database\\Migrations\\ReplaceClaimCodesWithPairing', 'default', 'App', UNIX_TIMESTAMP(), 1
+) AS nuevas
+WHERE NOT EXISTS (SELECT 1 FROM migrations);
+
+-- =========================================================
+-- COMPATIBILIDAD CON BASES VIEJAS
+-- Solo hace falta si venis de un esquema anterior, el del alta por
+-- codigo de activacion. En una base nueva no hace nada.
+-- =========================================================
+
+DROP TABLE IF EXISTS device_activation_codes;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'devices' AND COLUMN_NAME = 'activation_code') > 0,
+    'ALTER TABLE devices DROP COLUMN activation_code',
+    'DO 0'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- =========================================================
 -- RESUMEN RAPIDO DE USO
@@ -260,3 +311,24 @@ WHERE NOT EXISTS (SELECT 1 FROM device_activation_codes WHERE code = 'EDEN-DEMO-
 --
 -- device_commands:
 --   comandos para el dispositivo desde panel o automatizacion.
+--
+-- device_pairings:
+--   ventanas de vinculacion abiertas al apretar "Conectar" (QR + espera).
+--
+-- migrations:
+--   control interno de CodeIgniter (que migraciones ya se aplicaron).
+--
+-- =========================================================
+-- COMO USAR ESTE ARCHIVO
+-- =========================================================
+-- Maquina nueva, base desde cero:
+--   mysql -h 127.0.0.1 -P 3306 -u root < mysql_setup.sql
+--   (ajusta el puerto al de tu MySQL; en XAMPP a veces es 3307)
+--
+-- Despues verifica que quedo al dia:
+--   php spark migrate:status
+--   Tiene que decir que no hay migraciones pendientes.
+--
+-- Maquina que ya tiene la base:
+--   NO uses este archivo. Usa `php spark migrate`, que aplica solo
+--   los cambios que falten y respeta los datos que ya tenes.

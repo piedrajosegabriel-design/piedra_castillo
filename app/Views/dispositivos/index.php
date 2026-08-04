@@ -1,7 +1,7 @@
 <?php
 /**
  * Mis dispositivos — listado de todos los dispositivos vinculados a la cuenta.
- * Recibe: $dispositivos (array preparado por DeviceClaimService::listarDeUsuario).
+ * Recibe: $dispositivos (array preparado por DevicePairingService::listarDeUsuario).
  */
 $userName = (string) (session()->get('user_name') ?? 'Usuario');
 $initial  = strtoupper(mb_substr(trim($userName), 0, 1) ?: 'U');
@@ -59,19 +59,19 @@ $errors   = session()->getFlashdata('errors') ?? [];
                     <h2 class="ea-dev-toolbar-title">Equipos vinculados</h2>
                     <p class="ea-dev-toolbar-sub">Administrá el estado y el ambiente de cada Eden Air. Una misma cuenta puede tener varios dispositivos.</p>
                 </div>
-                <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-primary ea-button-buy">
+                <a href="<?= site_url('panel/dispositivos/conectar') ?>" class="ea-button ea-button-primary ea-button-buy">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                    Agregar dispositivo
+                    Conectar dispositivo
                 </a>
             </section>
 
             <?php if ($total === 0): ?>
                 <section class="ea-dev-empty">
                     <span class="ea-dev-empty-orb" aria-hidden="true"></span>
-                    <h3>Todavía no vinculaste ningún dispositivo</h3>
-                    <p>Conectá tu Eden Air con el código de activación que viene con el producto y empezá a monitorear tu ambiente.</p>
-                    <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-primary ea-button-buy">Conectá tu Eden Air</a>
-                    <p class="ea-dev-empty-hint">¿Probando la demo? Usá el código <strong>EDEN-DEMO-2026</strong>.</p>
+                    <h3>Todavía no conectaste ningún dispositivo</h3>
+                    <p>Enchufá tu Eden Air, apretá Conectar y escaneá el QR con el celular. Listo: empezás a monitorear tu ambiente.</p>
+                    <a href="<?= site_url('panel/dispositivos/conectar') ?>" class="ea-button ea-button-primary ea-button-buy">Conectá tu Eden Air</a>
+                    <p class="ea-dev-empty-hint">No hace falta ningún código: la vinculación es automática.</p>
                 </section>
             <?php else: ?>
                 <section class="ea-dev-grid" aria-label="Listado de dispositivos">
@@ -99,29 +99,29 @@ $errors   = session()->getFlashdata('errors') ?? [];
                             <?php endif; ?>
                             <footer class="ea-dev-card-foot">
                                 <a href="<?= site_url('panel') ?>" class="ea-button ea-button-secondary ea-button-sm">Ver panel</a>
-                                <?php if (! empty($d['codigo'])): ?>
-                                    <span class="ea-dev-code" title="Código de activación usado">· <?= esc($d['codigo']) ?></span>
+                                <?php if (! empty($d['visto'])): ?>
+                                    <span class="ea-dev-code" title="Última vez que el equipo se comunicó">· visto <?= esc(date('d/m H:i', strtotime((string) $d['visto']))) ?></span>
                                 <?php endif; ?>
                             </footer>
                         </article>
                     <?php endforeach; ?>
 
-                    <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-dev-card ea-dev-card-add">
+                    <a href="<?= site_url('panel/dispositivos/conectar') ?>" class="ea-dev-card ea-dev-card-add">
                         <span class="ea-dev-add-plus" aria-hidden="true">+</span>
-                        <span class="ea-dev-add-label">Agregar otro dispositivo</span>
-                        <span class="ea-dev-add-hint">Vinculá un nuevo Eden Air con su código</span>
+                        <span class="ea-dev-add-label">Conectar otro dispositivo</span>
+                        <span class="ea-dev-add-hint">Escaneá el QR y se vincula solo</span>
                     </a>
                 </section>
             <?php endif; ?>
 
             <section class="ea-dev-info" aria-label="Cómo funciona la vinculación">
-                <h3>¿Cómo se vincula un dispositivo?</h3>
+                <h3>¿Cómo se conecta un dispositivo?</h3>
                 <ol class="ea-dev-steps">
-                    <li><span>1</span> Encendé tu dispositivo Eden Air.</li>
-                    <li><span>2</span> Buscá el código de activación del producto (o de la maqueta).</li>
-                    <li><span>3</span> Ingresalo en “Agregar dispositivo”.</li>
-                    <li><span>4</span> Asignale un nombre y un ambiente.</li>
-                    <li><span>5</span> Finalizá la vinculación: queda asociado a tu cuenta.</li>
+                    <li><span>1</span> Enchufá tu dispositivo Eden Air.</li>
+                    <li><span>2</span> Apretá “Conectar dispositivo”: aparece un QR generado en el momento.</li>
+                    <li><span>3</span> Escanealo con la cámara del celular.</li>
+                    <li><span>4</span> Elegí el WiFi de tu casa en la pantalla que se abre sola.</li>
+                    <li><span>5</span> El equipo se conecta y aparece acá solo, sin códigos.</li>
                 </ol>
                 <p class="ea-dev-info-note">Podés administrar varios dispositivos desde un mismo dashboard. Luego vas a poder configurar automatizaciones ambientales por espacio.</p>
             </section>

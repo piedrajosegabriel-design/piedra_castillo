@@ -46,7 +46,7 @@ $ambientes = $ambientes ?? [];
                     <h2 class="ea-dev-toolbar-title">Tus ambientes</h2>
                     <p class="ea-dev-toolbar-sub">Cada ambiente representa un espacio físico (dormitorio, aula, oficina…). Podés ajustar sus rangos de confort y ver los dispositivos que tiene asignados.</p>
                 </div>
-                <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-secondary">+ Agregar dispositivo</a>
+                <a href="<?= site_url('panel/dispositivos/conectar') ?>" class="ea-button ea-button-secondary">+ Agregar dispositivo</a>
             </section>
 
             <?php if ($ambientes === []): ?>
@@ -54,7 +54,7 @@ $ambientes = $ambientes ?? [];
                     <span class="ea-dev-empty-orb" aria-hidden="true"></span>
                     <h3>Todavía no tenés ambientes</h3>
                     <p>Los ambientes se crean al vincular tu primer dispositivo Eden Air. Empezá agregando uno.</p>
-                    <a href="<?= site_url('panel/dispositivos/agregar') ?>" class="ea-button ea-button-primary ea-button-buy">Conectá tu Eden Air</a>
+                    <a href="<?= site_url('panel/dispositivos/conectar') ?>" class="ea-button ea-button-primary ea-button-buy">Conectá tu Eden Air</a>
                 </section>
             <?php else: ?>
                 <section class="ea-dev-grid">
