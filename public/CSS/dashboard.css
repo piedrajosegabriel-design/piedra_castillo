@@ -3106,3 +3106,38 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-amb-row { grid-template-columns: 1fr; }
     .ea-welcome-grid { grid-template-columns: 1fr; }
 }
+
+/* =====================================================================
+   Refresco en vivo del panel (panel-vivo.js)
+   El dashboard se actualiza solo cada 30 s. Estas dos piezas hacen que
+   el cambio se note sin ser molesto: un destello breve en el valor que
+   cambió, y un sello discreto que dice qué tan fresco es el dato.
+   ===================================================================== */
+
+/* Destello al cambiar un valor: el fondo se enciende y se apaga solo. */
+@keyframes ea-vivo-destello {
+    0%   { background-color: color-mix(in srgb, var(--ea-citrus) 45%, transparent); }
+    100% { background-color: transparent; }
+}
+.ea-vivo-cambio {
+    animation: ea-vivo-destello 1.4s ease-out;
+    border-radius: 4px;
+}
+
+/* Sello "actualizado hace…" junto a la última lectura. */
+.ea-vivo-sello {
+    display: inline-block;
+    margin-left: 10px;
+    font-family: var(--ea-font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--ea-mute);
+    white-space: nowrap;
+}
+/* Si el dato se puso viejo (más de 3 min), se avisa con color de alerta. */
+.ea-vivo-sello.is-viejo { color: var(--ea-warning); }
+
+/* Quien pidió menos animación no ve el destello, solo el valor nuevo. */
+@media (prefers-reduced-motion: reduce) {
+    .ea-vivo-cambio { animation: none; }
+}

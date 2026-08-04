@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use App\Services\CommandService;
 use App\Services\PanelService;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 
 /**
  * PanelController — el corazón del área privada (dashboard).
@@ -61,6 +62,34 @@ class PanelController extends BaseController
 
         return view('panel', [
             'panel' => (new PanelService())->obtenerVistaPanel($userId, $activeDeviceId),
+        ]);
+    }
+
+    // =========================================================================
+    // REFRESCO EN VIVO
+    // Devuelve los MISMOS datos que usa la vista, pero en JSON, para que el
+    // panel se actualice solo sin recargar la página.
+    //
+    // Reusa PanelService::obtenerVistaPanel(): no hay una segunda versión de
+    // la lógica que pueda quedar desincronizada con lo que se dibuja.
+    // GET → exento del filtro CSRF.
+    // =========================================================================
+    public function datos(): ResponseInterface
+    {
+        $userId = $this->usuarioActual();
+
+        try {
+            $panel = (new PanelService())->obtenerVistaPanel($userId, $this->dispositivoActivo($userId));
+        } catch (\RuntimeException $e) {
+            // La cuenta se quedó sin dispositivos mientras la página estaba
+            // abierta. El navegador recarga y cae en la pantalla de bienvenida.
+            return $this->response->setStatusCode(ResponseInterface::HTTP_CONFLICT)
+                ->setJSON(['ok' => false, 'motivo' => 'sin_dispositivo']);
+        }
+
+        return $this->response->setJSON([
+            'ok'   => true,
+            'view' => $panel['view'] ?? [],
         ]);
     }
 

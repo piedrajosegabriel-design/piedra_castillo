@@ -50,6 +50,8 @@ $routes->get('logout', 'AccesoController::logout', ['filter' => 'auth']);
 // =============================================================================
 $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->get('', 'PanelController::index');
+    // Refresco en vivo del dashboard (JSON). GET → exento de CSRF.
+    $routes->get('datos', 'PanelController::datos');
     $routes->get('perfil', 'PanelController::perfil');
     $routes->post('perfil', 'PanelController::actualizarPerfil');
     $routes->post('password', 'PanelController::actualizarPassword');

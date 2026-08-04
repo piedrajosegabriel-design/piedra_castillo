@@ -98,7 +98,7 @@ $tonoLabel = static fn (string $t): string => match ($t) {
     </div>
 </div>
 
-<div class="ea-dashboard" data-dashboard-app>
+<div class="ea-dashboard" data-dashboard-app data-url-datos="<?= site_url('panel/datos') ?>">
 
     <!-- =========================== SIDEBAR (compartido) =========================== -->
     <?= view('partials/dashboard_sidebar', [
@@ -185,12 +185,12 @@ $tonoLabel = static fn (string $t): string => match ($t) {
                  Una sola frase que responde "¿cómo está mi ambiente?", más la
                  tendencia de temperatura. Los valores medidos NO se repiten
                  acá: viven en las tarjetas de sensores, justo abajo. -->
-            <section class="ea-hero ea-reveal tone-<?= esc($tone) ?>" id="dashboard">
+            <section class="ea-hero ea-reveal tone-<?= esc($tone) ?>" id="dashboard" data-vivo-tono>
                 <div class="ea-hero-glow" aria-hidden="true"></div>
 
                 <div class="ea-hero-main">
                     <div class="ea-hero-top">
-                        <span class="ea-badge tone-<?= esc($tone) ?> ea-hero-status"><span class="ea-dot"></span><?= esc((string) ($view['estadoLabel'] ?? '')) ?></span>
+                        <span class="ea-badge tone-<?= esc($tone) ?> ea-hero-status" data-vivo-tono><span class="ea-dot"></span><span data-vivo="estadoLabel"><?= esc((string) ($view['estadoLabel'] ?? '')) ?></span></span>
                         <span class="ea-hero-mode ea-mode-tag <?= $modoManual ? 'is-manual' : 'is-auto' ?>">
                             <span class="ea-mode-tag-dot" aria-hidden="true"></span>
                             Modo <?= $modoManual ? 'manual' : 'automático' ?>
@@ -198,13 +198,13 @@ $tonoLabel = static fn (string $t): string => match ($t) {
                     </div>
 
                     <p class="ea-hero-eyebrow">Hola, <?= esc((string) ($view['userName'] ?? 'bienvenido')) ?></p>
-                    <h2 class="ea-serif ea-hero-title"><?= esc((string) ($view['estadoTitulo'] ?? '')) ?></h2>
-                    <p class="ea-hero-diag"><?= esc((string) ($view['estadoDetalle'] ?? '')) ?></p>
+                    <h2 class="ea-serif ea-hero-title" data-vivo="estadoTitulo"><?= esc((string) ($view['estadoTitulo'] ?? '')) ?></h2>
+                    <p class="ea-hero-diag" data-vivo="estadoDetalle"><?= esc((string) ($view['estadoDetalle'] ?? '')) ?></p>
 
                     <div class="ea-hero-foot">
                         <span class="ea-hero-foot-item">
                             <span class="ea-hero-foot-label">Última lectura</span>
-                            <span class="ea-mono ea-hero-foot-val"><?= esc((string) ($view['ultimaLectura'] ?? '—')) ?></span>
+                            <span class="ea-mono ea-hero-foot-val" data-vivo="ultimaLectura"><?= esc((string) ($view['ultimaLectura'] ?? '—')) ?></span>
                         </span>
                         <span class="ea-hero-foot-item">
                             <span class="ea-hero-foot-label">Dispositivo</span>
@@ -228,8 +228,8 @@ $tonoLabel = static fn (string $t): string => match ($t) {
                                     <stop offset="1" stop-color="var(--eden-500)" stop-opacity="0"/>
                                 </linearGradient>
                             </defs>
-                            <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?> L 220 60 L 0 60 Z" fill="url(#ea-spark-grad)"/>
-                            <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="var(--eden-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?> L 220 60 L 0 60 Z" fill="url(#ea-spark-grad)" data-vivo-spark="relleno"/>
+                            <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="var(--eden-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
                         </svg>
                     </div>
                 </div>
@@ -252,7 +252,7 @@ $tonoLabel = static fn (string $t): string => match ($t) {
                     $bandW    = max(0.0, $bandHigh - $bandLow);
                     $pin      = max(0.0, min(100.0, (float) ($sensor['pct'] ?? 0)));
                 ?>
-                    <article class="ea-sensor-card accent-<?= esc((string) ($sensor['accent'] ?? 'eden')) ?>">
+                    <article class="ea-sensor-card accent-<?= esc((string) ($sensor['accent'] ?? 'eden')) ?>" data-vivo-sensor="<?= esc((string) ($sensor['icono'] ?? ''), 'attr') ?>">
                         <div class="ea-sensor-head">
                             <span class="ea-sensor-icon" aria-hidden="true">
                                 <?php switch ($sensor['icono'] ?? 'temp'):
@@ -267,21 +267,21 @@ $tonoLabel = static fn (string $t): string => match ($t) {
                                 <?php break; endswitch; ?>
                             </span>
                             <span class="ea-sensor-title"><?= esc((string) ($sensor['titulo'] ?? '')) ?></span>
-                            <span class="ea-badge tone-<?= esc($sTono) ?> ea-sensor-badge"><span class="ea-dot"></span><?= esc($tonoLabel($sTono)) ?></span>
+                            <span class="ea-badge tone-<?= esc($sTono) ?> ea-sensor-badge" data-vivo-tono><span class="ea-dot"></span><span data-vivo="badge"><?= esc($tonoLabel($sTono)) ?></span></span>
                         </div>
 
                         <div class="ea-sensor-value">
-                            <span class="ea-sensor-num"><?= esc((string) ($sensor['valor'] ?? '--')) ?></span>
+                            <span class="ea-sensor-num" data-vivo="valor"><?= esc((string) ($sensor['valor'] ?? '--')) ?></span>
                             <span class="ea-mono ea-sensor-unit"><?= esc((string) ($sensor['unidad'] ?? '')) ?></span>
                         </div>
 
                         <div class="ea-sensor-foot">
                             <div class="ea-gauge" role="img" aria-label="Lectura comparada con el rango ideal">
-                                <span class="ea-gauge-band" style="left: <?= esc((string) round($bandLow, 1)) ?>%; width: <?= esc((string) round($bandW, 1)) ?>%;"></span>
-                                <span class="ea-gauge-pin tone-<?= esc($sTono) ?>" style="left: <?= esc((string) round($pin, 1)) ?>%;"></span>
+                                <span class="ea-gauge-band" data-vivo="band" style="left: <?= esc((string) round($bandLow, 1)) ?>%; width: <?= esc((string) round($bandW, 1)) ?>%;"></span>
+                                <span class="ea-gauge-pin tone-<?= esc($sTono) ?>" data-vivo="pin" data-vivo-tono style="left: <?= esc((string) round($pin, 1)) ?>%;"></span>
                             </div>
                             <div class="ea-sensor-hint">
-                                <span><?= esc((string) ($sensor['rango'] ?? '')) ?></span>
+                                <span data-vivo="rango"><?= esc((string) ($sensor['rango'] ?? '')) ?></span>
                                 <span class="ea-gauge-legend"><i></i>zona ideal</span>
                             </div>
                         </div>
@@ -474,5 +474,7 @@ $tonoLabel = static fn (string $t): string => match ($t) {
 <script src="<?= base_url('JS/dashboard-gsap.js') ?>"></script>
 <!-- Barra de scroll moderna flotante (misma que la landing) -->
 <script src="<?= base_url('JS/ea-scrollbar.js') ?>"></script>
+<!-- Refresco en vivo: trae las mediciones nuevas sin recargar la página -->
+<script src="<?= base_url('JS/panel-vivo.js') ?>"></script>
 </body>
 </html>
