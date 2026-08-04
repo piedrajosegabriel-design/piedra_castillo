@@ -29,7 +29,7 @@ físico. **Ahora** el flujo es así:
 
 | Estado de la cuenta | Pantalla que ve el usuario |
 |---|---|
-| Recién registrada, **0 dispositivos** | Pantalla de **Bienvenida** con 3 CTAs: Agregar dispositivo · Ver demo · Comprar. |
+| Recién registrada, **0 dispositivos** | Pantalla de **Bienvenida**: explica cómo funciona la cuenta y ofrece dos caminos — Agregar mi primer dispositivo · Comprar Eden Air. |
 | **≥ 1 dispositivo** | **Panel monitor** del dispositivo activo, con switcher entre dispositivos en el header. |
 
 ### Modelo de dominio actual
@@ -41,8 +41,9 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 ```
 
 - **Usuario** → cuenta única (nombre, apellido, email, usuario, contraseña).
-- **Dispositivo** → tiene un código de activación único, nombre, tipo y estado;
-  pertenece a un usuario y a un ambiente.
+- **Dispositivo** → tiene un `device_uid` público, un `api_token` secreto, su
+  MAC, nombre, tipo y estado; pertenece a un usuario y a un ambiente. Se da de
+  alta solo, al conectarse durante una ventana de vinculación.
 - **Ambiente (`space`)** → lugar físico donde está el dispositivo. Tiene su
   configuración de confort (rangos de temperatura, humedad y CO₂). Puede tener
   varios dispositivos.
@@ -64,8 +65,7 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 | `app/Controllers/PanelController.php` | `index()` ramifica bienvenida vs panel monitor según `count(devices)`. El guard `redireccionarSiFaltaDispositivo()` (renombrado desde `redireccionarSiFaltaAmbiente`) protege acciones que necesitan un dispositivo. |
 | `app/Config/Routes.php` | Eliminadas las rutas `GET/POST panel/ambiente`. |
 | `app/Views/seleccion_ambiente.php` | **Borrado.** |
-| `app/Views/login.php` | Hint actualizado: *"Al entrar vas directo a tu panel; si todavía no tenés un dispositivo, te guiamos para vincularlo o probar la demo."* |
-| `app/Services/DeviceProvisioningService.php` | Eliminado `hasConfiguredSpace()` (quedó sin consumidores). |
+| `app/Views/login.php` | Hint actualizado: *"Al entrar vas directo a tu panel; si todavía no tenés un dispositivo, lo conectás escaneando un QR, sin códigos ni configuración manual."* |
 
 ---
 
@@ -85,7 +85,7 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 
 **Archivos:** `public/CSS/eden-brand.css` (tokens, logo, botones premium,
 modo oscuro), `public/CSS/inicio.css` (landing), `public/CSS/dashboard.css`
-(dashboard, welcome, wizard, switcher, banner claim).
+(dashboard, welcome, wizard, switcher).
 
 ---
 
@@ -154,7 +154,7 @@ al final invita a comprar.
 4. **Núcleo y módulos** (Beneficios). Sección `.ea-core-section` con animación del núcleo y los 7 módulos.
 5. **Tecnología interna con VIDEO inferior** *(protegida)*. Vista explosionada del dispositivo (`#tecnologia-interna`) + 4 tarjetas flotantes.
 6. **Funcionamiento.** "Sensa. Decide. Actúa." — el ciclo del sistema.
-7. **Compra del producto** (`#comprar`). Tarjeta "Eden Air Core", precio demo, beneficios, CTA destacado.
+7. **Compra del producto** (`#comprar`). Tarjeta "Eden Air Core", precio de referencia, beneficios, CTA destacado.
 8. **Cierre y footer.**
 
 ### 2.2 Cómo se invoca
@@ -196,7 +196,7 @@ no es un ítem plano sino un CTA destacado).
 
 **Conecta con:** todas las vistas del dashboard
 (`panel.php`, `panel/bienvenida.php`, `dispositivos/index.php`,
-`dispositivos/agregar.php`, `ambientes/index.php`, `ambientes/editar.php`,
+`dispositivos/conectar.php`, `ambientes/index.php`, `ambientes/editar.php`,
 `perfil_usuario.php`, `compra_mercadopago.php`).
 
 ### 3.2 Pantalla de Bienvenida — `app/Views/panel/bienvenida.php`
@@ -220,16 +220,23 @@ $initial = strtoupper(mb_substr($nombre, 0, 1) ?: 'U');  // letra del avatar
 
 **Estructura:**
 - Hero con saludo personalizado (eyebrow + título con el nombre).
-- 3 bullets explicando *Dispositivos*, *Ambientes*, *Monitoreo*.
-- Grid con 3 tarjetas CTA:
-  - **Agregar mi primer dispositivo** → `panel/dispositivos/agregar`.
-  - **Ver demo del sistema** → form POST a `panel/demo` con `csrf_field()`.
-  - **Comprar Eden Air** → `panel/compra`.
-- Texto de ayuda sobre el código de activación.
+- 3 bullets explicando *Dispositivos*, *Ambientes*, *Monitoreo*: qué significa
+  cada concepto dentro de la cuenta, para que el usuario entienda el modelo
+  antes de configurar nada.
+- Grid con 2 tarjetas CTA:
+  - **Conectar mi primer dispositivo** (marcada como *Recomendado*) →
+    `panel/dispositivos/conectar`, la pantalla del QR.
+  - **Comprar Eden Air** (*Plan único*) → `panel/compra`.
+- Texto de ayuda aclarando que no hace falta ningún código ni buscar nada en la
+  caja: el QR se genera en el momento y el equipo se da de alta solo.
+
+**Por qué solo estos dos caminos:** la pantalla responde a la única pregunta
+real del usuario sin equipo en el panel — *"¿ya tengo un Eden Air o todavía no?"*.
+El panel monitor aparece recién cuando hay un dispositivo vinculado, así lo que
+se ve en el dashboard siempre corresponde a un equipo de esa cuenta.
 
 **Conecta con:**
-- `DispositivosController::agregar` (wizard).
-- `PanelController::iniciarDemo` (botón "Probar la demo").
+- `DispositivosController::conectar` (pantalla del QR).
 - `PanelController::compra` (vista compra).
 - `partials/dashboard_sidebar` con `$active='inicio'` y `$devicesCount=0`.
 
@@ -275,7 +282,8 @@ if ($activeDeviceId !== null) {
 
 - Si `count(devices_list) > 1` → `<select>` en el header que postea a `panel/dispositivo-activo`.
 - Si solo hay uno → chip discreto con su nombre.
-- Si el usuario solo tiene el simulado auto-provisionado → **banner "¿Ya tenés tu Eden Air?"** que linkea al wizard.
+- El dispositivo elegido queda guardado en `active_device_id` (sesión) y se
+  revalida en cada request: si no pertenece al usuario, se descarta.
 
 **Conecta con:**
 - `PanelService::obtenerVistaPanel`, `PanelService::obtenerDatos`.
@@ -290,56 +298,79 @@ if ($activeDeviceId !== null) {
 
 | Variable | Origen |
 |---|---|
-| `$dispositivos` | `DeviceClaimService::listarDeUsuario($userId)` — array con `id`, `nombre`, `tipo`, `espacio`, `uid`, `estado`, `estado_label`, `estado_tono`, `mac`, `codigo`, `notas`, `es_simulado`. |
+| `$dispositivos` | `DevicePairingService::listarDeUsuario($userId)` — array con `id`, `nombre`, `tipo`, `espacio`, `uid`, `estado`, `estado_label`, `estado_tono`, `mac`, `notas`, `visto`. |
 
-**Estructura:** grid de tarjetas (`auto-fill minmax(280px,1fr)`) + tarjeta extra "Agregar otro dispositivo".
+**Estructura:** grid de tarjetas (`auto-fill minmax(280px,1fr)`) + tarjeta extra "Conectar otro dispositivo".
 
-**Estados visuales** (devueltos por `DeviceClaimService::estadoLegible()`):
-- `active` → "Activo" / tono `success`.
+**Estados visuales** (devueltos por `DevicePairingService::estadoLegible()`):
+- `active` → "Conectado" / tono `success`.
 - `offline` → "Sin conexión" / tono `danger`.
-- `pending` → "Pendiente de configuración" / tono `warning`.
-- default → "Simulado" / tono `info`.
+- default → "Esperando primera lectura" / tono `info`.
 
-### 3.5 Wizard "Conectá tu Eden Air" — `app/Views/dispositivos/agregar.php`
+### 3.5 "Conectá tu Eden Air" — `app/Views/dispositivos/conectar.php`
 
-**Ruta:** `GET panel/dispositivos/agregar` → `DispositivosController::agregar()`.
+> **Reemplazó al wizard de 4 pasos.** El flujo por **código de activación**
+> (`EDEN-XXXX-XXXX`) se eliminó por completo: ya no hay que buscar nada en la
+> caja ni tipear ningún código. Ver §3.5.1 para el detalle de qué se borró.
+
+**Ruta:** `GET panel/dispositivos/conectar` → `DispositivosController::conectar()`.
 
 **Variables que recibe:**
 
 | Variable | Origen |
 |---|---|
-| `$tipos` | `DeviceClaimService::TIPOS` (4 radio-cards). |
-| `$espacios` | `DeviceClaimService::ESPACIOS` (catálogo: dormitorio, living, aula, oficina, cocina, laboratorio, otro). |
-| `$ambientesExistentes` | `SpaceModel`: ambientes ya creados por el usuario, con `id`, `label`, `tipo` (usados en el tab "Usar uno existente"). |
+| `$ssid` | `DevicePairingService::ssid()` — nombre del WiFi de configuración del equipo. |
+| `$minutos` | `DevicePairingService::MINUTOS_VENTANA` — cuánto dura la ventana (10). |
 
-**4 pasos con barra de progreso:**
+**Una sola pantalla, cuatro paneles que se alternan** (los maneja
+`public/JS/conectar.js`):
 
-1. **Código de activación.** Input `EDEN-XXXX-XXXX`. Validación en vivo (debounce) llamando a `GET panel/dispositivos/validar?code=...`. Estados: `vacio`, `formato`, `inexistente`, `usado`, `deshabilitado`, `disponible`. Atajo: autocompletar `EDEN-DEMO-2026`.
-2. **Datos del dispositivo.** `name` (sugerido por el código si trae `default_name`) + `device_type` (radio-cards).
-3. **Ambiente.** Tabs *"Usar uno existente"* (solo si `count($ambientesExistentes) > 0`) vs *"Crear uno nuevo"* (catálogo + nombre si elige "Otro"). El tab elegido se manda en `space_mode` (`existing` | `new`).
-4. **Confirmación.** Resumen + botón **Finalizar vinculación** (POST `panel/dispositivos`).
+| Panel | Cuándo se ve | Qué muestra |
+|---|---|---|
+| `reposo` | Al entrar | Los 3 pasos y el botón **Conectar**. |
+| `vivo` | Tras apretar Conectar | El **QR generado en el momento**, el nombre y la clave de la red, la cuenta regresiva y el estado en vivo. |
+| `ok` | Cuando el equipo aparece | "«Eden Air» quedó conectado" + accesos al panel. |
+| `fin` | Si se vence o se cancela | Motivo + botón **Intentar de nuevo**. |
 
-**Validación en vivo (paso 1):**
-- Ruta `GET panel/dispositivos/validar` → `DispositivosController::validar()`.
-- Por ser GET está exenta del filtro CSRF.
-- Internamente: `DeviceClaimService::inspeccionarCodigo($codigo)`.
+**El ciclo completo:**
 
-**Degradación elegante:** sin JavaScript, los 4 pasos se muestran completos y el form igual se puede enviar; el servidor valida igual con `DeviceClaimService::vincular()`.
+1. **Clic en Conectar** → `POST panel/dispositivos/conectar` →
+   `DispositivosController::iniciar()` → `DevicePairingService::abrirVentana()`.
+   Devuelve JSON con el **SVG del QR ya dibujado**, `ssid`, `password`, `token`,
+   `expira_en` y el hash CSRF nuevo.
+2. **El usuario escanea** el QR con la cámara del celular. El QR está en el
+   formato estándar `WIFI:T:WPA;S:EdenAir-Setup;P:...;;`, así que el celular
+   ofrece conectarse a la red del equipo sin escribir nada.
+3. **En el portal del equipo** elige el WiFi de su casa y pone la clave.
+4. **El equipo llama a la API**: `POST api/devices/pair` con su MAC →
+   `DevicePairingService::registrarDispositivo()`. Queda dado de alta en la
+   cuenta que tenga la ventana abierta, con ambiente y estado inicial, y recibe
+   `device_uid` + `api_token`.
+5. **La página lo detecta**: sondea `GET panel/dispositivos/conectar/estado?token=…`
+   cada 2,5 s (GET → exento de CSRF) y salta al panel `ok`.
 
-**Al enviar (POST `panel/dispositivos`)** — `DispositivosController::guardar()`:
-1. Lee `code`, `name`, `device_type`, `space_mode`, `space_id`, `space`, `space_custom`, `notes`.
-2. Valida reglas básicas (longitudes).
-3. Según `space_mode`:
-   - `existing`: exige `space_id > 0`.
-   - `new`: exige `space` válido (clave del catálogo).
-4. Llama a `DeviceClaimService::vincular()` dentro de **una transacción**:
-   - Revalida el código.
-   - Crea (o reutiliza) el ambiente.
-   - Crea el dispositivo (`device_uid` y `api_token` aleatorios).
-   - Crea su `device_states` inicial.
-   - Siembra historial simulado con `SimulationService::seedHistoryForDevice()`.
-   - Marca el código como `claimed` (evita doble canje).
-5. Redirige a `panel/dispositivos` con mensaje de éxito.
+**Cancelar:** `POST panel/dispositivos/conectar/cancelar`. También se dispara con
+`navigator.sendBeacon()` al cerrar la pestaña, para no dejar la ventana colgada.
+
+**El QR se genera en el servidor** con `app/Libraries/QrCode.php` (ISO/IEC 18004
+escrito a mano en PHP, modo byte, nivel M, versiones 1–10, salida SVG). No hay
+CDN ni Composer: la pantalla funciona sin internet.
+
+#### 3.5.1 Qué se eliminó del flujo anterior
+
+| Se borró | Reemplazo |
+|---|---|
+| `app/Views/dispositivos/agregar.php` (wizard de 4 pasos) | `conectar.php` (una pantalla) |
+| `app/Services/DeviceClaimService.php` | `DevicePairingService.php` |
+| `app/Models/DeviceActivationCodeModel.php` | `DevicePairingModel.php` |
+| Tabla `device_activation_codes` y columna `devices.activation_code` | Tabla `device_pairings` |
+| `GET panel/dispositivos/validar` (validación en vivo del código) | — (no hay código que validar) |
+| `POST panel/dispositivos` (alta por formulario) | El equipo se da de alta solo contra la API |
+| `POST api/devices/provision` (credenciales a cambio del código) | `POST api/devices/pair` (credenciales a cambio de la MAC, durante la ventana) |
+| Seeder del lote de códigos | El seeder solo cierra ventanas vencidas |
+
+La migración que hace el cambio de esquema es
+`2026-08-02-000001_ReplaceClaimCodesWithPairing.php`.
 
 ### 3.6 Ambientes — `app/Views/ambientes/index.php` + `editar.php`
 
@@ -376,7 +407,9 @@ de recuperación; quitarlo rompería el flujo `recuperar`/`restablecer`.
 
 - Marco visual del dashboard (sidebar + header).
 - Producto: "Eden Air Core", **pago único**.
-- Compra **simulada** (sin cobro real). Nota visible: *"Precio simulado para la presentación. No representa un valor comercial final."*
+- El checkout todavía **no procesa el cobro**: la pasarela de MercadoPago no
+  está integrada y la vista lo aclara (*"Compra simulada · sin integración de
+  pago todavía"*). El precio que se muestra es de referencia.
 
 ---
 
@@ -451,6 +484,11 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 
 ## 7. Archivos del Hito 2
 
+> **Es un registro histórico.** Algunos de los archivos que se listan acá ya no
+> existen: el flujo de conexión del dispositivo se rehízo después (ver §3.5.1) y
+> también se eliminaron `SimulationService` y `DeviceProvisioningService`. Para
+> el estado actual de la capa de servicios, mirar `services.md`.
+
 **Nuevos:**
 
 - `app/Controllers/DispositivosController.php`
@@ -470,7 +508,7 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 **Modificados (esta auditoría incluida):**
 
 - `app/Controllers/AccesoController.php` — eliminado todo el flujo de selección de ambiente al login.
-- `app/Controllers/PanelController.php` — `index()` ramifica; `iniciarDemo()`, `seleccionarDispositivo()`; guard renombrado a `redireccionarSiFaltaDispositivo`.
+- `app/Controllers/PanelController.php` — `index()` ramifica bienvenida/panel; `seleccionarDispositivo()` para el switcher; guard renombrado a `redireccionarSiFaltaDispositivo`.
 - `app/Services/PanelService.php` — `obtenerVistaPanel($userId, $activeDeviceId)` multi-dispositivo; `devices_list` para el switcher.
 - `app/Services/DeviceClaimService.php` — `vincular()` admite `space_id` existente o `space` nuevo.
 - `app/Services/DeviceProvisioningService.php` — eliminado `hasConfiguredSpace()` (huérfano).
@@ -478,7 +516,7 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 - `app/Filters/GuestFilter.php` — siempre redirige a `/panel`.
 - `app/Config/Routes.php` — añadidas rutas del Hito 2; eliminadas `panel/ambiente`.
 - `app/Views/inicio.php` — navbar/CTA, hero, menú mobile, sección video, sección compra, SEO.
-- `app/Views/panel.php` — sidebar única, banner claim, switcher de dispositivos.
+- `app/Views/panel.php` — sidebar única, switcher de dispositivos.
 - `app/Views/perfil_usuario.php`, `compra_mercadopago.php` — sidebar única.
 - `app/Views/portfolio.php` — análisis de competencia.
 - `app/Views/login.php` — hint actualizado a la nueva lógica.
@@ -494,13 +532,49 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 
 ## 8. Pendiente para integración con ESP32
 
-- Imprimir/etiquetar el claim code (y/o QR) en cada unidad y cargarlo en `device_activation_codes` con su `mac_address` de fábrica.
+Con el flujo nuevo **no hay nada que imprimir ni que precargar en la base**: no
+existen códigos de activación. Lo que tiene que hacer el firmware es:
+
+1. **Al arrancar sin WiFi configurado**, levantar un punto de acceso con
+   **exactamente** estas credenciales (son las que la web mete adentro del QR,
+   ver `DevicePairingService::AP_SSID_DEFECTO`):
+
+   | | |
+   |---|---|
+   | SSID | `EdenAir-Setup` |
+   | Clave | `edenair.setup` |
+
+   Si en el firmware se eligen otras, hay que cambiarlas también en el `.env`
+   del servidor (`edenair.apSsid` / `edenair.apPassword`).
+
+2. **Servir un portal cautivo** en `192.168.4.1` que liste las redes WiFi
+   cercanas y acepte SSID + contraseña de la red de la casa.
+
+3. **Al conectarse a esa red**, llamar a:
+
+   ```
+   POST /api/devices/pair
+   { "mac": "<su MAC>", "firmware": "1.0.0" }
+   ```
+
+   - **200** → guardar `device_uid` y `api_token` en memoria no volátil y
+     empezar a medir.
+   - **202** → el dueño todavía no apretó "Conectar" en la web: reintentar a los
+     `reintentar_en` segundos (15).
+
+4. **Después de eso**, usar los endpoints que ya existen (mediciones y comandos)
+   con el header `X-Device-Token`.
+
+Otros pendientes de hardware:
+
 - Confirmar voltajes (3.3 V/5 V) y consumo.
 - Probar lectura individual de cada componente (DHT, CO₂, calidad, ventilador, humidificador, aromatizador, LED).
 - Ya existe `POST api/devices/{uid}/measurements` con autenticación por `X-Device-Token`; falta el envío real del firmware.
 - Ya existen `GET api/devices/{uid}/commands/pending` y `POST .../commands/{id}/executed`; falta conectarlos.
-- Validar WiFi y alta del `device_uid`; alternar `status` `active`/`offline` según `last_seen_at`.
-- Pago real (MercadoPago / Stripe): hoy es demo.
+- Alternar `status` `active`/`offline` según `last_seen_at` (el alta del
+  `device_uid` ya la resuelve `POST api/devices/pair`).
+- Pago real (MercadoPago / Stripe): falta integrar la pasarela; hoy el checkout
+  no cobra.
 
 ---
 
@@ -512,23 +586,42 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 **Landing** (`/`)
 - Slogan con impacto; el "7" de **24/7** se ve completo.
 - Sección **Tecnología interna** reproduce el video (sin audio) y pausa al salir de pantalla.
-- Sección **Comprar** muestra Eden Air Core con precio demo.
+- Sección **Comprar** muestra Eden Air Core con su precio de referencia.
 - Cambio de **tema** estando scrolleado: la página **no salta**.
 
 **Login y entrada** (`/login`)
 - Logueate. Vas **directo a `/panel`** (sin paso intermedio).
-- Si la cuenta no tiene dispositivos → ves **Bienvenida** con 3 CTAs.
+- Si la cuenta no tiene dispositivos → ves **Bienvenida** con los dos CTAs.
 - Si tiene 1+ → ves el **panel monitor**.
 
 **Mis dispositivos** (`/panel/dispositivos`)
-- Lista los dispositivos con estado y ambiente; botón **Agregar dispositivo**.
+- Lista los dispositivos con estado y ambiente; botón **Conectar dispositivo**.
 
-**Agregar dispositivo** (`/panel/dispositivos/agregar`)
-1. Ingresá `EDEN-DEMO-2026` (o tocá el atajo) → debe decir **"Código válido"**.
-2. Probá un código falso → debe rechazarlo.
-3. Poné nombre, tipo y ambiente (existente o nuevo; probá *Otro* para el nombre extra).
-4. Confirmá → vuelve a *Mis dispositivos* con el nuevo equipo.
-5. Reintentá el mismo código → debe decir **"ya utilizado"**.
+**Conectar dispositivo** (`/panel/dispositivos/conectar`)
+
+Sin hardware a mano se puede probar el ciclo entero simulando la ESP32 con una
+sola llamada HTTP:
+
+1. Apretá **Conectar** → aparece el QR y arranca la cuenta regresiva.
+2. Escaneá el QR con el celular → te tiene que ofrecer conectarte a la red
+   **EdenAir-Setup**. (Eso comprueba que el QR está bien generado.)
+3. Simulá que el equipo se conectó, desde otra terminal:
+
+   ```bash
+   curl -X POST http://localhost/piedra_castillo/public/api/devices/pair -H "Content-Type: application/json" -d "{\"mac\":\"AA:BB:CC:11:22:33\",\"firmware\":\"1.0.0\"}"
+   ```
+
+4. En menos de 3 segundos la página tiene que saltar sola a **"quedó conectado"**.
+5. Volvé a *Mis dispositivos*: el equipo aparece como **Conectado**, con su MAC.
+
+Casos que conviene mirar:
+
+| Prueba | Resultado esperado |
+|---|---|
+| Correr el `curl` **sin** haber apretado Conectar | HTTP **202** `esperando_vinculacion` — no crea nada |
+| Repetir el `curl` con la **misma MAC** | HTTP 200 con **el mismo** `device_uid` y `api_token`; no se duplica |
+| Esperar los 10 minutos sin conectar nada | La pantalla pasa sola a **"Se agotó el tiempo"** |
+| Apretar **Cancelar** y correr el `curl` | HTTP 202: una ventana cancelada no vincula |
 
 **Ambientes** (`/panel/ambientes`)
 - Listado con rangos y dispositivos asignados.
@@ -539,7 +632,7 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 - Cambiar contraseña (actual + nueva + confirmación).
 - No se muestran roles.
 
-**Compra** (`/panel/compra`) — vista de pago demo.
+**Compra** (`/panel/compra`) — vista de checkout; el cobro todavía no se procesa.
 
 ---
 
@@ -550,11 +643,11 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 | 1 | Login va directo al dashboard, no fuerza ambiente | ✅ Corregido (limpieza completa: rutas, métodos, vista, helpers y constantes legacy eliminados) |
 | 2 | Pantalla de bienvenida cuando hay 0 dispositivos | ✅ `panel/bienvenida.php` |
 | 3 | Modelo: cuenta tiene N dispositivos y N ambientes | ✅ `spaces` multi-row + `devices` |
-| 4 | Wizard de 4 pasos (código → datos → ambiente → confirmar) | ✅ |
-| 5 | Wizard explica qué es el código de activación | ✅ Microcopy + `<details>` colapsable |
-| 6 | Wizard permite ambiente existente o nuevo | ✅ Tabs + `space_mode` |
-| 7 | 4 tipos de dispositivo seleccionables | ✅ Radio-cards |
-| 8 | 7 ambientes sugeridos | ✅ Catálogo `DeviceClaimService::ESPACIOS` |
+| 4 | Conexión del equipo sin pasos intermedios | ✅ **Reemplazó al wizard de 4 pasos**: una pantalla, un botón, un QR (§3.5) |
+| 5 | Sin código de activación ni nada que buscar en la caja | ✅ Esquema y flujo eliminados (§3.5.1) |
+| 6 | El equipo se asigna a un ambiente solo | ✅ Reusa el primero del usuario, o crea uno "hogar" |
+| 7 | El QR se genera en el servidor, sin dependencias | ✅ `app/Libraries/QrCode.php` |
+| 8 | 7 ambientes sugeridos | ✅ Catálogo de `EnvironmentPresetService` (editable en /panel/ambientes) |
 | 9 | Múltiples dispositivos por cuenta + switcher | ✅ `active_device_id` en sesión |
 | 10 | Sección "Ambientes" en el dashboard | ✅ `/panel/ambientes` + editar |
 | 11 | Sidebar único en TODAS las vistas internas | ✅ `partials/dashboard_sidebar.php` |
@@ -576,8 +669,8 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 | 27 | Documentación final con nueva lógica de usuario | ✅ |
 | 28 | Endpoint real de telemetría conectado al ESP32 | ⏳ Hardware |
 | 29 | Lecturas reales de sensores y comandos a actuadores | ⏳ Hardware |
-| 30 | Etiquetado físico de claim codes / QR | ⏳ Hardware |
-| 31 | Pago real (MercadoPago / Stripe) | ⏳ Demo |
+| 30 | Firmware: punto de acceso `EdenAir-Setup` + portal cautivo + `POST api/devices/pair` | ⏳ Hardware (§8) |
+| 31 | Pago real (MercadoPago / Stripe) | ⏳ Pendiente de integrar la pasarela |
 
 ---
 
@@ -587,15 +680,14 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 
 | Término | Significado |
 |---|---|
-| **Bienvenida** | Vista mostrada cuando el usuario tiene 0 dispositivos. Tres CTAs: agregar, ver demo, comprar. |
+| **Bienvenida** | Vista mostrada cuando el usuario tiene 0 dispositivos. Dos CTAs: conectar dispositivo y comprar. |
 | **Panel monitor** | Vista del dashboard con métricas, actuadores, automatizaciones e historial del dispositivo activo. |
 | **Switcher** | Selector en el header que permite cambiar entre dispositivos del usuario. Persiste en `active_device_id` (sesión). |
-| **Banner claim** | Aviso "¿Ya tenés tu Eden Air?" cuando el único dispositivo es el simulado, para invitar a vincular uno real. |
-| **Wizard** | Asistente de 4 pasos para vincular un dispositivo nuevo. |
-| **Claim code** | Código `EDEN-XXXX-XXXX` que viene con el producto. De un solo uso. Validable en vivo. |
-| **`space_mode`** | Decisión del wizard en el paso 3: `existing` (usa un ambiente ya creado) o `new` (crea uno desde el catálogo). |
-| **Catálogo de ambientes** | `DeviceClaimService::ESPACIOS` — 7 espacios sugeridos con su preset asociado. |
-| **Tipos de dispositivo** | `DeviceClaimService::TIPOS` — 4 productos seleccionables en el alta. |
+| **Ventana de vinculación** | Los 10 minutos que se abren al apretar "Conectar". El equipo que se presente a la API durante esa ventana queda asociado a esa cuenta. Fila en `device_pairings`. |
+| **QR de vinculación** | El código que muestra la pantalla, generado en el momento. Lleva las credenciales del WiFi de configuración del equipo en el formato estándar `WIFI:T:WPA;S:…;P:…;;`. |
+| **Punto de acceso de configuración** | El WiFi que publica la ESP32 cuando todavía no tiene red (`EdenAir-Setup`). Es una constante del firmware, porque la web arma el QR sin poder preguntarle nada al equipo. |
+| **Claim code** *(obsoleto)* | Código `EDEN-XXXX-XXXX` del flujo viejo. **Eliminado**: ya no existe la tabla ni el paso. |
+| **Catálogo de ambientes** | `EnvironmentPresetService::PRESETS` — perfiles con sus rangos de confort. |
 | **Sidebar único** | `partials/dashboard_sidebar.php` — mismo componente en todas las vistas internas. |
 | **CTA destacado** | Botón con identidad propia, gradiente y glow (clase `.ea-button-buy` o `.ea-sidebar-item--cta`). |
 | **`data-reveal`** | Atributo que activa la animación de aparición al entrar en viewport. |
@@ -623,23 +715,31 @@ if (! $valido) { session()->remove('active_device_id'); return null; }
 ```
 
 ```php
-// DispositivosController::guardar() — el wizard decide entre ambiente existente o nuevo.
-if ($datos['space_mode'] === 'existing') {
-    if ($datos['space_id'] <= 0) { /* error: elegí uno */ }
-} else {
-    if (! $servicio->esEspacioValido($datos['space'])) { /* error: clave inválida */ }
-}
-$resultado = $servicio->vincular($this->usuarioActual(), $datos);
+// DispositivosController::iniciar() — el clic en "Conectar".
+// Abre la ventana y devuelve el QR ya dibujado, más el hash CSRF nuevo
+// (el proyecto regenera el token en cada request).
+$paquete = (new DevicePairingService())->abrirVentana(
+    $this->usuarioActual(),
+    $this->request->getIPAddress()
+);
+return $this->response->setJSON(['ok' => true, 'csrf' => csrf_hash()] + $paquete);
 ```
 
 ```php
-// DispositivosController::validar() — validación en vivo del código (JSON, GET → sin CSRF).
-$inspeccion = (new DeviceClaimService())->inspeccionarCodigo((string) $this->request->getGet('code'));
-return $this->response->setJSON([
-    'ok' => $inspeccion['ok'], 'estado' => $inspeccion['estado'], 'mensaje' => $inspeccion['mensaje'],
-    'device_type' => $inspeccion['code']['device_type'] ?? null,
-    'default_name' => $inspeccion['code']['default_name'] ?? null,
-]);
+// DevicePairingService::payloadWifi() — lo que viaja adentro del QR.
+// Formato estándar de WiFi: al escanearlo, el celular ofrece conectarse solo.
+return 'WIFI:T:WPA;S:' . self::escaparWifi($ssid) . ';P:' . self::escaparWifi($password) . ';;';
+```
+
+```php
+// DevicePairingService::registrarDispositivo() — un equipo que ya se dio de alta
+// vuelve a entrar con SUS credenciales de siempre (reinicio, reflash) en vez de
+// duplicarse.
+$existente = $this->devices->where('mac_address', $mac)->first();
+if ($existente) {
+    $this->devices->update((int) $existente['id'], ['status' => 'active', 'last_seen_at' => date('Y-m-d H:i:s')]);
+    return ['estado' => 'ok', 'mensaje' => '…', 'device' => $this->devices->find((int) $existente['id'])];
+}
 ```
 
 ```php
@@ -655,12 +755,11 @@ $cls  = fn($key) => $active === $key ? 'ea-sidebar-item is-active' : 'ea-sidebar
 $aria = fn($key) => $active === $key ? ' aria-current="page"' : '';
 ```
 
-```html
-<!-- panel/bienvenida.php — la demo es una acción explícita (POST), no auto-magia. -->
-<form method="post" action="<?= site_url('panel/demo') ?>" class="ea-welcome-form">
-    <?= csrf_field() ?>
-    <button type="submit" class="ea-button ea-button-secondary ea-button-block">Probar la demo</button>
-</form>
+```php
+// panel/bienvenida.php — sin dispositivos no se inventa nada: la pantalla
+// solo ofrece los dos caminos reales (conectar el equipo o comprarlo).
+<a href="<?= site_url('panel/dispositivos/conectar') ?>"
+   class="ea-button ea-button-primary ea-button-buy ea-button-block">Conectá tu Eden Air</a>
 ```
 
 ```js

@@ -99,10 +99,12 @@ ordenada y fácil de mantener.
 | `app/Controllers/Api/` | Controlador de la **API REST** que usa el ESP32. |
 | `app/Filters/` | Filtros de acceso (`AuthFilter`, `GuestFilter`). |
 | `app/Models/` | Modelos: una clase por tabla, encapsulan las consultas. |
-| `app/Services/` | Lógica de negocio reutilizable (reglas, simulación, armado del panel). |
+| `app/Services/` | Lógica de negocio del **servidor** (validación, armado del panel, configuración del equipo). |
+| `app/Libraries/` | Utilidades propias sin dependencias externas (`QrCode.php`). |
 | `app/Views/` | Vistas (HTML/PHP) y parciales reutilizables. |
 | `app/Database/Migrations/` | Cambios versionados de estructura de la base. |
 | `writable/` | Sesiones, logs y caché (lo que el framework necesita escribir). |
+| **`firmware/`** | **El código del ESP32 (MicroPython).** No es PHP ni forma parte de CodeIgniter: es un programa aparte que se sube a la placa con Thonny y se comunica por HTTP. Tiene su propio README. |
 
 ---
 
@@ -130,7 +132,7 @@ POST /login
    │
    ▼ PanelController::index()
    │     ¿cuántos dispositivos tiene el usuario?
-   │        0  → view('panel/bienvenida')      ← pantalla con 3 CTAs
+   │        0  → view('panel/bienvenida')      ← pantalla de alta
    │        ≥1 → PanelService::obtenerVistaPanel() → view('panel')
    ▼
 HTML del dashboard en el navegador
@@ -162,16 +164,18 @@ $activeDeviceId = $this->dispositivoActivo($userId);
 return view('panel', ['panel' => (new PanelService())->obtenerVistaPanel($userId, $activeDeviceId)]);
 ```
 
-- **0 dispositivos** → `panel/bienvenida` (3 CTAs: agregar dispositivo, ver
-  demo, comprar). No se auto-crea nada en silencio.
+- **0 dispositivos** → `panel/bienvenida` (dos caminos: vincular un dispositivo
+  con su código de activación, o comprar uno). No se auto-crea nada en
+  silencio: sin equipo vinculado no hay panel monitor.
 - **≥ 1 dispositivo** → panel monitor del **dispositivo activo**.
 
 ### 4.3 Dónde se elige el ambiente ahora
 
-El ambiente (perfil de rangos) se crea **dentro del wizard de alta de
-dispositivo** (`DispositivosController` + `DeviceClaimService::vincular()`), o
-se reutiliza uno ya existente. Editar rangos se hace en **Ambientes**
-(`AmbientesController`). Nunca más en el login.
+El ambiente (perfil de rangos) se asigna **solo, al conectar el dispositivo**
+(`DevicePairingService`): se reutiliza el primer ambiente del usuario y, si
+todavía no tiene ninguno, se crea uno con el perfil `hogar`. Editar los rangos
+o crear más ambientes se hace en **Ambientes** (`AmbientesController`). Nunca
+más en el login ni en un formulario de alta.
 
 > **Archivos que sostienen esta lógica:** `GuestFilter` (manda al panel si ya
 > hay sesión), `AccesoController::redirigirDespuesDelLogin()` (siempre
@@ -251,11 +255,11 @@ colección de rutas que CI4 inyecta.
 | POST | `panel/password` | `actualizarPassword`. |
 | GET | `panel/compra` | `compra`. |
 | GET | `panel/dispositivos` | `DispositivosController::index` (Mis dispositivos). |
-| GET | `panel/dispositivos/agregar` | `agregar` (wizard de 4 pasos). |
-| GET | `panel/dispositivos/validar` | `validar` (chequeo en vivo del código, JSON, exento de CSRF por ser GET). |
-| POST | `panel/dispositivos` | `guardar` (canjea el código y crea el dispositivo). |
+| GET | `panel/dispositivos/conectar` | `conectar` (pantalla del QR). |
+| POST | `panel/dispositivos/conectar` | `iniciar` (abre la ventana y devuelve el QR, JSON). |
+| GET | `panel/dispositivos/conectar/estado` | `estadoVinculacion` (sondeo, JSON, exento de CSRF por ser GET). |
+| POST | `panel/dispositivos/conectar/cancelar` | `cancelar` (cierra la ventana, JSON). |
 | POST | `panel/dispositivo-activo` | `PanelController::seleccionarDispositivo` (switcher). |
-| POST | `panel/demo` | `PanelController::iniciarDemo`. |
 | GET | `panel/ambientes` | `AmbientesController::index`. |
 | GET | `panel/ambientes/(:num)/editar` | `editar/$1`. |
 | POST | `panel/ambientes/(:num)` | `actualizar/$1`. |
@@ -273,7 +277,9 @@ colección de rutas que CI4 inyecta.
 Sin filtro `auth` (autentican con token de dispositivo), exentas de CSRF.
 | Método | Ruta | Acción |
 |---|---|---|
-| POST | `api/devices/(:segment)/measurements` | `DeviceApiController::storeMeasurement/$1`. |
+| POST | `api/devices/pair` | `DeviceApiController::pair`. Alta del equipo por su MAC durante la ventana de vinculación. **Único endpoint sin token** (viene a buscarlo). Responde **202** si todavía no hay ninguna ventana abierta. |
+| GET | `api/devices/(:segment)/config` | `DeviceApiController::config/$1`. Los umbrales del ambiente y el modo, para que el **equipo decida por su cuenta**. |
+| POST | `api/devices/(:segment)/measurements` | `DeviceApiController::storeMeasurement/$1`. Acepta además `actuadores` y `motivo`: lo que el equipo hizo antes de avisar. |
 | GET | `api/devices/(:segment)/commands/pending` | `pendingCommands/$1`. |
 | POST | `api/devices/(:segment)/commands/(:num)/executed` | `markCommandExecuted/$1/$2`. |
 
@@ -340,32 +346,36 @@ private function iniciarSesion(array $usuario): void {
 | Método | Qué hace | Conexiones |
 |---|---|---|
 | `index()` | Ramifica bienvenida (0 dispositivos) vs panel monitor (≥1). | `DeviceModel::countAllResults`, `UserModel::obtenerPorId`, `PanelService::obtenerVistaPanel`, `dispositivoActivo()` |
-| `iniciarDemo()` | Si no hay dispositivos, crea uno simulado de demo y vuelve al panel. | `DeviceProvisioningService::ensureUserSetup` |
 | `seleccionarDispositivo()` | Cambia el dispositivo activo; valida pertenencia y lo guarda en `active_device_id`. | `DeviceModel`, sesión |
 | `dispositivoActivo()` *(priv.)* | Devuelve el id activo de sesión si pertenece al usuario; si no, lo limpia. | `DeviceModel`, sesión |
 | `perfil()` | Muestra el perfil; si el usuario no existe, cierra sesión. | `UserModel::obtenerPorId` |
 | `actualizarPerfil()` | Valida, confirma identidad con la contraseña actual, verifica unicidad y guarda. | `UserModel::existeCorreoOUsuarioExcepto`, `UserModel::actualizarPerfil` |
 | `actualizarPassword()` | Valida y confirma identidad antes de cambiar el hash. | `UserModel::actualizarHashContrasena` |
 | `compra()` | Muestra `compra_mercadopago`. | vista |
-| `guardarMedicion()` | Guarda una medición manual y dispara automatización. | `redireccionarSiFaltaDispositivo`, `obtenerContexto`, `SimulationService::createMeasurement` |
-| `cambiarModo()` | Cambia automático/manual (lista blanca). | `CommandService::changeOperatingMode`, `AutomationService` |
+| `guardarMedicion()` | Guarda una medición manual y dispara automatización. | `redireccionarSiFaltaDispositivo`, `obtenerContexto`, `MeasurementService::registrar` |
+| `cambiarModo()` | Cambia automático/manual (lista blanca). Solo lo anota: el equipo lo lee en su próxima consulta de configuración. | `CommandService::changeOperatingMode` |
 | `cambiarActuador()` | Enciende/apaga un actuador, solo en modo manual. | `CommandService::queueAndExecuteManualCommand` |
 
 **Helpers privados clave:**
-- `crearPanel()` → llama `DeviceProvisioningService::ensureUserSetup($userId, [], false)` y luego `PanelService::obtenerDatos()`.
+- `crearPanel()` → llama a `PanelService::obtenerDatos()`. Ya **no** hay alta
+  automática silenciosa: se eliminó `DeviceProvisioningService`, así que el panel
+  solo se dibuja si el usuario conectó un equipo de verdad.
 - `obtenerContexto()` → devuelve `['device' => $panel['device_raw'], 'space' => $panel['space_raw']]`.
 - `redireccionarSiFaltaDispositivo()` → **(renombrado)** guard que corta la acción si el usuario tiene 0 dispositivos. Antes se llamaba `redireccionarSiFaltaAmbiente`.
 - `estaEnModoManual()`, `modoValido()`, `accionActuadorValida()`, `crearMensajeCambioModo()`.
 
 ### 7.3 `DispositivosController`
-**Responsabilidad:** "Mis dispositivos" y el alta por código de activación.
+**Responsabilidad:** "Mis dispositivos" y la conexión de un equipo nuevo por QR.
+No hay código de activación ni formulario de alta: el equipo se da de alta solo
+contra la API mientras la ventana de vinculación está abierta.
 
 | Método | Qué hace | Conexiones |
 |---|---|---|
-| `index()` | Lista los dispositivos del usuario con metadatos de estado. | `DeviceClaimService::listarDeUsuario` |
-| `agregar()` | Prepara el wizard: tipos, catálogo de espacios y ambientes existentes. | `DeviceClaimService::tiposDispositivo/espacios`, `SpaceModel`, `EnvironmentPresetService` |
-| `validar()` | Chequeo en vivo del código (JSON). GET → exento de CSRF. | `DeviceClaimService::inspeccionarCodigo` |
-| `guardar()` | Valida, decide ambiente existente o nuevo, y vincula dentro de transacción. | `DeviceClaimService::vincular` |
+| `index()` | Lista los dispositivos del usuario con metadatos de estado. | `DevicePairingService::listarDeUsuario` |
+| `conectar()` | Muestra la pantalla con el botón "Conectar". | `DevicePairingService::ssid/MINUTOS_VENTANA` |
+| `iniciar()` | Abre la ventana y devuelve el SVG del QR (JSON). Es el clic en "Conectar". | `DevicePairingService::abrirVentana` |
+| `estadoVinculacion()` | Sondeo: ¿ya apareció el equipo? (JSON). GET → exento de CSRF. | `DevicePairingService::estado` |
+| `cancelar()` | Cierra la ventana antes de tiempo (JSON). | `DevicePairingService::cancelar` |
 
 ### 7.4 `AmbientesController`
 **Responsabilidad:** listar y editar los ambientes del usuario (perfiles de
@@ -383,7 +393,8 @@ dispositivo**, no por sesión.
 
 | Método | Qué hace | Conexiones |
 |---|---|---|
-| `storeMeasurement($uid)` | Recibe una medición JSON, la valida y la guarda; corre automatización. | `SimulationService::createMeasurement`, `resolveAuthenticatedDevice` |
+| `pair()` | Da de alta el equipo por su MAC durante la ventana de vinculación y le devuelve `device_uid` + `api_token`. Único endpoint sin token. | `DevicePairingService::registrarDispositivo` |
+| `storeMeasurement($uid)` | Recibe una medición JSON, la valida y la guarda; corre automatización. | `MeasurementService::registrar`, `resolveAuthenticatedDevice` |
 | `pendingCommands($uid)` | Devuelve los comandos pendientes del dispositivo. | `CommandService::getPendingCommands` |
 | `markCommandExecuted($uid,$id)` | Marca un comando como ejecutado. | `CommandService::markCommandAsExecuted` |
 
@@ -414,12 +425,12 @@ pueden insertar/actualizar masivamente) y, en la mayoría, `$useTimestamps=true`
 | Modelo | Tabla | Métodos propios destacados |
 |---|---|---|
 | **UserModel** | `users` | `obtenerPorId`, `buscarParaLogin` (email **o** usuario), `existeCorreoOUsuario`, `existeCorreoOUsuarioExcepto`, `crearUsuario` (hashea con `password_hash`), `actualizarPerfil`, `actualizarHashContrasena`, `guardarToken`/`buscarPorToken` (token **hasheado** SHA-256 + vencimiento), `actualizarPasswordConToken`, `limpiarTokenRecuperacion`. |
-| **DeviceModel** | `devices` | `obtenerDeUsuario($userId)`: hace `JOIN` con `spaces` para traer `environment_type` y `custom_name` de cada dispositivo. `allowedFields` incluye los campos nuevos del Hito 2: `device_type`, `status`, `mac_address`, `activation_code`, `notes`, `last_seen_at`, `last_command_sync_at`. |
+| **DeviceModel** | `devices` | `obtenerDeUsuario($userId)`: hace `JOIN` con `spaces` para traer `environment_type` y `custom_name` de cada dispositivo. `allowedFields` incluye `device_type`, `status`, `mac_address`, `notes`, `last_seen_at`, `last_command_sync_at`. |
 | **SpaceModel** | `spaces` | Solo configuración base. Guarda el ambiente y sus rangos. *(Ahora admite varias filas por usuario.)* |
 | **MeasurementModel** | `measurements` | Solo configuración base. Historial de lecturas (`source`, `temperature`, `humidity`, `co2_ppm`, `air_quality_index/label`, `captured_at`). |
 | **DeviceStateModel** | `device_states` | Estado actual: `operating_mode`, `fan_state`, `aromatizer_state`, `alert_led_state`, `last_reason`, `updated_by`. |
 | **DeviceCommandModel** | `device_commands` | Cola de comandos: `command_type`, `target_value`, `payload` (JSON con `reason`), `status`, `executed_at`, `source`, `issued_by_user_id`. |
-| **DeviceActivationCodeModel** | `device_activation_codes` | `normalizar()` (estático: mayúsculas, sin espacios), `buscarPorCodigo`, `marcarCanjeado` (pone `status='claimed'` + quién/cuándo). |
+| **DevicePairingModel** | `device_pairings` | `buscarPorToken`, `abiertas()` (ventanas vigentes), `marcarVencidas()`, `cancelarAbiertasDe($userId)`. Reemplazó a `DeviceActivationCodeModel`, borrado junto con el flujo de códigos. |
 
 ---
 
@@ -431,11 +442,10 @@ completo está en **`services.md`**.
 | Servicio | Qué resuelve |
 |---|---|
 | **PanelService** | Arma **todo** el dashboard a partir de mediciones, estado y ambiente. |
-| **AutomationService** | Aplica las reglas automáticas comparando la última medición con los rangos. |
+| **DeviceConfigService** | Arma los umbrales que el ESP32 descarga para decidir solo. **Las reglas ya no están en el servidor:** viven en `firmware/reglas.py`. |
 | **CommandService** | Crea y ejecuta comandos y mantiene `device_states`. |
-| **SimulationService** | Genera mediciones simuladas (demo / historial). |
-| **DeviceProvisioningService** | Prepara la cuenta: ambiente + dispositivo + estado iniciales (usado por la demo). |
-| **DeviceClaimService** | Vincula un dispositivo real por código de activación. |
+| **MeasurementService** | Valida y guarda las mediciones **reales** del hardware, y calcula el índice de calidad de aire. |
+| **DevicePairingService** | Conecta un equipo nuevo: abre la ventana de vinculación, genera el QR y da de alta al equipo que se presenta. |
 | **EnvironmentPresetService** | Define los presets de ambiente (rangos sugeridos por tipo). |
 
 ---
@@ -513,15 +523,14 @@ Define qué es "normal" para ese espacio. **Ahora puede haber varios por usuario
 | `user_id` *(FK→users)* | Dueño. |
 | `space_id` *(FK→spaces)* | Ambiente asociado. |
 | `name` | Nombre visible. |
-| `device_type` | Tipo elegido en el alta (Eden Air Core, Monitor ambiental, etc.). |
-| `device_uid` *(único)* | Identificador público usado en la URL de la API. |
-| `api_token` *(único)* | Credencial secreta del ESP32 (header `X-Device-Token`). |
-| `is_simulated` | 1 si es demo/simulado. |
+| `device_type` | Tipo de producto (Eden Air Core, Monitor ambiental, etc.). |
+| `device_uid` *(único)* | Identificador público usado en la URL de la API. Lo genera el servidor al vincular. |
+| `api_token` *(único)* | Credencial secreta del ESP32 (header `X-Device-Token`). También la genera el servidor al vincular. |
+| `is_simulated` | Queda en 0: ya no existen dispositivos simulados. |
 | `is_active` | 1 si es el visible por defecto en el panel. |
-| `status` | `simulated` / `active` / `offline` / `pending`. |
-| `mac_address` | Dato **técnico interno**, nunca credencial. |
-| `activation_code` | Código con el que se vinculó. |
-| `notes` | Notas opcionales. |
+| `status` | `active` / `offline` / `pending`. |
+| `mac_address` | Dato **técnico interno**, nunca credencial. La graba el propio equipo la primera vez que se presenta a la API; sirve para reconocerlo si se reinicia. |
+| `notes` | Notas opcionales (por ejemplo, la versión de firmware que informó). |
 | `last_seen_at`, `last_command_sync_at` | Última actividad y última sincronización de comandos. |
 
 #### `device_states` — estado actual de cada dispositivo
@@ -549,15 +558,37 @@ Define qué es "normal" para ese espacio. **Ahora puede haber varios por usuario
 |---|---|
 | `device_id` *(FK→devices)* | A qué dispositivo. |
 | `issued_by_user_id` *(FK→users)* | Quién lo originó (si fue persona). |
-| `source` | `web` (usuario) o `automation`. |
+| `source` | `web` (orden del usuario, nace `pending`) o `device` (lo que el equipo decidió solo, nace `executed`). `automation` es del esquema viejo. |
 | `command_type`, `target_value` | Qué hacer (ej.: `fan` → `on`). |
 | `payload` | JSON con `reason`. |
 | `status`, `executed_at` | `pending`/`executed`/`cancelled` y cuándo. |
 
-#### `device_activation_codes` — vinculación de hardware real
-Guarda los **claim codes** físicos: `code` *(único)*, `device_type`,
-`default_name`, `mac_address`, `status` (`available`/`claimed`/`disabled`),
-`claimed_by_user_id`, `device_id`, `claimed_at`, `batch`.
+#### `device_pairings` — ventanas de vinculación
+Una fila por cada vez que alguien apretó **"Conectar"**. Mientras la ventana
+está abierta (`status = 'esperando'` y sin vencer), el primer equipo que se
+presente a `POST api/devices/pair` queda dado de alta en esa cuenta.
+
+| Campo | Significado |
+|---|---|
+| `user_id` *(FK→users)* | Quién abrió la ventana. |
+| `token` *(único)* | Con esto el navegador pregunta "¿ya apareció mi equipo?". |
+| `ap_ssid`, `ap_password` | Credenciales del WiFi de configuración que viajan adentro del QR. |
+| `status` | `esperando` / `vinculado` / `expirado` / `cancelado`. |
+| `device_id` | El equipo que terminó vinculándose. |
+| `client_ip` | IP del navegador; desempata si hay varias ventanas abiertas. |
+| `expires_at`, `completed_at` | Cuándo vence y cuándo se completó. |
+
+> **No hay nada que precargar.** Se eliminó `device_activation_codes` (y la
+> columna `devices.activation_code`): ya no existen los claim codes
+> `EDEN-XXXX-XXXX` ni el lote inicial. La migración que hace el cambio es
+> `2026-08-02-000001_ReplaceClaimCodesWithPairing`.
+
+Ventanas abiertas ahora mismo:
+
+```sql
+SELECT id, user_id, status, expires_at FROM device_pairings
+WHERE status = 'esperando' AND expires_at >= NOW();
+```
 
 #### Tablas heredadas (legacy) e internas
 - **`ambientes`** y **`lecturas_ambientales`**: modelo inicial; reemplazadas por
@@ -573,7 +604,8 @@ spaces ─1:N── devices            (un ambiente, varios dispositivos)
 devices ─1:1── device_states     (un dispositivo, un estado)
 devices ─1:N── device_commands   (un dispositivo, muchos comandos)
 devices ─1:N── measurements      (un dispositivo, muchas mediciones)
-device_activation_codes ─1:1── devices  (un código canjea un dispositivo)
+users ──1:N── device_pairings    (historial de intentos de conexión)
+device_pairings ─0:1── devices   (la ventana que dio de alta a ese equipo)
 ```
 
 > **Migración clave del Hito 2:** `spaces` tenía `UNIQUE(user_id)` (un solo
