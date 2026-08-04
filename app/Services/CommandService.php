@@ -8,15 +8,30 @@ use App\Models\DeviceStateModel;
 /* ============================================================
    CommandService
    QUÉ HACE: administra la COLA de comandos hacia el dispositivo
-   y mantiene sincronizado su estado (device_states). Todo cambio
-   de modo o de actuador pasa por acá: se registra como comando
-   (auditoría de quién pidió qué y por qué) y, al ejecutarse, se
-   refleja en el estado actual del dispositivo.
+   y mantiene sincronizado su estado (device_states).
+
+   DOS CAMINOS, MUY DISTINTOS:
+
+   1. ÓRDENES DEL USUARIO (source 'web'). Nacen acá: el usuario
+      aprieta un botón del dashboard en modo manual y el comando
+      queda 'pending' hasta que el equipo lo consulta y lo aplica.
+      Es el ÚNICO caso en que el servidor le dice al equipo qué
+      hacer.
+
+   2. LO QUE EL EQUIPO DECIDIÓ SOLO (source 'device'). No son
+      órdenes: son hechos consumados. El ESP32 comparó la medición
+      con sus umbrales, accionó, y recién después avisó. Acá se
+      registran con registrarEstadoReportado(), ya en estado
+      'executed'.
+
+   El servidor NO tiene reglas de automatización: viven en el
+   firmware. Los umbrales se los manda DeviceConfigService.
+
    SE RELACIONA CON: DeviceCommandModel y DeviceStateModel (sus
-   dos tablas). Lo usan AutomationService (comandos automáticos),
+   dos tablas). Lo usan MeasurementService (registra lo reportado),
    PanelController (modo y control manual), DeviceApiController
-   (el ESP32 consulta pendientes y confirma ejecución) y
-   PanelService (lee el estado para el dashboard).
+   (el ESP32 consulta pendientes y confirma ejecución),
+   DeviceConfigService y PanelService (leen el estado).
    ============================================================ */
 class CommandService
 {
@@ -93,11 +108,20 @@ class CommandService
     // -------------------------------------------------------------------------
 
     /**
-     * Encola un comando manual y lo ejecuta al instante (en el simulador no
-     * hay hardware real que esperar). Antes cancela los pendientes del mismo
-     * tipo para que no queden órdenes contradictorias en la cola.
+     * Encola una orden del usuario y la deja PENDIENTE.
+     *
+     * Antes se marcaba como ejecutada al instante, porque no había hardware
+     * real que esperar. Con un equipo de verdad eso seria mentir: el panel
+     * mostraría el ventilador encendido antes de que el ESP32 se enterara.
+     *
+     * Ahora el comando espera en la cola hasta que el equipo lo consulta
+     * (GET .../commands/pending), lo aplica y lo confirma
+     * (POST .../commands/N/executed). Recién ahí cambia `device_states`.
+     *
+     * Antes de encolar se cancelan los pendientes del mismo actuador, para
+     * que no queden dos órdenes contradictorias esperando.
      */
-    public function queueAndExecuteManualCommand(
+    public function encolarComandoManual(
         int $deviceId,
         string $commandType,
         string $targetValue,
@@ -116,57 +140,68 @@ class CommandService
             'status'            => 'pending',
         ]);
 
-        $this->markCommandAsExecuted($deviceId, $commandId, 'web-simulator');
-
         return $this->commandModel->find($commandId);
     }
 
     // -------------------------------------------------------------------------
-    // Comandos AUTOMÁTICOS (los encola AutomationService)
+    // Lo que el EQUIPO decidió por su cuenta
+    //
+    // El servidor no manda prender nada por automatización: el ESP32 compara
+    // la medición con sus umbrales y acciona solo. Después informa qué quedó
+    // encendido, y acá se guarda ese estado.
     // -------------------------------------------------------------------------
 
     /**
-     * Encola un comando de automatización SOLO si hace falta:
-     * - si el actuador ya está en el valor pedido → null (nada que hacer)
-     * - si ya existe el mismo comando pendiente   → devuelve ese (no duplica)
-     * - si hay pendientes contradictorios del mismo tipo → los cancela primero
+     * Registra el estado de actuadores que reportó el dispositivo.
+     *
+     * Actualiza `device_states` siempre, y deja una fila en `device_commands`
+     * SOLO por los actuadores que cambiaron. Así el historial cuenta "a las
+     * 14:03 el equipo prendió el ventilador porque el CO₂ estaba alto", sin
+     * llenarse de filas repetidas en cada medición.
+     *
+     * @param array<string,string> $actuadores ['fan' => 'on', 'aromatizer' => 'off', ...]
+     * @return array<int,string> los actuadores que cambiaron
      */
-    public function queueAutomationCommand(int $deviceId, string $commandType, string $targetValue, string $reason): ?array
+    public function registrarEstadoReportado(int $deviceId, array $actuadores, string $motivo = ''): array
     {
-        $state = $this->getStateByDeviceId($deviceId);
-        $field = $this->actuatorMap[$commandType] ?? null;
+        $estado = $this->asegurarEstado($deviceId);
+        $cambios     = [];
+        $actualizar  = [];
 
-        if ($state === null || $field === null) {
-            return null;
+        foreach ($this->actuatorMap as $tipo => $campo) {
+            if (! isset($actuadores[$tipo])) {
+                continue;
+            }
+
+            $valor = $actuadores[$tipo] === 'on' ? 'on' : 'off';
+
+            if (($estado[$campo] ?? 'off') === $valor) {
+                continue;   // ya estaba así: nada que anotar
+            }
+
+            $actualizar[$campo] = $valor;
+            $cambios[]          = $tipo;
+
+            // Queda como comando ya ejecutado: es un hecho consumado, no una
+            // orden pendiente. El equipo ya lo hizo antes de avisarnos.
+            $this->commandModel->insert([
+                'device_id'    => $deviceId,
+                'source'       => 'device',
+                'command_type' => $tipo,
+                'target_value' => $valor,
+                'payload'      => json_encode(['reason' => $motivo], JSON_UNESCAPED_UNICODE),
+                'status'       => 'executed',
+                'executed_at'  => date('Y-m-d H:i:s'),
+            ]);
         }
 
-        if (($state[$field] ?? 'off') === $targetValue) {
-            return null;
+        if ($actualizar !== []) {
+            $actualizar['last_reason'] = $motivo !== '' ? $motivo : 'Ajuste decidido por el equipo.';
+            $actualizar['updated_by']  = 'device';
+            $this->stateModel->update($estado['id'], $actualizar);
         }
 
-        $existing = $this->commandModel
-            ->where('device_id', $deviceId)
-            ->where('command_type', $commandType)
-            ->where('target_value', $targetValue)
-            ->where('status', 'pending')
-            ->first();
-
-        if ($existing) {
-            return $existing;
-        }
-
-        $this->cancelPendingByType($deviceId, $commandType);
-
-        $commandId = (int) $this->commandModel->insert([
-            'device_id'     => $deviceId,
-            'source'        => 'automation',
-            'command_type'  => $commandType,
-            'target_value'  => $targetValue,
-            'payload'       => json_encode(['reason' => $reason], JSON_UNESCAPED_UNICODE),
-            'status'        => 'pending',
-        ]);
-
-        return $this->commandModel->find($commandId);
+        return $cambios;
     }
 
     // -------------------------------------------------------------------------
@@ -181,23 +216,6 @@ class CommandService
             ->where('status', 'pending')
             ->orderBy('id', 'ASC')
             ->findAll();
-    }
-
-    /** Ejecuta TODOS los pendientes de una (lo usa el dispositivo simulado). */
-    public function applyPendingCommands(int $deviceId, string $executor = 'simulated-device'): array
-    {
-        $pending  = $this->getPendingCommands($deviceId);
-        $executed = [];
-
-        foreach ($pending as $command) {
-            $updated = $this->markCommandAsExecuted($deviceId, (int) $command['id'], $executor);
-
-            if ($updated) {
-                $executed[] = $updated;
-            }
-        }
-
-        return $executed;
     }
 
     /**
@@ -255,7 +273,14 @@ class CommandService
     // Cancelaciones y consultas de estado
     // -------------------------------------------------------------------------
 
-    /** Cancela los pendientes de la automatización (al pasar a modo manual). */
+    /**
+     * Limpia órdenes viejas de la automatización del servidor.
+     *
+     * Ya no se generan comandos con source 'automation' (esa lógica se mudó al
+     * firmware), pero pueden quedar filas pendientes de antes. Si el equipo las
+     * consultara, ejecutaría órdenes de una arquitectura que ya no existe.
+     * Se limpian al pasar a modo manual.
+     */
     public function cancelPendingAutomationCommands(int $deviceId): void
     {
         $pending = $this->commandModel
@@ -273,6 +298,35 @@ class CommandService
     public function getStateByDeviceId(int $deviceId): ?array
     {
         return $this->stateModel->where('device_id', $deviceId)->first();
+    }
+
+    /**
+     * Igual que getStateByDeviceId(), pero si el dispositivo no tiene fila de
+     * estado la crea con los valores de arranque (automático, todo apagado).
+     *
+     * Sin esta fila la automatización no puede decidir nada: el hardware
+     * mandaría mediciones y ningún actuador se movería nunca. Por eso la
+     * automatización usa esta versión y no la anterior.
+     */
+    public function asegurarEstado(int $deviceId): array
+    {
+        $estado = $this->getStateByDeviceId($deviceId);
+
+        if ($estado !== null) {
+            return $estado;
+        }
+
+        $estadoId = (int) $this->stateModel->insert([
+            'device_id'        => $deviceId,
+            'operating_mode'   => 'automatic',
+            'fan_state'        => 'off',
+            'aromatizer_state' => 'off',
+            'alert_led_state'  => 'off',
+            'last_reason'      => 'Estado inicial creado al recibir la primera medición.',
+            'updated_by'       => 'system',
+        ]);
+
+        return $this->stateModel->find($estadoId);
     }
 
     /** Cancela los pendientes de UN tipo (antes de encolar uno nuevo). */
@@ -313,11 +367,14 @@ class CommandService
    Públicos:
    - changeOperatingMode()       → cambia automatic/manual; registra el comando
                                    como ejecutado y actualiza device_states
-   - queueAndExecuteManualCommand() → comando manual: encola + ejecuta al toque
-   - queueAutomationCommand()    → comando automático: solo si cambia algo y
-                                   sin duplicar pendientes
+   - encolarComandoManual()      → orden del usuario: queda PENDIENTE hasta
+                                   que el equipo la aplique y la confirme
+   - registrarEstadoReportado()  → guarda lo que el equipo decidió por su
+                                   cuenta; anota en el historial solo los
+                                   actuadores que realmente cambiaron
    - getPendingCommands()        → cola pendiente del dispositivo (para la API)
-   - applyPendingCommands()      → ejecuta todos los pendientes (simulador)
+   - markCommandAsExecuted()     → lo llama el equipo tras aplicar la orden;
+                                   es lo único que cambia device_states
    - markCommandAsExecuted()     → comando → 'executed' + refleja el cambio en
                                    device_states (idempotente)
    - cancelPendingAutomationCommands() → al pasar a manual, limpia la cola

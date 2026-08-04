@@ -3,25 +3,26 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Services\AutomationService;
 use App\Services\CommandService;
-use App\Services\DeviceProvisioningService;
 use App\Services\PanelService;
-use App\Services\SimulationService;
 use CodeIgniter\HTTP\RedirectResponse;
 
 /**
  * PanelController — el corazón del área privada (dashboard).
  *
  * Maneja: el panel principal (bienvenida o monitor según haya dispositivos),
- * la demo, el switcher de dispositivo activo, el perfil del usuario,
+ * el switcher de dispositivo activo, el perfil del usuario,
  * la carga manual de mediciones, el cambio de modo (automático/manual)
  * y el control de actuadores.
  *
  * Patrón general de los métodos POST: cada paso que puede fallar devuelve
  * un RedirectResponse (guard clause); si devuelve null, el flujo sigue.
- * La lógica pesada vive en los services (PanelService, CommandService,
- * SimulationService, AutomationService) — este controller solo orquesta.
+ * La lógica pesada vive en los services (PanelService, CommandService)
+ * — este controller solo orquesta.
+ *
+ * Lo que este controller NO hace: decidir cuándo prender un actuador. Eso lo
+ * decide el ESP32 con los umbrales que le da DeviceConfigService. Desde acá
+ * el usuario solo puede pasar a modo manual y mandar órdenes puntuales.
  */
 class PanelController extends BaseController
 {
@@ -42,8 +43,9 @@ class PanelController extends BaseController
         $userId = $this->usuarioActual();
 
         // Si la cuenta aún no tiene dispositivos, mostramos la pantalla de
-        // bienvenida (3 CTAs: agregar dispositivo, ver demo o comprar). No se
-        // auto-crea nada en silencio: la demo es una acción explícita.
+        // bienvenida (CTAs: conectar dispositivo o comprar). No se auto-crea
+        // nada en silencio: el panel monitor solo aparece con un equipo real
+        // conectado por el QR de vinculación.
         $cantidadDispositivos = (new \App\Models\DeviceModel())
             ->where('user_id', $userId)
             ->countAllResults();
@@ -60,26 +62,6 @@ class PanelController extends BaseController
         return view('panel', [
             'panel' => (new PanelService())->obtenerVistaPanel($userId, $activeDeviceId),
         ]);
-    }
-
-    /**
-     * Crea un dispositivo + ambiente simulados etiquetados como Demo y
-     * redirige al panel. Es la acción explícita detrás del CTA
-     * "Ver demo del sistema" de la pantalla de bienvenida.
-     */
-    public function iniciarDemo(): RedirectResponse
-    {
-        $userId = $this->usuarioActual();
-
-        $cantidad = (new \App\Models\DeviceModel())
-            ->where('user_id', $userId)
-            ->countAllResults();
-
-        if ($cantidad === 0) {
-            (new DeviceProvisioningService())->ensureUserSetup($userId, [], true);
-        }
-
-        return redirect()->to('/panel')->with('success', 'Cargamos un dispositivo de demostración para que veas el panel en acción.');
     }
 
     // =========================================================================
@@ -200,34 +182,10 @@ class PanelController extends BaseController
         return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
     }
 
-    /** Página estática de compra (checkout simulado con MercadoPago). */
+    /** Página estática de compra (checkout con MercadoPago, sin cobro en línea). */
     public function compra(): string
     {
         return view('compra_mercadopago');
-    }
-
-    // =========================================================================
-    // MEDICION MANUAL
-    // =========================================================================
-    public function guardarMedicion()
-    {
-        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
-            return $redirect;
-        }
-
-        $datos = $this->leerDatosMedicion();
-
-        if ($redirect = $this->validarFormularioMedicion($datos)) {
-            return $redirect;
-        }
-
-        ['device' => $device, 'space' => $space] = $this->obtenerContexto();
-
-        $resultado = (new SimulationService())->createMeasurement($device, $space, 'web', $datos);
-
-        return $this->redirigirAlPanelConExito(
-            'Medición registrada correctamente. ' . $resultado['automation']['summary']
-        );
     }
 
     // =========================================================================
@@ -274,30 +232,29 @@ class PanelController extends BaseController
             return $this->redirigirAlPanelConError('Activa el modo manual para controlar actuadores.');
         }
 
-        (new CommandService())->queueAndExecuteManualCommand(
+        // La orden queda encolada. NO se marca como aplicada acá: el equipo la
+        // consulta, la ejecuta físicamente y recién entonces la confirma.
+        (new CommandService())->encolarComandoManual(
             (int) $device['id'],
             $actuador,
             $valor,
             $this->usuarioActual()
         );
 
-        return $this->redirigirAlPanelConExito('Acción aplicada correctamente.');
+        return $this->redirigirAlPanelConExito('Orden enviada. El equipo la aplica en unos segundos.');
     }
 
     // =========================================================================
     // ARMADO DEL PANEL
     // =========================================================================
-    private function crearPanel(): array
-    {
-        $userId = $this->usuarioActual();
-        (new DeviceProvisioningService())->ensureUserSetup($userId, [], false);
-
-        return (new PanelService())->obtenerDatos($userId);
-    }
-
+    /**
+     * Dispositivo y ambiente activos, para las acciones del panel (modo y
+     * actuadores). El guard redireccionarSiFaltaDispositivo() ya garantizó
+     * que la cuenta tenga al menos un dispositivo vinculado.
+     */
     private function obtenerContexto(): array
     {
-        $panel = $this->crearPanel();
+        $panel = (new PanelService())->obtenerDatos($this->usuarioActual());
 
         return [
             'device' => $panel['device_raw'],
@@ -308,33 +265,6 @@ class PanelController extends BaseController
     // =========================================================================
     // DATOS Y VALIDACION
     // =========================================================================
-    private function leerDatosMedicion(): array
-    {
-        return $this->request->getPost();
-    }
-
-    private function reglasMedicion(): array
-    {
-        return [
-            'temperature'       => 'permit_empty|decimal',
-            'humidity'          => 'permit_empty|decimal',
-            'co2_ppm'           => 'permit_empty|integer',
-            'air_quality_index' => 'permit_empty|integer|greater_than_equal_to[0]|less_than_equal_to[100]',
-            'notes'             => 'permit_empty|max_length[255]',
-        ];
-    }
-
-    private function validarFormularioMedicion(array $datos): ?RedirectResponse
-    {
-        if ($this->validateData($datos, $this->reglasMedicion())) {
-            return null;
-        }
-
-        return redirect()->to('/panel')
-            ->withInput()
-            ->with('error', implode(' ', array_values($this->validator->getErrors())));
-    }
-
     private function leerDatosPerfil(): array
     {
         return [
@@ -439,15 +369,17 @@ class PanelController extends BaseController
         return ($estado['operating_mode'] ?? 'automatic') === 'manual';
     }
 
+    /**
+     * El cambio de modo no acciona nada acá: solo queda anotado en
+     * `device_states`. El equipo lo lee la próxima vez que pide su
+     * configuración y a partir de ahí decide (automático) o se limita a
+     * obedecer los comandos del usuario (manual).
+     */
     private function crearMensajeCambioModo(string $modo, array $device, array $space): string
     {
-        if ($modo === 'manual') {
-            return 'Modo manual activado.';
-        }
-
-        $automatico = (new AutomationService())->processLatestMeasurement($device, $space);
-
-        return 'Modo automático activado. ' . $automatico['summary'];
+        return $modo === 'manual'
+            ? 'Modo manual activado. El equipo va a esperar tus órdenes.'
+            : 'Modo automático activado. El equipo vuelve a regularse solo.';
     }
 
     // =========================================================================
@@ -496,22 +428,18 @@ class PanelController extends BaseController
 
    Métodos públicos (responden a rutas):
    - index()                 → bienvenida (0 dispositivos) o panel monitor (≥1)
-   - iniciarDemo()           → crea dispositivo+ambiente simulados (CTA "Ver demo")
    - seleccionarDispositivo()→ guarda en sesión el dispositivo activo del switcher
    - perfil()                → muestra los datos del usuario
    - actualizarPerfil()      → guarda nombre/apellido/email/usuario (pide contraseña)
    - actualizarPassword()    → cambia la contraseña (pide la actual)
-   - compra()                → página de compra simulada
-   - guardarMedicion()       → registra una medición manual y corre automatización
+   - compra()                → página de compra (checkout sin cobro en línea)
    - cambiarModo()           → cambia automatic/manual vía CommandService
    - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual)
 
    Helpers privados:
    - dispositivoActivo()     → valida el active_device_id de sesión (pertenencia)
-   - crearPanel()            → asegura setup del usuario y pide datos a PanelService
    - obtenerContexto()       → devuelve device_raw y space_raw del panel
-   - leerDatos*()            → leen el POST (medición, perfil, password)
-   - reglasMedicion()        → reglas de validación de la medición manual
+   - leerDatos*()            → leen el POST (perfil, password)
    - validarFormulario*()    → corren la validación; null = OK, redirect = error
    - validarAutenticacionPerfil() → exige la contraseña actual para confirmar cambios
    - modoValido()/accionActuadorValida() → chequeo contra las listas blancas

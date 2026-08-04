@@ -11,9 +11,9 @@ namespace App\Services;
    `spaces` y resuelve los nombres legibles de cada ambiente.
    Es el único service SIN modelos: solo constantes y helpers
    (no toca la base de datos).
-   SE RELACIONA CON: lo usan DeviceClaimService y
-   DeviceProvisioningService (al crear ambientes), PanelService,
-   DispositivosController y AmbientesController (nombres legibles).
+   SE RELACIONA CON: lo usan DevicePairingService (al crear
+   ambientes), PanelService, DispositivosController y
+   AmbientesController (nombres legibles).
    ============================================================ */
 class EnvironmentPresetService
 {
