@@ -15,10 +15,35 @@ solo: donde queda el servidor y a que pin esta conectada cada cosa.
 # ---------------------------------------------------------------------------
 # Direccion de la web EdenAir. Sin barra al final.
 #
+# ESTE ES SOLO EL VALOR DE FABRICA. El equipo prefiere el que se haya
+# configurado desde el portal del celular (archivo servidor.json), asi que
+# mudar el equipo a otra red NO obliga a abrir Thonny: se cambia desde el
+# telefono, en "Opciones avanzadas" del portal.
+#
 # OJO: no sirve "localhost" ni "127.0.0.1". Para la ESP32, localhost es ella
 # misma. Tenes que poner la IP de la computadora que corre XAMPP dentro de
 # tu red WiFi (en Windows se averigua con `ipconfig`, campo IPv4).
-SERVIDOR = "http://192.168.1.194/piedra_castillo/public"
+SERVIDOR_DEFECTO = "http://192.168.2.130/piedra_castillo/public"
+
+
+def servidor():
+    """
+    Direccion del servidor que hay que usar ahora.
+
+    Primero la que configuro el usuario desde el portal; si no hay ninguna,
+    la de fabrica. Se lee en cada llamada (son pocas y el archivo es diminuto)
+    para que un cambio desde el portal tome efecto sin reiniciar.
+    """
+    try:
+        import json
+        with open(ARCHIVO_SERVIDOR) as f:
+            guardada = str(json.load(f).get("url", "")).strip().rstrip("/")
+            if guardada:
+                return guardada
+    except (OSError, ValueError, AttributeError):
+        pass
+
+    return SERVIDOR_DEFECTO
 
 # ---------------------------------------------------------------------------
 # PUNTO DE ACCESO DE CONFIGURACION
@@ -76,3 +101,14 @@ REINTENTO_RED = 15
 # equipo vuelve a arrancar como si fuera nuevo.
 ARCHIVO_WIFI = "wifi.json"
 ARCHIVO_CREDENCIALES = "credenciales.json"
+
+# Lo escribe el portal si el usuario cambia la direccion del servidor desde
+# "Opciones avanzadas". Si no existe, se usa SERVIDOR_DEFECTO.
+ARCHIVO_SERVIDOR = "servidor.json"
+
+# Codigo de un solo uso que el portal le entrega al celular para que pueda
+# seguir la vinculacion desde la web. Se escribe al configurar el WiFi y se
+# borra apenas el equipo queda vinculado. Sobrevive a un reinicio a proposito:
+# si la placa se reinicia entre el portal y el alta, el celular igual encuentra
+# su equipo en vez de quedarse esperando para siempre.
+ARCHIVO_SESION = "sesion.json"

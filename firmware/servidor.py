@@ -43,7 +43,9 @@ class Servidor:
     # Interno
     # -----------------------------------------------------------------------
     def _url(self, camino):
-        return config.SERVIDOR + camino
+        # config.servidor() y no config.SERVIDOR: la direccion puede haberse
+        # cambiado desde el portal del celular, sin reprogramar la placa.
+        return config.servidor() + camino
 
     def _headers(self, con_token=True):
         cabeceras = {"Content-Type": "application/json"}
@@ -84,15 +86,25 @@ class Servidor:
     # -----------------------------------------------------------------------
     # 1) Alta del equipo
     # -----------------------------------------------------------------------
-    def vincular(self, mac, firmware="1.0.0"):
+    def vincular(self, mac, firmware="1.0.0", sesion=None):
         """
         Se presenta con su MAC y pide credenciales.
 
         Devuelve (device_uid, api_token).
         Lanza SinVentana si el dueño todavia no apreto "Conectar" en la web.
+
+        `sesion` es el codigo que este equipo invento en su portal y que YA le
+        entrego al celular del usuario. Mandarlo aca es lo que le permite a ese
+        celular ver "quedo conectado" sin iniciar sesion: el servidor lo guarda
+        en la ventana de vinculacion y la pantalla del telefono lo encuentra.
         """
+        cuerpo = {"mac": mac, "firmware": firmware}
+
+        if sesion:
+            cuerpo["session"] = sesion
+
         estado, datos = self._pedir(
-            "POST", "/api/devices/pair", {"mac": mac, "firmware": firmware}, con_token=False
+            "POST", "/api/devices/pair", cuerpo, con_token=False
         )
 
         if estado == 202:

@@ -227,6 +227,57 @@ class DevicePairingService
         ];
     }
 
+    /**
+     * Estado de una ventana para el CELULAR, que llega con el código de sesión
+     * que le dio el portal del equipo y sin haber iniciado sesión.
+     *
+     * Devuelve lo mínimo indispensable: si ya se vinculó y cómo se llama el
+     * equipo. Nada de datos de la cuenta — el código es una credencial débil
+     * por diseño (vive 10 minutos y sirve para una sola vinculación), así que
+     * no puede abrir la puerta a nada más.
+     *
+     * @return array{estado:string, mensaje:string, device:?string}
+     */
+    public function estadoPorSesion(string $sesion): array
+    {
+        $this->ventanas->marcarVencidas();
+        $ventana = $this->ventanas->buscarPorSesion($sesion);
+
+        if (! $ventana) {
+            return [
+                'estado'  => 'desconocida',
+                'mensaje' => 'Todavía no recibimos a tu Eden Air. Si recién configuraste el WiFi, esperá unos segundos.',
+                'device'  => null,
+            ];
+        }
+
+        if ($ventana['status'] === 'vinculado') {
+            $device = $ventana['device_id'] ? $this->devices->find((int) $ventana['device_id']) : null;
+
+            return [
+                'estado'  => 'vinculado',
+                'mensaje' => 'Tu Eden Air quedó conectado y ya está midiendo.',
+                'device'  => $device['name'] ?? 'Tu Eden Air',
+            ];
+        }
+
+        if ($ventana['status'] === 'esperando') {
+            return [
+                'estado'  => 'esperando',
+                'mensaje' => 'Tu Eden Air se está conectando a la red…',
+                'device'  => null,
+            ];
+        }
+
+        return [
+            'estado'  => (string) $ventana['status'],
+            'mensaje' => $ventana['status'] === 'expirado'
+                ? 'Se agotó el tiempo de esta vinculación. Volvé a apretar "Conectar" en la web.'
+                : 'Esta vinculación se canceló.',
+            'device'  => null,
+        ];
+    }
+
     /** Cierra la ventana a pedido del usuario (botón "Cancelar"). */
     public function cancelar(string $token, int $userId): void
     {
@@ -253,7 +304,7 @@ class DevicePairingService
      *  - No hay ninguna ventana → 'sin_ventana': no es un error, es que el
      *    dueño todavía no apretó "Conectar". El firmware reintenta.
      *
-     * @param array{mac?:string, firmware?:string, nombre?:string} $datos
+     * @param array{mac?:string, firmware?:string, nombre?:string, session?:string} $datos
      * @return array{estado:string, mensaje:string, device:?array}
      */
     public function registrarDispositivo(array $datos, ?string $ipDispositivo = null): array
@@ -264,6 +315,10 @@ class DevicePairingService
             return ['estado' => 'invalido', 'mensaje' => 'El equipo no informó su MAC.', 'device' => null];
         }
 
+        // Código que inventó la ESP32 en su portal. Es el hilo que le permite al
+        // celular seguir la vinculación sin iniciar sesión.
+        $sesion = $this->limpiarSesion((string) ($datos['session'] ?? ''));
+
         // ¿Este equipo ya fue dado de alta antes? Le devolvemos lo suyo.
         $existente = $this->devices->where('mac_address', $mac)->first();
 
@@ -272,6 +327,14 @@ class DevicePairingService
                 'status'       => 'active',
                 'last_seen_at' => date('Y-m-d H:i:s'),
             ]);
+
+            // Reconfiguró el WiFi de un equipo que ya era suyo (se mudó de casa,
+            // cambió de router). No hay ventana abierta que cerrar, pero el
+            // celular sí está esperando en /vinculacion/seguir: se deja
+            // registrado el evento para que esa página pueda resolverse.
+            if ($sesion !== '') {
+                $this->registrarReconexion($existente, $sesion);
+            }
 
             return [
                 'estado'  => 'ok',
@@ -291,7 +354,41 @@ class DevicePairingService
             ];
         }
 
-        return $this->crearDispositivo($ventana, $mac, $datos);
+        return $this->crearDispositivo($ventana, $mac, $datos, $sesion);
+    }
+
+    /**
+     * Normaliza el código de sesión que llegó del equipo.
+     *
+     * Viene de afuera y termina en un WHERE, así que se acepta solamente
+     * hexadecimal y del largo que genera el firmware. Cualquier otra cosa se
+     * descarta entera en vez de intentar arreglarla.
+     */
+    private function limpiarSesion(string $sesion): string
+    {
+        $sesion = trim($sesion);
+
+        return preg_match('/^[0-9a-f]{8,32}$/i', $sesion) === 1 ? strtolower($sesion) : '';
+    }
+
+    /**
+     * Deja constancia de que un equipo YA vinculado volvió a presentarse con un
+     * código de sesión nuevo. Sin esto, el celular de alguien que reconfigura la
+     * red se quedaría esperando para siempre.
+     */
+    private function registrarReconexion(array $device, string $sesion): void
+    {
+        $this->ventanas->insert([
+            'user_id'      => (int) $device['user_id'],
+            'token'        => bin2hex(random_bytes(16)),
+            'session_code' => $sesion,
+            'ap_ssid'      => self::ssid(),
+            'ap_password'  => self::password(),
+            'status'       => 'vinculado',
+            'device_id'    => (int) $device['id'],
+            'expires_at'   => date('Y-m-d H:i:s', time() + self::MINUTOS_VENTANA * 60),
+            'completed_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**
@@ -338,7 +435,7 @@ class DevicePairingService
      * Crea ambiente (si hace falta) + dispositivo + estado inicial, y cierra la
      * ventana. Todo en una transacción: o queda todo, o no queda nada.
      */
-    private function crearDispositivo(array $ventana, string $mac, array $datos): array
+    private function crearDispositivo(array $ventana, string $mac, array $datos, string $sesion = ''): array
     {
         $userId = (int) $ventana['user_id'];
 
@@ -381,11 +478,19 @@ class DevicePairingService
             'updated_by'       => 'system',
         ]);
 
-        $this->ventanas->update((int) $ventana['id'], [
+        $cierre = [
             'status'       => 'vinculado',
             'device_id'    => $deviceId,
             'completed_at' => date('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        // Se guarda el código del portal recién ahora: es lo que hace que la
+        // página del celular pase de "conectando…" a "listo".
+        if ($sesion !== '') {
+            $cierre['session_code'] = $sesion;
+        }
+
+        $this->ventanas->update((int) $ventana['id'], $cierre);
 
         $db->transComplete();
 
@@ -476,6 +581,8 @@ class DevicePairingService
    Esperar (web):
    - estado($token, $userId)      → esperando | vinculado | expirado |
                                     cancelado | desconocida
+   - estadoPorSesion($codigo)     → lo mismo para el CELULAR, que llega con el
+                                    código del portal y sin iniciar sesión
    - cancelar($token, $userId)    → cierra la ventana a pedido del usuario
 
    El equipo aparece (API):

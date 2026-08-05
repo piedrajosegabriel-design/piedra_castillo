@@ -223,6 +223,11 @@ CREATE TABLE IF NOT EXISTS device_pairings (
     user_id INT UNSIGNED NOT NULL,
     -- Con este token el navegador pregunta "ya aparecio mi equipo?".
     token VARCHAR(64) NOT NULL,
+    -- Codigo que inventa la ESP32 en su portal y manda al vincularse. Deja que
+    -- el celular siga la vinculacion desde /vinculacion/seguir sin iniciar
+    -- sesion: es la unica forma de llevarlo al panel despues de configurar el
+    -- WiFi, porque el QR no le puede pasar nada a la placa.
+    session_code VARCHAR(32) NULL,
     -- Credenciales que viajan adentro del QR (el WiFi que publica el equipo).
     ap_ssid VARCHAR(64) NOT NULL,
     ap_password VARCHAR(64) NOT NULL,
@@ -237,7 +242,8 @@ CREATE TABLE IF NOT EXISTS device_pairings (
     PRIMARY KEY (id),
     UNIQUE KEY uq_pairing_token (token),
     KEY idx_pairing_estado (status, expires_at),
-    KEY idx_pairing_user (user_id)
+    KEY idx_pairing_user (user_id),
+    KEY idx_pairing_sesion (session_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- =========================================================
@@ -270,6 +276,7 @@ SELECT * FROM (
     UNION ALL SELECT '2026-05-31-000002', 'App\\Database\\Migrations\\CreateDeviceClaimSchema',      'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-05-31-000003', 'App\\Database\\Migrations\\AllowMultipleSpacesPerUser',   'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-08-02-000001', 'App\\Database\\Migrations\\ReplaceClaimCodesWithPairing', 'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-08-05-000001', 'App\\Database\\Migrations\\AddSessionCodeToPairings',     'default', 'App', UNIX_TIMESTAMP(), 1
 ) AS nuevas
 WHERE NOT EXISTS (SELECT 1 FROM migrations);
 
@@ -285,6 +292,30 @@ SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'devices' AND COLUMN_NAME = 'activation_code') > 0,
     'ALTER TABLE devices DROP COLUMN activation_code',
+    'DO 0'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- device_pairings.session_code: si la tabla se creo con una version anterior
+-- de este archivo, le falta la columna y el celular no podria seguir la
+-- vinculacion desde /vinculacion/seguir.
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_pairings' AND COLUMN_NAME = 'session_code') = 0,
+    'ALTER TABLE device_pairings ADD COLUMN session_code VARCHAR(32) NULL AFTER token',
+    'DO 0'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'device_pairings' AND INDEX_NAME = 'idx_pairing_sesion') = 0,
+    'ALTER TABLE device_pairings ADD INDEX idx_pairing_sesion (session_code)',
     'DO 0'
 );
 PREPARE stmt FROM @sql;

@@ -25,6 +25,7 @@ class DevicePairingModel extends Model
     protected $allowedFields = [
         'user_id',
         'token',
+        'session_code',
         'ap_ssid',
         'ap_password',
         'status',
@@ -42,6 +43,17 @@ class DevicePairingModel extends Model
     public function buscarPorToken(string $token): ?array
     {
         return $this->where('token', $token)->first();
+    }
+
+    /**
+     * Busca una ventana por el código de sesión que inventó la ESP32.
+     *
+     * Lo usa el celular al volver de configurar el WiFi: es lo único que
+     * lleva encima, porque en ese teléfono nadie inició sesión.
+     */
+    public function buscarPorSesion(string $sesion): ?array
+    {
+        return $this->where('session_code', $sesion)->first();
     }
 
     /**
@@ -80,6 +92,8 @@ class DevicePairingModel extends Model
 /* ============================================================================
    GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
    - buscarPorToken($token)   → la ventana que abrió ese navegador
+   - buscarPorSesion($cod)    → la ventana por el código que invento la ESP32
+                                (lo usa el celular, que no tiene sesión)
    - abiertas()               → ventanas vigentes (esperando y sin vencer)
    - marcarVencidas()         → pasa a 'expirado' las que se pasaron de hora
    - cancelarAbiertasDe($id)  → cierra las anteriores del mismo usuario, para

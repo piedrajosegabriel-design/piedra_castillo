@@ -1,10 +1,34 @@
 # Firmware del Eden Air (MicroPython)
 
-Codigo que corre **adentro de la ESP32**. Se edita y se sube con **Thonny**.
+Codigo que corre **adentro de la ESP32**.
 
 No tiene nada que ver con el PHP: son dos programas separados que se hablan
 por HTTP. Esta carpeta se puede abrir en Thonny sin tocar el resto del
 proyecto.
+
+---
+
+## QUIEN HACE QUE: Thonny NO es parte del producto
+
+Es la distincion mas importante de este documento, y la que mas confusion
+genera. Son dos roles distintos:
+
+| | Quien | Con que | Cuando |
+|---|---|---|---|
+| **Grabar el firmware** | Vos, armando el equipo | Thonny + cable USB | **Una vez por placa**, antes de entregarla |
+| **Conectar el equipo al WiFi** | **El cliente** | **Solo su celular** | Cada vez que cambia de red |
+
+**El cliente nunca instala Thonny, nunca ve un cable de datos y nunca abre un
+archivo `.py`.** Recibe la placa ya grabada, la enchufa, escanea el QR desde
+la web y elige su WiFi en una pagina que se abre sola en su telefono.
+
+Si en algun momento te encontras diciendo "el cliente tiene que abrir Thonny
+para...", eso es un bug de diseño. Lo unico que antes obligaba a eso era la
+direccion del servidor grabada en `config.py`; hoy se puede cambiar desde el
+propio portal del celular, en **Opciones avanzadas**.
+
+Todo lo que sigue en este README, salvo la seccion "Primer arranque", es
+trabajo de **fabricacion**.
 
 ---
 
@@ -121,7 +145,7 @@ Cuando termine, en la consola de Thonny (abajo) tiene que aparecer `>>>`.
 Es el unico archivo que hay que editar. Lo importante:
 
 ```python
-SERVIDOR = "http://192.168.1.100/piedra_castillo/public"
+SERVIDOR_DEFECTO = "http://192.168.1.100/piedra_castillo/public"
 ```
 
 > **Ojo con esto.** No sirve `localhost` ni `127.0.0.1`: para la ESP32,
@@ -131,6 +155,10 @@ SERVIDOR = "http://192.168.1.100/piedra_castillo/public"
 >
 > Esa computadora tiene que estar **en la misma red WiFi** que la ESP32, y con
 > Apache prendido.
+
+Es el **valor de fabrica**, no una condena: si despues la IP cambia, se
+corrige desde el portal del celular (*Opciones avanzadas*) y queda guardada en
+`servidor.json`. No hay que volver a abrir Thonny por un cambio de red.
 
 Despues revisa los pines (`PIN_VENTILADOR`, `PIN_I2C_SDA`, etc.) segun como
 tengas armado el circuito.
@@ -165,31 +193,72 @@ Entra a EdenAir y apreta 'Conectar'.
 
 ---
 
-## Primer arranque: como se conecta
+## Primer arranque: lo que hace EL CLIENTE
 
-La primera vez la placa no sabe ni el WiFi ni a que cuenta pertenece.
+**Esta es la unica seccion que le importa a quien compra el equipo.** Todo se
+hace desde el celular: no hay que instalar nada ni conectar ningun cable a la
+computadora.
 
-1. **Enchufas la placa.** Como no tiene WiFi guardado, crea su propia red:
+1. **Enchufa la placa.** Como no tiene WiFi guardado, crea su propia red:
    `EdenAir-Setup`.
-2. **En la web**, entras a *Mis dispositivos → Conectar dispositivo* y apretas
+2. **En la web**, entra a *Mis dispositivos → Conectar dispositivo* y aprieta
    **Conectar**. Aparece un QR.
-3. **Escaneas el QR con el celular.** El celular entra solo a `EdenAir-Setup`
-   y se abre la pagina que sirve `red.py`.
-4. **Elegis tu WiFi de casa** y ponés la clave. La placa la guarda en
-   `wifi.json` y se conecta.
-5. **La placa llama sola** a `POST /api/devices/pair` con su MAC. Como hay una
-   ventana abierta, el servidor la da de alta y le devuelve sus credenciales,
-   que quedan en `credenciales.json`.
-6. **La pagina lo detecta** y muestra "quedo conectado".
+3. **Escanea el QR con la camara del celular.** El telefono entra solo a
+   `EdenAir-Setup` y se abre la pagina que sirve `red.py`.
+4. **Elige su WiFi de casa y pone la clave.** La lista viene ordenada por
+   señal y con candado en las protegidas; el boton **Ver** deja leer la clave
+   mientras la escribe.
+5. **La placa prueba la clave.** Si anda, guarda `wifi.json` y sigue. Si esta
+   mal, **vuelve a levantar `EdenAir-Setup`** y al reconectarse el cliente
+   encuentra un cartel rojo que le dice exactamente que paso.
+6. **El portal le da un boton "Ver mi Eden Air"** que apunta a
+   `/vinculacion/seguir?s=CODIGO`. Cuando el celular vuelve solo a su WiFi
+   normal, el cliente lo toca y cae en una pantalla que le muestra su equipo
+   ya conectado, **sin iniciar sesion**.
+7. **La placa llama sola** a `POST /api/devices/pair` con su MAC y ese mismo
+   codigo. Como hay una ventana abierta, el servidor la da de alta y le
+   devuelve sus credenciales, que quedan en `credenciales.json`.
+8. **Las dos pantallas lo detectan**: la de la computadora y la del celular.
 
 De ahi en mas la placa arranca directo: lee `wifi.json` y `credenciales.json`
-y se pone a medir.
+y se pone a medir. El celular no vuelve a hacer falta.
 
-### Empezar de cero
+### Por que el codigo lo inventa la placa y no la web
 
-Si queres que la placa se olvide de todo, borra desde Thonny los archivos
-`wifi.json` y `credenciales.json` del dispositivo. En el proximo arranque
-vuelve a pedir configuracion.
+Es la pregunta que siempre aparece: *¿por que el QR no lleva el link y listo?*
+
+Un QR con una URL abre el navegador, pero **no puede cambiar de red WiFi al
+telefono**. Y el formulario de configuracion tiene que vivir en la ESP32,
+porque es el unico que puede recibir la clave del WiFi de la casa. Para llegar
+a el, el celular tiene que estar antes en `EdenAir-Setup`, y lo unico que hace
+eso solo es un QR de tipo `WIFI:`.
+
+Ademas, cuando la web dibuja el QR todavia no existe ningun canal hacia la
+placa: no esta en ninguna red. Asi que el dato no puede ir web -> placa.
+
+Por eso viaja al reves: **la placa inventa el codigo** y lo reparte por dos
+caminos que se encuentran en el servidor.
+
+    ESP32 ──(boton del portal)──> celular ──> /vinculacion/seguir?s=CODIGO
+      │                                                  ↑
+      └──(POST /api/devices/pair, session)──> servidor ──┘
+
+### Si el equipo se muda a otra red
+
+El cliente repite los pasos 1 a 5. Para que la placa vuelva a abrir su portal
+hay que borrarle el WiFi viejo; como no queremos obligarlo a usar Thonny, la
+placa lo hace sola: si la red guardada ya no responde, **reabre el portal
+automaticamente** (ver `asegurar_conexion()`).
+
+### Si cambio la computadora donde corre EdenAir
+
+En el portal, **Opciones avanzadas → Direccion del servidor**. Se guarda en
+`servidor.json` y pisa el `SERVIDOR_DEFECTO` de `config.py`. Sin Thonny.
+
+### Empezar de cero (fabricacion)
+
+Para dejar una placa como recien salida, borra desde Thonny los archivos
+`wifi.json`, `credenciales.json` y `servidor.json` del dispositivo.
 
 ---
 
@@ -215,7 +284,7 @@ Cinco llamadas. Estan en `servidor.py`, una funcion por cada una.
 
 | Metodo | Ruta | Para que |
 |---|---|---|
-| POST | `/api/devices/pair` | Darse de alta. Devuelve `device_uid` y `api_token`. **200** = vinculado, **202** = todavia nadie apreto "Conectar" |
+| POST | `/api/devices/pair` | Darse de alta. Devuelve `device_uid` y `api_token`. **200** = vinculado, **202** = todavia nadie apreto "Conectar". Lleva tambien `session`: el codigo que el portal ya le dio al celular |
 | GET | `/api/devices/{uid}/config` | Con que umbrales decidir, y en que modo esta |
 | POST | `/api/devices/{uid}/measurements` | Subir la medicion y que actuadores quedaron encendidos |
 | GET | `/api/devices/{uid}/commands/pending` | Ordenes manuales del usuario |
@@ -268,16 +337,28 @@ probar sin hardware.
 
 ## Problemas frecuentes
 
+### Los que puede resolver el cliente solo
+
+| Sintoma | Que hacer |
+|---|---|
+| La pagina del portal no se abre sola | Abrir el navegador y entrar a `http://192.168.4.1`. Si tiene **DNS privado** activado en Android, desactivarlo: bloquea el portal |
+| "Esta red no tiene internet" y el celular se sale | Es normal, esa red es el equipo. Elegir "mantener conexion" y apagar datos moviles un minuto |
+| Cartel rojo: `La contraseña no es correcta` | Volver a escribirla usando el boton **Ver**. Mayusculas y minusculas importan |
+| Cartel rojo: `No se encontro la red` | La red esta apagada o lejos. Acercar el equipo al router |
+| Su red no aparece en la lista | Elegir **✎ Otra red** y escribir el nombre a mano (redes ocultas) |
+| El celular no encuentra `EdenAir-Setup` | La placa ya esta conectada a un WiFi. Si ese WiFi ya no existe, la placa reabre el portal sola en menos de un minuto |
+
+### Los de fabricacion (necesitan Thonny)
+
 | Sintoma | Causa probable |
 |---|---|
 | `ImportError: no module named 'urequests'` | Falta instalar la libreria (paso 2) |
 | `ImportError: no module named 'reglas'` | Subiste solo `main.py`. Hay que subir los 7 |
 | `No se detecta el SCD41 en I2C` | Cableado, o los pines de `config.py` no coinciden |
-| `No se pudo contactar al servidor` | Pusiste `localhost` en vez de la IP real, o Apache esta apagado, o la PC esta en otra red |
+| `No se pudo contactar al servidor` | La IP del servidor esta mal, o Apache apagado, o la PC en otra red. **Se corrige desde el portal**, no hace falta Thonny |
 | Se queda en `Todavia nadie apreto 'Conectar'` | Correcto: entra a la web y apreta Conectar. Reintenta solo cada 15 s |
 | El actuador funciona al reves | Cambia `RELES_INVERTIDOS` en `config.py` |
 | Aprieto un boton del panel y no pasa nada | Ese actuador esta en `None` en `config.py`. La orden queda pendiente a proposito: el equipo no confirma algo que no hizo |
-| El celular no encuentra `EdenAir-Setup` | La placa ya tiene WiFi guardado. Borra `wifi.json` desde Thonny |
 
 ---
 

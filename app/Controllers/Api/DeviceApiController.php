@@ -40,7 +40,12 @@ class DeviceApiController extends BaseController
     // No manda ningún código: queda asociado a la cuenta que en ese momento
     // tenga abierta la ventana de vinculación (el usuario apretó "Conectar").
     //
-    // Cuerpo esperado:  { "mac": "A1:B2:C3:D4:E5:F6", "firmware": "1.0.0" }
+    // `session` es el código que el equipo inventó en su portal de configuración
+    // y que ya le entregó al celular del usuario. Guardarlo acá es lo que le
+    // permite a ese celular seguir la vinculación sin iniciar sesión.
+    //
+    // Cuerpo esperado:
+    //   { "mac": "A1:B2:C3:D4:E5:F6", "firmware": "1.0.0", "session": "a1b2..." }
     // =========================================================================
     public function pair()
     {
@@ -50,6 +55,7 @@ class DeviceApiController extends BaseController
             'mac'      => (string) ($payload['mac'] ?? ''),
             'firmware' => (string) ($payload['firmware'] ?? ''),
             'nombre'   => (string) ($payload['nombre'] ?? ''),
+            'session'  => (string) ($payload['session'] ?? ''),
         ], $this->request->getIPAddress());
 
         if ($resultado['estado'] === 'invalido') {

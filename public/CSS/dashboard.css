@@ -2844,6 +2844,21 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-pair-net dt { margin: 0; color: var(--ea-mute); }
 .ea-pair-net dd { margin: 0; font-family: var(--ea-font-mono); font-size: 13px; color: var(--ea-ink); font-weight: 600; }
 
+/* Anticipa lo que el usuario va a ver en el celular: sin esto, el aviso de
+   "esta red no tiene internet" y la pagina que no abre sola se leen como
+   fallas del producto y la gente abandona la vinculacion a mitad de camino. */
+.ea-pair-hints {
+    margin: 0 0 18px;
+    padding: 0 0 0 18px;
+    display: grid;
+    gap: 7px;
+    list-style: disc;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ea-mute);
+}
+.ea-pair-hints b { color: var(--ea-ink-2); font-weight: 600; }
+
 .ea-pair-status {
     display: flex;
     align-items: center;

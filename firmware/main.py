@@ -61,6 +61,29 @@ def guardar_credenciales(device_uid, api_token):
 # ---------------------------------------------------------------------------
 # Alta del equipo
 # ---------------------------------------------------------------------------
+def avisar_reconexion(api, sesion):
+    """
+    Le dice al servidor que este equipo —que ya estaba vinculado— volvio a la
+    red con un codigo de seguimiento nuevo.
+
+    NO es critico: si falla, el equipo funciona igual y lo unico que pasa es
+    que la pantalla del celular no se entera. Por eso son dos intentos y
+    seguimos, en vez del reintento infinito del alta normal.
+    """
+    for intento in range(2):
+        try:
+            api.vincular(red.mac(), sesion=sesion)
+            print("Aviso de reconexion enviado.")
+            break
+        except (ErrorServidor, SinVentana) as e:
+            print("No se pudo avisar la reconexion (%s)." % e)
+            if intento == 0:
+                time.sleep(3)
+
+    # Se descarta igual: sirvio o no sirvio, pero ya no vale para otra vez.
+    red.olvidar_sesion()
+
+
 def obtener_credenciales(api):
     """
     Consigue device_uid y api_token.
@@ -68,23 +91,42 @@ def obtener_credenciales(api):
     Si ya los tiene guardados, los usa. Si no, se presenta al servidor con su
     MAC y espera a que alguien apriete "Conectar" en la web. Reintenta para
     siempre: el equipo puede estar enchufado antes de que el dueño entre.
+
+    Junto con la MAC viaja el codigo de sesion que el portal le entrego al
+    celular. Es lo que hace que el telefono, al tocar "Ver mi Eden Air", vea
+    su equipo ya conectado sin tener que iniciar sesion.
     """
     device_uid, api_token = leer_credenciales()
+    sesion = red.leer_sesion()
 
     if device_uid and api_token:
         api.device_uid = device_uid
         api.api_token = api_token
         print("Credenciales ya guardadas. UID:", device_uid)
+
+        # Equipo que ya era de alguien y acaba de reconfigurar su WiFi (se
+        # mudo, cambio de router). No necesita credenciales nuevas, pero hay
+        # un celular esperando en la pantalla de seguimiento: avisamos.
+        if sesion:
+            avisar_reconexion(api, sesion)
+
         return
 
     mi_mac = red.mac()
+
     print("Equipo sin vincular. MAC:", mi_mac)
     print("Entra a EdenAir y apreta 'Conectar'.")
 
     while True:
         try:
-            device_uid, api_token = api.vincular(mi_mac)
+            device_uid, api_token = api.vincular(mi_mac, sesion=sesion)
             guardar_credenciales(device_uid, api_token)
+
+            # El codigo ya cumplio: el celular pudo ver el equipo. Dejarlo
+            # guardado no aporta nada y lo reusariamos por error en la
+            # proxima reconfiguracion de red.
+            red.olvidar_sesion()
+
             print("Vinculado. UID:", device_uid)
             return
         except SinVentana:

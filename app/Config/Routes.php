@@ -21,6 +21,14 @@ $routes->get('/', 'AccesoController::inicio');
 $routes->get('portfolio',     'PortfolioController::index');
 $routes->get('portfolio.php', 'PortfolioController::index');
 
+// Seguimiento de la vinculación desde el CELULAR. Es público a propósito:
+// el teléfono que acaba de configurar el WiFi del equipo no tiene sesión
+// iniciada, y obligarlo a loguearse ahí rompería todo el flujo del QR.
+// La credencial es el código de sesión que le dio el portal de la placa:
+// aleatorio, de un solo uso y con la misma vida que la ventana (10 min).
+$routes->get('vinculacion/seguir',        'VinculacionController::seguir');
+$routes->get('vinculacion/seguir/estado', 'VinculacionController::estado');
+
 // =============================================================================
 // 2) GRUPO GUEST — solo para usuarios SIN sesión.
 // El filtro 'guest' (app/Filters/GuestFilter.php) redirige a /panel si ya

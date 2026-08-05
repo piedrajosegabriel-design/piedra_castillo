@@ -76,8 +76,13 @@ $minutos  = $minutos ?? 10;
                         <ol class="ea-pair-steps">
                             <li><b>1</b><span>Enchufá el equipo y esperá unos segundos.<small>Si todavía no tiene WiFi configurado, crea su propia red para que puedas configurarlo.</small></span></li>
                             <li><b>2</b><span>Escaneá el QR con la cámara del celular.<small>El celular se conecta solo a la red del equipo, sin escribir contraseñas.</small></span></li>
-                            <li><b>3</b><span>Elegí tu WiFi de casa en la pantalla que se abre sola.<small>El Eden Air se conecta y aparece acá en unos segundos.</small></span></li>
+                            <li><b>3</b><span>Elegí tu WiFi de casa en la pantalla que se abre sola.<small>Ahí escribís la clave de <b>tu</b> WiFi. El Eden Air se conecta y aparece acá en unos segundos.</small></span></li>
                         </ol>
+
+                        <p class="ea-step-lede" style="margin-top:18px;font-size:13.5px;">
+                            <b>No necesitás instalar nada.</b> Todo se hace desde el celular:
+                            ni cables ni programas.
+                        </p>
 
                         <button type="button" class="ea-button ea-button-primary ea-button-buy ea-pair-cta" data-pair-start>
                             Conectar
@@ -99,6 +104,17 @@ $minutos  = $minutos ?? 10;
                                     Tu celular te va a ofrecer conectarse a la red del equipo. Aceptá, y en la
                                     pantalla que se abre sola elegí el WiFi de tu casa y poné su contraseña.
                                 </p>
+
+                                <ul class="ea-pair-hints">
+                                    <li>Si tu celular avisa que <b>“esta red no tiene internet”</b>, es normal:
+                                        esa red es el propio Eden Air. Elegí mantener la conexión.</li>
+                                    <li>Si la pantalla no se abre sola, entrá desde el navegador del celular a
+                                        <b>http://192.168.4.1</b></li>
+                                    <li>Si te equivocás en la clave, el equipo te lo avisa y podés reintentar
+                                        sin volver a empezar.</li>
+                                    <li>Al terminar, el equipo te ofrece un botón <b>«Ver mi Eden Air»</b>:
+                                        podés seguir todo desde el celular sin volver a esta pantalla.</li>
+                                </ul>
 
                                 <dl class="ea-pair-net">
                                     <div><dt>Red del equipo</dt><dd data-pair-ssid><?= esc($ssid) ?></dd></div>
