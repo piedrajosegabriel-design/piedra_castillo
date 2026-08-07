@@ -132,7 +132,11 @@ buscan con Ctrl+F.
 | `eden-core-3d.js` | landing | Núcleo 3D del hero (Three.js, módulo ES). |
 | `portfolio.js` / `portfolio-gsap.js` | portfolio | Scrollspy + gráficos Chart.js / animaciones. |
 | `dashboard.js` / `dashboard-gsap.js` | área privada | Loader, sidebar, "ver más" / scroll suave + reveals. |
-| `login.js`, `registro.js`, `panel.js`, `ambiente.js` | sus vistas | Interacciones puntuales de cada formulario. |
+| `acceso.js` | login, registro, recuperar, restablecer | Mostrar/ocultar contraseña y bloqueo del botón al enviar. |
+| `registro.js` | registro | Medidor de seguridad y coincidencia de contraseñas. |
+| `conectar.js` / `vinculacion.js` | conexión por QR | Sondeo del estado de la vinculación. |
+| `compra.js` | compra | Aviso de compra simulada. |
+| `navbar.js` | páginas públicas | Mega menú de Portfolio. |
 
 **Convención `*-gsap.js`:** la interacción "funcional" (menús, formularios)
 vive en el JS base de la página; **todo lo que es animación** vive en el
@@ -172,7 +176,45 @@ al final invita a comprar.
 
 ## 3. El dashboard
 
-### 3.1 Sidebar único — `app/Views/partials/dashboard_sidebar.php`
+### 3.0 Layout único — `app/Views/layouts/panel.php`
+
+Las 8 pantallas internas comparten un solo esqueleto: `<head>`, menú lateral,
+barra superior, mensajes flash y scripts viven **una sola vez**, en el layout.
+Cada vista escribe únicamente su contenido:
+
+```php
+<?php $this->setData([
+    'tituloPagina'  => 'EdenAir · Mis dispositivos',
+    'sidebarActivo' => 'dispositivos',
+    'cabecera'      => ['titulo' => 'Mis dispositivos', 'bajada' => '2 vinculados'],
+]) ?>
+<?= $this->extend('layouts/panel') ?>
+<?= $this->section('contenido') ?>
+    ... solo el HTML de esta pantalla ...
+<?= $this->endSection() ?>
+```
+
+Opciones del layout: `tituloPagina`, `descripcion`, `sidebarActivo`,
+`cantidadEquipos`, `cabecera`, `claseContenido`, `attrsApp`, `conLoader`,
+`conScrollSuave`, `scripts`. Están documentadas en el encabezado del archivo.
+
+**Agregar un botón a la barra superior** es una línea en la config de la vista,
+sin copiar clases de otro botón:
+
+```php
+'cabecera' => ['titulo' => '...', 'botones' => [
+    ['texto' => 'Conectar', 'href' => site_url('panel/dispositivos/conectar'), 'icono' => 'mas'],
+]],
+```
+
+Las piezas del layout: `partials/panel_header.php` (barra superior),
+`partials/panel_sidebar.php` (menú), `partials/flashes.php` (avisos) y
+`partials/panel_loader.php` (pantalla de carga, solo en `/panel`).
+
+Las cuatro pantallas de acceso usan el mismo mecanismo con
+`layouts/acceso.php`.
+
+### 3.1 Sidebar único — `app/Views/partials/panel_sidebar.php`
 
 Componente reutilizable presente en **todas** las vistas internas.
 
@@ -238,7 +280,7 @@ se ve en el dashboard siempre corresponde a un equipo de esa cuenta.
 **Conecta con:**
 - `DispositivosController::conectar` (pantalla del QR).
 - `PanelController::compra` (vista compra).
-- `partials/dashboard_sidebar` con `$active='inicio'` y `$devicesCount=0`.
+- `partials/panel_sidebar` con `$active='inicio'` y `$devicesCount=0`.
 
 ### 3.3 Panel monitor — `app/Views/panel.php`
 
@@ -288,7 +330,7 @@ if ($activeDeviceId !== null) {
 **Conecta con:**
 - `PanelService::obtenerVistaPanel`, `PanelService::obtenerDatos`.
 - `PanelController::seleccionarDispositivo` (POST del switcher).
-- `partials/dashboard_sidebar` con `$active='inicio'`.
+- `partials/panel_sidebar` con `$active='inicio'`.
 
 ### 3.4 Mis dispositivos — `app/Views/dispositivos/index.php`
 
@@ -497,7 +539,7 @@ ffmpeg -ss 00:00:03 -i origen.mp4 -frames:v 1 -q:v 3 eden-air-exploded-poster.jp
 - `app/Models/DeviceActivationCodeModel.php`
 - `app/Database/Migrations/2026-05-31-000002_CreateDeviceClaimSchema.php`
 - `app/Database/Migrations/2026-05-31-000003_AllowMultipleSpacesPerUser.php`
-- `app/Views/partials/dashboard_sidebar.php`
+- `app/Views/partials/panel_sidebar.php`
 - `app/Views/panel/bienvenida.php`
 - `app/Views/dispositivos/index.php`
 - `app/Views/dispositivos/agregar.php`
@@ -650,7 +692,7 @@ Casos que conviene mirar:
 | 8 | 7 ambientes sugeridos | ✅ Catálogo de `EnvironmentPresetService` (editable en /panel/ambientes) |
 | 9 | Múltiples dispositivos por cuenta + switcher | ✅ `active_device_id` en sesión |
 | 10 | Sección "Ambientes" en el dashboard | ✅ `/panel/ambientes` + editar |
-| 11 | Sidebar único en TODAS las vistas internas | ✅ `partials/dashboard_sidebar.php` |
+| 11 | Sidebar único en TODAS las vistas internas | ✅ `partials/panel_sidebar.php` |
 | 12 | Orden del menú: Inicio · Dispositivos · Ambientes · Automatizaciones · Plan · Perfil | ✅ |
 | 13 | "Editar datos" dentro de Perfil | ✅ |
 | 14 | "Comprar" como CTA destacado | ✅ `.ea-sidebar-item--cta` |
@@ -688,7 +730,7 @@ Casos que conviene mirar:
 | **Punto de acceso de configuración** | El WiFi que publica la ESP32 cuando todavía no tiene red (`EdenAir-Setup`). Es una constante del firmware, porque la web arma el QR sin poder preguntarle nada al equipo. |
 | **Claim code** *(obsoleto)* | Código `EDEN-XXXX-XXXX` del flujo viejo. **Eliminado**: ya no existe la tabla ni el paso. |
 | **Catálogo de ambientes** | `EnvironmentPresetService::PRESETS` — perfiles con sus rangos de confort. |
-| **Sidebar único** | `partials/dashboard_sidebar.php` — mismo componente en todas las vistas internas. |
+| **Sidebar único** | `partials/panel_sidebar.php` — mismo componente en todas las vistas internas. |
 | **CTA destacado** | Botón con identidad propia, gradiente y glow (clase `.ea-button-buy` o `.ea-sidebar-item--cta`). |
 | **`data-reveal`** | Atributo que activa la animación de aparición al entrar en viewport. |
 | **`prefers-reduced-motion`** | Preferencia del SO; si está activa, se evitan las animaciones grandes y los videos no autoreproducen. |
@@ -750,7 +792,7 @@ if (! $ambiente || (int) $ambiente['user_id'] !== $userId) {
 ```
 
 ```php
-// partials/dashboard_sidebar.php — clase activa y aria-current basadas en $active.
+// partials/panel_sidebar.php — clase activa y aria-current basadas en $active.
 $cls  = fn($key) => $active === $key ? 'ea-sidebar-item is-active' : 'ea-sidebar-item';
 $aria = fn($key) => $active === $key ? ' aria-current="page"' : '';
 ```

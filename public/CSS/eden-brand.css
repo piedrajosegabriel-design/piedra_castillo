@@ -1040,6 +1040,80 @@ body.ea-nav-open {
     overflow: hidden;
 }
 
+/* ---------- Interruptor claro / oscuro --------------------------------
+   El HTML está en app/Views/partials/theme_toggle.php y la lógica en
+   public/JS/tema.js. Antes este bloque viajaba embebido en el propio partial
+   y se repetía en cada página que lo incluía; vive acá porque todas cargan
+   este archivo. dashboard.css lo achica para la barra del panel con
+   selectores más específicos (.ea-header .ea-theme-switch ...). ------- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    background: var(--eden-100);
+    border: 1px solid var(--ea-rule);
+    border-radius: 999px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: var(--ea-card);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(20, 32, 26, 0.18);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--eden-700);
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ea-theme-sun  { opacity: 1; transform: scale(1); }
+.ea-theme-moon { opacity: 0; transform: scale(0.4) rotate(-25deg); }
+
+/* Encendido = modo oscuro: la pastilla se corre y cambia sol por luna. */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: var(--eden-800);
+    border-color: var(--eden-700);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(26px);
+    background: var(--eden-700);
+    color: var(--eden-100);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun  { opacity: 0; transform: scale(0.4) rotate(25deg); }
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon { opacity: 1; transform: scale(1) rotate(0); }
+
 /* ---------- Botones --------------------------------------------------- */
 .ea-button,
 .ea-button-primary,

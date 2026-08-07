@@ -1,56 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <?= view('partials/head', ['title' => 'EdenAir | Recuperar Contraseña']) ?>
-</head>
-<body class="ea-body">
-<div class="ea-shell">
-    <?= view('partials/navbar', [
-        'subtitle' => 'Recuperación de cuenta',
-        'actions'  => '<a href="' . site_url('login') . '" class="ea-button ea-button-secondary">Iniciar Sesión</a>',
-    ]) ?>
+<?php
+/**
+ * RECUPERAR CONTRASEÑA — pide el mail y manda el enlace.
+ * Ruta: /recuperar · Controlador: AccesoController::recuperar / procesarRecuperacion
+ *
+ * El enlace que se envía por mail lleva un token de 15 minutos y cae en
+ * /restablecer/{token} (ver restablecer_password.php).
+ */
+$this->setData([
+    'tituloPagina' => 'EdenAir | Recuperar Contraseña',
+    'navSubtitulo' => 'Recuperación de cuenta',
+    'navBoton'     => ['texto' => 'Iniciar Sesión', 'href' => site_url('login')],
+    'scripts'      => ['JS/acceso.js'],
+    'encabezado'   => [
+        'sobretitulo' => 'Seguridad',
+        'titulo'      => '¿Olvidaste tu contraseña?',
+        'bajada'      => 'Ingresá el correo electrónico asociado a tu cuenta.',
+    ],
+]);
+?>
+<?= $this->extend('layouts/acceso') ?>
+<?= $this->section('contenido') ?>
 
-    <main class="ea-auth">
-        <section class="ea-auth-main">
-            <div class="ea-auth-card">
-                <div>
-                    <p class="ea-eyebrow">Seguridad</p>
-                    <h1>¿Olvidaste tu contraseña?</h1>
-                    <p class="ea-lede">Ingresá el correo electrónico asociado a tu cuenta.</p>
-                </div>
+    <form action="<?= site_url('recuperar') ?>" method="POST" class="ea-form" novalidate
+          data-enviando="Enviando…">
+        <?= csrf_field() ?>
 
-                <?php if (session()->getFlashdata('error')): ?>
-                    <div class="ea-message ea-message--error"><?= esc(session()->getFlashdata('error')) ?></div>
-                <?php endif; ?>
+        <div class="ea-field">
+            <label for="email">Correo electrónico</label>
+            <input type="email" name="email" id="email" required
+                   placeholder="correo@dominio.com"
+                   value="<?= esc(old('email')) ?>"
+                   autocomplete="email">
+        </div>
 
-                <form action="<?= site_url('recuperar') ?>" method="POST" id="formRecuperar" class="ea-form" novalidate>
-                    <?= csrf_field() ?>
+        <p class="ea-hint">
+            Revisá tu bandeja de entrada (y la carpeta de spam) tras enviar la solicitud.
+            El enlace adjunto tendrá una validez de 15 minutos.
+        </p>
 
-                    <div class="ea-field">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" name="email" id="email"
-                               placeholder="correo@dominio.com"
-                               value="<?= esc(old('email')) ?>"
-                               autocomplete="email" required>
-                    </div>
+        <button type="submit" class="ea-button ea-button-primary ea-button-block">
+            Enviar enlace de recuperación
+        </button>
 
-                    <p class="ea-hint">
-                        Revisá tu bandeja de entrada (y la carpeta de spam) tras enviar la solicitud. El enlace adjunto tendrá una validez de 15 minutos.
-                    </p>
+        <div class="ea-auth-foot">
+            <a href="<?= site_url('login') ?>" class="ea-auth-link">Volver al login</a>
+        </div>
+    </form>
 
-                    <button type="submit" class="ea-button ea-button-primary ea-button-block" id="botonRecuperar">
-                        Enviar enlace de recuperación
-                    </button>
-
-                    <div class="ea-auth-foot">
-                        <a href="<?= site_url('login') ?>" class="ea-auth-link">Volver al login</a>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </main>
-</div>
-
-<script src="<?= base_url('JS/tema.js') ?>"></script>
-</body>
-</html>
+<?= $this->endSection() ?>

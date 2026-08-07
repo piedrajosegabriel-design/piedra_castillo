@@ -88,5 +88,8 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = [];
+    // 'eden' = app/Helpers/eden_helper.php: icono(), marca_e() y asset().
+    // Se carga siempre para que cualquier vista pueda usarlas sin acordarse
+    // de llamar a helper('eden').
+    public $helpers = ['eden'];
 }

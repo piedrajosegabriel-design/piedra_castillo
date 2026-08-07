@@ -1,99 +1,77 @@
+/**
+ * EdenAir — registro: medidor de seguridad y coincidencia de contraseñas.
+ *
+ * Lo genérico (mostrar/ocultar la contraseña, bloquear el botón al enviar)
+ * NO está acá: vive en acceso.js, compartido con el resto de las pantallas.
+ * Este archivo solo tiene lo propio del alta de una cuenta.
+ */
 document.addEventListener("DOMContentLoaded", function () {
-    var formRegistro = document.getElementById("formRegistro");
-    var password = document.getElementById("registroPassword");
+    var password     = document.getElementById("registroPassword");
     var confirmacion = document.getElementById("confirmPassword");
-    var botonVer = document.getElementById("verPasswordRegistro");
-    var barra = document.getElementById("fuerzaBarra");
-    var textoFuerza = document.getElementById("fuerzaTexto");
-    var textoCoincide = document.getElementById("coincideTexto");
-    var botonRegistro = document.getElementById("botonRegistro");
+    var barra        = document.getElementById("fuerzaBarra");
+    var textoFuerza  = document.getElementById("fuerzaTexto");
+    var textoIgual   = document.getElementById("coincideTexto");
 
-    function puntajePassword(valor) {
-        var puntaje = 0;
+    if (!password) return;
 
-        if (valor.length >= 8) puntaje += 30;
-        if (/[a-z]/.test(valor)) puntaje += 20;
-        if (/[A-Z]/.test(valor)) puntaje += 20;
-        if (/\d/.test(valor)) puntaje += 20;
-        if (/[^A-Za-z0-9]/.test(valor)) puntaje += 10;
+    var ROJO  = "#be5159";
+    var AMBAR = "#c67a26";
+    var VERDE = "#3f8b5e";
 
-        return Math.min(puntaje, 100);
+    /* -------------------- Medidor de seguridad -------------------- */
+
+    /** Puntaje 0-100 según largo y variedad de caracteres. */
+    function puntaje(valor) {
+        var total = 0;
+        if (valor.length >= 8)            total += 30;
+        if (/[a-z]/.test(valor))          total += 20;
+        if (/[A-Z]/.test(valor))          total += 20;
+        if (/\d/.test(valor))             total += 20;
+        if (/[^A-Za-z0-9]/.test(valor))   total += 10;
+        return Math.min(total, 100);
     }
 
     function actualizarFuerza() {
-        if (!password || !barra || !textoFuerza) {
-            return;
-        }
+        if (!barra || !textoFuerza) return;
 
-        var puntaje = puntajePassword(password.value);
-        barra.style.width = Math.max(puntaje, 10) + "%";
+        var valor = puntaje(password.value);
+        barra.style.width = Math.max(valor, 10) + "%";
 
-        if (puntaje < 40) {
-            barra.style.backgroundColor = "#be5159";
+        if (valor < 40) {
+            barra.style.backgroundColor = ROJO;
             textoFuerza.textContent = "Seguridad baja.";
-            return;
-        }
-
-        if (puntaje < 75) {
-            barra.style.backgroundColor = "#c67a26";
+        } else if (valor < 75) {
+            barra.style.backgroundColor = AMBAR;
             textoFuerza.textContent = "Seguridad media.";
-            return;
+        } else {
+            barra.style.backgroundColor = VERDE;
+            textoFuerza.textContent = "Seguridad alta.";
         }
-
-        barra.style.backgroundColor = "#3f8b5e";
-        textoFuerza.textContent = "Seguridad alta.";
     }
 
+    /* -------------------- ¿Coinciden las dos contraseñas? -------------------- */
     function actualizarCoincidencia() {
-        if (!password || !confirmacion || !textoCoincide) {
-            return;
-        }
+        if (!confirmacion || !textoIgual) return;
 
         if (confirmacion.value === "") {
-        textoCoincide.textContent = "Esperando confirmación de contraseña.";
-            textoCoincide.style.color = "";
-            return;
+            textoIgual.textContent = "Esperando confirmación de contraseña.";
+            textoIgual.style.color = "";
+        } else if (password.value === confirmacion.value) {
+            textoIgual.textContent = "Las contraseñas coinciden.";
+            textoIgual.style.color = VERDE;
+        } else {
+            textoIgual.textContent = "Las contraseñas no coinciden.";
+            textoIgual.style.color = ROJO;
         }
-
-        if (password.value === confirmacion.value) {
-        textoCoincide.textContent = "Las contraseñas coinciden.";
-            textoCoincide.style.color = "#3f8b5e";
-            return;
-        }
-
-        textoCoincide.textContent = "Las contraseñas no coinciden.";
-        textoCoincide.style.color = "#be5159";
     }
 
-    if (botonVer && password) {
-        botonVer.addEventListener("click", function () {
-            var oculto = password.type === "password";
-            password.type = oculto ? "text" : "password";
-
-            if (confirmacion) {
-                confirmacion.type = oculto ? "text" : "password";
-            }
-
-            botonVer.textContent = oculto ? "Ocultar" : "Mostrar";
-        });
-    }
-
-    if (password) {
-        password.addEventListener("input", function () {
-            actualizarFuerza();
-            actualizarCoincidencia();
-        });
-    }
+    password.addEventListener("input", function () {
+        actualizarFuerza();
+        actualizarCoincidencia();
+    });
 
     if (confirmacion) {
         confirmacion.addEventListener("input", actualizarCoincidencia);
-    }
-
-    if (formRegistro && botonRegistro) {
-        formRegistro.addEventListener("submit", function () {
-            botonRegistro.disabled = true;
-            botonRegistro.textContent = "Creando cuenta...";
-        });
     }
 
     actualizarFuerza();

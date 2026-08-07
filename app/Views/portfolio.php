@@ -1293,22 +1293,16 @@ $sitemap = [
 <!-- ===== SCRIPTS DE LA PÁGINA =====
      GSAP (CDN) → tema.js → Chart.js (CDN, gráficos de la encuesta) →
      portfolio.js (interacción) → portfolio-gsap.js (animaciones) →
-     ea-scrollbar.js. $eaJsBust agrega ?v=mtime para invalidar caché. -->
-<?php
-    $eaJsBust = static function (string $relativePath): string {
-        $abs = FCPATH . $relativePath;
-        $v   = is_file($abs) ? filemtime($abs) : time();
-        return base_url($relativePath) . '?v=' . $v;
-    };
-?>
+     ea-scrollbar.js. asset() agrega ?v=mtime para que el navegador no
+     sirva la versión vieja. -->
 <!-- GSAP + ScrollTrigger + ScrollSmoother (CDN cdnjs) — todos libres desde GSAP 3.13 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= asset('JS/tema.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/portfolio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/portfolio-gsap.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/ea-scrollbar.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= asset('JS/portfolio.js') ?>"></script>
+<script src="<?= asset('JS/portfolio-gsap.js') ?>"></script>
+<script src="<?= asset('JS/ea-scrollbar.js') ?>"></script>
 </body>
 </html>

@@ -1,3 +1,25 @@
+/**
+ * EdenAir — comportamiento común de todas las pantallas del panel.
+ * Lo carga layouts/panel.php, así que corre en las 8 vistas internas.
+ *
+ * QUÉ HACE (cada bloque está marcado más abajo):
+ *   1. Loader        · saca la pantalla de carga cuando la página está lista
+ *   2. Header        · mide su alto real y lo publica como --ead-header-h,
+ *                      para que el contenido no le quede debajo
+ *   3. Anclas        · los links #seccion bajan suave, respetando el header
+ *   4. Reveal        · muestra los .ea-reveal al entrar en pantalla
+ *   5. Ver más       · despliega el resto de las lecturas
+ *   6. Confirmación  · diálogo de "¿seguro?" antes de enviar ciertos formularios
+ *   7. Sidebar       · abrir/cerrar, modo escritorio vs. móvil, Escape
+ *
+ * SE ENGANCHA POR ATRIBUTOS, no por ids:
+ *   [data-dashboard-app]      el contenedor del panel
+ *   [data-dashboard-loader]   la pantalla de carga
+ *   [data-sidebar-toggle]     la hamburguesa      [data-sidebar-backdrop] el fondo
+ *   [data-readings-toggle]    el botón "Ver más"
+ *   [data-preserve-scroll]    formulario que, al volver, mantiene el scroll
+ *   [data-confirm-form]       formulario que pide confirmación
+ */
 document.addEventListener("DOMContentLoaded", function () {
     var body = document.body;
     var app = document.querySelector("[data-dashboard-app]");
@@ -5,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var loader = document.querySelector("[data-dashboard-loader]");
     var toggle = document.querySelector("[data-sidebar-toggle]");
     var backdrop = document.querySelector("[data-sidebar-backdrop]");
-    var links = document.querySelectorAll(".sidebar-link");
     var preserveForms = document.querySelectorAll("[data-preserve-scroll]");
     var confirmForms = document.querySelectorAll("[data-confirm-form]");
     var mobileQuery = window.matchMedia("(max-width: 960px)");
@@ -120,7 +141,6 @@ document.addEventListener("DOMContentLoaded", function () {
             history.replaceState(null, "", href);
         }
 
-        setActiveLink(href);
         closeMobileSidebar();
     });
 
@@ -132,49 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Pequeña espera para que el layout haya estabilizado tras el loader
         window.setTimeout(function () { scrollToTarget(target); }, 60);
     }
-
-    /* -------------------- Scroll spy -------------------- */
-    var navLinks = Array.prototype.slice.call(document.querySelectorAll('.sidebar-link[href^="#"]'));
-    var sections = navLinks
-        .map(function (link) {
-            var id = link.getAttribute("href").slice(1);
-            var el = document.getElementById(id);
-            return el ? { id: id, el: el, link: link } : null;
-        })
-        .filter(Boolean);
-
-    function setActiveLink(hash) {
-        navLinks.forEach(function (link) {
-            link.classList.toggle("is-active", link.getAttribute("href") === hash);
-        });
-    }
-
-    var spyTicking = false;
-    function updateSpy() {
-        if (sections.length === 0) return;
-        var offset = getHeaderOffset() + 12;
-        var current = sections[0];
-        for (var i = 0; i < sections.length; i++) {
-            var rect = sections[i].el.getBoundingClientRect();
-            if (rect.top - offset <= 0) {
-                current = sections[i];
-            } else {
-                break;
-            }
-        }
-        setActiveLink("#" + current.id);
-    }
-
-    window.addEventListener("scroll", function () {
-        if (spyTicking) return;
-        spyTicking = true;
-        window.requestAnimationFrame(function () {
-            updateSpy();
-            spyTicking = false;
-        });
-    }, { passive: true });
-
-    updateSpy();
 
     /* -------------------- Scroll reveal (sutil, accesible) -------------------- */
     if ("IntersectionObserver" in window && !reducedMotionQuery.matches) {
@@ -409,8 +386,11 @@ document.addEventListener("DOMContentLoaded", function () {
         backdrop.addEventListener("click", closeMobileSidebar);
     }
 
-    links.forEach(function (link) {
-        link.addEventListener("click", closeMobileSidebar);
+    // En móvil el menú lateral es un cajón encima del contenido: al elegir una
+    // opción hay que cerrarlo. (Antes buscaba ".sidebar-link", una clase que no
+    // existe en el HTML, así que nunca se cerraba.)
+    document.querySelectorAll(".ea-sidebar-item").forEach(function (opcion) {
+        opcion.addEventListener("click", closeMobileSidebar);
     });
 
     preserveForms.forEach(function (form) {

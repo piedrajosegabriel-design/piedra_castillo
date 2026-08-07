@@ -421,12 +421,14 @@ body.dashboard-body { overflow-x: hidden; }
 
 /* =====================================================================
    APP SHELL
+   Acá está solo la entrada (el desvanecido del loader). La POSICIÓN del
+   sidebar, el header y el main vive toda junta al final del archivo, en
+   "LAYOUT FIJO": son fixed porque ScrollSmoother rompe cualquier cosa
+   sticky que quede adentro de #smooth-content.
    ===================================================================== */
 .ea-dashboard {
-    display: grid;
-    grid-template-columns: var(--ead-sb-w) 1fr;
     min-height: 100vh;
-    transition: grid-template-columns 0.25s ease, opacity 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .dashboard-body.dashboard-loading .ea-dashboard {
@@ -441,16 +443,14 @@ body.dashboard-body { overflow-x: hidden; }
     transform: none;
 }
 
-.ea-dashboard.sidebar-closed { grid-template-columns: var(--ead-sb-w-collapsed) 1fr; }
-
-.ea-main { min-width: 0; display: flex; flex-direction: column; }
+.ea-main { min-width: 0; }
 
 /* =====================================================================
    SIDEBAR
+   Pinta y ordena. La posición (fixed, ancho, colapsado) está en
+   "LAYOUT FIJO", al final del archivo.
    ===================================================================== */
 .ea-sidebar {
-    position: sticky;
-    top: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -703,10 +703,11 @@ body.dashboard-body { overflow-x: hidden; }
 
 /* =====================================================================
    HEADER
+   Pinta y ordena. La posición (fixed, corrido por el ancho del sidebar)
+   está en "LAYOUT FIJO", al final del archivo.
    ===================================================================== */
 .ea-header,
 .dashboard-header {
-    position: sticky;
     top: 0;
     z-index: 30;
     display: flex;
@@ -848,6 +849,15 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 .ea-header-tools { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Botones que cada pantalla agrega a la barra superior.
+   Se llenan desde 'botones' en la config de la vista (partials/panel_header.php),
+   así que un botón nuevo ya sale bien alineado sin tocar este CSS. */
+.ea-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .ea-header-user {
     display: inline-flex;
@@ -2405,9 +2415,6 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 @media (max-width: 960px) {
-    .ea-dashboard { grid-template-columns: 1fr; }
-    .ea-dashboard.sidebar-closed { grid-template-columns: 1fr; }
-
     .ea-sidebar {
         position: fixed;
         top: 0;
@@ -2445,8 +2452,8 @@ body.dashboard-body { overflow-x: hidden; }
 
 @media (max-width: 680px) {
     /* Header en dos filas: fila 1 = burger + título + tema + usuario;
-       fila 2 = chips informativos / selector de dispositivo. Así nada se
-       superpone ni se corta. La altura real la sincroniza dashboard.js. */
+       fila 2 = chips, selector de dispositivo y botones de la pantalla. Así
+       nada se superpone ni se corta. La altura la sincroniza dashboard.js. */
     .ea-header,
     .dashboard-header { flex-wrap: wrap; }
     .ea-header::after,
@@ -2456,7 +2463,8 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-header-tools { order: 2; margin-left: auto; }
     .ea-header-user { order: 3; }
     .ea-header .ea-chip,
-    .ea-header .ea-device-switcher { order: 5; margin-top: 2px; }
+    .ea-header .ea-device-switcher,
+    .ea-header-actions { order: 5; margin-top: 2px; }
 
     .ea-hero { padding: 22px; }
     .ea-hero-side { flex-direction: column; }
@@ -2492,15 +2500,13 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 /* =====================================================================
-   LAYOUT FIJO — sidebar y header siempre position:fixed
-   Reemplaza el layout de CSS grid. Necesario para que ScrollSmoother
-   funcione: los elementos sticky/fixed no pueden vivir dentro de
-   #smooth-content porque el transform de GSAP los rompe.
+   LAYOUT FIJO — dónde se para cada pieza del panel.
+   Sidebar y header son position:fixed en todas las resoluciones. Tiene
+   que ser así para que ScrollSmoother funcione: el transform de GSAP
+   rompe cualquier sticky/fixed que quede adentro de #smooth-content.
+   Como salen del flujo, el shell es un simple bloque y el hueco lo
+   compensa .ea-main con margin-left + padding-top.
    ===================================================================== */
-
-/* Shell: ya no necesita el grid — sidebar y header salen del flujo */
-.ea-dashboard { display: block; }
-.ea-dashboard.sidebar-closed { grid-template-columns: unset; }
 
 /* ---- Sidebar: fija en TODAS las resoluciones ----------------------- */
 .ea-sidebar {
@@ -2547,8 +2553,6 @@ body.dashboard-body { overflow-x: hidden; }
 
 /* ---- Mobile (≤960px) ----------------------------------------------- */
 @media (max-width: 960px) {
-    .ea-dashboard { display: block; }
-
     /* Header cubre todo el ancho en mobile */
     .ea-header,
     .dashboard-header { left: 0; transition: none; }
@@ -2758,6 +2762,11 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-wizard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; }
 .ea-wizard-nav .ea-button { min-width: 120px; }
+/* Variante con los botones pegados a la izquierda (pantalla del QR). */
+.ea-wizard-nav--izq { justify-content: flex-start; }
+
+/* Formulario de una sola columna que no se estira a lo ancho del panel. */
+.ea-form-angosto { max-width: 620px; }
 
 /* =====================================================================
    "Conectá tu Eden Air" — pantalla única con QR de vinculación
@@ -2806,6 +2815,7 @@ body.dashboard-body { overflow-x: hidden; }
     font-weight: 600;
 }
 .ea-pair-steps small { display: block; color: var(--ea-mute); font-size: 13px; }
+.ea-pair-nota-final { margin-top: 18px; font-size: 13.5px; }
 .ea-pair-cta { min-width: 220px; font-size: 15.5px; padding: 13px 26px; }
 
 /* ---------- En vivo: QR + espera ---------- */

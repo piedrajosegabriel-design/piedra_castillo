@@ -555,4 +555,33 @@ document.addEventListener("DOMContentLoaded", function () {
         updateTextsVisibility(0);
         syncExperience();
     }
+
+    /* -------- Video "Ingeniería interna": reproduce solo si está en pantalla --------
+       Ahorra CPU y batería, y respeta prefers-reduced-motion (con movimiento
+       reducido queda el póster estático). Antes vivía como <script> suelto
+       adentro de inicio.php. */
+    var techVideo = document.querySelector("[data-ea-tech-video]");
+    if (techVideo) {
+        if (reducedMotion) {
+            techVideo.removeAttribute("autoplay");
+            techVideo.removeAttribute("loop");
+            try { techVideo.pause(); } catch (e) {}
+        } else {
+            var playTech = function () {
+                var p = techVideo.play();
+                if (p && typeof p.catch === "function") p.catch(function () {});
+            };
+
+            if ("IntersectionObserver" in window) {
+                new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) playTech();
+                        else { try { techVideo.pause(); } catch (e) {} }
+                    });
+                }, { threshold: 0.25 }).observe(techVideo);
+            } else {
+                playTech();
+            }
+        }
+    }
 });

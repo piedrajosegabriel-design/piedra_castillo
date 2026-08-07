@@ -7,7 +7,7 @@
     <div class="ea-page">
         <div class="ea-footer-inner">
             <div>
-                <?= view('partials/logo', ['tone' => 'cream', 'size' => 38]) ?>
+                <?= view('partials/logo', ['logo' => ['tone' => 'cream', 'size' => 38]]) ?>
                 <p>
                     Plataforma de monitoreo y control ambiental conectada a un módulo ESP32.
                     Hecha para que cada habitación sea su propio pequeño edén.

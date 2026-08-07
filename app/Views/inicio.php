@@ -76,7 +76,7 @@ ob_start(); ?>
         <div class="ea-mobile-nav-actions">
             <div class="ea-mobile-nav-theme">
                 <span class="ea-mobile-nav-theme-label">Tema</span>
-                <?= view('partials/theme_toggle', ['unique' => '-mobile']) ?>
+                <?= view('partials/theme_toggle', ['toggle' => ['sufijo' => '-movil']]) ?>
             </div>
             <a href="#comprar" class="ea-button ea-button-primary ea-button-block ea-button-buy">Comprar Eden Air</a>
             <?php if ($conSesion): ?>
@@ -863,58 +863,18 @@ ob_start(); ?>
 
 <!-- ===== SCRIPTS DE LA PÁGINA =====
      Orden de carga: librerías GSAP (CDN) → tema.js (claro/oscuro) →
-     inicio.js (menú + datos) → inicio-gsap.js (todas las animaciones de
-     scroll) → ea-scrollbar.js (barra custom) → eden-core-3d.js (módulo
-     Three.js del hero). $eaJsBust agrega ?v=mtime para invalidar caché. -->
-<?php
-    $eaJsBust = function (string $relativePath): string {
-        $abs = FCPATH . $relativePath;
-        $v   = is_file($abs) ? filemtime($abs) : time();
-        return base_url($relativePath) . '?v=' . $v;
-    };
-?>
+     inicio.js (menú, datos y el video de "Ingeniería interna") →
+     inicio-gsap.js (todas las animaciones de scroll) → ea-scrollbar.js
+     (barra custom) → eden-core-3d.js (módulo Three.js del hero).
+     asset() agrega ?v=mtime para que el navegador no sirva la versión vieja. -->
 <!-- GSAP + ScrollTrigger + ScrollSmoother (CDN cdnjs) — todos libres desde GSAP 3.13 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/tema.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/inicio.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/inicio-gsap.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script src="<?= htmlspecialchars($eaJsBust('JS/ea-scrollbar.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
-<script>
-/* Video "Ingeniería interna": reproduce solo cuando está en pantalla.
-   Ahorra CPU/batería y respeta prefers-reduced-motion. */
-(function () {
-    var video = document.querySelector("[data-ea-tech-video]");
-    if (!video) return;
-
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-        // Sin movimiento: mostramos el póster estático y no autoreproducimos.
-        video.removeAttribute("autoplay");
-        video.removeAttribute("loop");
-        try { video.pause(); } catch (e) {}
-        return;
-    }
-
-    var intentarPlay = function () {
-        var p = video.play();
-        if (p && typeof p.catch === "function") { p.catch(function () {}); }
-    };
-
-    if ("IntersectionObserver" in window) {
-        var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) { intentarPlay(); }
-                else { try { video.pause(); } catch (e) {} }
-            });
-        }, { threshold: 0.25 });
-        io.observe(video);
-    } else {
-        intentarPlay();
-    }
-})();
-</script>
+<script src="<?= asset('JS/tema.js') ?>"></script>
+<script src="<?= asset('JS/inicio.js') ?>"></script>
+<script src="<?= asset('JS/inicio-gsap.js') ?>"></script>
+<script src="<?= asset('JS/ea-scrollbar.js') ?>"></script>
 <script type="importmap">
 {
     "imports": {
@@ -923,6 +883,6 @@ ob_start(); ?>
     }
 }
 </script>
-<script type="module" src="<?= htmlspecialchars($eaJsBust('JS/eden-core-3d.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script type="module" src="<?= asset('JS/eden-core-3d.js') ?>"></script>
 </body>
 </html>
