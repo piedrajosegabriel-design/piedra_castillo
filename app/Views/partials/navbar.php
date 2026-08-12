@@ -43,6 +43,7 @@ $portfolioSections = [
     ['anchor' => 'analisis-mercado',     'label' => 'Análisis de mercado',        'hint' => 'TP Nº 2 · Emprendimientos'],
     ['anchor' => 'analisis-competencia', 'label' => 'Análisis de la competencia', 'hint' => 'Comparativa con otros'],
     ['anchor' => 'plan-operativo',       'label' => 'Plan operativo',             'hint' => 'Etapas y recursos'],
+    ['anchor' => 'analisis-costos',      'label' => 'Análisis de costos',         'hint' => 'TP Nº 5 · Costos y precio'],
 ];
 
 // Dentro del propio portfolio los enlaces son anclas sueltas; desde afuera
@@ -102,7 +103,7 @@ $hasNavList = $navLinks !== [] || $portfolioMenu;
                                 <div class="ea-mega-foot">
                                     <span class="ea-mega-foot-tag">
                                         <span class="ea-mega-foot-dot" aria-hidden="true"></span>
-                                        Apartado actual · <strong>Análisis de mercado</strong>
+                                        Apartado actual · <strong>Análisis de costos</strong>
                                     </span>
                                     <a href="<?= esc($portfolioUrl) ?>" class="ea-mega-foot-link">Abrir portfolio →</a>
                                 </div>

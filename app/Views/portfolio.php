@@ -16,6 +16,11 @@
    ============================================================================= */
 $conSesion = (bool) session()->get('user_id');
 
+// Precio de venta del equipo: sale del análisis de costos (sección 07) y es el
+// mismo número que muestra la landing. Se escribe una sola vez, acá.
+$precioVenta    = 450000;
+$precioVentaTxt = '$' . number_format($precioVenta, 0, ',', '.');
+
 $landingLinks = [
     ['href' => site_url('/') . '#inicio',         'label' => 'Inicio'],
     ['href' => site_url('/') . '#que-es',         'label' => 'Qué es'],
@@ -33,6 +38,7 @@ $internalSections = [
     ['anchor' => 'analisis-mercado',     'label' => 'Análisis de mercado'],
     ['anchor' => 'analisis-competencia', 'label' => 'Análisis de la competencia'],
     ['anchor' => 'plan-operativo',       'label' => 'Plan operativo'],
+    ['anchor' => 'analisis-costos',      'label' => 'Análisis de costos'],
 ];
 
 $sitemap = [
@@ -42,6 +48,7 @@ $sitemap = [
     ['n' => '04', 'anchor' => 'analisis-mercado',     'title' => 'Análisis de mercado',         'lede' => 'TP Nº 2 · Investigación, encuesta y reflexión.',    'status' => 'is-focus',    'status_label' => 'Prioritario'],
     ['n' => '05', 'anchor' => 'analisis-competencia', 'title' => 'Análisis de la competencia',  'lede' => 'Comparativa frente a otros productos del rubro.',   'status' => 'is-research', 'status_label' => 'En investigación'],
     ['n' => '06', 'anchor' => 'plan-operativo',       'title' => 'Plan operativo',              'lede' => 'Etapas, recursos y línea de tiempo del proyecto.',  'status' => 'is-progress', 'status_label' => 'En curso'],
+    ['n' => '07', 'anchor' => 'analisis-costos',      'title' => 'Análisis de costos',         'lede' => 'TP Nº 5 · Costos, precio de venta y punto muerto.', 'status' => 'is-active',   'status_label' => 'Desarrollado'],
 ];
 
 ?>
@@ -120,7 +127,7 @@ $sitemap = [
                     </p>
 
                     <span class="ea-pf-hero__current">
-                        Trabajo Práctico Nº 2 ·&nbsp;<strong>Análisis de Mercado</strong>
+                        Trabajo Práctico Nº 5 ·&nbsp;<strong>Análisis de Costos</strong>
                     </span>
 
                     <div class="ea-pf-hero__actions">
@@ -167,7 +174,7 @@ $sitemap = [
         <!-- ============================================================
              Sitemap — Mapa visual del recorrido
              ============================================================ -->
-        <section class="ea-pf-sitemap" aria-labelledby="ea-pf-sitemap-title">
+        <section class="ea-pf-sitemap" aria-labelledby="ea-pf-sitemap-title" data-reveal>
             <div class="ea-page">
                 <header class="ea-pf-sitemap__head">
                     <div>
@@ -175,13 +182,13 @@ $sitemap = [
                         <h2 class="ea-pf-h ea-pf-h2" id="ea-pf-sitemap-title">Mapa del <em>portfolio</em>.</h2>
                     </div>
                     <p class="ea-pf-lede" style="max-width: 38ch;">
-                        Seis paradas para entender, validar y proyectar Eden Air. Toca cualquier card para saltar a esa sección.
+                        Siete paradas para entender, validar y proyectar Eden Air. Toca cualquier card para saltar a esa sección.
                     </p>
                 </header>
 
                 <div class="ea-pf-sitemap__grid">
                     <?php foreach ($sitemap as $tile): ?>
-                        <a href="#<?= esc($tile['anchor']) ?>" class="ea-pf-tile">
+                        <a href="#<?= esc($tile['anchor']) ?>" class="ea-pf-tile" data-reveal-child>
                             <div class="ea-pf-tile__head">
                                 <span class="ea-pf-tile__num"><?= esc($tile['n']) ?></span>
                                 <span class="ea-pf-status <?= esc($tile['status']) ?>"><?= esc($tile['status_label']) ?></span>
@@ -960,6 +967,7 @@ $sitemap = [
                 $competidores = [
                     [
                         'name' => 'Xiaomi', 'model' => 'Smart Air Purifier 4', 'eden' => false,
+                        'prestacion' => 'Purifica · no mide CO₂', 'precio_ref' => 200,
                         'vals' => [
                             'localizacion'    => 'China · venta global e importación',
                             'productos'       => 'Purificador con filtro HEPA y app Mi Home',
@@ -981,6 +989,7 @@ $sitemap = [
                     ],
                     [
                         'name' => 'Dyson', 'model' => 'Purifier Cool', 'eden' => false,
+                        'prestacion' => 'Purifica y mide gases', 'precio_ref' => 575,
                         'vals' => [
                             'localizacion'    => 'Reino Unido / Singapur · presencia oficial',
                             'productos'       => 'Purificador + ventilador con app Dyson Link',
@@ -1002,6 +1011,7 @@ $sitemap = [
                     ],
                     [
                         'name' => 'Netatmo', 'model' => 'Healthy Home Coach', 'eden' => false,
+                        'prestacion' => 'Solo mide e informa', 'precio_ref' => 115,
                         'vals' => [
                             'localizacion'    => 'Francia (grupo Legrand)',
                             'productos'       => 'Monitor ambiental (CO₂, temp, humedad, ruido)',
@@ -1023,6 +1033,7 @@ $sitemap = [
                     ],
                     [
                         'name' => 'Airthings', 'model' => 'View Plus', 'eden' => false,
+                        'prestacion' => 'Solo mide e informa', 'precio_ref' => 275,
                         'vals' => [
                             'localizacion'    => 'Noruega · envío internacional',
                             'productos'       => 'Monitor de calidad de aire (radón, CO₂, PM, COV)',
@@ -1044,10 +1055,11 @@ $sitemap = [
                     ],
                     [
                         'name' => 'Eden Air', 'model' => 'Eden Air Core', 'eden' => true,
+                        'prestacion' => 'Mide, decide y actúa', 'precio_ref' => null,
                         'vals' => [
                             'localizacion'    => 'Río Tercero, Córdoba (Argentina) · proyecto local',
                             'productos'       => 'Monitoreo + ambientación automática (dispositivo + dashboard)',
-                            'precio'           => 'USD 5 (precio de referencia) · todo incluido',
+                            'precio'           => $precioVentaTxt . ' ARS · pago único (todo incluido)',
                             'pagos'            => 'MercadoPago; preparado para tarjeta/transferencia',
                             'materia'          => 'ESP32, sensores, actuadores y carcasa reutilizable',
                             'marca'            => 'Identidad propia, tecnológica y sustentable',
@@ -1064,6 +1076,10 @@ $sitemap = [
                         ],
                     ],
                 ];
+                // Nota al pie del cuadro: va igual debajo de la tabla y del acordeón.
+                $compNota = 'Precios de la competencia <strong>estimativos / de referencia</strong>, '
+                    . 'en dólares (importación y tiendas oficiales). El de Eden Air es el precio de '
+                    . 'venta local calculado en <a href="#analisis-costos">07 · Análisis de costos</a>.';
                 ?>
 
                 <!-- Tabla comparativa (scroll horizontal en pantallas chicas) -->
@@ -1094,7 +1110,7 @@ $sitemap = [
                             </tbody>
                         </table>
                     </div>
-                    <p class="ea-comp-note">* Precios <strong>estimativos / a verificar</strong>, según mercado de referencia (importación y tiendas oficiales). Datos orientativos para la comparación académica.</p>
+                    <p class="ea-comp-note">* <?= $compNota ?></p>
                 </div>
 
                 <!-- Versión móvil: acordeón por competidor -->
@@ -1112,7 +1128,7 @@ $sitemap = [
                             </dl>
                         </details>
                     <?php endforeach; ?>
-                    <p class="ea-comp-note">* Precios estimativos / a verificar. Datos orientativos para la comparación académica.</p>
+                    <p class="ea-comp-note">* <?= $compNota ?></p>
                 </div>
 
                 <!-- Análisis y conclusión (Parte B del TP) -->
@@ -1267,6 +1283,545 @@ $sitemap = [
                         <span class="ea-pf-status is-pending">Pendiente</span>
                     </article>
                 </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             07 · Análisis de costos · TP Nº 5
+             Se lee como una historia: el precio, el laboratorio para jugar
+             con los números, de qué está hecho, cómo se fijó. El desarrollo
+             académico completo queda plegado al final (<details>) para no
+             tapar la sección con tablas.
+             ============================================================ -->
+        <section class="ea-pf-section ea-cost" id="analisis-costos" data-reveal>
+            <div class="ea-page">
+                <header class="ea-pf-section-head">
+                    <div class="ea-pf-section-head__meta">
+                        <span class="ea-pf-section-num">07</span>
+                        <span class="ea-pf-eyebrow">TP Nº 5 · Emprendimientos</span>
+                    </div>
+                    <div>
+                        <h2 class="ea-pf-h ea-pf-h2">Análisis de <em>costos</em>.</h2>
+                        <p class="ea-pf-lede">Qué cuesta fabricar un Eden Air, a cuánto se vende y desde qué unidad empieza a dar ganancia.</p>
+                    </div>
+                </header>
+
+                <?php
+                // --- Cifras base del análisis (única fuente de toda la sección) ---
+                // Cambiás un número acá y se recalculan tablas, gráficos y textos.
+                $costo = [
+                    'unidades'     => 15,             // unidades a producir por mes
+                    'horas_unidad' => 8,              // horas de producción por unidad
+                    'valor_hora'   => 5000,           // $ de la hora de mano de obra
+                    'mpd_unidad'   => 220000,         // $ de materia prima directa por unidad
+                    'precio_venta' => $precioVenta,   // $ definido arriba de todo (lo comparte la landing)
+                ];
+
+                // Materia prima directa, agrupada por subsistema del equipo.
+                $costoInsumos = [
+                    'Cerebro y sensores' => [
+                        [1, 'Placa ESP32 DevKitC-32 (módulo ESP32-WROOM-32)'],
+                        [1, 'Sensor SCD41 de CO₂, temperatura y humedad'],
+                        [1, 'Módulo sensor MQ-135 de calidad de aire'],
+                        [1, 'Receptor infrarrojo VS1838B'],
+                    ],
+                    'Actuadores' => [
+                        [1, 'Módulo relé optoacoplado de 2 canales, 5 V'],
+                        [1, 'Mini ventilador de 5 V'],
+                        [1, 'Módulo atomizador ultrasónico de 5 V con placa controladora'],
+                        [1, 'Emisor infrarrojo KY-005'],
+                        [3, 'LEDs de 5 mm (verde, rojo y azul)'],
+                    ],
+                    'Alimentación' => [
+                        [1, 'Fuente switching regulada de 5 V y 3 A'],
+                        [1, 'Adaptador jack hembra 5,5 × 2,1 mm a bornera'],
+                        [1, 'Bloque distribuidor de alimentación de 2 polos'],
+                        [1, 'Interruptor SPST para 5 V y 3 A'],
+                        [2, 'Adaptadores USB-A hembra a bornera'],
+                        [1, 'Cable USB de datos para programar la ESP32'],
+                        [1, 'Cable USB para el atomizador (USB-A a USB-C)'],
+                    ],
+                    'Electrónica de soporte' => [
+                        [1, 'Protoboard grande'],
+                        [3, 'Kits de cables Dupont'],
+                        [3, 'Resistencias de 220 Ω y 330 Ω para los LEDs'],
+                        [1, 'Resistencia de 20 kΩ del divisor del MQ-135'],
+                        [1, 'Resistencia de 10 kΩ del divisor del MQ-135'],
+                        [1, 'Transistor NPN BC337 o 2N2222'],
+                        [1, 'Resistencia de 1 kΩ para la base del transistor'],
+                        [1, 'Resistencia de 220 Ω del emisor infrarrojo'],
+                    ],
+                    'Montaje' => [
+                        [1, 'Base de MDF o acrílico'],
+                        ['-',  'Cable flexible rojo y negro'],
+                        ['-',  'Tubos termocontraíbles de varios diámetros'],
+                        ['-',  'Separadores, tornillos y tuercas'],
+                        ['-',  'Precintos y sujetacables'],
+                    ],
+                ];
+
+                // Costos fijos del mes: agregás o sacás filas y el total se recalcula solo.
+                $costoFijos = [
+                    'Sueldo administrativo (part time)'           => 400000,
+                    'Publicidad y gestión de redes'               => 80000,
+                    'Energía eléctrica'                           => 60000,
+                    'Servicio de internet'                        => 50000,
+                    'Amortización de herramientas'                => 35000,
+                    'Hosting y dominio del sistema web'           => 25000,
+                ];
+
+                // --- Todo lo demás se deriva: ningún número escrito dos veces ---
+                $c = $costo;
+                $c['mpd_total']    = $c['mpd_unidad'] * $c['unidades'];
+                $c['horas_mes']    = $c['horas_unidad'] * $c['unidades'];
+                $c['mod_unidad']   = $c['horas_unidad'] * $c['valor_hora'];
+                $c['mod_total']    = $c['horas_mes'] * $c['valor_hora'];
+                $c['var_total']    = $c['mpd_total'] + $c['mod_total'];
+                $c['fijo_total']   = array_sum($costoFijos);
+                $c['total']        = $c['var_total'] + $c['fijo_total'];
+                $c['var_unit']     = $c['var_total'] / $c['unidades'];
+                $c['fijo_unit']    = $c['fijo_total'] / $c['unidades'];
+                $c['unit']         = $c['total'] / $c['unidades'];
+                $c['ganancia']     = $c['precio_venta'] - $c['unit'];
+                $c['margen_costo'] = $c['ganancia'] / $c['unit'] * 100;
+                $c['margen_venta'] = $c['ganancia'] / $c['precio_venta'] * 100;
+                $c['contrib']      = $c['precio_venta'] - $c['var_unit'];
+                $c['punto']        = $c['fijo_total'] / $c['contrib'];
+                $c['punto_ent']    = (int) ceil($c['punto']);
+                $c['punto_pesos']  = $c['punto_ent'] * $c['precio_venta'];
+                $c['punto_pct']    = $c['punto_ent'] / $c['unidades'] * 100;
+                $c['ingresos']     = $c['unidades'] * $c['precio_venta'];
+                $c['utilidad']     = $c['ingresos'] - $c['total'];
+                $c['peso_var']     = $c['var_unit'] / $c['unit'] * 100;
+                $c['peso_fijo']    = $c['fijo_unit'] / $c['unit'] * 100;
+                $c['peso_mpd']     = $c['mpd_unidad'] / $c['unit'] * 100;
+                $c['insumos_qty']  = array_sum(array_map('count', $costoInsumos));
+
+                // Formato: $1.234,56 (decimales solo cuando la cifra no es redonda).
+                $pesos = static function ($n, ?int $dec = null): string {
+                    $n   = round((float) $n, 2);
+                    $dec = $dec ?? (fmod($n, 1) === 0.0 ? 0 : 2);
+                    return '$' . number_format($n, $dec, ',', '.');
+                };
+                $num = static fn ($n, int $dec = 2): string => number_format((float) $n, $dec, ',', '.');
+                $pct = static fn ($n, int $dec = 1): string => number_format((float) $n, $dec, ',', '.') . ' %';
+
+                // A dónde va cada peso del precio de venta (suma 100 %).
+                $costoReparto = [
+                    ['Materia prima', $c['mpd_unidad'], 'mpd'],
+                    ['Mano de obra',  $c['mod_unidad'], 'mod'],
+                    ['Costos fijos',  $c['fijo_unit'],  'fijo'],
+                    ['Ganancia',      $c['ganancia'],   'gan'],
+                ];
+
+                // Relevamiento de precios: reusa los competidores de la sección 05.
+                $costoRivales  = array_values(array_filter($competidores, static fn ($x) => ! $x['eden']));
+                $costoPromedio = array_sum(array_column($costoRivales, 'precio_ref')) / max(1, count($costoRivales));
+
+                // Semilla para el simulador: el JS arranca de acá y puede volver.
+                $costoSemilla = json_encode([
+                    'unidades'   => $c['unidades'],
+                    'horas'      => $c['horas_unidad'],
+                    'valorHora'  => $c['valor_hora'],
+                    'mpd'        => $c['mpd_unidad'],
+                    'precio'     => $c['precio_venta'],
+                    'fijos'      => $c['fijo_total'],
+                ], JSON_UNESCAPED_UNICODE);
+                ?>
+
+                <!-- 1 · El número, y a dónde va cada peso -->
+                <div class="ea-cost-open" data-reveal-child>
+                    <div class="ea-cost-open__main">
+                        <span class="ea-pf-eyebrow">Precio de venta</span>
+                        <p class="ea-cost-open__amount" data-cost-count="<?= esc($c['precio_venta']) ?>"><?= esc($pesos($c['precio_venta'])) ?></p>
+                        <p class="ea-cost-open__sub">
+                            Por equipo, pago único, con la plataforma web incluida. Cubre
+                            <strong><?= esc($pesos($c['unit'])) ?></strong> de costo y deja
+                            <strong><?= esc($pesos($c['ganancia'])) ?></strong> de ganancia.
+                        </p>
+                    </div>
+
+                    <figure class="ea-cost-open__split">
+                        <figcaption>A dónde va cada peso que paga el cliente</figcaption>
+                        <div class="ea-cost-bar" role="img" aria-label="<?php
+                            $partes = [];
+                            foreach ($costoReparto as [$etiqueta, $importe]) {
+                                $partes[] = $etiqueta . ' ' . $pct($importe / $c['precio_venta'] * 100);
+                            }
+                            echo esc(implode(', ', $partes), 'attr');
+                        ?>">
+                            <?php foreach ($costoReparto as [$etiqueta, $importe, $clave]): ?>
+                                <span class="ea-cost-bar__seg is-<?= esc($clave) ?>"
+                                      style="--w: <?= esc(round($importe / $c['precio_venta'] * 100, 3)) ?>%"></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <ul class="ea-cost-key">
+                            <?php foreach ($costoReparto as [$etiqueta, $importe, $clave]): ?>
+                                <li class="is-<?= esc($clave) ?>">
+                                    <span class="ea-cost-key__name"><?= esc($etiqueta) ?></span>
+                                    <span class="ea-cost-key__val"><?= esc($pesos($importe)) ?></span>
+                                    <span class="ea-cost-key__pct"><?= esc($pct($importe / $c['precio_venta'] * 100)) ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </figure>
+                </div>
+
+                <!-- 2 · Laboratorio: el visitante mueve los números y ve qué pasa -->
+                <div class="ea-cost-lab" data-cost-lab data-cost-seed='<?= esc($costoSemilla, 'attr') ?>' data-reveal-child>
+                    <div class="ea-cost-lab__head">
+                        <h3 class="ea-cost-lab__title">Probá vos.</h3>
+                        <p class="ea-cost-lab__lede">Movés un valor y se recalculan el costo, la ganancia y el punto de equilibrio.</p>
+                        <button type="button" class="ea-cost-reset" data-cost-reset>Volver a los valores del TP</button>
+                    </div>
+
+                    <div class="ea-cost-lab__grid">
+                        <div class="ea-cost-controls">
+                            <?php
+                            // Cada control: id, etiqueta, unidad, min, max, paso y valor inicial.
+                            $costoControles = [
+                                ['unidades',  'Unidades por mes',    'u',  5,      40,     1,     $c['unidades']],
+                                ['horas',     'Horas por unidad',    'h',  2,      16,     1,     $c['horas_unidad']],
+                                ['valorHora', 'Valor de la hora',    '$',  2000,   12000,  500,   $c['valor_hora']],
+                                ['mpd',       'Materiales por equipo', '$', 120000, 400000, 10000, $c['mpd_unidad']],
+                                ['precio',    'Precio de venta',     '$',  300000, 800000, 10000, $c['precio_venta']],
+                            ];
+                            foreach ($costoControles as [$id, $etiqueta, $unidad, $min, $max, $paso, $valor]):
+                                $texto = $unidad === '$' ? $pesos($valor) : $valor . ' ' . $unidad;
+                            ?>
+                                <div class="ea-cost-control">
+                                    <label for="ea-cost-<?= esc($id) ?>"><?= esc($etiqueta) ?></label>
+                                    <output id="ea-cost-<?= esc($id) ?>-out" for="ea-cost-<?= esc($id) ?>"><?= esc($texto) ?></output>
+                                    <input type="range" id="ea-cost-<?= esc($id) ?>" data-cost-input="<?= esc($id) ?>"
+                                           min="<?= esc($min) ?>" max="<?= esc($max) ?>" step="<?= esc($paso) ?>"
+                                           value="<?= esc($valor) ?>" data-cost-unit="<?= esc($unidad) ?>">
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="ea-cost-readout">
+                            <div class="ea-cost-readout__row" data-cost-results aria-live="polite">
+                                <div class="ea-cost-tile">
+                                    <span class="ea-cost-tile__label">Costo por unidad</span>
+                                    <span class="ea-cost-tile__value" data-cost-out="unit"><?= esc($pesos($c['unit'])) ?></span>
+                                </div>
+                                <div class="ea-cost-tile is-good" data-cost-profit>
+                                    <span class="ea-cost-tile__label">Ganancia por unidad</span>
+                                    <span class="ea-cost-tile__value" data-cost-out="ganancia"><?= esc($pesos($c['ganancia'])) ?></span>
+                                    <span class="ea-cost-tile__sub" data-cost-out="margen"><?= esc($pct($c['margen_costo'], 2)) ?> sobre el costo</span>
+                                </div>
+                                <div class="ea-cost-tile">
+                                    <span class="ea-cost-tile__label">Punto de equilibrio</span>
+                                    <span class="ea-cost-tile__value" data-cost-out="punto"><?= esc($c['punto_ent']) ?> unidades</span>
+                                    <span class="ea-cost-tile__sub" data-cost-out="puntoPct"><?= esc($pct($c['punto_pct'], 0)) ?> de la producción</span>
+                                </div>
+                                <div class="ea-cost-tile">
+                                    <span class="ea-cost-tile__label">Utilidad del mes</span>
+                                    <span class="ea-cost-tile__value" data-cost-out="utilidad"><?= esc($pesos($c['utilidad'])) ?></span>
+                                    <span class="ea-cost-tile__sub">Si se vende toda la producción</span>
+                                </div>
+                            </div>
+
+                            <p class="ea-cost-alert" data-cost-alert hidden>
+                                A ese precio cada equipo se vende por debajo de lo que cuesta fabricarlo.
+                            </p>
+
+                            <figure class="ea-cost-chart">
+                                <figcaption>Ingresos contra costos, según las unidades vendidas en el mes</figcaption>
+                                <div class="ea-cost-chart__stage">
+                                    <canvas id="ea-cost-chart" height="260" aria-label="Gráfico de punto de equilibrio: la línea de ingresos cruza a la de costos totales en la unidad de equilibrio. Los mismos datos están en la tabla del desarrollo completo, más abajo." role="img"></canvas>
+                                </div>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 · De qué está hecho: filtro por subsistema en vez de una lista de 29 filas -->
+                <div class="ea-cost-parts" data-cost-parts data-reveal-child>
+                    <div class="ea-cost-parts__head">
+                        <h3 class="ea-cost-lab__title">De qué está hecho.</h3>
+                        <p class="ea-cost-lab__lede"><?= esc($c['insumos_qty']) ?> insumos por equipo, <?= esc($pesos($c['mpd_unidad'])) ?> en materiales.</p>
+                    </div>
+
+                    <div class="ea-cost-filters" role="group" aria-label="Filtrar insumos por subsistema">
+                        <button type="button" class="ea-cost-filter is-active" data-cost-filter="todos" aria-pressed="true">
+                            Todos <span><?= esc($c['insumos_qty']) ?></span>
+                        </button>
+                        <?php foreach ($costoInsumos as $grupo => $items): ?>
+                            <button type="button" class="ea-cost-filter" data-cost-filter="<?= esc(md5($grupo)) ?>" aria-pressed="false">
+                                <?= esc($grupo) ?> <span><?= esc(count($items)) ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <ul class="ea-cost-chips">
+                        <?php foreach ($costoInsumos as $grupo => $items): ?>
+                            <?php foreach ($items as [$cantidad, $insumo]): ?>
+                                <li class="ea-cost-chip" data-cost-group="<?= esc(md5($grupo)) ?>">
+                                    <span class="ea-cost-chip__qty"><?= esc($cantidad) ?></span>
+                                    <span class="ea-cost-chip__name"><?= esc($insumo) ?></span>
+                                    <span class="ea-cost-chip__group"><?= esc($grupo) ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <!-- 4 · Costos fijos: barras proporcionales, no una tabla más -->
+                <div class="ea-cost-fixed" data-reveal-child>
+                    <div class="ea-cost-fixed__head">
+                        <h3 class="ea-cost-lab__title">Lo que se paga igual.</h3>
+                        <p class="ea-cost-lab__lede">
+                            <?= esc($pesos($c['fijo_total'])) ?> por mes, se fabrique una unidad o veinte.
+                            No hay alquiler: se trabaja en un espacio propio.
+                        </p>
+                    </div>
+                    <ul class="ea-cost-fixed__list">
+                        <?php $costoFijoTope = max($costoFijos); ?>
+                        <?php foreach ($costoFijos as $descripcion => $importe): ?>
+                            <li>
+                                <span class="ea-cost-fixed__name"><?= esc($descripcion) ?></span>
+                                <span class="ea-cost-fixed__track">
+                                    <span class="ea-cost-fixed__fill" style="--w: <?= esc(round($importe / $costoFijoTope * 100, 2)) ?>%"></span>
+                                </span>
+                                <span class="ea-cost-fixed__val"><?= esc($pesos($importe)) ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <!-- 5 · Los dos métodos con los que se fijó el precio -->
+                <div class="ea-cost-methods" data-reveal-child>
+                    <article class="ea-cost-method">
+                        <h3 class="ea-cost-method__title">Según la competencia</h3>
+                        <p class="ea-cost-method__text">
+                            El cliente compara antes de comprar. Eden Air queda arriba de los equipos que
+                            solo miden y abajo de los importados de gama alta.
+                        </p>
+                        <dl class="ea-cost-method__data">
+                            <div>
+                                <dt>Promedio de mercado relevado</dt>
+                                <dd>USD <?= esc($num($costoPromedio, 0)) ?></dd>
+                            </div>
+                            <div>
+                                <dt>Equipos comparados</dt>
+                                <dd><?= esc(count($costoRivales)) ?> en la <a href="#analisis-competencia">sección 05</a></dd>
+                            </div>
+                        </dl>
+                    </article>
+                    <article class="ea-cost-method">
+                        <h3 class="ea-cost-method__title">Según el valor percibido</h3>
+                        <p class="ea-cost-method__text">
+                            Eden Air no solo mide: ventila, humidifica y comanda el aire acondicionado,
+                            con plataforma web sin abono mensual.
+                        </p>
+                        <dl class="ea-cost-method__data">
+                            <div>
+                                <dt>Margen sobre el costo</dt>
+                                <dd><?= esc($pct($c['margen_costo'], 2)) ?></dd>
+                            </div>
+                            <div>
+                                <dt>Margen sobre la venta</dt>
+                                <dd><?= esc($pct($c['margen_venta'], 2)) ?></dd>
+                            </div>
+                        </dl>
+                    </article>
+                </div>
+
+                <!-- 6 · Las tres conclusiones, sin párrafo largo -->
+                <ul class="ea-cost-takeaways" data-reveal-child>
+                    <li>
+                        <span class="ea-cost-takeaway__num" data-cost-count="<?= esc(round($c['peso_mpd'])) ?>" data-cost-suffix=" %"><?= esc($pct($c['peso_mpd'], 0)) ?></span>
+                        <p>del costo unitario son componentes importados. Ahí está el riesgo y también el margen de mejora.</p>
+                    </li>
+                    <li>
+                        <span class="ea-cost-takeaway__num" data-cost-count="<?= esc($c['punto_ent']) ?>"><?= esc($c['punto_ent']) ?></span>
+                        <p>unidades de <?= esc($c['unidades']) ?> alcanzan para cubrir todos los costos del mes. El proyecto aguanta una demanda inicial baja.</p>
+                    </li>
+                    <li>
+                        <span class="ea-cost-takeaway__num" data-cost-count="<?= esc($c['contrib']) ?>" data-cost-money="1"><?= esc($pesos($c['contrib'])) ?></span>
+                        <p>aporta cada equipo vendido a partir de ahí. Comprar por volumen y pasar a placa impresa sube ese número.</p>
+                    </li>
+                </ul>
+
+                <!-- 7 · El TP completo, plegado: tablas y fórmulas para quien las busque -->
+                <details class="ea-cost-full">
+                    <summary>
+                        <span class="ea-cost-full__title">Ver el desarrollo completo del trabajo práctico</span>
+                        <span class="ea-cost-full__hint">Supuestos, materia prima, mano de obra, costos unitarios y punto muerto</span>
+                    </summary>
+
+                    <div class="ea-cost-full__body">
+                        <h4>Supuestos de trabajo</h4>
+                        <p>
+                            <?= esc($c['unidades']) ?> unidades por mes, <?= esc($c['horas_unidad']) ?> horas de
+                            producción por unidad y la hora valorizada en <?= esc($pesos($c['valor_hora'])) ?>.
+                            Produce el equipo de dos integrantes en un espacio propio, sin alquiler de taller.
+                            La modalidad es de pago único: el acceso a la plataforma web va incluido, sin suscripción.
+                        </p>
+
+                        <h4>Tema 1 · Costos del producto</h4>
+                        <div class="ea-pf-table-wrap">
+                            <table class="ea-pf-table ea-cost-table ea-cost-table--money">
+                                <caption class="ea-comp-caption">a, b y c · Costo variable, costo fijo y costo total del mes</caption>
+                                <thead>
+                                    <tr><th scope="col">Concepto</th><th scope="col">Cálculo</th><th scope="col">Importe</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Materia prima directa</td>
+                                        <td><?= esc($pesos($c['mpd_unidad'])) ?> × <?= esc($c['unidades']) ?> unidades</td>
+                                        <td><?= esc($pesos($c['mpd_total'])) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mano de obra directa</td>
+                                        <td><?= esc($c['horas_mes']) ?> h × <?= esc($pesos($c['valor_hora'])) ?></td>
+                                        <td><?= esc($pesos($c['mod_total'])) ?></td>
+                                    </tr>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Costo variable total</td>
+                                        <td><?= esc($pesos($c['mpd_total'])) ?> + <?= esc($pesos($c['mod_total'])) ?></td>
+                                        <td><?= esc($pesos($c['var_total'])) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Costo fijo total mensual</td>
+                                        <td>Suma de los <?= esc(count($costoFijos)) ?> conceptos fijos</td>
+                                        <td><?= esc($pesos($c['fijo_total'])) ?></td>
+                                    </tr>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Costo total</td>
+                                        <td><?= esc($pesos($c['var_total'])) ?> + <?= esc($pesos($c['fijo_total'])) ?></td>
+                                        <td><?= esc($pesos($c['total'])) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="ea-pf-table-wrap">
+                            <table class="ea-pf-table ea-cost-table ea-cost-table--money">
+                                <caption class="ea-comp-caption">d · Costo unitario, por las dos vías vistas en clase</caption>
+                                <thead>
+                                    <tr><th scope="col">Vía</th><th scope="col">Cálculo</th><th scope="col">Resultado</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Costo total sobre unidades</td>
+                                        <td><?= esc($pesos($c['total'])) ?> / <?= esc($c['unidades']) ?></td>
+                                        <td><?= esc($pesos($c['unit'])) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Costo variable unitario</td>
+                                        <td><?= esc($pesos($c['var_total'])) ?> / <?= esc($c['unidades']) ?></td>
+                                        <td><?= esc($pesos($c['var_unit'])) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Costo fijo unitario</td>
+                                        <td><?= esc($pesos($c['fijo_total'])) ?> / <?= esc($c['unidades']) ?></td>
+                                        <td><?= esc($pesos($c['fijo_unit'])) ?></td>
+                                    </tr>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Costo total unitario</td>
+                                        <td><?= esc($pesos($c['var_unit'])) ?> + <?= esc($pesos($c['fijo_unit'])) ?></td>
+                                        <td><?= esc($pesos($c['unit'])) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="ea-comp-note">
+                            Las dos vías dan el mismo resultado, lo que verifica el cálculo. El costo variable pesa
+                            <?= esc($pct($c['peso_var'])) ?> del costo unitario y el fijo el <?= esc($pct($c['peso_fijo'])) ?>.
+                        </p>
+
+                        <h4>Tema 2 · Precio del producto</h4>
+                        <div class="ea-pf-table-wrap">
+                            <table class="ea-pf-table ea-cost-table ea-cost-table--money">
+                                <caption class="ea-comp-caption">a y b · Método 1, relevamiento de la competencia</caption>
+                                <thead>
+                                    <tr><th scope="col">Producto</th><th scope="col">Prestaciones</th><th scope="col">Precio de referencia *</th></tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($costoRivales as $rival): ?>
+                                        <tr>
+                                            <td><?= esc($rival['name'] . ' ' . $rival['model']) ?></td>
+                                            <td><?= esc($rival['prestacion']) ?></td>
+                                            <td><?= esc($rival['vals']['precio']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Precio promedio de mercado</td>
+                                        <td>Valor medio de cada rango</td>
+                                        <td>USD <?= esc($num($costoPromedio, 0)) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="ea-comp-note">
+                            * Precios de la competencia estimativos, en dólares (importación y tiendas oficiales),
+                            relevados en la sección 05. El de Eden Air es local y en pesos, así que la comparación
+                            se hace por segmento y no por conversión directa. Este método siempre se verifica contra
+                            el costo unitario: por debajo de <?= esc($pesos($c['unit'])) ?> se vendería a pérdida.
+                        </p>
+
+                        <div class="ea-pf-table-wrap">
+                            <table class="ea-pf-table ea-cost-table ea-cost-table--money">
+                                <caption class="ea-comp-caption">b · Método 2, precio según el valor percibido</caption>
+                                <thead>
+                                    <tr><th scope="col">Concepto</th><th scope="col">Importe</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Costo total unitario</td><td><?= esc($pesos($c['unit'])) ?></td></tr>
+                                    <tr><td>Ganancia por unidad</td><td><?= esc($pesos($c['ganancia'])) ?></td></tr>
+                                    <tr><td>Margen sobre el costo</td><td><?= esc($pct($c['margen_costo'], 2)) ?></td></tr>
+                                    <tr><td>Margen sobre el precio de venta</td><td><?= esc($pct($c['margen_venta'], 2)) ?></td></tr>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Precio de venta adoptado</td>
+                                        <td><?= esc($pesos($c['precio_venta'])) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="ea-pf-table-wrap">
+                            <table class="ea-pf-table ea-cost-table ea-cost-table--money">
+                                <caption class="ea-comp-caption">c · Punto muerto = Costos fijos / (Precio de venta - Costo variable unitario)</caption>
+                                <thead>
+                                    <tr><th scope="col">Cálculo</th><th scope="col">Resultado</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Contribución marginal unitaria = <?= esc($pesos($c['precio_venta'])) ?> - <?= esc($pesos($c['var_unit'])) ?></td>
+                                        <td><?= esc($pesos($c['contrib'])) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Punto muerto = <?= esc($pesos($c['fijo_total'])) ?> / <?= esc($pesos($c['contrib'])) ?></td>
+                                        <td><?= esc($num($c['punto'])) ?> unidades</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Punto muerto en unidades enteras</td>
+                                        <td><?= esc($c['punto_ent']) ?> unidades</td>
+                                    </tr>
+                                    <tr class="ea-cost-row-total">
+                                        <td>Punto muerto en pesos = <?= esc($c['punto_ent']) ?> × <?= esc($pesos($c['precio_venta'])) ?></td>
+                                        <td><?= esc($pesos($c['punto_pesos'])) ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>Conclusión</h4>
+                        <p>
+                            El costo unitario es alto (<?= esc($pesos($c['unit'])) ?>) por el peso de los insumos
+                            electrónicos importados, cerca del <?= esc($pct($c['peso_mpd'], 0)) ?> del total. La mano
+                            de obra es el segundo componente y los costos fijos inciden poco, por trabajar en un
+                            espacio propio. Con un punto muerto de <?= esc($c['punto_ent']) ?> unidades sobre
+                            <?= esc($c['unidades']) ?>, el proyecto es viable incluso con demanda inicial reducida.
+                            El riesgo principal es la variación del precio de los componentes importados, que golpea
+                            directo al costo variable. Las mejoras propuestas: comprar por volumen, reemplazar la
+                            protoboard y el cableado Dupont por una placa de circuito impreso propia, y producir un
+                            gabinete estandarizado. Todas bajan la materia prima y las horas de armado por unidad.
+                        </p>
+                    </div>
+                </details>
 
                 <!-- Cierre presentación -->
                 <div class="ea-pf-close ea-page" style="padding-left: clamp(28px,5vw,56px); padding-right: clamp(28px,5vw,56px);">
@@ -1302,6 +1857,7 @@ $sitemap = [
 <script src="<?= asset('JS/tema.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script src="<?= asset('JS/portfolio.js') ?>"></script>
+<script src="<?= asset('JS/portfolio-costos.js') ?>"></script>
 <script src="<?= asset('JS/portfolio-gsap.js') ?>"></script>
 <script src="<?= asset('JS/ea-scrollbar.js') ?>"></script>
 </body>

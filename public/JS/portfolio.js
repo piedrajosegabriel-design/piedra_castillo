@@ -136,14 +136,27 @@
         /* -------- Scroll reveal suave para secciones ------------------ */
         var reveals = document.querySelectorAll("[data-reveal]");
         if (reveals.length) {
+            /* Cascada: cada hijo guarda su turno en --reveal-i y entra escalonado. */
+            reveals.forEach(function (section) {
+                section.querySelectorAll("[data-reveal-child]").forEach(function (child, i) {
+                    child.style.setProperty("--reveal-i", String(i));
+                });
+            });
+
             if (reducedMotion || typeof IntersectionObserver !== "function") {
-                reveals.forEach(function (el) { el.classList.add("is-visible"); });
+                reveals.forEach(function (el) { el.classList.add("is-visible", "is-revealed"); });
             } else {
                 var obs = new IntersectionObserver(function (entries) {
                     entries.forEach(function (entry) {
                         if (entry.isIntersecting) {
-                            entry.target.classList.add("is-visible");
-                            obs.unobserve(entry.target);
+                            var target = entry.target;
+                            target.classList.add("is-visible");
+                            obs.unobserve(target);
+                            /* Terminada la cascada se corta el delay heredado. */
+                            var hijos = target.querySelectorAll("[data-reveal-child]").length;
+                            window.setTimeout(function () {
+                                target.classList.add("is-revealed");
+                            }, 650 + hijos * 80);
                         }
                     });
                 /* threshold 0: las secciones largas (análisis de mercado mide

@@ -32,6 +32,33 @@
             return;
         }
 
+        /* --- Barra de progreso de lectura -------------------------------
+           Va fuera del #smooth-wrapper (como el navbar) y la mueve
+           ScrollTrigger, así funciona igual con o sin ScrollSmoother.
+           Es información de avance, no decoración: se muestra también
+           con reduced-motion, solo que sin suavizado. */
+        if (window.ScrollTrigger) {
+            var progreso = document.createElement("div");
+            progreso.className = "ea-pf-progress";
+            progreso.setAttribute("aria-hidden", "true");
+
+            var relleno = document.createElement("div");
+            relleno.className = "ea-pf-progress__bar";
+            progreso.appendChild(relleno);
+            document.body.appendChild(progreso);
+
+            gsap.to(relleno, {
+                scaleX: 1,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: content,
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0.3
+                }
+            });
+        }
+
         var mm = gsap.matchMedia();
 
         mm.add("(prefers-reduced-motion: no-preference)", function () {

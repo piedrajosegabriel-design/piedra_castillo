@@ -1823,3 +1823,747 @@
     .ea-comp-cards { display: block; }
     .ea-comp-advantage { grid-template-columns: 1fr; }
 }
+
+/* =====================================================================
+   HITO 2 — Análisis de costos (TP Nº 5)
+   ---------------------------------------------------------------------
+   La sección se lee como una historia y cada bloque usa una forma
+   distinta, para que no parezca un documento pegado en la web:
+     · apertura   → el precio grande + barra de reparto
+     · laboratorio→ sliders que recalculan en vivo + gráfico
+     · insumos    → chips filtrables (no una tabla de 29 filas)
+     · fijos      → barras proporcionales
+     · métodos    → dos fichas
+     · cierre     → tres cifras
+     · <details>  → el TP completo, plegado
+   Colores: la misma escala verde de la marca. Los cuatro tonos del
+   reparto se declaran acá y se pisan en oscuro, porque --eden-700 y
+   compañía no cambian con el tema.
+   ===================================================================== */
+.ea-cost {
+    --cost-mpd:  var(--eden-700);
+    --cost-mod:  var(--eden-500);
+    --cost-fijo: var(--eden-400);
+    --cost-gan:  #b3c455;
+    --cost-r:    var(--ea-r-lg, 22px);
+}
+
+:root[data-theme="dark"] .ea-cost {
+    --cost-mpd:  #4f9a6f;
+    --cost-mod:  #8fd6c8;
+    --cost-fijo: #bcd2bd;
+    --cost-gan:  #c9d870;
+}
+
+/* Par de encabezado que se repite en cada bloque de la sección */
+.ea-cost-lab__title {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(22px, 3vw, 30px);
+    letter-spacing: -0.015em;
+    color: var(--ea-ink);
+    margin: 0;
+}
+:root[data-theme="dark"] .ea-cost-lab__title { color: var(--eden-100); }
+
+.ea-cost-lab__lede {
+    margin: 6px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ea-ink-2);
+    max-width: 52ch;
+}
+
+/* ---------------------------------------------------------------------
+   1 · Apertura: el precio y a dónde va cada peso
+   ------------------------------------------------------------------- */
+.ea-cost-open {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(22px, 4vw, 52px);
+    align-items: center;
+    padding: clamp(24px, 4vw, 44px);
+    border-radius: var(--cost-r);
+    background:
+        radial-gradient(120% 130% at 0% 0%, var(--ea-success-soft), transparent 58%),
+        var(--ea-card);
+    border: 1px solid var(--ea-rule);
+    box-shadow: var(--ea-shadow-sm);
+}
+
+.ea-cost-open__amount {
+    margin: 10px 0 0;
+    font-family: var(--ea-font-serif);
+    font-size: clamp(48px, 9vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: var(--eden-600);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-open__amount { color: var(--eden-300); }
+
+.ea-cost-open__sub {
+    margin: 14px 0 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ea-ink-2);
+    max-width: 40ch;
+}
+.ea-cost-open__sub strong { color: var(--ea-ink); font-variant-numeric: tabular-nums; }
+:root[data-theme="dark"] .ea-cost-open__sub strong { color: var(--eden-100); }
+
+.ea-cost-open__split { margin: 0; }
+.ea-cost-open__split figcaption {
+    font-family: var(--ea-font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    margin-bottom: 12px;
+}
+
+/* Barra apilada: los cuatro destinos del precio, en proporción real */
+.ea-cost-bar {
+    display: flex;
+    height: 46px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--ea-rule-soft);
+}
+.ea-cost-bar__seg {
+    width: var(--w);
+    transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.ea-cost-bar__seg.is-mpd  { background: var(--cost-mpd); }
+.ea-cost-bar__seg.is-mod  { background: var(--cost-mod); }
+.ea-cost-bar__seg.is-fijo { background: var(--cost-fijo); }
+.ea-cost-bar__seg.is-gan  { background: var(--cost-gan); }
+
+.ea-cost-key {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 20px;
+}
+.ea-cost-key li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "dot name" "dot val";
+    column-gap: 10px;
+    align-items: baseline;
+}
+.ea-cost-key li::before {
+    content: "";
+    grid-area: dot;
+    align-self: center;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+}
+.ea-cost-key li.is-mpd::before  { background: var(--cost-mpd); }
+.ea-cost-key li.is-mod::before  { background: var(--cost-mod); }
+.ea-cost-key li.is-fijo::before { background: var(--cost-fijo); }
+.ea-cost-key li.is-gan::before  { background: var(--cost-gan); }
+
+.ea-cost-key__name { grid-area: name; font-size: 12.5px; color: var(--ea-ink-2); }
+.ea-cost-key__val {
+    grid-area: val;
+    font-family: var(--ea-font-mono);
+    font-size: 14px;
+    color: var(--ea-ink);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-key__val { color: var(--eden-100); }
+.ea-cost-key__pct {
+    grid-area: val;
+    justify-self: end;
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    color: var(--ea-mute);
+}
+
+/* ---------------------------------------------------------------------
+   2 · Laboratorio: mover los números y ver qué pasa
+   ------------------------------------------------------------------- */
+.ea-cost-lab {
+    margin-top: clamp(26px, 4vw, 44px);
+    padding: clamp(22px, 3.5vw, 38px);
+    border-radius: var(--cost-r);
+    background: var(--ea-linen);
+    border: 1px solid var(--ea-rule);
+}
+
+.ea-cost-lab__head {
+    display: grid;
+    gap: 4px;
+    margin-bottom: clamp(18px, 3vw, 28px);
+    position: relative;
+}
+
+.ea-cost-reset {
+    justify-self: start;
+    margin-top: 12px;
+    min-height: 44px;
+    padding: 10px 18px;
+    border-radius: var(--ea-r-pill, 999px);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    color: var(--ea-ink-2);
+    font-family: var(--ea-font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.12s ease;
+}
+.ea-cost-reset:hover { border-color: var(--eden-500); color: var(--ea-ink); }
+.ea-cost-reset:active { transform: translateY(1px); }
+.ea-cost-reset:focus-visible { outline: 2px solid var(--eden-500); outline-offset: 3px; }
+
+.ea-cost-lab__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 36px);
+    align-items: start;
+}
+
+.ea-cost-controls { display: grid; gap: 14px; }
+
+.ea-cost-control {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 0 10px;
+    padding: 12px 16px 4px;
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+}
+.ea-cost-control label {
+    font-size: 12.5px;
+    color: var(--ea-ink-2);
+}
+.ea-cost-control output {
+    font-family: var(--ea-font-mono);
+    font-size: 14px;
+    color: var(--eden-600);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-control output { color: var(--eden-300); }
+
+/* Slider: pista fina, pulgar cómodo, área táctil de 44px */
+.ea-cost-control input[type="range"] {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 44px;
+    margin: 0;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+.ea-cost-control input[type="range"]:focus-visible {
+    outline: 2px solid var(--eden-500);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+.ea-cost-control input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ea-rule);
+}
+.ea-cost-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: var(--eden-500);
+    border: 3px solid var(--ea-card);
+    box-shadow: 0 2px 8px rgba(20, 32, 26, 0.3);
+    transition: transform 0.15s ease;
+}
+.ea-cost-control input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.14); }
+.ea-cost-control input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ea-rule);
+}
+.ea-cost-control input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--eden-500);
+    border: 3px solid var(--ea-card);
+    box-shadow: 0 2px 8px rgba(20, 32, 26, 0.3);
+}
+
+.ea-cost-readout { display: grid; gap: 16px; min-width: 0; }
+
+.ea-cost-readout__row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.ea-cost-tile {
+    padding: 16px 18px;
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+    display: grid;
+    align-content: start;
+    gap: 4px;
+}
+.ea-cost-tile__label {
+    font-family: var(--ea-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+}
+.ea-cost-tile__value {
+    font-family: var(--ea-font-serif);
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.15;
+    color: var(--ea-ink);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-tile__value { color: var(--eden-100); }
+.ea-cost-tile__sub { font-size: 11.5px; color: var(--ea-ink-2); }
+
+.ea-cost-tile.is-good {
+    background: var(--ea-success-soft);
+    border-color: rgba(74, 122, 85, 0.3);
+}
+.ea-cost-tile.is-bad {
+    background: var(--ea-danger-soft);
+    border-color: rgba(166, 91, 61, 0.4);
+}
+
+.ea-cost-alert {
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-danger-soft);
+    border: 1px solid rgba(166, 91, 61, 0.4);
+    color: var(--ea-ink);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+:root[data-theme="dark"] .ea-cost-alert { color: var(--eden-100); }
+
+.ea-cost-chart {
+    margin: 0;
+    padding: clamp(14px, 2vw, 20px);
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+}
+.ea-cost-chart figcaption {
+    font-family: var(--ea-font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    margin-bottom: 10px;
+}
+.ea-cost-chart__stage { position: relative; height: 260px; }
+
+/* ---------------------------------------------------------------------
+   3 · Insumos: chips filtrables
+   ------------------------------------------------------------------- */
+.ea-cost-parts { margin-top: clamp(28px, 4.5vw, 52px); }
+.ea-cost-parts__head { margin-bottom: 16px; }
+
+.ea-cost-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.ea-cost-filter {
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: var(--ea-r-pill, 999px);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    color: var(--ea-ink-2);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.ea-cost-filter span {
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--ea-rule-soft);
+    color: var(--ea-mute);
+}
+.ea-cost-filter:hover { border-color: var(--eden-500); color: var(--ea-ink); }
+.ea-cost-filter:focus-visible { outline: 2px solid var(--eden-500); outline-offset: 3px; }
+.ea-cost-filter.is-active {
+    background: var(--eden-600);
+    border-color: var(--eden-600);
+    color: #fff;
+}
+.ea-cost-filter.is-active span { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+.ea-cost-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+.ea-cost-chip {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "qty name" "qty group";
+    column-gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+    transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.ea-cost-chip:hover { border-color: var(--eden-400); transform: translateY(-2px); }
+.ea-cost-chip[hidden] { display: none; }
+.ea-cost-chip__qty {
+    grid-area: qty;
+    align-self: center;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--ea-success-soft);
+    color: var(--eden-600);
+    font-family: var(--ea-font-mono);
+    font-size: 12.5px;
+}
+:root[data-theme="dark"] .ea-cost-chip__qty { color: var(--eden-300); }
+.ea-cost-chip__name { grid-area: name; font-size: 13.5px; line-height: 1.35; color: var(--ea-ink-2); }
+.ea-cost-chip__group {
+    grid-area: group;
+    font-family: var(--ea-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   4 · Costos fijos: barras proporcionales
+   ------------------------------------------------------------------- */
+.ea-cost-fixed { margin-top: clamp(28px, 4.5vw, 52px); }
+.ea-cost-fixed__head { margin-bottom: 18px; }
+
+.ea-cost-fixed__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ea-cost-fixed__list li {
+    display: grid;
+    grid-template-columns: minmax(0, 200px) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+}
+.ea-cost-fixed__name { font-size: 13.5px; color: var(--ea-ink-2); }
+.ea-cost-fixed__track {
+    height: 12px;
+    border-radius: 999px;
+    background: var(--ea-rule-soft);
+    overflow: hidden;
+}
+.ea-cost-fixed__fill {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--cost-mod), var(--cost-fijo));
+}
+.ea-cost-fixed__val {
+    font-family: var(--ea-font-mono);
+    font-size: 13.5px;
+    color: var(--ea-ink);
+    font-variant-numeric: tabular-nums;
+    min-width: 84px;
+    text-align: right;
+}
+:root[data-theme="dark"] .ea-cost-fixed__val { color: var(--eden-100); }
+
+/* ---------------------------------------------------------------------
+   5 · Los dos métodos de precio
+   ------------------------------------------------------------------- */
+.ea-cost-methods {
+    margin-top: clamp(28px, 4.5vw, 52px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: clamp(14px, 2vw, 20px);
+}
+.ea-cost-method {
+    padding: clamp(20px, 3vw, 28px);
+    border-radius: var(--cost-r);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+    border-top: 3px solid var(--eden-500);
+}
+.ea-cost-method__title {
+    margin: 0;
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 21px;
+    color: var(--ea-ink);
+}
+:root[data-theme="dark"] .ea-cost-method__title { color: var(--eden-100); }
+.ea-cost-method__text {
+    margin: 10px 0 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ea-ink-2);
+}
+.ea-cost-method__data {
+    margin: 18px 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ea-rule-soft);
+}
+.ea-cost-method__data dt {
+    font-family: var(--ea-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+}
+.ea-cost-method__data dd {
+    margin: 4px 0 0;
+    font-size: 16px;
+    color: var(--ea-ink);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-method__data dd { color: var(--eden-100); }
+
+/* ---------------------------------------------------------------------
+   6 · Cierre: tres cifras
+   ------------------------------------------------------------------- */
+.ea-cost-takeaways {
+    list-style: none;
+    margin: clamp(28px, 4.5vw, 52px) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: clamp(16px, 2.5vw, 28px);
+}
+.ea-cost-takeaways li {
+    padding-top: 18px;
+    border-top: 2px solid var(--eden-500);
+}
+.ea-cost-takeaway__num {
+    display: block;
+    font-family: var(--ea-font-serif);
+    font-size: clamp(34px, 4.5vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--eden-600);
+    font-variant-numeric: tabular-nums;
+}
+:root[data-theme="dark"] .ea-cost-takeaway__num { color: var(--eden-300); }
+.ea-cost-takeaways p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ea-ink-2);
+}
+
+/* ---------------------------------------------------------------------
+   7 · El TP completo, plegado
+   ------------------------------------------------------------------- */
+.ea-cost-full {
+    margin-top: clamp(28px, 4.5vw, 52px);
+    border-radius: var(--cost-r);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    overflow: hidden;
+}
+.ea-cost-full > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: clamp(18px, 2.6vw, 24px);
+    display: grid;
+    gap: 3px;
+    position: relative;
+    padding-right: 60px;
+    min-height: 44px;
+}
+.ea-cost-full > summary::-webkit-details-marker { display: none; }
+.ea-cost-full > summary::after {
+    content: "";
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    width: 11px;
+    height: 11px;
+    margin-top: -7px;
+    border-right: 2px solid var(--ea-mute);
+    border-bottom: 2px solid var(--ea-mute);
+    transform: rotate(45deg);
+    transition: transform 0.25s ease;
+}
+.ea-cost-full[open] > summary::after { transform: rotate(-135deg); margin-top: -2px; }
+.ea-cost-full > summary:focus-visible { outline: 2px solid var(--eden-500); outline-offset: -3px; }
+.ea-cost-full > summary:hover .ea-cost-full__title { color: var(--eden-600); }
+
+.ea-cost-full__title {
+    font-family: var(--ea-font-serif);
+    font-size: 19px;
+    color: var(--ea-ink);
+    transition: color 0.18s ease;
+}
+:root[data-theme="dark"] .ea-cost-full__title { color: var(--eden-100); }
+.ea-cost-full__hint { font-size: 12.5px; color: var(--ea-mute); }
+
+.ea-cost-full__body {
+    padding: 0 clamp(18px, 2.6vw, 24px) clamp(22px, 3vw, 30px);
+    border-top: 1px solid var(--ea-rule-soft);
+}
+.ea-cost-full__body h4 {
+    margin: clamp(20px, 3vw, 28px) 0 10px;
+    font-family: var(--ea-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--eden-600);
+}
+:root[data-theme="dark"] .ea-cost-full__body h4 { color: var(--eden-300); }
+.ea-cost-full__body > p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ea-ink-2);
+    max-width: 78ch;
+}
+
+/* Tablas del desarrollo: importes a la derecha y una sola fila remarcada */
+.ea-cost-table { min-width: 340px; }
+.ea-cost-table--money td:last-child,
+.ea-cost-table--money thead th:last-child {
+    text-align: right;
+    font-family: var(--ea-font-mono);
+    white-space: nowrap;
+}
+.ea-cost-row-total td {
+    background: var(--ea-card-soft);
+    font-weight: 600;
+    color: var(--ea-ink);
+}
+:root[data-theme="dark"] .ea-cost-row-total td { color: var(--eden-100); }
+
+/* Los hijos de un grid no se achican solos: sin min-width 0 una tarjeta o el
+   canvas del gráfico estiran su track y desbordan la sección en mobile
+   (mismo problema que ya estaba documentado en .ea-pf-block). */
+.ea-cost-lab__grid > *,
+.ea-cost-readout__row,
+.ea-cost-tile,
+.ea-cost-chart,
+.ea-cost-chips > li,
+.ea-cost-fixed__list li { min-width: 0; }
+
+.ea-cost-tile__label,
+.ea-cost-tile__value,
+.ea-cost-tile__sub,
+.ea-cost-chip__name,
+.ea-cost-fixed__name { overflow-wrap: anywhere; }
+
+.ea-cost-chart__stage canvas { max-width: 100%; }
+
+/* ---------------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .ea-cost-open { grid-template-columns: 1fr; }
+    .ea-cost-lab__grid { grid-template-columns: 1fr; }
+    .ea-cost-readout__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .ea-cost-key { grid-template-columns: 1fr; }
+    .ea-cost-readout__row { grid-template-columns: 1fr; }
+    .ea-cost-chips { grid-template-columns: 1fr; }
+    .ea-cost-fixed__list li {
+        grid-template-columns: 1fr auto;
+        grid-template-areas: "name val" "track track";
+        gap: 6px 12px;
+    }
+    .ea-cost-fixed__name  { grid-area: name; }
+    .ea-cost-fixed__val   { grid-area: val; }
+    .ea-cost-fixed__track { grid-area: track; }
+    .ea-cost-method__data { grid-template-columns: 1fr; }
+    .ea-cost-chart__stage { height: 220px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-cost-bar__seg,
+    .ea-cost-chip,
+    .ea-cost-full > summary::after { transition: none; }
+    .ea-cost-chip:hover { transform: none; }
+}
+
+/* =====================================================================
+   Cascada de entrada + barra de progreso (todo el portfolio)
+   ---------------------------------------------------------------------
+   [data-reveal] ya existía; [data-reveal-child] estaba documentado en la
+   vista pero nunca implementado acá. Es el mismo patrón de la landing
+   (CSS/inicio.css), así que las dos páginas se sienten iguales.
+   ===================================================================== */
+[data-reveal-child] {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition: opacity 0.55s cubic-bezier(0.23, 1, 0.32, 1),
+                transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+    transition-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+
+[data-reveal].is-visible [data-reveal-child] {
+    opacity: 1;
+    transform: none;
+}
+
+/* Terminada la cascada, el delay deja de aplicarse (si no, los hover se
+   sienten pegajosos porque heredan el retardo). */
+[data-reveal].is-revealed [data-reveal-child] { transition-delay: 0s; }
+
+/* Progreso de lectura: dice cuánto falta del recorrido sin robar espacio. */
+.ea-pf-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 90;
+    background: transparent;
+    pointer-events: none;
+}
+.ea-pf-progress__bar {
+    height: 100%;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--eden-500), #c9d870);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal-child] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}

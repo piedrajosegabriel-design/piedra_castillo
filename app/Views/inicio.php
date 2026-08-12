@@ -796,7 +796,7 @@ ob_start(); ?>
                         </header>
 
                         <div class="ea-buy-price">
-                            <span class="ea-buy-amount"><span class="ea-buy-cur">$</span>89.999</span>
+                            <span class="ea-buy-amount"><span class="ea-buy-cur">$</span>450.000</span>
                             <span class="ea-buy-period">ARS · pago único<br>compra del producto</span>
                         </div>
 
@@ -812,7 +812,7 @@ ob_start(); ?>
 
                         <p class="ea-buy-note">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
-                            Precio de referencia del proyecto: el cobro en línea todavía no está activo.
+                            Precio calculado en el análisis de costos del portfolio; el cobro en línea todavía no está activo.
                         </p>
                     </article>
 

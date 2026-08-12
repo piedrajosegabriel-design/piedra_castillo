@@ -57,7 +57,7 @@ $this->setData([
 
                     <div class="ea-plan-price">
                         <span class="ea-plan-currency">$</span>
-                        <span class="ea-plan-amount">89.999</span>
+                        <span class="ea-plan-amount">450.000</span>
                         <span class="ea-plan-period">ARS · pago único<br>compra del producto</span>
                     </div>
 
