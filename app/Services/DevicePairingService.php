@@ -328,11 +328,29 @@ class DevicePairingService
                 'last_seen_at' => date('Y-m-d H:i:s'),
             ]);
 
-            // Reconfiguró el WiFi de un equipo que ya era suyo (se mudó de casa,
-            // cambió de router). No hay ventana abierta que cerrar, pero el
-            // celular sí está esperando en /vinculacion/seguir: se deja
-            // registrado el evento para que esa página pueda resolverse.
-            if ($sesion !== '') {
+            // Si el dueño está mirando la pantalla del QR, hay una ventana
+            // abierta esperando A ESTE equipo y hay que cerrarla igual que en
+            // un alta nueva. Sin esto la página se queda en "esperando" hasta
+            // que expira aunque el equipo se haya conectado bien: pasa cada vez
+            // que se resetea un equipo YA registrado para volver a vincularlo.
+            $this->ventanas->marcarVencidas();
+            $ventana = $this->elegirVentana($ipDispositivo, (int) $existente['user_id']);
+
+            if ($ventana) {
+                $cierre = [
+                    'status'       => 'vinculado',
+                    'device_id'    => (int) $existente['id'],
+                    'completed_at' => date('Y-m-d H:i:s'),
+                ];
+
+                if ($sesion !== '') {
+                    $cierre['session_code'] = $sesion;
+                }
+
+                $this->ventanas->update((int) $ventana['id'], $cierre);
+            } elseif ($sesion !== '') {
+                // Nadie mirando la web, pero el celular sí espera en
+                // /vinculacion/seguir: se deja registrado para esa página.
                 $this->registrarReconexion($existente, $sesion);
             }
 
@@ -399,10 +417,27 @@ class DevicePairingService
      * el navegador del dueño y su Eden Air comparten el WiFi de la casa, así
      * que sus IP caen en el mismo /24. Si eso no desempata, se toma la más
      * reciente.
+     *
+     * `$userId` acota la búsqueda a las ventanas de un dueño. Se usa cuando el
+     * equipo YA está registrado: ahí sabemos de quién es, y sin este filtro un
+     * equipo podría cerrar la ventana de otra persona que está vinculando al
+     * mismo tiempo y mostrarle en pantalla un dispositivo que no es suyo.
      */
-    private function elegirVentana(?string $ipDispositivo): ?array
+    private function elegirVentana(?string $ipDispositivo, ?int $userId = null): ?array
     {
         $abiertas = $this->ventanas->abiertas();
+
+        if ($userId !== null) {
+            $propias = [];
+
+            foreach ($abiertas as $ventana) {
+                if ((int) $ventana['user_id'] === $userId) {
+                    $propias[] = $ventana;
+                }
+            }
+
+            $abiertas = $propias;
+        }
 
         if ($abiertas === []) {
             return null;
