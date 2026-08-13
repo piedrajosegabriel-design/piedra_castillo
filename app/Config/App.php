@@ -132,8 +132,22 @@ class App extends BaseConfig
      *
      * @see https://www.php.net/manual/en/timezones.php for list of timezones
      *      supported by PHP.
+     *
+     * EdenAir guarda y muestra en hora de Argentina, no en UTC.
+     *
+     * POR QUÉ: los 16 lugares que escriben fechas usan date('Y-m-d H:i:s'), que
+     * respeta esta zona, y el panel las muestra con date('d/m/Y H:i'). Con 'UTC'
+     * todo quedaba coherente entre sí pero TRES HORAS ADELANTADO respecto del
+     * reloj del usuario: una medición tomada a las 00:42 se mostraba 03:42.
+     *
+     * Argentina no aplica horario de verano (UTC-3 fijo desde 2009), así que no
+     * hay saltos de los que preocuparse.
+     *
+     * OJO: el php.ini de esta máquina tiene date.timezone = Europe/Berlin. No
+     * afecta a la app (esta línea lo pisa), pero sí a cualquier script PHP suelto
+     * que no arranque CodeIgniter.
      */
-    public string $appTimezone = 'UTC';
+    public string $appTimezone = 'America/Argentina/Buenos_Aires';
 
     /**
      * --------------------------------------------------------------------------
