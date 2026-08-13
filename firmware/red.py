@@ -116,8 +116,16 @@ def _motivo_falla(wlan, ssid):
     except (OSError, AttributeError):
         estado = None
 
+    # El numero crudo va al log: es lo unico que permite distinguir un rechazo
+    # del router de una clave mala cuando el chip no lo dice de frente.
+    print("Estado del WiFi al fallar:", estado)
+
     mala_clave = getattr(network, "STAT_WRONG_PASSWORD", object())
     sin_red = getattr(network, "STAT_NO_AP_FOUND", object())
+    handshake = getattr(network, "STAT_HANDSHAKE_TIMEOUT", object())
+    rechazo = getattr(network, "STAT_ASSOC_FAIL", object())
+    sin_señal = getattr(network, "STAT_BEACON_TIMEOUT", object())
+    conectando = getattr(network, "STAT_CONNECTING", object())
 
     if estado == mala_clave:
         return ("La contraseña no es correcta",
@@ -128,6 +136,28 @@ def _motivo_falla(wlan, ssid):
         return ("No se encontró la red " + ssid,
                 "Puede estar apagada o demasiado lejos del equipo. "
                 "Acerca el Eden Air al router y proba otra vez.")
+
+    # El chip suele reportar el handshake cortado en vez de "clave mala"
+    # cuando la clave esta mal: para el usuario es el mismo paso a seguir.
+    if estado == handshake:
+        return ("La contraseña no es correcta",
+                "La red te reconocio pero rechazo la clave. Volve a escribirla "
+                "con el boton Ver activado, sin espacios al final.")
+
+    if estado == rechazo:
+        return ("La red " + ssid + " rechazó al equipo",
+                "El router no lo dejo entrar. Suele ser filtrado por MAC o "
+                "limite de dispositivos: revisa la configuracion del router.")
+
+    if estado == sin_señal:
+        return ("Se perdió la señal de " + ssid,
+                "La red aparecio en la lista pero despues dejo de responder. "
+                "Acerca el Eden Air al router y proba otra vez.")
+
+    if estado == conectando:
+        return ("La red " + ssid + " tardó demasiado",
+                "Sigue intentando conectarse pero no termina. Suele pasar con "
+                "el router saturado o con señal debil: acercalo y reintenta.")
 
     return ("No se pudo conectar a " + ssid,
             "La red respondio pero la conexion no se completó. "
@@ -141,6 +171,18 @@ def conectar(ssid, password, espera=20):
     Si sale bien, error es None. Si sale mal, ip es None y error es el par
     (titulo, detalle) que el portal muestra arriba del formulario.
     """
+    # WPA2 no admite claves de menos de 8 caracteres. Sin este corte el chip
+    # se queda 20 segundos en STAT_CONNECTING —nunca llega a que se la
+    # rechacen— y el usuario recibe un "tardó demasiado" que lo manda a
+    # buscar el problema en la señal o en el router, cuando en realidad le
+    # falta escribir la clave entera.
+    if password and len(password) < 8:
+        error = ("La clave de " + ssid + " esta incompleta",
+                 "Escribiste %d caracteres y una clave de WiFi tiene 8 o mas. "
+                 "Toca el boton Ver y fijate que este completa." % len(password))
+        print("Clave demasiado corta (%d caracteres): ni se intenta." % len(password))
+        return None, error
+
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
 
@@ -234,7 +276,7 @@ PAGINA = """<!DOCTYPE html>
 
   <label for="password">Contrase&ntilde;a de tu WiFi</label>
   <div class="clave">
-   <input id="password" name="password" type="password" placeholder="La clave de tu router" autocapitalize="none" autocorrect="off" spellcheck="false">
+   <input id="password" name="password" type="password" placeholder="La clave de tu router" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="8" title="La clave de un WiFi protegido tiene 8 caracteres o mas.">
    <button type="button" class="ver" onclick="var c=document.getElementById('password');var v=c.type=='password';c.type=v?'text':'password';this.textContent=v?'Ocultar':'Ver'">Ver</button>
   </div>
   <p class="ayuda">Toc&aacute; &laquo;Ver&raquo; para revisar lo que escribiste. La may&uacute;scula y min&uacute;scula importan.</p>
@@ -440,6 +482,55 @@ def _desescapar(texto):
     return salida
 
 
+def _leer_pedido(cliente):
+    """
+    Lee un pedido HTTP entero: las cabeceras y, si lo hay, todo el cuerpo.
+
+    NO alcanza con un solo recv(): TCP no garantiza que el mensaje entero
+    llegue junto. El navegador manda las cabeceras en un paquete y el cuerpo
+    del formulario en otro, asi que un unico recv() devuelve muchas veces SOLO
+    las cabeceras, con el cuerpo vacio. El equipo entonces intenta conectarse
+    con una clave vacia y el sintoma es "la contraseña no es correcta" con una
+    clave que estaba bien escrita.
+
+    Lo peor es que depende de como el telefono parta los paquetes: al mismo
+    equipo le anda una vez y a la siguiente no, y a un companero le anda
+    siempre, sin ninguna razon visible. Por eso hay que leer hasta completar
+    el Content-Length en vez de confiar en una sola lectura.
+
+    Devuelve (cabeceras, cuerpo), las dos ya como texto.
+    """
+    datos = b""
+    while b"\r\n\r\n" not in datos:
+        pedazo = cliente.recv(512)
+        if not pedazo:
+            break
+        datos += pedazo
+        if len(datos) > 8192:   # tope de cortesia: nadie manda cabeceras asi
+            break
+
+    cabeceras, _, cuerpo = datos.partition(b"\r\n\r\n")
+
+    # Cuanto cuerpo prometio el navegador. Sin esto no sabemos si ya llego todo.
+    largo = 0
+    for linea in cabeceras.split(b"\r\n"):
+        if linea.lower().startswith(b"content-length:"):
+            try:
+                largo = int(linea.split(b":", 1)[1].strip())
+            except ValueError:
+                largo = 0
+            break
+
+    while len(cuerpo) < largo:
+        pedazo = cliente.recv(512)
+        if not pedazo:
+            break
+        cuerpo += pedazo
+
+    return (cabeceras.decode("utf-8", "ignore"),
+            cuerpo.decode("utf-8", "ignore"))
+
+
 def _respuesta_dns(consulta, ip):
     """
     Arma una respuesta DNS que apunta CUALQUIER nombre a la IP del equipo.
@@ -514,6 +605,14 @@ def abrir_portal(error=None):
         time.sleep_ms(100)
 
     ip_portal = ap.ifconfig()[0]
+
+    # El DHCP del AP tiene que anunciarse a SI MISMO como servidor DNS. De
+    # fabrica anuncia 0.0.0.0, o sea "no hay DNS": el celular se queda sin con
+    # quien resolver nombres, no llega a disparar su sonda de portal cautivo y
+    # el navegador gira para siempre sin abrir nada. Con esto, todo nombre cae
+    # en el servidor DNS de abajo, que contesta siempre la IP del equipo.
+    ap.ifconfig((ip_portal, "255.255.255.0", ip_portal, ip_portal))
+
     print("Punto de acceso activo:", config.AP_SSID)
     print("Si no se abre sola, entra desde el celular a http://" + ip_portal)
 
@@ -557,11 +656,10 @@ def abrir_portal(error=None):
 
                 try:
                     cliente.settimeout(5)
-                    pedido = cliente.recv(1024).decode("utf-8", "ignore")
+                    pedido, cuerpo = _leer_pedido(cliente)
                     camino = pedido.split(" ")[1] if " " in pedido else "/"
 
                     if pedido.startswith("POST /guardar"):
-                        cuerpo = pedido.split("\r\n\r\n", 1)[1] if "\r\n\r\n" in pedido else ""
                         campos = {}
                         for par in cuerpo.split("&"):
                             if "=" in par:
