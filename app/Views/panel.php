@@ -29,6 +29,27 @@ $modoManual  = ! empty($view['modoManual']);
 $historial   = (array) ($view['historial'] ?? []);
 $filasFijas  = 3;   // cuántas lecturas se ven sin apretar "Ver más"
 
+/* CALIDAD DE AIRE APARTE DEL RESTO
+   El service manda cuatro "sensores", pero uno no es un sensor: la calidad de
+   aire es un ÍNDICE que se calcula a partir de los otros tres. Mostrarlo como
+   una tarjeta más hacía que se leyera como una cuarta medición independiente,
+   y encima obligaba a recorrer las cuatro para saber si el ambiente está bien.
+
+   Acá se separa: el índice sube al hero (es la respuesta a "¿cómo está mi
+   aire?") y abajo quedan las tres mediciones reales que lo explican. Se
+   conservan intactos los atributos data-vivo-*, así que panel-vivo.js lo sigue
+   refrescando sin cambios: para el JS es la misma tarjeta, solo se mudó. */
+$indiceAire = null;
+$medidos    = [];
+
+foreach ((array) ($view['sensores'] ?? []) as $sensor) {
+    if (($sensor['icono'] ?? '') === 'air') {
+        $indiceAire = $sensor;
+        continue;
+    }
+    $medidos[] = $sensor;
+}
+
 /** Etiqueta corta de un tono de sensor (el color ya lo pone la clase CSS). */
 $tonoLabel = static fn (string $t): string => match ($t) {
     'danger'  => 'Crítico',
@@ -44,7 +65,11 @@ $this->setData([
     'cantidadEquipos' => count($panel['devices_list'] ?? []),
     'conLoader'       => true,
     'conScrollSuave'  => true,
-    'attrsApp'        => 'data-url-datos="' . site_url('panel/datos') . '"',
+    // data-epoch-lectura: antigüedad real de la medición que se está dibujando,
+    // para que el sello de "actualizado hace…" ya sea correcto al abrir la
+    // página y no solo después del primer refresco.
+    'attrsApp'        => 'data-url-datos="' . site_url('panel/datos') . '"'
+                       . ' data-epoch-lectura="' . esc((string) ($view['ultimaLecturaEpoch'] ?? ''), 'attr') . '"',
     'scripts'         => ['JS/panel-vivo.js'],
     'cabecera'        => [
         // Solo identidad: qué ambiente estoy viendo y con qué equipo. El estado
@@ -104,11 +129,56 @@ $this->setData([
         </div>
 
         <div class="ea-hero-side">
+
+            <?php /* ÍNDICE DE CALIDAD DE AIRE — el titular numérico.
+                     Mantiene data-vivo-sensor="air" y los data-vivo de adentro,
+                     así panel-vivo.js lo refresca igual que cuando vivía en la
+                     grilla de sensores. */ ?>
+            <?php if ($indiceAire !== null): $aTono = (string) ($indiceAire['tono'] ?? 'success'); ?>
+                <div class="ea-hero-indice" data-vivo-sensor="air">
+                    <span class="ea-hero-indice-label">Calidad de aire</span>
+
+                    <span class="ea-hero-indice-dato">
+                        <span class="ea-hero-indice-num" data-vivo="valor"><?= esc((string) ($indiceAire['valor'] ?? '--')) ?></span>
+                        <span class="ea-hero-indice-unidad">/100</span>
+                        <span class="ea-badge tone-<?= esc($aTono) ?> ea-hero-indice-badge" data-vivo-tono>
+                            <span class="ea-dot"></span>
+                            <span data-vivo="badge"><?= esc($tonoLabel($aTono)) ?></span>
+                        </span>
+                    </span>
+
+                    <?php /* El medidor: banda = zona buena, pin = el valor de ahora. */ ?>
+                    <span class="ea-gauge ea-hero-indice-gauge" role="img"
+                          aria-label="Calidad de aire: <?= esc((string) ($indiceAire['valor'] ?? '--'), 'attr') ?> de 100. <?= esc($tonoLabel($aTono), 'attr') ?>.">
+                        <span class="ea-gauge-band" data-vivo="band"
+                              style="left: <?= round((float) ($indiceAire['bandLow'] ?? 0), 1) ?>%; width: <?= round(max(0.0, (float) ($indiceAire['bandHigh'] ?? 100) - (float) ($indiceAire['bandLow'] ?? 0)), 1) ?>%;"></span>
+                        <span class="ea-gauge-pin tone-<?= esc($aTono) ?>" data-vivo="pin" data-vivo-tono
+                              style="left: <?= round(max(0.0, min(100.0, (float) ($indiceAire['pct'] ?? 0))), 1) ?>%;"></span>
+                    </span>
+
+                    <?php /* Este texto lo reescribe panel-vivo.js con view.sensores[].rango,
+                             así que arranca con el MISMO valor que va a poner el JS. */ ?>
+                    <span class="ea-hero-indice-hint" data-vivo="rango"><?= esc((string) ($indiceAire['rango'] ?? '')) ?></span>
+                </div>
+            <?php endif; ?>
+
             <div class="ea-hero-trend">
-                <span class="ea-mono ea-hero-trend-label">Temperatura · últimas <?= count($historial) ?> lecturas</span>
                 <?php /* El trazo del mini-gráfico (sparkPath) lo calcula PanelService.
-                         panel-vivo.js lo reemplaza cuando llegan lecturas nuevas. */ ?>
-                <svg viewBox="0 0 220 60" class="ea-hero-spark" preserveAspectRatio="none" aria-hidden="true">
+                         panel-vivo.js lo reemplaza cuando llegan lecturas nuevas.
+                         Los topes numéricos NO son decoración: sin ellos la curva
+                         no dice nada, porque no se sabe entre qué valores se mueve. */ ?>
+                <span class="ea-hero-trend-label">
+                    Temperatura · últimas <?= count($historial) ?> lecturas
+                </span>
+
+                <?php
+                $hayEscala = isset($view['trendMin'], $view['trendMax']);
+                $altSpark  = 'Tendencia de temperatura de las últimas ' . count($historial) . ' lecturas'
+                           . ($hayEscala ? ', entre ' . $view['trendMin'] . ' y ' . $view['trendMax'] . ' grados' : '')
+                           . '.';
+                ?>
+                <svg viewBox="0 0 220 60" class="ea-hero-spark" preserveAspectRatio="none" role="img"
+                     aria-label="<?= esc($altSpark, 'attr') ?>">
                     <defs>
                         <linearGradient id="ea-spark-grad" x1="0" x2="0" y1="0" y2="1">
                             <stop offset="0" stop-color="var(--eden-500)" stop-opacity=".30"/>
@@ -118,6 +188,13 @@ $this->setData([
                     <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?> L 220 60 L 0 60 Z" fill="url(#ea-spark-grad)" data-vivo-spark="relleno"/>
                     <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="var(--eden-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
                 </svg>
+
+                <?php if ($hayEscala): ?>
+                    <span class="ea-hero-trend-escala" aria-hidden="true">
+                        <span class="ea-mono"><span data-vivo="trendMin"><?= esc((string) $view['trendMin']) ?></span>°</span>
+                        <span class="ea-mono"><span data-vivo="trendMax"><?= esc((string) $view['trendMax']) ?></span>°</span>
+                    </span>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -128,12 +205,12 @@ $this->setData([
          medidor es el rango ideal del ambiente; el pin, la lectura actual.
          ===================================================================== -->
     <div class="ea-sec" id="sensores">
-        <h2>Sensores</h2>
-        <span class="ea-sec-right">Comparados con el rango de <?= esc((string) ($view['spaceName'] ?? 'tu ambiente')) ?></span>
+        <h2>Lo que mide el equipo</h2>
+        <span class="ea-sec-right">Comparado con el rango de <?= esc((string) ($view['spaceName'] ?? 'tu ambiente')) ?></span>
     </div>
 
     <div class="ea-sensor-grid">
-        <?php foreach (($view['sensores'] ?? []) as $sensor):
+        <?php foreach ($medidos as $sensor):
             $sTono    = (string) ($sensor['tono'] ?? 'success');
             $bandLow  = (float) ($sensor['bandLow'] ?? 0);
             $bandHigh = (float) ($sensor['bandHigh'] ?? 100);
@@ -156,7 +233,10 @@ $this->setData([
                 </div>
 
                 <div class="ea-sensor-foot">
-                    <div class="ea-gauge" role="img" aria-label="Lectura comparada con el rango ideal">
+                    <?php /* La etiqueta dice el dato, no "hay un gráfico acá": quien
+                             usa lector de pantalla necesita el valor y el rango. */ ?>
+                    <div class="ea-gauge" role="img"
+                         aria-label="<?= esc((string) ($sensor['titulo'] ?? '') . ': ' . ($sensor['valor'] ?? '--') . ' ' . ($sensor['unidad'] ?? '') . '. ' . ($sensor['rango'] ?? '') . '. ' . $tonoLabel($sTono) . '.', 'attr') ?>">
                         <span class="ea-gauge-band" data-vivo="band" style="left: <?= round($bandLow, 1) ?>%; width: <?= round($bandAnch, 1) ?>%;"></span>
                         <span class="ea-gauge-pin tone-<?= esc($sTono) ?>" data-vivo="pin" data-vivo-tono style="left: <?= round($pin, 1) ?>%;"></span>
                     </div>
@@ -309,7 +389,11 @@ $this->setData([
                         <th>Estado</th>
                     </tr>
                 </thead>
-                <tbody>
+                <?php /* data-vivo-historial: panel-vivo.js reconstruye estas filas
+                         cuando llega una lectura nueva, sin recargar la página.
+                         data-filas-fijas le dice cuántas se ven sin apretar "Ver
+                         más", para que no tenga el número duplicado. */ ?>
+                <tbody data-vivo-historial data-filas-fijas="<?= (int) $filasFijas ?>">
                     <?php if ($historial === []): ?>
                         <tr>
                             <td colspan="7" class="ea-table-empty">

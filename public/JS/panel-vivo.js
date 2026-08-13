@@ -33,7 +33,22 @@
     var CADA_MS = 30000;          // cada cuanto preguntar
     var TONOS = ["success", "warning", "danger", "neutral", "info"];
 
-    var ultimoOk = Date.now();    // cuando entro el ultimo dato bueno
+    // El equipo manda una medicion cada 5 minutos (INTERVALO_MEDICION en
+    // firmware/config.py). Recien despues de perder DOS ciclos seguidos tiene
+    // sentido avisar que algo anda mal: antes de eso seria una falsa alarma
+    // cada vez que el panel mira entre medicion y medicion.
+    var VIEJO_SEG = 11 * 60;
+
+    // Momento de la ULTIMA MEDICION, en segundos desde 1970, tal como lo
+    // calculo el servidor. Es lo que mide el sello.
+    //
+    // Antes se usaba Date.now() del ultimo pedido exitoso, y eso estaba mal:
+    // si la placa se moria, el servidor seguia devolviendo la misma lectura
+    // vieja, el pedido seguia saliendo bien, y el sello decia "actualizado
+    // recien" para siempre. Lo unico que confirmaba era que la web respondia.
+    var epochLectura = parseInt(raiz.getAttribute("data-epoch-lectura"), 10);
+    if (!isFinite(epochLectura)) { epochLectura = null; }
+
     var sello = null;             // elemento que muestra "actualizado hace..."
 
     // -----------------------------------------------------------------------
@@ -66,7 +81,11 @@
     // -----------------------------------------------------------------------
     function pintar(view) {
         // ---- Diagnostico general ----
-        ["estadoLabel", "estadoTitulo", "estadoDetalle", "ultimaLectura"].forEach(function (clave) {
+        // trendMin/trendMax son los topes de la curva de tendencia: si entran
+        // lecturas nuevas la escala cambia, y dejarlos fijos haria que el
+        // dibujo y sus numeros dijeran cosas distintas.
+        ["estadoLabel", "estadoTitulo", "estadoDetalle", "ultimaLectura",
+         "trendMin", "trendMax"].forEach(function (clave) {
             var el = document.querySelector('[data-vivo="' + clave + '"]');
             texto(el, view[clave]);
         });
@@ -104,6 +123,9 @@
             }
         });
 
+        // ---- Historial de lecturas ----
+        pintarHistorial(view.historial);
+
         // ---- Curva de tendencia ----
         if (view.sparkPath) {
             var relleno = document.querySelector('[data-vivo-spark="relleno"]');
@@ -119,6 +141,158 @@
         if (t === "warning") { return "Atención"; }
         if (t === "neutral") { return "Sin datos"; }
         return "Normal";
+    }
+
+    // -----------------------------------------------------------------------
+    // Historial de lecturas
+    //
+    // La tabla se armaba una sola vez, al cargar la pagina: entraba una lectura
+    // nueva, el hero y los sensores se actualizaban, pero el historial seguia
+    // mostrando lo viejo hasta que apretaras F5.
+    //
+    // Las filas se construyen con createElement y textContent, no pegando HTML:
+    // asi lo que venga del servidor no puede inyectar marcado.
+    // -----------------------------------------------------------------------
+    var firmaHistorial = null;   // evita rehacer la tabla si no cambio nada
+
+    function celda(clase, valor) {
+        var td = document.createElement("td");
+        if (clase) { td.className = clase; }
+        td.textContent = (valor === undefined || valor === null) ? "--" : valor;
+        return td;
+    }
+
+    /** Celda "Origen": puntito + texto, como la arma panel.php. */
+    function celdaOrigen(origen) {
+        var td = document.createElement("td");
+        var caja = document.createElement("span");
+        caja.className = "ea-table-dev";
+
+        var punto = document.createElement("span");
+        punto.className = "ea-table-dev-dot";
+
+        var texto = document.createElement("span");
+        texto.className = "ea-mono";
+        texto.textContent = origen || "--";
+
+        caja.appendChild(punto);
+        caja.appendChild(texto);
+        td.appendChild(caja);
+        return td;
+    }
+
+    /** Celda "Estado": el badge con su tono. */
+    function celdaEstado(tonoFila) {
+        var td = document.createElement("td");
+        var badge = document.createElement("span");
+        badge.className = "ea-badge tone-" + (tonoFila || "success");
+
+        var punto = document.createElement("span");
+        punto.className = "ea-dot";
+
+        badge.appendChild(punto);
+        badge.appendChild(document.createTextNode(etiquetaTono(tonoFila)));
+        td.appendChild(badge);
+        return td;
+    }
+
+    function filaVacia(columnas) {
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        td.className = "ea-table-empty";
+        td.setAttribute("colspan", columnas);
+
+        var caja = document.createElement("div");
+        caja.className = "ea-empty";
+
+        var titulo = document.createElement("strong");
+        titulo.textContent = "Sin lecturas registradas todavía.";
+
+        var p = document.createElement("p");
+        p.textContent = "Cuando el dispositivo envíe datos, las lecturas aparecerán acá.";
+
+        caja.appendChild(titulo);
+        caja.appendChild(p);
+        td.appendChild(caja);
+        tr.appendChild(td);
+        return tr;
+    }
+
+    /**
+     * Ajusta el boton "Ver N mas" cuando cambia la cantidad de filas.
+     * Si la pagina se cargo con pocas lecturas el boton no existe en el HTML;
+     * en ese caso no hay nada que ajustar y la tabla igual se ve completa.
+     */
+    function ajustarVerMas(total, fijas) {
+        var boton = document.querySelector("[data-readings-toggle]");
+        if (!boton) { return; }
+
+        var pie = boton.closest(".ea-readings-foot");
+        var ocultas = total - fijas;
+
+        if (pie) { pie.hidden = ocultas <= 0; }
+        if (ocultas <= 0) { return; }
+
+        var etiquetaMas = "Ver " + ocultas + " más";
+        boton.setAttribute("data-more", etiquetaMas);
+
+        // Solo se reescribe el texto visible si la tabla esta contraida: si el
+        // usuario la tiene desplegada, el boton dice "Ver menos" y no hay que
+        // pisarselo.
+        var tarjeta = document.querySelector("[data-readings]");
+        if (tarjeta && tarjeta.classList.contains("is-expanded")) { return; }
+
+        var etiqueta = boton.querySelector("[data-readings-label]");
+        if (etiqueta) { etiqueta.textContent = etiquetaMas; }
+    }
+
+    function pintarHistorial(historial) {
+        var cuerpo = document.querySelector("[data-vivo-historial]");
+        if (!cuerpo || Object.prototype.toString.call(historial) !== "[object Array]") { return; }
+
+        // Firma barata: con la misma cantidad de filas y la misma fecha arriba,
+        // no hay nada nuevo. Sin esto la tabla se reconstruiria cada 30 s.
+        var firma = historial.length + "|" + (historial[0] ? historial[0].fecha : "");
+        if (firma === firmaHistorial) { return; }
+
+        var esRefresco = firmaHistorial !== null;
+        firmaHistorial = firma;
+
+        var fijas = parseInt(cuerpo.getAttribute("data-filas-fijas"), 10);
+        if (!isFinite(fijas)) { fijas = 3; }
+
+        var columnas = (cuerpo.parentElement.querySelectorAll("thead th") || []).length || 7;
+
+        while (cuerpo.firstChild) { cuerpo.removeChild(cuerpo.firstChild); }
+
+        if (!historial.length) {
+            cuerpo.appendChild(filaVacia(columnas));
+            ajustarVerMas(0, fijas);
+            return;
+        }
+
+        historial.forEach(function (fila, i) {
+            var tr = document.createElement("tr");
+            if (i >= fijas) { tr.className = "is-extra"; }
+
+            tr.appendChild(celda("ea-mono ea-table-time", fila.fecha));
+            tr.appendChild(celdaOrigen(fila.origen));
+            tr.appendChild(celda("ea-num ea-mono", fila.temperatura));
+            tr.appendChild(celda("ea-num ea-mono", fila.humedad));
+            tr.appendChild(celda("", fila.aire));
+            tr.appendChild(celda("ea-num ea-mono", fila.co2));
+            tr.appendChild(celdaEstado(fila.tono));
+
+            cuerpo.appendChild(tr);
+        });
+
+        // Destello en la lectura recien llegada, con el mismo efecto que usan
+        // los numeros del hero. En la primera carga no: ahi no "cambio" nada.
+        if (esRefresco && cuerpo.firstChild) {
+            cuerpo.firstChild.classList.add("ea-vivo-cambio");
+        }
+
+        ajustarVerMas(historial.length, fijas);
     }
 
     // -----------------------------------------------------------------------
@@ -138,15 +312,26 @@
     function refrescarSello() {
         if (!sello) { return; }
 
-        var seg = Math.round((Date.now() - ultimoOk) / 1000);
+        if (epochLectura === null) {
+            sello.textContent = "sin lecturas todavía";
+            sello.classList.remove("is-viejo");
+            return;
+        }
+
+        var seg = Math.round(Date.now() / 1000 - epochLectura);
         var txt;
 
-        if (seg < 45) { txt = "actualizado recién"; }
-        else if (seg < 5400) { txt = "actualizado hace " + Math.round(seg / 60) + " min"; }
-        else { txt = "sin actualizar"; }
+        // Negativo = el reloj del visitante atrasa respecto del servidor. No es
+        // un dato viejo, asi que no se lo trata como tal.
+        if (seg < 0) { seg = 0; }
+
+        if (seg < 90) { txt = "medición de recién"; }
+        else if (seg < 5400) { txt = "medido hace " + Math.round(seg / 60) + " min"; }
+        else if (seg < 172800) { txt = "medido hace " + Math.round(seg / 3600) + " h"; }
+        else { txt = "sin mediciones nuevas"; }
 
         sello.textContent = txt;
-        sello.classList.toggle("is-viejo", seg > 180);
+        sello.classList.toggle("is-viejo", seg > VIEJO_SEG);
     }
 
     // -----------------------------------------------------------------------
@@ -171,13 +356,32 @@
         }).then(function (data) {
             if (!data || !data.ok || !data.view) { return; }
             pintar(data.view);
-            ultimoOk = Date.now();
+
+            var epoch = parseInt(data.view.ultimaLecturaEpoch, 10);
+            epochLectura = isFinite(epoch) ? epoch : null;
+
             refrescarSello();
         }).catch(function () {
             // Un fallo suelto no rompe nada: queda el último dato bueno.
             refrescarSello();
         });
     }
+
+    // Firma de la tabla que ya vino armada desde el servidor. Sin esto, el
+    // primer refresco la reconstruiria entera aunque no hubiera cambiado nada.
+    (function firmarHistorialInicial() {
+        var cuerpo = document.querySelector("[data-vivo-historial]");
+        if (!cuerpo) { return; }
+
+        var filas = cuerpo.querySelectorAll("tr");
+        var primeraFecha = cuerpo.querySelector(".ea-table-time");
+
+        // Si la tabla esta vacia se deja la firma en null a proposito: cuando
+        // llegue la primera lectura, se dibuja.
+        if (filas.length && primeraFecha) {
+            firmaHistorial = filas.length + "|" + primeraFecha.textContent.trim();
+        }
+    })();
 
     crearSello();
     window.setInterval(preguntar, CADA_MS);
@@ -197,6 +401,12 @@
    - tono(el, nuevo)      → reemplaza la clase tone-* (success/warning/danger)
    - pintar(view)         → aplica todo el bloque de datos a la página
    - etiquetaTono(t)      → "danger" → "Crítico" (igual que en panel.php)
+
+   Historial:
+   - pintarHistorial(h)   → rehace las filas de la tabla si llegó algo nuevo
+   - celda / celdaOrigen / celdaEstado / filaVacia → arman cada <td>
+   - ajustarVerMas(n, f)  → recalcula el botón "Ver N más"
+   - firmaHistorial       → cantidad + fecha de arriba; si no cambió, no rehace
 
    Sello de frescura:
    - crearSello()         → inserta el "actualizado hace…" junto a la lectura

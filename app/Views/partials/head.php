@@ -36,4 +36,12 @@ $extraHead = $extraHead ?? '';
 <?php foreach ($extraCss as $cssPath): ?>
     <link rel="stylesheet" href="<?= asset($cssPath) ?>">
 <?php endforeach; ?>
+<?php /* Red de seguridad: .ea-reveal arranca en opacity:0 y lo destapa
+         dashboard.js al entrar en pantalla. Si el JS no llega a correr
+         (error de red, bloqueador, navegador viejo), sin esto la página se
+         vería COMPLETAMENTE EN BLANCO. El contenido nunca debería depender
+         del JS para ser visible. */ ?>
+<noscript>
+    <style>.ea-reveal { opacity: 1 !important; transform: none !important; }</style>
+</noscript>
 <?= $extraHead ?>

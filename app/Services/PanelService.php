@@ -520,6 +520,13 @@ class PanelService
             },
             'ultimaLectura' => $ctx['ultima'] ? $this->fechaHumana($ctx['ultima']['captured_at']) : 'Sin lecturas',
 
+            // La MISMA fecha en segundos desde 1970. La necesita panel-vivo.js
+            // para saber qué tan vieja es la medición: el texto de arriba está
+            // pensado para leerse, no para hacerle cuentas. Sin esto, el sello
+            // de "actualizado hace…" medía la antigüedad DEL PEDIDO y no la del
+            // DATO, así que una placa muerta seguía figurando como "recién".
+            'ultimaLecturaEpoch' => $ctx['ultima'] ? strtotime((string) $ctx['ultima']['captured_at']) : null,
+
             // Modo de operación
             'modoManual' => $manual,
             'modoLabel'  => $manual ? 'Manual' : 'Automático',
@@ -532,6 +539,35 @@ class PanelService
             'reglasActivas'    => count(array_filter($reglas, static fn (array $r): bool => $r['activa'])),
             'historial'        => $this->historial($ctx['historial'], $perfil),
             'sparkPath'        => $this->sparkPath($ctx['historial']),
+
+            // Topes de la curva de tendencia. Una línea sin escala no se puede
+            // leer: no se sabe si sube dos décimas o diez grados. Con estos dos
+            // números el dibujo pasa de decorativo a informativo.
+            ...$this->escalaTendencia($ctx['historial']),
+        ];
+    }
+
+    /**
+     * Valor mínimo y máximo de temperatura del tramo que dibuja la curva.
+     * Devuelve un array vacío si no hay suficientes lecturas: la vista solo
+     * pinta la escala cuando el gráfico existe.
+     *
+     * @return array{trendMin?: string, trendMax?: string}
+     */
+    private function escalaTendencia(array $historial): array
+    {
+        $valores = array_map(
+            static fn (array $fila): float => (float) $fila['temperature'],
+            $historial
+        );
+
+        if (count($valores) < 2) {
+            return [];
+        }
+
+        return [
+            'trendMin' => number_format(min($valores), 1),
+            'trendMax' => number_format(max($valores), 1),
         ];
     }
 

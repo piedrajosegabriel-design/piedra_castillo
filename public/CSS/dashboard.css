@@ -1140,16 +1140,37 @@ body.dashboard-body { overflow-x: hidden; }
     border-radius: var(--ead-radius-lg);
     border: 1px solid transparent;
     color: #fff;
-    background: linear-gradient(125deg, var(--ea-primary) 0%, var(--ea-primary-med) 60%, color-mix(in oklab, var(--ea-primary-med) 78%, var(--ea-air)) 100%);
+    /* El tramo final llevaba 22% de --ea-air y terminaba en rgb(88,142,109):
+       demasiado claro para texto blanco. Ahi el maximo alcanzable era 3.8:1,
+       o sea que NINGUN ajuste del color del texto podia llegar al 4.5:1 que
+       pide un cuerpo de texto. Se baja a 10% de aire: el degradado se sigue
+       viendo, pero deja de comerse el texto en la esquina inferior derecha
+       (que en celular es justo donde caen el titulo y el diagnostico, porque
+       las dos columnas se apilan). */
+    background: linear-gradient(125deg, var(--ea-primary) 0%, var(--ea-primary-med) 60%, color-mix(in oklab, var(--ea-primary-med) 96%, var(--ea-air)) 100%);
     box-shadow: 0 18px 42px color-mix(in oklab, var(--ea-primary-dark) 34%, transparent);
 }
 
+/* VELO OSCURO SOBRE LOS TONOS DE ALERTA
+   --ea-clay es #c89c7a, un tono claro: con texto blanco el maximo alcanzable
+   sobre el era 2.47:1, muy por debajo del 4.5:1 que pide un cuerpo de texto.
+   No habia color de texto que lo arreglara, porque el problema es el fondo.
+
+   Se resuelve con una capa negra translucida ENCIMA del degradado, en la misma
+   propiedad. Asi se conserva el color de marca (sigue siendo el naranja de
+   "atencion" y el rojo de "critico") y de paso los tres estados del hero
+   quedan con un peso visual parecido, en vez de que el amarillo pareciera
+   apagado al lado del verde. */
 .ea-hero.tone-warning {
-    background: linear-gradient(125deg, #a6764e 0%, var(--ea-clay) 58%, color-mix(in oklab, var(--ea-clay) 74%, #e6c19a) 100%);
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.38)),
+        linear-gradient(125deg, #a6764e 0%, var(--ea-clay) 58%, color-mix(in oklab, var(--ea-clay) 74%, #e6c19a) 100%);
     box-shadow: 0 18px 42px color-mix(in oklab, #7a4a23 32%, transparent);
 }
 .ea-hero.tone-danger {
-    background: linear-gradient(125deg, #863c26 0%, var(--ea-earth) 58%, color-mix(in oklab, var(--ea-earth) 76%, #cf7e5c) 100%);
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.16)),
+        linear-gradient(125deg, #863c26 0%, var(--ea-earth) 58%, color-mix(in oklab, var(--ea-earth) 76%, #cf7e5c) 100%);
     box-shadow: 0 18px 42px color-mix(in oklab, #5f2a18 34%, transparent);
 }
 
@@ -1255,7 +1276,9 @@ body.dashboard-body { overflow-x: hidden; }
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.78);
+    /* Blanco puro: es texto chico y muy espaciado sobre el verde del hero.
+       Con 0.78 daba 3.75:1 y con 0.95 se quedaba en 4.46. */
+    color: #fff;
 }
 
 .ea-hero-title {
@@ -1270,7 +1293,8 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-hero-diag {
     margin: 14px 0 0;
-    color: rgba(255, 255, 255, 0.86);
+    /* 0.86 daba 3.27:1 sobre el tramo claro del degradado. */
+    color: rgba(255, 255, 255, 0.98);
     font-size: 15px;
     line-height: 1.6;
     max-width: 50ch;
@@ -1297,7 +1321,9 @@ body.dashboard-body { overflow-x: hidden; }
     font-size: 9.5px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.66);
+    /* Blanco puro: era el texto mas chico del hero y el de peor contraste
+       (3.16:1 con 0.66). */
+    color: #fff;
 }
 
 .ea-hero-foot-val {
@@ -1351,19 +1377,86 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 6px;
     padding: 14px 16px 6px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Velo OSCURO, no claro. Estas cajas caen sobre el tramo mas claro del
+       degradado del hero, y aclararlas todavia mas dejaba el texto blanco en
+       2.4:1. Oscurecer el fondo sube todo lo de adentro de una sola vez. */
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .ea-hero-trend-label {
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(255, 255, 255, 0.94);
 }
 
 .ea-hero-spark { width: 100%; height: 52px; }
 .ea-hero-spark path[stroke] { stroke: var(--ea-citrus); }
+
+/* Topes de la curva: el valor más bajo a la izquierda, el más alto a la
+   derecha. Sin esto la línea sube y baja sin decir cuánto. */
+.ea-hero-trend-escala {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.94);
+    padding-bottom: 8px;
+}
+
+/* ---------- Índice de calidad de aire (el titular numérico) -----------
+   Vive en el hero y no en la grilla de sensores porque NO es una medición:
+   es el resumen calculado a partir de las otras tres. Es lo primero que hay
+   que poder leer de lejos.                                                */
+.ea-hero-indice {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.ea-hero-indice-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.94);
+}
+
+.ea-hero-indice-dato {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.ea-hero-indice-num {
+    font-family: var(--ea-font-serif);
+    /* Cifras de ancho fijo: al refrescar, un 84 que pasa a 100 no debe
+       correr de lugar a la unidad ni al badge de al lado. */
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(38px, 6vw, 52px);
+    line-height: 1;
+    color: #fff;
+}
+
+.ea-hero-indice-unidad {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+    margin-right: 4px;
+}
+
+.ea-hero-indice-badge { align-self: center; }
+
+.ea-hero-indice-gauge { margin-top: 2px; }
+
+.ea-hero-indice-hint {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.94);
+}
 
 /* =====================================================================
    SENSORES (gauges)
@@ -3039,62 +3132,86 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-welcome-title em { font-style: italic; color: var(--eden-600); }
 .ea-welcome-lede { max-width: 60ch; color: var(--ea-ink-2); font-size: 15.5px; line-height: 1.6; margin: 0 0 22px; }
 
-.ea-welcome-actions { padding: 0; }
-.ea-welcome-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-    margin-bottom: 16px;
+/* Sello "tu cuenta está lista": lo primero que se lee, para que quien entra
+   sepa que no le falta ningún trámite previo. */
+.ea-welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px 5px 10px;
+    border-radius: 999px;
+    background: var(--eden-100);
+    color: var(--eden-700);
+    border: 1px solid var(--eden-300);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .01em;
 }
-.ea-welcome-card {
+.ea-welcome-badge svg { flex: none; }
+
+/* ---------- El tutorial de tres pasos ---------------------------------
+   Va ANTES de las tarjetas de acción a propósito: quien llega nuevo lee qué
+   va a pasar y recién después elige. Es la diferencia entre "apretá acá y
+   fijate" y "esto es lo que va a ocurrir".                                */
+.ea-welcome-pasos { margin-bottom: 24px; }
+
+.ea-welcome-subtitulo {
+    font-family: var(--ea-font-serif);
+    font-size: 20px;
+    color: var(--ea-ink);
+    margin: 0 0 14px;
+    letter-spacing: -0.01em;
+}
+
+.ea-pasos-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    counter-reset: none;
+}
+
+/* Un renglón por paso: número y frase, alineados al centro. Antes cada paso
+   tenía título y párrafo y la pantalla pesaba más que la decisión que pide. */
+.ea-paso {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 22px;
-    border-radius: var(--ea-r-lg, 22px);
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: var(--ea-r-md, 14px);
     background: var(--ea-card);
     border: 1px solid var(--ea-rule);
-    box-shadow: var(--ea-shadow-sm);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.ea-welcome-card:hover { transform: translateY(-2px); box-shadow: var(--ea-shadow-md); border-color: var(--eden-300); }
-.ea-welcome-card--primary { border-color: var(--eden-500); box-shadow: 0 0 0 1px var(--eden-500), var(--ea-shadow-md); }
-.ea-welcome-card-head { display: flex; align-items: center; justify-content: space-between; }
-.ea-welcome-card-icon {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    background: var(--ea-success-soft);
-    color: var(--eden-500);
-    display: inline-flex; align-items: center; justify-content: center;
-}
-.ea-welcome-card-tag {
-    font-family: var(--ea-font-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: var(--ea-r-pill);
-    background: var(--eden-700);
-    color: #fff;
-}
-.ea-welcome-card-tag--neutral { background: var(--ea-rule-soft); color: var(--ea-mute); }
-.ea-welcome-card h4 { font-family: var(--ea-font-serif); font-size: 19px; margin: 6px 0 4px; color: var(--ea-ink); }
-.ea-welcome-card p { color: var(--ea-mute); font-size: 13.5px; line-height: 1.5; margin: 0 0 12px; }
-.ea-welcome-card .ea-button { margin-top: auto; }
-
-.ea-welcome-help {
-    margin: 8px 0 0;
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: var(--ea-info-soft);
-    color: var(--ea-ink-2);
-    font-size: 13px;
+    font-size: 13.5px;
     line-height: 1.5;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
+    color: var(--ea-ink-2);
 }
-.ea-welcome-help svg { flex: none; color: var(--ea-info); margin-top: 3px; }
+
+.ea-paso-num {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--eden-500);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Las dos acciones del saludo -------------------------------
+   Conectar (primario) y Comprar (fantasma). La jerarquía la marca el ESTILO,
+   no el tamaño: los dos son botones y los dos se ven, pero uno solo pesa.
+   Antes "comprar" era un link de texto y directamente pasaba desapercibido. */
+.ea-welcome-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+}
 
 /* ---------- Editar ambiente ---------- */
 .ea-amb-row {
@@ -3129,7 +3246,15 @@ body.dashboard-body { overflow-x: hidden; }
 
 @media (max-width: 560px) {
     .ea-amb-row { grid-template-columns: 1fr; }
-    .ea-welcome-grid { grid-template-columns: 1fr; }
+
+    /* Apilados y a todo el ancho: en celular, dos botones lado a lado quedan
+       angostos y se toca el equivocado. */
+    .ea-welcome-cta { flex-direction: column; align-items: stretch; }
+    .ea-welcome-cta .ea-button { width: 100%; }
+
+    /* 16px es el mínimo cómodo de lectura en celular. Este párrafo es lo
+       primero que lee alguien que recién entra, así que no se achica. */
+    .ea-welcome-lede { font-size: 16px; }
 }
 
 /* =====================================================================
