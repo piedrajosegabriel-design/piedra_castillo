@@ -37,7 +37,7 @@ $this->setData([
                 <input type="password" name="password" id="loginPassword" required
                        placeholder="Ingresá tu contraseña"
                        autocomplete="current-password">
-                <button type="button" class="ea-button ea-button-secondary" data-ver-password="#loginPassword">Mostrar</button>
+                <?= view('partials/ojo_password', ['objetivo' => '#loginPassword']) ?>
             </div>
         </div>
 

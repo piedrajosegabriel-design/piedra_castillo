@@ -16,6 +16,8 @@ $this->setData([
     'tituloPagina'  => 'EdenAir · Perfil',
     'descripcion'   => 'Editá tus datos personales y tu contraseña en Eden Air.',
     'sidebarActivo' => 'perfil',
+    // acceso.js trae el ojo para ver la contraseña (partials/ojo_password.php).
+    'scripts'       => ['JS/acceso.js'],
     'cabecera'      => [
         'titulo' => 'Perfil',
         'bajada' => 'Tus datos personales y tu contraseña',
@@ -87,8 +89,12 @@ $this->setData([
 
                 <label class="ea-account-wide ea-account-secure">
                     <span>Contraseña actual <small>(verificación)</small></span>
-                    <input type="password" name="current_password" autocomplete="current-password" required
-                           placeholder="Ingresá tu contraseña para confirmar">
+                    <div class="ea-password">
+                        <input type="password" id="perfilDatosPassword" name="current_password"
+                               autocomplete="current-password" required
+                               placeholder="Ingresá tu contraseña para confirmar">
+                        <?= view('partials/ojo_password', ['objetivo' => '#perfilDatosPassword']) ?>
+                    </div>
                 </label>
 
                 <div class="ea-account-actions">
@@ -116,17 +122,29 @@ $this->setData([
 
                 <label class="ea-account-wide">
                     <span>Contraseña actual</span>
-                    <input type="password" name="current_password" autocomplete="current-password" required>
+                    <div class="ea-password">
+                        <input type="password" id="perfilPasswordActual" name="current_password"
+                               autocomplete="current-password" required>
+                        <?= view('partials/ojo_password', ['objetivo' => '#perfilPasswordActual']) ?>
+                    </div>
                 </label>
 
                 <label>
                     <span>Nueva contraseña</span>
-                    <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+                    <div class="ea-password">
+                        <input type="password" id="perfilPasswordNueva" name="password"
+                               autocomplete="new-password" minlength="6" required>
+                        <?= view('partials/ojo_password', ['objetivo' => '#perfilPasswordNueva, #perfilPasswordConfirmar']) ?>
+                    </div>
                 </label>
 
                 <label>
                     <span>Confirmar contraseña</span>
-                    <input type="password" name="password_confirm" autocomplete="new-password" minlength="6" required>
+                    <div class="ea-password">
+                        <input type="password" id="perfilPasswordConfirmar" name="password_confirm"
+                               autocomplete="new-password" minlength="6" required>
+                        <?= view('partials/ojo_password', ['objetivo' => '#perfilPasswordConfirmar']) ?>
+                    </div>
                 </label>
 
                 <p class="ea-account-hint">Mínimo 6 caracteres. Te recomendamos combinar letras y números.</p>

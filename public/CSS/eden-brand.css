@@ -1553,15 +1553,72 @@ body.ea-nav-open {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+/* ---------- Contraseña con ojo ----------------------------------------
+   El botón va ADENTRO del campo, contra el borde derecho. El input reserva
+   ese espacio con padding-right para que el texto nunca pase por abajo del
+   ícono. El área táctil es de 44px: el mínimo cómodo en un celular.        */
 .ea-password {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: stretch;
+    position: relative;
+    display: block;
 }
 
-.ea-password .ea-button-secondary {
-    padding: 0 18px;
+/* Los dos tipos, porque el campo pasa a type="text" al mostrar la clave.
+   Van con [type] a propósito: así empatan en especificidad con la regla
+   general de .ea-field input[type="password"] (línea ~1491) y ganan por
+   venir después. Con `.ea-password input` a secas, perdían y el texto
+   quedaba pasando por abajo del ojo.                                      */
+.ea-password input[type="password"],
+.ea-password input[type="text"] {
+    width: 100%;
+    padding-right: 48px;
+}
+
+.ea-password-ojo {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ea-r-sm, 8px);
+    background: transparent;
+    color: var(--ea-text-soft, #7b8794);
+    cursor: pointer;
+    transition: color .18s ease, background-color .18s ease;
+}
+
+.ea-password-ojo:hover,
+.ea-password-ojo:focus-visible {
+    color: var(--ea-brand, #2f9e77);
+    background: rgba(127, 127, 127, .12);
+}
+
+.ea-password-ojo svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+}
+
+/* Con la contraseña oculta se ofrece "ver"; con la contraseña a la vista,
+   "ocultar". Solo uno de los dos íconos está presente a la vez.            */
+.ea-password-ojo .ea-ojo-ocultar,
+.ea-password-ojo[data-visible="true"] .ea-ojo-ver {
+    display: none;
+}
+
+.ea-password-ojo[data-visible="true"] .ea-ojo-ocultar {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-password-ojo {
+        transition: none;
+    }
 }
 
 /* ---------- Messages -------------------------------------------------- */

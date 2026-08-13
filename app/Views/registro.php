@@ -62,7 +62,7 @@ $this->setData([
                 <input type="password" id="registroPassword" name="password" required
                        placeholder="Creá una contraseña"
                        autocomplete="new-password" minlength="8">
-                <button type="button" class="ea-button ea-button-secondary" data-ver-password="#registroPassword, #confirmPassword">Mostrar</button>
+                <?= view('partials/ojo_password', ['objetivo' => '#registroPassword, #confirmPassword']) ?>
             </div>
             <p class="ea-hint">8+ caracteres, una mayúscula, una minúscula y un número.</p>
         </div>

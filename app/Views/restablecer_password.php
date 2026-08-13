@@ -31,7 +31,7 @@ $this->setData([
                 <input type="password" id="password" name="password" required
                        placeholder="Ingresá tu nueva contraseña"
                        autocomplete="new-password" minlength="8">
-                <button type="button" class="ea-button ea-button-secondary" data-ver-password="#password">Mostrar</button>
+                <?= view('partials/ojo_password', ['objetivo' => '#password']) ?>
             </div>
         </div>
 
@@ -41,7 +41,7 @@ $this->setData([
                 <input type="password" id="password_confirm" name="password_confirm" required
                        placeholder="Repetí tu nueva contraseña"
                        autocomplete="new-password" minlength="8">
-                <button type="button" class="ea-button ea-button-secondary" data-ver-password="#password_confirm">Mostrar</button>
+                <?= view('partials/ojo_password', ['objetivo' => '#password_confirm']) ?>
             </div>
         </div>
 

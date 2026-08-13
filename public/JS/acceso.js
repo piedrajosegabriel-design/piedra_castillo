@@ -8,9 +8,10 @@
  *
  * ---------------------------------------------------------------------------
  * 1. MOSTRAR / OCULTAR CONTRASEÑA
- *    <button type="button" data-ver-password="#miPassword">Mostrar</button>
+ *    El botón lo pone app/Views/partials/ojo_password.php:
+ *    <?= view('partials/ojo_password', ['objetivo' => '#miPassword']) ?>
  *    Podés apuntar a varios campos a la vez:
- *    <button type="button" data-ver-password="#pass, #confirmar">Mostrar</button>
+ *    ['objetivo' => '#pass, #confirmar']
  *
  * 2. BLOQUEAR EL BOTÓN AL ENVIAR (evita el doble click y el doble alta)
  *    <form data-enviando="Validando…"> … <button type="submit">Entrar</button>
@@ -29,8 +30,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 campo.type = estaOculto ? "text" : "password";
             });
 
-            boton.textContent = estaOculto ? "Ocultar" : "Mostrar";
-            boton.setAttribute("aria-label", estaOculto ? "Ocultar contraseña" : "Mostrar contraseña");
+            var etiqueta = estaOculto ? "Ocultar contraseña" : "Mostrar contraseña";
+            boton.setAttribute("aria-label", etiqueta);
+            boton.setAttribute("title", etiqueta);
+
+            // El botón con ojo (partials/ojo_password.php) cambia de ícono por
+            // CSS mirando data-visible. El botón de solo texto, si queda alguno
+            // dado de alta a mano, sigue cambiando su palabra como antes.
+            if (boton.querySelector("svg")) {
+                boton.setAttribute("data-visible", estaOculto ? "true" : "false");
+            } else {
+                boton.textContent = estaOculto ? "Ocultar" : "Mostrar";
+            }
         });
     });
 
