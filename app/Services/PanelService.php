@@ -487,7 +487,7 @@ class PanelService
 
         $actuadores = $this->actuadores($ctx['estado']);
         $reglas     = $this->reglas($lec, $perfil);
-        $nombre     = (string) $ctx['usuario']['nombre'];
+        $nombre     = (string) $ctx['usuario']['nombre'] . ' ' . (string) $ctx['usuario']['apellido'];
 
         return [
             // Identidad y contexto

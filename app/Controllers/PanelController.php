@@ -178,6 +178,8 @@ class PanelController extends BaseController
         if ($redirect = $this->validarAutenticacionPerfil($usuario, $datos['current_password'])) {
             return $redirect;
         }
+        
+        $datos['email'] = (string) $usuario['email'];
 
         if ($usuarios->existeCorreoOUsuarioExcepto((int) $usuario['id'], $datos['email'], $datos['usuario'])) {
             return $this->redirigirConInputYDato('/panel/perfil', 'errors', [
@@ -296,10 +298,13 @@ class PanelController extends BaseController
     // =========================================================================
     private function leerDatosPerfil(): array
     {
+        // El email NO se lee del POST: en el formulario es de solo lectura, así
+        // que nunca viaja. Lo pone actualizarPerfil() desde la fila del usuario.
+        // Leerlo de acá era el bug: quedaba vacío y la regla 'required' hacía
+        // fallar la validación siempre, con lo cual no se guardaba nada.
         return [
             'nombre'           => trim((string) $this->request->getPost('nombre')),
             'apellido'         => trim((string) $this->request->getPost('apellido')),
-            'email'            => strtolower(trim((string) $this->request->getPost('email'))),
             'usuario'          => trim((string) $this->request->getPost('usuario')),
             'current_password' => (string) $this->request->getPost('current_password'),
         ];
@@ -316,17 +321,32 @@ class PanelController extends BaseController
 
     private function validarFormularioPerfil(array $datos): ?RedirectResponse
     {
+        // Sin regla para 'email': no es editable, no se postea y lo resuelve
+        // actualizarPerfil() desde la base.
         $reglas = [
             'nombre'           => 'required|min_length[2]|max_length[120]',
             'apellido'         => 'required|min_length[2]|max_length[120]',
-            'email'            => 'required|valid_email|max_length[120]',
             'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
             'current_password' => 'required|max_length[255]',
         ];
 
+        // Sin estos, CI4 responde en inglés ("The nombre field is required").
         $mensajes = [
+            'nombre' => [
+                'required'   => 'Escribi tu nombre.',
+                'min_length' => 'El nombre tiene que tener al menos 2 caracteres.',
+            ],
+            'apellido' => [
+                'required'   => 'Escribi tu apellido.',
+                'min_length' => 'El apellido tiene que tener al menos 2 caracteres.',
+            ],
             'usuario' => [
+                'required'    => 'Escribi tu nombre de usuario.',
+                'min_length'  => 'El nombre de usuario tiene que tener al menos 3 caracteres.',
                 'regex_match' => 'El usuario solo puede contener letras, numeros, puntos, guiones y guion bajo.',
+            ],
+            'current_password' => [
+                'required' => 'Ingresa tu contrasena actual para confirmar el cambio.',
             ],
         ];
 

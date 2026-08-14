@@ -80,6 +80,11 @@ $this->setData([
                     </label>
                 <?php endif; ?>
 
+                <?php /* Este input va A PROPÓSITO sin name=: es solo para que el
+                         usuario vea con qué mail entra, no se manda ni se guarda.
+                         El controlador toma el email de la base. No le agregues
+                         name="email": readonly se saca desde el navegador, y ahí
+                         cualquiera podría cambiarse el mail de la cuenta. */ ?>
                 <?php if (! empty($usuario['email'])): ?>
                     <label>
                         <span>Email <small>(no editable)</small></span>
