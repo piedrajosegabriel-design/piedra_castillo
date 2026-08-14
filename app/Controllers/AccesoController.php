@@ -145,7 +145,7 @@ class AccesoController extends BaseController
         session()->regenerate(true);
         session()->set([
             'user_id'      => (int) $usuario['id'],
-            'user_name'    => $usuario['nombre'],
+            'user_name'    => trim($usuario['nombre'] . ' ' . ($usuario['apellido'] ?? '')),
             'is_logged_in' => true,
         ]);
     }

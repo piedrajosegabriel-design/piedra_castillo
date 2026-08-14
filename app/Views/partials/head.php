@@ -15,9 +15,13 @@ $extraHead = $extraHead ?? '';
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1c4029">
 <title><?= esc($title) ?></title>
-<link rel="icon" type="image/svg+xml" href="<?= base_url('assets/img/branding/favicon.svg') ?>">
-<link rel="alternate icon" href="<?= base_url('favicon.ico') ?>">
-<link rel="mask-icon" href="<?= base_url('assets/img/branding/mark-mono-dark.svg') ?>" color="#1c4029">
+<?php /* asset() en vez de base_url(): el favicon es de lo que más cachea el
+         navegador, y sin el ?v=<fecha> se sigue viendo el icono viejo aunque
+         el archivo haya cambiado. El .ico es el que usan los navegadores que
+         ignoran el SVG; tiene que ser la marca de EdenAir, no el de CI4. */ ?>
+<link rel="icon" type="image/svg+xml" href="<?= asset('assets/img/branding/favicon.svg') ?>">
+<link rel="alternate icon" type="image/x-icon" href="<?= asset('favicon.ico') ?>">
+<link rel="mask-icon" href="<?= asset('assets/img/branding/mark-mono-dark.svg') ?>" color="#1c4029">
 <script>
     (function () {
         try {
