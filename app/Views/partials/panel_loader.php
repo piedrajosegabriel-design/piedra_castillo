@@ -28,7 +28,7 @@
     <div class="ea-loader-inner">
         <span class="ea-loader-eyebrow">
             <span class="ea-loader-dot" aria-hidden="true"></span>
-            EdenAir · Núcleo ambiental
+            EdenAir
         </span>
 
         <div class="ea-loader-orbit" aria-hidden="true">

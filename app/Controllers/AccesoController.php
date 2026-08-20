@@ -271,7 +271,12 @@ class AccesoController extends BaseController
         if ($usuario) {
             $token     = bin2hex(random_bytes(32)); // Token Seguro
             $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes')); // Vence en 15 min
-            $enlace    = site_url('restablecer/' . $token); //Link enviado por email
+            // El tercer argumento (la config de App) fuerza a usar el baseURL
+            // configurado en vez del host por el que entró este pedido. Sin
+            // eso, pedir la recuperación desde "localhost" mandaría un enlace
+            // a localhost, que fuera de esta máquina no existe: el mail se
+            // abre en el celular y el botón no lleva a ningún lado.
+            $enlace = site_url('restablecer/' . $token, null, config('App'));
             $nombre    = (string) ($usuario['nombre'] ?? 'Usuario'); // Nombre o valor por defecto
 
             $usuarios->guardarToken((int) $usuario['id'], $token, $expiresAt);
@@ -279,12 +284,18 @@ class AccesoController extends BaseController
             $emailService = \Config\Services::email();
             $emailService->setFrom(config('Email')->fromEmail, config('Email')->fromName);
             $emailService->setTo((string) $usuario['email']);
-            $emailService->setSubject('EdenAir - Restablecer tu contrasena');
+            $emailService->setSubject('EdenAir - Restablecer tu contraseña');
             $emailService->setMessage(view('emails/recuperar_password', [
-                'nombre' => $nombre,
-                'enlace' => $enlace,
+                'nombre'  => $nombre,
+                'enlace'  => $enlace,
                 'minutos' => 15,
-            ]));
+            ] + $this->adjuntarMarcaEnElMail($emailService)));
+
+            // Versión en texto plano del mismo mensaje. Sin esto, CodeIgniter
+            // arma una solo con strip_tags() del HTML: sale un engrudo de
+            // palabras sueltas. Y esa parte es justamente la que leen los
+            // filtros de spam, así que conviene que se entienda.
+            $emailService->setAltMessage($this->mailRecuperacionEnTextoPlano($nombre, $enlace, 15));
 
             if (! $emailService->send()) {
                 log_message('error', 'Fallo el envio de recuperacion para {email}. Debug: {debug}', [
@@ -301,6 +312,61 @@ class AccesoController extends BaseController
         // Mensaje neutro a propósito: no revela si el correo existe o no
         // (evita que un atacante descubra qué cuentas están registradas).
         return redirect()->to('/login')->with('success', 'Si el correo coincide con una cuenta registrada, recibiras un enlace de recuperacion en los proximos minutos.');
+    }
+
+    /**
+     * El mismo mail, en texto plano: lo ven los clientes sin HTML y lo leen
+     * los filtros de spam. Es corto a propósito.
+     */
+    private function mailRecuperacionEnTextoPlano(string $nombre, string $enlace, int $minutos): string
+    {
+        return implode("\n", [
+            'Hola ' . $nombre . ',',
+            '',
+            'Pediste restablecer tu contraseña de EdenAir.',
+            'Abrí este enlace para crear una nueva:',
+            '',
+            $enlace,
+            '',
+            'El enlace vence en ' . $minutos . ' minutos.',
+            'Si no fuiste vos, ignorá este correo: tu contraseña actual sigue intacta.',
+            '',
+            '— EdenAir · Respirá mejor, viví más cómodo.',
+            'Correo automático, no es necesario responderlo.',
+        ]);
+    }
+
+    /**
+     * Mete el logo ADENTRO del correo y devuelve sus Content-ID para la vista.
+     *
+     * Un <img src="http://localhost/..."> se ve roto apenas abrís el mail en el
+     * celular: esa dirección no existe fuera de esta máquina. Adjuntándolo como
+     * 'inline' el PNG viaja con el mensaje y se ve siempre, sin depender de que
+     * el sitio sea accesible desde afuera.
+     *
+     * Van los dos: el verde para fondo claro y el crema para modo oscuro. La
+     * vista muestra uno u otro con @media (prefers-color-scheme).
+     *
+     * Si un archivo faltara, setAttachmentCID() devuelve false y la vista cae
+     * sola a la URL absoluta: el mail sale igual, nunca se corta el envío.
+     *
+     * @return array{logoCid: string, logoClaroCid: string}
+     */
+    private function adjuntarMarcaEnElMail(\CodeIgniter\Email\Email $email): array
+    {
+        $marcas = [
+            'logoCid'      => FCPATH . 'assets/img/branding/mark-email.png',
+            'logoClaroCid' => FCPATH . 'assets/img/branding/mark-email-light.png',
+        ];
+
+        $cids = [];
+
+        foreach ($marcas as $clave => $ruta) {
+            $email->attach($ruta, 'inline');
+            $cids[$clave] = (string) $email->setAttachmentCID($ruta);
+        }
+
+        return $cids;
     }
 
     public function restablecer(string $token): string|RedirectResponse
@@ -396,6 +462,9 @@ class AccesoController extends BaseController
    - actualizarHashLoginSiHaceFalta()     → rehash si cambió el algoritmo
    - iniciarSesion()                      → regenera sesión + guarda user_id
    - redirigirDespuesDelLogin()           → siempre a /panel (flujo Hito 2)
+   - adjuntarMarcaEnElMail()              → adjunta el logo 'inline' y devuelve
+                                            sus Content-ID para la plantilla
+   - mailRecuperacionEnTextoPlano()       → la versión sin HTML del mismo mail
    - redirigirConInputYDato()             → redirect + withInput + flash
 
    Funciones del framework (CI4) usadas acá:

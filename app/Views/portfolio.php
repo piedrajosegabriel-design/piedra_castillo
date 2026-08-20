@@ -222,7 +222,7 @@ $sitemap = [
                     <article class="ea-pf-card">
                         <span class="ea-pf-card__eyebrow">Marca</span>
                         <div class="ea-pf-logo-stage">
-                            <?= view('partials/logo', ['variant' => 'horizontal', 'size' => 60, 'subtitle' => 'Monitoreo ambiental']) ?>
+                            <?= view('partials/logo', ['logo' => ['variant' => 'horizontal', 'size' => 60, 'subtitle' => 'Monitoreo ambiental']]) ?>
                         </div>
                         <h3 class="ea-pf-card__title">Eden Air · isotipo + wordmark</h3>
                         <p class="ea-pf-card__text">

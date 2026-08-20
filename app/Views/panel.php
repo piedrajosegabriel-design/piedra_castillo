@@ -205,8 +205,7 @@ $this->setData([
          medidor es el rango ideal del ambiente; el pin, la lectura actual.
          ===================================================================== -->
     <div class="ea-sec" id="sensores">
-        <h2>Lo que mide el equipo</h2>
-        <span class="ea-sec-right">Comparado con el rango de <?= esc((string) ($view['spaceName'] ?? 'tu ambiente')) ?></span>
+        <h2>Mediciones</h2>
     </div>
 
     <div class="ea-sensor-grid">
@@ -256,7 +255,6 @@ $this->setData([
          ===================================================================== -->
     <div class="ea-sec" id="configuracion">
         <h2>Control</h2>
-        <span class="ea-sec-right">Qué está encendido y con qué criterio</span>
     </div>
 
     <div class="ea-ops-grid">
@@ -358,8 +356,8 @@ $this->setData([
 
             <p class="ea-actuators-note">
                 <?= $modoManual
-                    ? 'En modo manual las reglas quedan en pausa: los actuadores hacen lo que vos indiques.'
-                    : 'En modo automático estas reglas encienden y apagan los actuadores solas.' ?>
+                    ? 'Modo manual: reglas modificables.'
+                    : 'Modo automático: reglas automaticas.' ?>
             </p>
         </article>
 
@@ -372,7 +370,6 @@ $this->setData([
          ===================================================================== -->
     <div class="ea-sec" id="historial">
         <h2>Lecturas</h2>
-        <span class="ea-sec-right"><span class="ea-mono"><?= count($historial) ?> registros recientes</span></span>
     </div>
 
     <article class="ea-card ea-readings-card" data-readings>

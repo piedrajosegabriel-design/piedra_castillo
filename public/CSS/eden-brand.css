@@ -182,10 +182,27 @@
     box-sizing: border-box;
 }
 
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó mirando la pantalla con el zoom del navegador en
+   125%, así que al 100% —que es como entra cualquiera— todo quedaba chico.
+
+   Los tamaños de letra están en rem, o sea relativos a este font-size. Con
+   subirlo acá, escala toda la tipografía de las cuatro hojas de estilo de
+   una sola vez. Los títulos grandes no están en rem: usan clamp() con vw,
+   así que ya crecen solos con el ancho de la ventana.
+
+   Los saltos son por ancho de ventana, no por zoom: no hay forma de leer el
+   zoom desde CSS, pero es lo mismo: en una pantalla de 1920 al 100% la
+   ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no se toca nada,
+   así que notebooks chicas y celulares quedan igual que antes. */
 html {
+    font-size: 16px;
     scroll-behavior: smooth;
     scroll-padding-top: var(--ea-scroll-offset);
 }
+
+@media (min-width: 1400px) { html { font-size: 18px; } }   /* ~112% */
+@media (min-width: 1700px) { html { font-size: 20px; } }   /* = el 125% del navegador */
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -244,7 +261,7 @@ a {
 body.ea-body {
     min-height: 100vh;
     font-family: var(--ea-font-sans);
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.55;
     color: var(--ea-ink);
     background: var(--ea-paper);
@@ -268,13 +285,13 @@ body.ea-body {
 
 .ea-mono {
     font-family: var(--ea-font-mono);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     letter-spacing: 0.04em;
 }
 
 .ea-eyebrow {
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -311,6 +328,12 @@ body.ea-body {
     padding: 0 clamp(20px, 4vw, 48px);
 }
 
+/* En una pantalla ancha, 1280 dejaba 320px muertos de cada lado: el
+   contenido ocupaba dos tercios y todo parecía lejos. Se ensancha junto con
+   la tipografía, en los mismos saltos. */
+@media (min-width: 1400px) { .ea-page { max-width: 1400px; } }
+@media (min-width: 1700px) { .ea-page { max-width: 1600px; } }
+
 .ea-section {
     padding: clamp(36px, 6vw, 72px) 0;
     position: relative;
@@ -343,7 +366,7 @@ body.ea-body {
 }
 
 .ea-section-head p {
-    font-size: 17px;
+    font-size: 1.0625rem;
     color: var(--ea-ink-2);
     max-width: 56ch;
     margin: 0;
@@ -377,43 +400,40 @@ body.ea-body {
     overflow: visible;
 }
 
-/* Marca "e": el trazo es un degradado de 3 stops resuelto con variables CSS,
-   de modo que el mismo SVG se adapta al tono y al modo oscuro.
+/* Marca "e": un solo trazo con un degradado de 3 stops que salen de variables,
+   así el mismo SVG sirve en toda la página. La clase se la pone marca_e()
+   (app/Helpers/eden_helper.php), de modo que la landing, el pie, el sidebar y
+   el loader dibujan exactamente el mismo logo.
    --ea-elogo-a → inicio (profundo)
    --ea-elogo-b → medio (verde)
-   --ea-elogo-c → final (aqua / aire)
-   --ea-elogo-glow → halo aqua opcional (modo oscuro) */
+   --ea-elogo-c → final (aqua / aire) */
+
+/* Sobre fondo claro: verde profundo → aqua. */
 .ea-logo-mark--e {
     --ea-elogo-a: var(--ea-primary-dark);  /* #143326 */
     --ea-elogo-b: var(--ea-primary);       /* #2f6b4f */
     --ea-elogo-c: #3fae97;                  /* aqua-verde */
-    --ea-elogo-glow: transparent;
     filter: drop-shadow(0 0 0 transparent);
     transition: filter 0.35s var(--ea-ease-out);
 }
 
-/* Tono "ink": en claro mantiene el verde profundo; en oscuro brilla en aqua. */
-:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-mark--e {
+/* Sobre fondo oscuro: crema → aqua-mint con un halo suave. Vale para el modo
+   oscuro y para el tono "cream" (el pie, que siempre va sobre oscuro). */
+:root[data-theme="dark"] .ea-logo-mark--e,
+.ea-logo--tone-cream .ea-logo-mark--e {
     --ea-elogo-a: #F6F4EC;                  /* crema brillante */
     --ea-elogo-b: #8FD6C8;                  /* aqua vibrante */
     --ea-elogo-c: #5BE5B6;                  /* aqua-mint luminoso */
     filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
 }
 
-/* Tono "cream": pensado para fondos oscuros (no depende del tema).
-   Trazo claro con final aqua intenso + halo sutil para que respire. */
-.ea-logo--tone-cream .ea-logo-mark--e {
-    --ea-elogo-a: #F6F4EC;
-    --ea-elogo-b: #BCE9DC;
-    --ea-elogo-c: #5BE5B6;
-    filter: drop-shadow(0 0 10px rgba(143, 214, 200, 0.30));
-}
-
-/* Tono "moss": variante monocroma verde */
-.ea-logo--tone-moss .ea-logo-mark--e {
+/* Tono "moss": variante monocroma verde, igual en claro y en oscuro. */
+.ea-logo--tone-moss .ea-logo-mark--e,
+:root[data-theme="dark"] .ea-logo--tone-moss .ea-logo-mark--e {
     --ea-elogo-a: var(--eden-700);
     --ea-elogo-b: var(--eden-600);
     --ea-elogo-c: var(--eden-500);
+    filter: drop-shadow(0 0 0 transparent);
 }
 
 .ea-logo-word {
@@ -444,7 +464,7 @@ body.ea-body {
 
 .ea-logo-sub {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -458,7 +478,7 @@ body.ea-body {
     font-style: italic;
     color: var(--ea-ink-2);
     margin: 12px 0 0;
-    font-size: 17px;
+    font-size: 1.0625rem;
     line-height: 1.3;
 }
 
@@ -500,7 +520,7 @@ body.ea-body {
 .ea-brand-text strong {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 20px;
+    font-size: 1.25rem;
     letter-spacing: -0.02em;
     color: var(--ea-ink);
 }
@@ -516,7 +536,7 @@ body.ea-body {
 
 .ea-brand-text small {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -542,7 +562,7 @@ body.ea-body {
     gap: 6px;
     padding: 8px 12px;
     border-radius: var(--ea-r-pill);
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     font-weight: 500;
     color: var(--ea-ink-2);
     cursor: pointer;
@@ -675,7 +695,7 @@ body.ea-body {
     align-items: center;
     gap: 8px;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -684,7 +704,7 @@ body.ea-body {
 .ea-mega-title {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 1.375rem;
     letter-spacing: -0.012em;
     margin: 6px 0 4px;
     color: var(--ea-ink);
@@ -699,7 +719,7 @@ body.ea-body {
 :root[data-theme="dark"] .ea-mega-title em { color: var(--eden-300); }
 
 .ea-mega-lede {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--ea-ink-2);
     margin: 0;
 }
@@ -740,7 +760,7 @@ body.ea-body {
 
 .ea-mega-link-label {
     display: block;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     line-height: 1.2;
 }
@@ -748,7 +768,7 @@ body.ea-body {
 .ea-mega-link-hint {
     display: block;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.06em;
     color: var(--ea-mute);
     margin-top: 4px;
@@ -771,7 +791,7 @@ body.ea-body {
     align-items: center;
     gap: 8px;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -802,7 +822,7 @@ body.ea-body {
 
 .ea-mega-foot-link {
     font-family: var(--ea-font-sans);
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: var(--eden-700);
     transition: color 0.18s ease;
@@ -855,7 +875,7 @@ body.ea-body {
     position: relative;
     padding: 8px 12px;
     border-radius: var(--ea-r-pill);
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     color: var(--ea-ink-2);
     font-weight: 500;
     transition: color 0.18s ease, background-color 0.18s ease;
@@ -984,7 +1004,7 @@ body.ea-body {
     padding: 14px 16px;
     border-radius: var(--ea-r-md);
     font-family: var(--ea-font-serif);
-    font-size: 24px;
+    font-size: 1.5rem;
     letter-spacing: -0.012em;
     color: var(--eden-100);
     border: 1px solid transparent;
@@ -1025,7 +1045,7 @@ body.ea-body {
 
 .ea-mobile-nav-theme-label {
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.58);
@@ -1136,7 +1156,7 @@ body.ea-nav-open {
     color: var(--btn-color);
     font-family: var(--ea-font-sans);
     font-weight: 500;
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     letter-spacing: 0.01em;
     line-height: 1;
     text-decoration: none;
@@ -1262,7 +1282,7 @@ body.ea-nav-open {
 
 .ea-button-sm {
     padding: 7px 13px;
-    font-size: 12.5px;
+    font-size: 0.7813rem;
 }
 
 /* CTA de compra destacado — disponible en todas las páginas (landing y panel). */
@@ -1392,7 +1412,7 @@ body.ea-nav-open {
 }
 
 .ea-page-header .ea-lede {
-    font-size: 17px;
+    font-size: 1.0625rem;
     color: var(--ea-ink-2);
     max-width: 52ch;
 }
@@ -1411,7 +1431,7 @@ body.ea-nav-open {
     padding: 6px 12px;
     border-radius: var(--ea-r-pill);
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     background: var(--eden-100);
@@ -1479,7 +1499,7 @@ body.ea-nav-open {
 .ea-field label,
 .ea-label {
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-ink-2);
@@ -1503,7 +1523,7 @@ body.ea-nav-open {
     border-radius: var(--ea-r-sm);
     padding: 11px 14px;
     font-family: var(--ea-font-sans);
-    font-size: 14.5px;
+    font-size: 0.9063rem;
     line-height: 1.4;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
@@ -1543,7 +1563,7 @@ body.ea-nav-open {
 .ea-field .ea-hint,
 .ea-hint {
     font-family: var(--ea-font-sans);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     color: var(--ea-mute);
 }
 
@@ -1625,7 +1645,7 @@ body.ea-nav-open {
 .ea-message {
     border-radius: var(--ea-r-md);
     padding: 14px 18px;
-    font-size: 14px;
+    font-size: 0.875rem;
     border: 1px solid transparent;
     display: flex;
     gap: 12px;
@@ -1693,7 +1713,7 @@ body.ea-nav-open {
 .ea-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .ea-table th,
@@ -1709,7 +1729,7 @@ body.ea-nav-open {
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     color: var(--ea-mute);
     background: rgba(236, 242, 232, 0.42);
 }
@@ -1765,7 +1785,7 @@ body.ea-nav-open {
 
 .ea-stat-card .ea-stat-label {
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1782,13 +1802,13 @@ body.ea-nav-open {
 
 .ea-stat-card .ea-stat-unit {
     font-family: var(--ea-font-mono);
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--ea-mute);
     letter-spacing: 0.08em;
 }
 
 .ea-stat-card .ea-stat-detail {
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     color: var(--ea-ink-2);
     line-height: 1.5;
 }
@@ -1850,7 +1870,7 @@ body.ea-nav-open {
 }
 
 .ea-hero-lede {
-    font-size: 16.5px;
+    font-size: 1.0313rem;
     line-height: 1.55;
     color: var(--ea-ink-2);
     max-width: 52ch;
@@ -1918,14 +1938,14 @@ body.ea-nav-open {
 .ea-feature-card h3 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 1.375rem;
     line-height: 1.1;
     letter-spacing: -0.012em;
 }
 
 .ea-feature-card p {
     color: var(--ea-ink-2);
-    font-size: 14.5px;
+    font-size: 0.9063rem;
     line-height: 1.55;
 }
 
@@ -1977,7 +1997,7 @@ body.ea-nav-open {
 .ea-auth-card h2 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 28px;
+    font-size: 1.75rem;
     letter-spacing: -0.015em;
     line-height: 1.05;
     color: var(--ea-ink);
@@ -1985,11 +2005,15 @@ body.ea-nav-open {
 
 .ea-auth-card p.ea-lede {
     color: var(--ea-ink-2);
-    font-size: 15px;
+    font-size: 0.9375rem;
 }
 
 .ea-auth-foot {
     display: flex;
+    /* Con la tipografia mas grande los dos enlaces del login no entraban
+       en una linea y el segundo se salia de la tarjeta. Que bajen. */
+    flex-wrap: wrap;
+    gap: 10px 24px;
     justify-content: space-between;
     margin-top: 4px;
 }
@@ -2001,8 +2025,6 @@ body.ea-nav-open {
     font-weight: 500;
     border-bottom: 1px solid transparent;
     transition: border-color 0.18s ease;
-    margin-left: 2rem;
-    margin-right: 2rem;
 }
 
 .ea-auth-link:hover {
@@ -2094,7 +2116,7 @@ body.ea-nav-open {
 
 .ea-env-card .ea-env-code {
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2117,14 +2139,14 @@ body.ea-nav-open {
 .ea-env-card strong {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 1.375rem;
     line-height: 1.1;
     letter-spacing: -0.012em;
 }
 
 .ea-env-card small {
     color: var(--ea-ink-2);
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.45;
 }
 
@@ -2136,7 +2158,7 @@ body.ea-nav-open {
 .ea-env-card .ea-env-range {
     margin-top: auto;
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.06em;
     color: var(--ea-mute);
 }
@@ -2163,7 +2185,7 @@ body.ea-nav-open {
 
 .ea-footer p {
     color: rgba(236, 242, 232, 0.7);
-    font-size: 14.5px;
+    font-size: 0.9063rem;
     max-width: 40ch;
     margin-top: 18px;
     line-height: 1.55;
@@ -2171,7 +2193,7 @@ body.ea-nav-open {
 
 .ea-footer h4 {
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.5);
@@ -2181,7 +2203,7 @@ body.ea-nav-open {
 .ea-footer ul li,
 .ea-footer span {
     color: rgba(236, 242, 232, 0.78);
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .ea-footer-bottom {
@@ -2193,7 +2215,7 @@ body.ea-nav-open {
     justify-content: space-between;
     gap: 12px;
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.5);
@@ -2225,7 +2247,7 @@ body.ea-nav-open {
     border-radius: var(--ea-r-pill);
     color: var(--eden-700);
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
@@ -2351,7 +2373,7 @@ body.dashboard-body {
 .dashboard-body .brand-copy strong {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 1.375rem;
     letter-spacing: -0.02em;
 }
 
@@ -2359,7 +2381,7 @@ body.dashboard-body {
     font-family: var(--ea-font-mono);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     color: var(--ea-mute);
 }
 

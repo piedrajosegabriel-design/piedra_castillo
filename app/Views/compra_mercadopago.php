@@ -26,8 +26,6 @@ $this->setData([
         'titulo'  => 'Comprar EdenAir',
         'bajada'  => 'Dispositivo + dashboard · compra del producto',
         'usuario' => false,
-        'extra'   => '<span class="ea-chip ea-chip-status status-success" title="Estado del checkout">'
-                   . '<span class="ea-pulse"></span><span>Compra simulada</span></span>',
     ],
 ]);
 ?>
@@ -68,7 +66,7 @@ $this->setData([
                         </button>
                         <p class="ea-plan-note">
                             <?= icono('candado', 12) ?>
-                            Compra simulada · sin integración de pago todavía
+                            Compra segura · Mercado Pago
                         </p>
                     </div>
                 </div>

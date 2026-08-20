@@ -73,7 +73,7 @@
     color: var(--eden-700);
     font-family: var(--ea-font-mono);
     font-weight: 500;
-    font-size: 11px;
+    font-size: 0.6875rem;
     line-height: 1.2;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -211,7 +211,7 @@
 
 .ea-pf-card__eyebrow {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -220,7 +220,7 @@
 .ea-pf-card__title {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 19px;
+    font-size: 1.1875rem;
     letter-spacing: -0.01em;
     margin: 8px 0 6px;
     color: var(--ea-ink);
@@ -230,7 +230,7 @@
 
 .ea-pf-card__text {
     color: var(--ea-ink-2);
-    font-size: 14px;
+    font-size: 0.875rem;
     margin: 0;
 }
 
@@ -244,7 +244,7 @@
     padding: 4px 10px;
     border-radius: var(--ea-r-pill);
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     background: var(--ea-rule-soft);
@@ -351,7 +351,7 @@
     background: rgba(201, 216, 112, 0.22);
     color: var(--eden-800);
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     border: 1px solid rgba(74, 122, 85, 0.22);
@@ -410,7 +410,7 @@
     display: block;
     margin-top: 6px;
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.65);
@@ -465,7 +465,7 @@
     border: 1px solid rgba(20, 32, 26, 0.1);
     box-shadow: var(--ea-shadow-sm);
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.06em;
     color: var(--ea-ink);
     pointer-events: auto;
@@ -483,7 +483,7 @@
 
 :root[data-theme="dark"] .ea-pf-chip svg { color: var(--ea-breath); }
 
-.ea-pf-chip strong { font-family: var(--ea-font-sans); font-weight: 600; font-size: 12px; letter-spacing: 0; }
+.ea-pf-chip strong { font-family: var(--ea-font-sans); font-weight: 600; font-size: 0.75rem; letter-spacing: 0; }
 
 .ea-pf-chip--temp     { top: 6%;  left: -4%; animation-delay: 0s; }
 .ea-pf-chip--humedad  { top: 22%; right: -6%; animation-delay: 1.4s; }
@@ -509,7 +509,7 @@
     align-items: center;
     gap: 8px;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -603,7 +603,7 @@
 
 .ea-pf-tile__num {
     font-family: var(--ea-font-mono);
-    font-size: 12px;
+    font-size: 0.75rem;
     letter-spacing: 0.16em;
     color: var(--ea-mute);
 }
@@ -611,7 +611,7 @@
 .ea-pf-tile__title {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: 1.375rem;
     line-height: 1.1;
     margin: 4px 0 0;
     color: var(--ea-ink);
@@ -621,7 +621,7 @@
 :root[data-theme="dark"] .ea-pf-tile__title { color: var(--eden-100); }
 
 .ea-pf-tile__lede {
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     color: var(--ea-ink-2);
     margin: 0;
 }
@@ -632,7 +632,7 @@
     align-items: center;
     gap: 6px;
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--eden-700);
@@ -702,6 +702,9 @@
     left: 4px;
     right: 4px;
     font-family: var(--ea-font-mono);
+    /* Excepcion a la escala en rem: la muestra mide 52px fijos (5 columnas
+       dentro de la tarjeta), asi que si la etiqueta crece el codigo hex se
+       sale del recuadro. Es el unico tamano del sitio que no escala. */
     font-size: 8.5px;
     letter-spacing: 0.01em;
     color: rgba(255, 255, 255, 0.94);
@@ -721,14 +724,14 @@
 
 .ea-pf-type__serif {
     font-family: var(--ea-font-serif);
-    font-size: 30px;
+    font-size: 1.875rem;
     line-height: 1;
     letter-spacing: -0.02em;
     color: var(--ea-ink);
 }
 
-.ea-pf-type__sans  { font-family: var(--ea-font-sans); font-size: 15px; color: var(--ea-ink-2); }
-.ea-pf-type__mono  { font-family: var(--ea-font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--ea-mute); text-transform: uppercase; }
+.ea-pf-type__sans  { font-family: var(--ea-font-sans); font-size: 0.9375rem; color: var(--ea-ink-2); }
+.ea-pf-type__mono  { font-family: var(--ea-font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; color: var(--ea-mute); text-transform: uppercase; }
 
 :root[data-theme="dark"] .ea-pf-type__serif { color: var(--eden-100); }
 
@@ -747,7 +750,7 @@
     background: var(--eden-100);
     color: var(--eden-700);
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.06em;
     border: 1px solid rgba(74, 122, 85, 0.18);
 }
@@ -777,7 +780,7 @@
     display: grid;
     place-items: center;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     color: var(--ea-mute);
     text-transform: uppercase;
@@ -809,7 +812,7 @@
         radial-gradient(circle at 30% 30%, rgba(184, 213, 208, 0.9), rgba(74, 122, 85, 0.45) 65%, rgba(14, 31, 23, 0.85) 100%);
     color: var(--eden-100);
     font-family: var(--ea-font-mono);
-    font-size: 13px;
+    font-size: 0.8125rem;
     letter-spacing: 0.06em;
     display: grid;
     place-items: center;
@@ -819,7 +822,7 @@
 
 .ea-pf-team__role {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--eden-700);
@@ -873,7 +876,7 @@
     background: rgba(20, 50, 38, 0.10); /* tono sutil, contrasta en claro y oscuro */
     color: var(--ea-primary);
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.16em;
     line-height: 1.4;
     border: 1px solid var(--ea-rule-soft);
@@ -905,7 +908,7 @@
 .ea-pf-journey__step h4 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 16px;
+    font-size: 1rem;
     margin: 0 0 6px;           /* padding-top de la card maneja el espacio superior */
     letter-spacing: -0.01em;
     color: var(--ea-ink);
@@ -913,7 +916,7 @@
 }
 
 .ea-pf-journey__step p {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--ea-ink-2);
     margin: 0;
     line-height: 1.5;
@@ -935,7 +938,7 @@
     border-radius: var(--ea-r-pill);
     background: var(--ea-card);
     border: 1px solid var(--ea-rule);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     color: var(--ea-ink);
 }
 
@@ -981,14 +984,14 @@
 
 .ea-pf-metric__label {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
 }
 
 .ea-pf-metric__hint {
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     color: var(--ea-ink-2);
     margin-top: 4px;
 }
@@ -1018,7 +1021,7 @@
 
 .ea-pf-stat__label {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1035,7 +1038,7 @@
 :root[data-theme="dark"] .ea-pf-stat__value { color: var(--eden-100); }
 
 .ea-pf-stat__sub {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--ea-ink-2);
     margin-top: 4px;
 }
@@ -1072,7 +1075,7 @@
 
 .ea-pf-block__letter {
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.18em;
     color: var(--eden-700);
     padding: 4px 10px;
@@ -1090,7 +1093,7 @@
 .ea-pf-block__title {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 21px;
+    font-size: 1.3125rem;
     letter-spacing: -0.012em;
     color: var(--ea-ink);
 }
@@ -1160,7 +1163,7 @@
     padding: 10px 12px;
     background: rgba(255, 255, 255, 0.65);
     border-radius: var(--ea-r-md);
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--ea-ink);
     border: 1px solid var(--ea-rule-soft);
 }
@@ -1199,7 +1202,7 @@
     background: var(--ea-card);
     border: 1px solid var(--ea-rule-soft);
     color: var(--ea-ink-2);
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     counter-increment: pfq;
 }
 
@@ -1211,7 +1214,7 @@
     background: var(--eden-100);
     color: var(--eden-700);
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     display: grid;
     place-items: center;
     flex-shrink: 0;
@@ -1246,7 +1249,7 @@
 
 .ea-pf-date__label {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1254,7 +1257,7 @@
 
 .ea-pf-date__value {
     font-family: var(--ea-font-serif);
-    font-size: 22px;
+    font-size: 1.375rem;
     margin-top: 4px;
     letter-spacing: -0.01em;
 }
@@ -1287,7 +1290,7 @@
     right: -14px;
     transform: translateY(-50%);
     font-family: var(--ea-font-mono);
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--eden-500);
 }
 
@@ -1298,7 +1301,7 @@
 .ea-pf-pipeline__num {
     display: block;
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.16em;
     color: var(--ea-mute);
 }
@@ -1306,7 +1309,7 @@
 .ea-pf-pipeline__name {
     display: block;
     font-family: var(--ea-font-serif);
-    font-size: 15px;
+    font-size: 0.9375rem;
     margin-top: 4px;
     color: var(--ea-ink);
     letter-spacing: -0.01em;
@@ -1343,14 +1346,14 @@
 .ea-pf-chart__head h4 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 16px;
+    font-size: 1rem;
     margin: 0;
     letter-spacing: -0.01em;
 }
 
 .ea-pf-chart__meta {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.1em;
     color: var(--ea-mute);
 }
@@ -1382,7 +1385,7 @@
     text-align: center;
     padding: 8px 18px;
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.08em;
     color: var(--ea-mute);
     max-width: 28ch;
@@ -1400,7 +1403,7 @@
 .ea-pf-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 0.8125rem;
     min-width: 640px;
 }
 
@@ -1410,7 +1413,7 @@
     background: var(--ea-card-soft);
     color: var(--ea-ink-2);
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     border-bottom: 1px solid var(--ea-rule);
@@ -1429,7 +1432,7 @@
     text-align: center;
     color: var(--ea-mute);
     font-family: var(--ea-font-mono);
-    font-size: 12px;
+    font-size: 0.75rem;
     letter-spacing: 0.06em;
 }
 
@@ -1447,7 +1450,7 @@
 
 .ea-pf-form-link a {
     font-family: var(--ea-font-mono);
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--eden-700);
     word-break: break-all;
 }
@@ -1463,7 +1466,7 @@
     background: rgba(200, 156, 122, 0.18);
     color: #7a4a23;
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     align-self: flex-start;
@@ -1511,7 +1514,7 @@
 .ea-pf-empty h4 {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 19px;
+    font-size: 1.1875rem;
     margin: 0 0 6px;
     color: var(--ea-ink);
 }
@@ -1520,7 +1523,7 @@
 
 .ea-pf-empty p {
     color: var(--ea-ink-2);
-    font-size: 14px;
+    font-size: 0.875rem;
     max-width: 52ch;
     margin: 0;
 }
@@ -1539,7 +1542,7 @@
     border-radius: var(--ea-r-pill);
     background: var(--ea-card-soft);
     color: var(--ea-ink-2);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     border: 1px solid var(--ea-rule-soft);
 }
 
@@ -1585,7 +1588,7 @@
 
 .ea-pf-stage__num {
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.18em;
     color: var(--ea-mute);
     text-transform: uppercase;
@@ -1594,13 +1597,13 @@
 .ea-pf-stage__title {
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 19px;
+    font-size: 1.1875rem;
     margin: 0 0 4px;
     letter-spacing: -0.01em;
 }
 
 .ea-pf-stage__lede {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--ea-ink-2);
     margin: 0;
 }
@@ -1655,7 +1658,7 @@
 .ea-mobile-nav .ea-mobile-nav-section-title {
     display: block;
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.58);
@@ -1696,14 +1699,14 @@
     border-collapse: collapse;
     width: 100%;
     min-width: 820px;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 .ea-comp-caption {
     caption-side: top;
     text-align: left;
     padding: 14px 16px 0;
     color: var(--ea-mute);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     font-style: italic;
 }
 .ea-comp-table th,
@@ -1729,15 +1732,15 @@
     min-width: 160px;
 }
 .ea-comp-corner { color: var(--ea-mute); font-weight: 600; }
-.ea-comp-brand { display: block; font-family: var(--ea-font-serif); font-size: 16px; color: var(--ea-ink); }
-.ea-comp-model { display: block; font-size: 11px; color: var(--ea-mute); font-family: var(--ea-font-mono); }
+.ea-comp-brand { display: block; font-family: var(--ea-font-serif); font-size: 1rem; color: var(--ea-ink); }
+.ea-comp-model { display: block; font-size: 0.6875rem; color: var(--ea-mute); font-family: var(--ea-font-mono); }
 .ea-comp-table td { color: var(--ea-ink-2); }
 
 /* Columna de Eden Air resaltada */
 .ea-comp-eden { background: var(--ea-success-soft) !important; }
 .ea-comp-table thead th.ea-comp-eden { box-shadow: inset 0 -3px 0 var(--eden-500); }
 .ea-comp-table thead th.ea-comp-eden .ea-comp-brand { color: var(--eden-600); }
-.ea-comp-note { margin: 12px 2px 0; font-size: 12px; color: var(--ea-mute); line-height: 1.5; }
+.ea-comp-note { margin: 12px 2px 0; font-size: 0.75rem; color: var(--ea-mute); line-height: 1.5; }
 
 /* Acordeón móvil (oculto en desktop) */
 .ea-comp-cards { display: none; }
@@ -1762,17 +1765,17 @@
     content: "+";
     position: absolute;
     right: 18px;
-    font-size: 20px;
+    font-size: 1.25rem;
     color: var(--ea-mute);
 }
 .ea-comp-acc[open] summary::after { content: "–"; }
 .ea-comp-acc summary { position: relative; }
-.ea-comp-acc-brand { font-family: var(--ea-font-serif); font-size: 18px; color: var(--ea-ink); }
-.ea-comp-acc-model { font-size: 11px; font-family: var(--ea-font-mono); color: var(--ea-mute); }
+.ea-comp-acc-brand { font-family: var(--ea-font-serif); font-size: 1.125rem; color: var(--ea-ink); }
+.ea-comp-acc-model { font-size: 0.6875rem; font-family: var(--ea-font-mono); color: var(--ea-mute); }
 .ea-comp-acc-list { margin: 0; padding: 0 16px 14px; display: grid; gap: 8px; }
 .ea-comp-acc-list > div { display: grid; gap: 1px; }
-.ea-comp-acc-list dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ea-mute); }
-.ea-comp-acc-list dd { margin: 0; font-size: 13.5px; color: var(--ea-ink-2); line-height: 1.4; }
+.ea-comp-acc-list dt { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ea-mute); }
+.ea-comp-acc-list dd { margin: 0; font-size: 0.8438rem; color: var(--ea-ink-2); line-height: 1.4; }
 
 /* Análisis, ventajas y conclusión */
 .ea-comp-analysis { margin-top: clamp(20px, 3vw, 30px); }
@@ -1794,7 +1797,7 @@
 .ea-comp-checks li {
     position: relative;
     padding-left: 28px;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5;
     color: var(--ea-ink-2);
 }
@@ -1815,7 +1818,7 @@
     border-radius: 0 var(--ea-r-md, 14px) var(--ea-r-md, 14px) 0;
     background: var(--ea-linen);
 }
-.ea-comp-conclusion p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ea-ink-2); }
+.ea-comp-conclusion p { margin: 0; font-size: 0.9375rem; line-height: 1.65; color: var(--ea-ink-2); }
 
 /* Responsive: tabla → acordeón */
 @media (max-width: 720px) {
@@ -1868,7 +1871,7 @@
 
 .ea-cost-lab__lede {
     margin: 6px 0 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--ea-ink-2);
     max-width: 52ch;
@@ -1904,7 +1907,7 @@
 
 .ea-cost-open__sub {
     margin: 14px 0 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.65;
     color: var(--ea-ink-2);
     max-width: 40ch;
@@ -1915,7 +1918,7 @@
 .ea-cost-open__split { margin: 0; }
 .ea-cost-open__split figcaption {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1967,11 +1970,11 @@
 .ea-cost-key li.is-fijo::before { background: var(--cost-fijo); }
 .ea-cost-key li.is-gan::before  { background: var(--cost-gan); }
 
-.ea-cost-key__name { grid-area: name; font-size: 12.5px; color: var(--ea-ink-2); }
+.ea-cost-key__name { grid-area: name; font-size: 0.7813rem; color: var(--ea-ink-2); }
 .ea-cost-key__val {
     grid-area: val;
     font-family: var(--ea-font-mono);
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--ea-ink);
     font-variant-numeric: tabular-nums;
 }
@@ -1980,7 +1983,7 @@
     grid-area: val;
     justify-self: end;
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     color: var(--ea-mute);
 }
 
@@ -2012,7 +2015,7 @@
     background: var(--ea-card);
     color: var(--ea-ink-2);
     font-family: var(--ea-font-mono);
-    font-size: 11.5px;
+    font-size: 0.7188rem;
     letter-spacing: 0.06em;
     cursor: pointer;
     transition: border-color 0.2s ease, color 0.2s ease, transform 0.12s ease;
@@ -2041,12 +2044,12 @@
     border: 1px solid var(--ea-rule);
 }
 .ea-cost-control label {
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     color: var(--ea-ink-2);
 }
 .ea-cost-control output {
     font-family: var(--ea-font-mono);
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--eden-600);
     font-variant-numeric: tabular-nums;
 }
@@ -2119,7 +2122,7 @@
 }
 .ea-cost-tile__label {
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2132,7 +2135,7 @@
     font-variant-numeric: tabular-nums;
 }
 :root[data-theme="dark"] .ea-cost-tile__value { color: var(--eden-100); }
-.ea-cost-tile__sub { font-size: 11.5px; color: var(--ea-ink-2); }
+.ea-cost-tile__sub { font-size: 0.7188rem; color: var(--ea-ink-2); }
 
 .ea-cost-tile.is-good {
     background: var(--ea-success-soft);
@@ -2150,7 +2153,7 @@
     background: var(--ea-danger-soft);
     border: 1px solid rgba(166, 91, 61, 0.4);
     color: var(--ea-ink);
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     line-height: 1.5;
 }
 :root[data-theme="dark"] .ea-cost-alert { color: var(--eden-100); }
@@ -2164,7 +2167,7 @@
 }
 .ea-cost-chart figcaption {
     font-family: var(--ea-font-mono);
-    font-size: 10.5px;
+    font-size: 0.6563rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2191,7 +2194,7 @@
     border: 1px solid var(--ea-rule);
     background: var(--ea-card);
     color: var(--ea-ink-2);
-    font-size: 13px;
+    font-size: 0.8125rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -2200,7 +2203,7 @@
 }
 .ea-cost-filter span {
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     padding: 2px 7px;
     border-radius: 999px;
     background: var(--ea-rule-soft);
@@ -2248,14 +2251,14 @@
     background: var(--ea-success-soft);
     color: var(--eden-600);
     font-family: var(--ea-font-mono);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
 }
 :root[data-theme="dark"] .ea-cost-chip__qty { color: var(--eden-300); }
-.ea-cost-chip__name { grid-area: name; font-size: 13.5px; line-height: 1.35; color: var(--ea-ink-2); }
+.ea-cost-chip__name { grid-area: name; font-size: 0.8438rem; line-height: 1.35; color: var(--ea-ink-2); }
 .ea-cost-chip__group {
     grid-area: group;
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2275,7 +2278,7 @@
     align-items: center;
     gap: 14px;
 }
-.ea-cost-fixed__name { font-size: 13.5px; color: var(--ea-ink-2); }
+.ea-cost-fixed__name { font-size: 0.8438rem; color: var(--ea-ink-2); }
 .ea-cost-fixed__track {
     height: 12px;
     border-radius: 999px;
@@ -2291,7 +2294,7 @@
 }
 .ea-cost-fixed__val {
     font-family: var(--ea-font-mono);
-    font-size: 13.5px;
+    font-size: 0.8438rem;
     color: var(--ea-ink);
     font-variant-numeric: tabular-nums;
     min-width: 84px;
@@ -2319,13 +2322,13 @@
     margin: 0;
     font-family: var(--ea-font-serif);
     font-weight: 400;
-    font-size: 21px;
+    font-size: 1.3125rem;
     color: var(--ea-ink);
 }
 :root[data-theme="dark"] .ea-cost-method__title { color: var(--eden-100); }
 .ea-cost-method__text {
     margin: 10px 0 0;
-    font-size: 14.5px;
+    font-size: 0.9063rem;
     line-height: 1.6;
     color: var(--ea-ink-2);
 }
@@ -2339,14 +2342,14 @@
 }
 .ea-cost-method__data dt {
     font-family: var(--ea-font-mono);
-    font-size: 10px;
+    font-size: 0.625rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ea-mute);
 }
 .ea-cost-method__data dd {
     margin: 4px 0 0;
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--ea-ink);
     font-variant-numeric: tabular-nums;
 }
@@ -2379,7 +2382,7 @@
 :root[data-theme="dark"] .ea-cost-takeaway__num { color: var(--eden-300); }
 .ea-cost-takeaways p {
     margin: 10px 0 0;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.6;
     color: var(--ea-ink-2);
 }
@@ -2424,12 +2427,12 @@
 
 .ea-cost-full__title {
     font-family: var(--ea-font-serif);
-    font-size: 19px;
+    font-size: 1.1875rem;
     color: var(--ea-ink);
     transition: color 0.18s ease;
 }
 :root[data-theme="dark"] .ea-cost-full__title { color: var(--eden-100); }
-.ea-cost-full__hint { font-size: 12.5px; color: var(--ea-mute); }
+.ea-cost-full__hint { font-size: 0.7813rem; color: var(--ea-mute); }
 
 .ea-cost-full__body {
     padding: 0 clamp(18px, 2.6vw, 24px) clamp(22px, 3vw, 30px);
@@ -2438,7 +2441,7 @@
 .ea-cost-full__body h4 {
     margin: clamp(20px, 3vw, 28px) 0 10px;
     font-family: var(--ea-font-mono);
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--eden-600);
@@ -2446,7 +2449,7 @@
 :root[data-theme="dark"] .ea-cost-full__body h4 { color: var(--eden-300); }
 .ea-cost-full__body > p {
     margin: 0;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.7;
     color: var(--ea-ink-2);
     max-width: 78ch;

@@ -20,9 +20,7 @@ $this->setData([
     'scripts'       => ['JS/acceso.js'],
     'cabecera'      => [
         'titulo' => 'Perfil',
-        'bajada' => 'Tus datos personales y tu contraseña',
-        'extra'  => '<span class="ea-chip ea-chip-status status-success" title="Sesión protegida">'
-                  . '<span class="ea-pulse"></span><span>Sesión segura</span></span>',
+        'bajada' => 'Datos personales y contraseña',
     ],
 ]);
 ?>
@@ -34,8 +32,7 @@ $this->setData([
         <span class="ea-badge tone-info"><span class="ea-dot"></span>Cuenta protegida</span>
         <h2 id="cuentaTitulo" class="ea-serif ea-account-title">Tus datos, en tu control.</h2>
         <p class="ea-account-lede">
-            Actualizá tu nombre y tu contraseña cuando lo necesites.
-            Los cambios se verifican con tu contraseña actual.
+            Actualizá tu nombre y tu contraseña.
         </p>
     </section>
 

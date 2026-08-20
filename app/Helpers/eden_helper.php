@@ -92,6 +92,10 @@ if (! function_exists('marca_e')) {
      * Cada uso necesita su propio $id porque el degradado es un <defs> y dos
      * gradientes con el mismo id en la misma página se pisan.
      *
+     * El SVG sale con la clase .ea-logo-mark--e y de ahí saca los colores
+     * (eden-brand.css). Sin esa clase el degradado queda sin resolver y el
+     * trazo se dibuja negro: es lo que le pasaba al logo de la landing.
+     *
      * @param string        $id      Identificador único del degradado en la página.
      * @param string[]|null $colores 3 colores del degradado. Null = variables de
      *                               marca (--ea-elogo-a/b/c), que se adaptan al tema.
@@ -115,7 +119,7 @@ if (! function_exists('marca_e')) {
         $id      = preg_replace('/[^A-Za-z0-9_-]/', '', $id);
         $colores = array_map(static fn ($c) => preg_replace('/[^A-Za-z0-9#(),.\- ]/', '', (string) $c), $colores);
 
-        return '<svg viewBox="2 16 116 70"' . $medidas . ' role="img" aria-label="EdenAir">'
+        return '<svg class="ea-logo-mark ea-logo-mark--e" viewBox="2 16 116 70"' . $medidas . ' role="img" aria-label="EdenAir">'
              . '<defs><linearGradient id="' . $id . '" x1="0.08" y1="0.1" x2="0.92" y2="0.92">'
              . '<stop offset="0" stop-color="' . $colores[0] . '"/>'
              . '<stop offset="0.55" stop-color="' . $colores[1] . '"/>'

@@ -28,8 +28,18 @@ class App extends BaseConfig
      *     ['media.example.com', 'accounts.example.com']
      *
      * @var list<string>
+     *
+     * ACÁ: el baseURL apunta a la IP de la máquina en la red (192.168.2.130),
+     * porque es la dirección que sirve para el ESP32 y para los enlaces que
+     * viajan por mail. Pero durante el desarrollo uno abre el sitio por
+     * "localhost", y ahí las dos direcciones se pelean: la página se carga
+     * desde localhost y el formulario apunta a la IP, así que el POST sale
+     * hacia OTRO host. La cookie del token CSRF no viaja (las cookies son por
+     * host) y CodeIgniter responde 403 "The action you requested is not
+     * allowed". Listando acá los nombres válidos, cada página arma sus
+     * enlaces con el host por el que la abriste y deja de haber cruce.
      */
-    public array $allowedHostnames = [];
+    public array $allowedHostnames = ['localhost', '127.0.0.1'];
 
     /**
      * --------------------------------------------------------------------------

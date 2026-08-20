@@ -113,7 +113,6 @@ $inicial = strtoupper(mb_substr(trim($nombre), 0, 1) ?: 'U');
             <span class="ea-header-avatar"><?= esc($inicial) ?></span>
             <span class="ea-header-name">
                 <?= esc($nombre) ?>
-                <small>Cuenta Eden Air</small>
             </span>
         </div>
     <?php endif; ?>
