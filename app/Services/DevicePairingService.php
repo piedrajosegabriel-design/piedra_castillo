@@ -569,9 +569,9 @@ class DevicePairingService
         return array_map(function (array $d): array {
             [$estadoLabel, $estadoTono] = $this->estadoLegible((string) ($d['status'] ?? 'pending'));
 
-            $espacio = ($d['environment_type'] ?? '') === 'personalizable'
-                ? (trim((string) ($d['custom_name'] ?? '')) ?: 'Personalizable')
-                : $this->presets->getEnvironmentLabel((string) ($d['environment_type'] ?? 'hogar'));
+            // El JOIN de obtenerDeUsuario() trae environment_type y custom_name:
+            // alcanza para resolver el nombre con el mismo criterio que el resto.
+            $espacio = $this->presets->getDisplayName($d);
 
             return [
                 'id'           => (int) $d['id'],

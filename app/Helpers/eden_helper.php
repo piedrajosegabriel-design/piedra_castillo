@@ -39,6 +39,13 @@ if (! function_exists('icono')) {
             'carrito'        => ['<path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>', 1.7],
             'salir'          => ['<path d="M14 4h4a2 2 0 012 2v12a2 2 0 01-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h12"/>', 1.6],
 
+            // --- Tipos de espacio (selector y referencia de /panel/ambientes)
+            // 'casa' (arriba) es el del tipo "hogar": no se repite acá.
+            'oficina'    => ['<rect x="3" y="8" width="18" height="12" rx="1.6"/><path d="M9 8V5a1 1 0 011-1h4a1 1 0 011 1v3"/><path d="M3 13h18"/>', 1.6],
+            'aula'       => ['<rect x="3" y="4" width="18" height="11" rx="1.6"/><path d="M7 19h10M12 15v4"/><path d="M7 8h6"/>', 1.6],
+            'dormitorio' => ['<path d="M3 18v-8"/><path d="M3 13h18v5"/><path d="M21 18v-4a3 3 0 00-3-3h-7"/><circle cx="7.5" cy="9.5" r="1.8"/>', 1.6],
+            'ajustes'    => ['<path d="M5 8h14M5 16h14"/><circle cx="10" cy="8" r="2.2"/><circle cx="15" cy="16" r="2.2"/>', 1.6],
+
             // --- Sensores (tarjetas del dashboard) ---
             'temp' => ['<path d="M10 14V5a2 2 0 014 0v9a4 4 0 11-4 0z"/><path d="M12 8v6"/>', 1.6],
             'hum'  => ['<path d="M12 3.5c3.5 4 6 7.2 6 10.5a6 6 0 11-12 0c0-3.3 2.5-6.5 6-10.5z"/><path d="M9 14a3 3 0 003 3"/>', 1.6],

@@ -501,7 +501,10 @@ body.ea-body {
     align-items: center;
     justify-content: space-between;
     gap: var(--ea-gap-md);
-    padding: 12px 0;
+    /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
+       mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
+       los botones quedaban pegados al borde de la ventana. */
+    padding-block: var(--ea-nav-pad, 12px);
 }
 
 .ea-brand {
@@ -850,10 +853,15 @@ body.ea-body {
 }
 
 /* ---------- Navbar links + mobile drawer (compartido entre páginas) --- */
-.ea-navbar { transition: padding 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease; }
+/* Al scrollear la barra se achica: el alto lo pone el padding vertical del
+   .ea-navbar-inner, asi que el que cambia es --ea-nav-pad (12px en reposo,
+   6px al scrollear). Ponerle padding al <header> lo agrandaba en vez de
+   achicarlo, porque se sumaba al del inner. */
+.ea-navbar { --ea-nav-pad: 12px; transition: box-shadow 0.25s ease, background-color 0.25s ease; }
+.ea-navbar-inner { transition: padding-block 0.25s ease; }
 
 .ea-navbar.is-scrolled {
-    padding: 4px 0;
+    --ea-nav-pad: 6px;
     box-shadow: var(--ea-shadow-sm);
     background: rgba(244, 241, 234, 0.96);
 }

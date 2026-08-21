@@ -2855,9 +2855,6 @@ body.dashboard-body { overflow-x: hidden; }
 /* Variante con los botones pegados a la izquierda (pantalla del QR). */
 .ea-wizard-nav--izq { justify-content: flex-start; }
 
-/* Formulario de una sola columna que no se estira a lo ancho del panel. */
-.ea-form-angosto { max-width: 620px; }
-
 /* =====================================================================
    "Conectá tu Eden Air" — pantalla única con QR de vinculación
    Tres estados que se alternan en la misma tarjeta: reposo (botón),
@@ -3210,13 +3207,219 @@ body.dashboard-body { overflow-x: hidden; }
     gap: 10px 12px;
 }
 
-/* ---------- Editar ambiente ---------- */
+/* =====================================================================
+   AMBIENTES — listado (/panel/ambientes) y edición (.../{id}/editar)
+   Vistas: app/Views/ambientes/index.php · ambientes/editar.php
+   Los tipos de espacio y sus rangos salen de EnvironmentPresetService;
+   acá está sólo cómo se ven.
+   ===================================================================== */
+
+/* ---------- Piezas compartidas ---------- */
+/* Texto chico de ayuda debajo de un campo. */
+.ea-field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.7813rem;
+    line-height: 1.5;
+    color: var(--ea-mute);
+}
+.ea-field-hint strong { color: var(--ea-ink-2); font-weight: 600; }
+
+/* ---------- Listado: origen de los rangos de cada tarjeta ---------- */
+.ea-amb-origen {
+    margin: -4px 0 2px;
+    font-size: 0.7813rem;
+    line-height: 1.45;
+    color: var(--ea-mute);
+}
+
+/* ---------- Listado: referencia "rangos por tipo de espacio" ---------- */
+.ea-amb-ref { margin-top: clamp(22px, 4vw, 34px); }
+.ea-amb-ref-head { margin-bottom: 14px; }
+.ea-amb-ref-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+}
+.ea-amb-ref-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: var(--ea-r-md, 14px);
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+}
+/* El tipo que el usuario ya está usando se destaca con el verde de marca. */
+.ea-amb-ref-card.is-usado {
+    border-color: var(--eden-300);
+    box-shadow: var(--ea-shadow-sm);
+}
+.ea-amb-ref-card-head { display: flex; align-items: center; gap: 10px; }
+.ea-amb-ref-name {
+    font-family: var(--ea-font-serif);
+    font-size: 1.0625rem;
+    margin: 0;
+    color: var(--ea-ink);
+    flex: 1;
+}
+.ea-amb-ref-desc, .ea-amb-ref-libre {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ea-mute);
+}
+.ea-amb-ref-libre {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--ea-rule-soft);
+    color: var(--ea-ink-2);
+}
+.ea-amb-ref-card .ea-dev-meta dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.ea-amb-ref-card .ea-dev-meta dt svg { color: var(--eden-500); }
+
+/* ---------- Editar ambiente: la tarjeta del formulario ---------- */
+/* Más ancha que el resto de los formularios del panel: el selector de
+   tipos es una grilla de tarjetas. */
+.ea-amb-form { max-width: 860px; }
+
+/* ---------- Editar: selector de tipo de espacio ---------- */
+.ea-amb-tipos {
+    border: 0;
+    margin: 0 0 22px;
+    padding: 0;
+}
+.ea-amb-tipos-grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+/* Cada opción es un <label> con el radio adentro: se puede tocar en toda
+   la tarjeta y el teclado sigue funcionando como con un radio normal. */
+.ea-amb-tipo {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--ea-r-md, 14px);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.ea-amb-tipo:hover { border-color: var(--eden-300); }
+
+/* El radio real: invisible pero presente (lector de pantalla y teclado). */
+.ea-amb-tipo input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+.ea-amb-tipo:has(input:checked) {
+    border-color: var(--eden-500);
+    background: var(--ea-success-soft);
+    box-shadow: var(--ea-shadow-sm);
+}
+.ea-amb-tipo:has(input:focus-visible) {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+.ea-amb-tipo-icon {
+    flex: none;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--ea-rule-soft);
+    color: var(--eden-500);
+}
+.ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon { background: var(--ea-card); }
+
+.ea-amb-tipo-body { display: grid; gap: 4px; }
+.ea-amb-tipo-label { font-weight: 600; color: var(--ea-ink); font-size: 0.9063rem; }
+.ea-amb-tipo-desc { font-size: 0.7813rem; line-height: 1.45; color: var(--ea-mute); }
+
+.ea-amb-tipo-rangos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 4px;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6875rem;
+    color: var(--ea-ink-2);
+}
+.ea-amb-tipo-rangos span { display: inline-flex; align-items: center; gap: 5px; }
+.ea-amb-tipo-rangos svg { color: var(--eden-500); }
+
+.ea-amb-tipo-libre {
+    margin-top: 4px;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6875rem;
+    color: var(--eden-500);
+}
+
+/* Tilde de "elegido": sólo aparece en la opción marcada. */
+.ea-amb-tipo-check {
+    flex: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--ea-rule);
+    color: transparent;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.ea-amb-tipo:has(input:checked) .ea-amb-tipo-check {
+    background: var(--eden-500);
+    border-color: var(--eden-500);
+    color: #fff;
+}
+
+/* ---------- Editar: bloque de rangos ---------- */
+.ea-amb-valores {
+    padding: 16px;
+    border-radius: var(--ea-r-md, 14px);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-rule-soft);
+    margin-bottom: 20px;
+}
+.ea-amb-valores-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.ea-amb-valores-title {
+    font-family: var(--ea-font-serif);
+    font-size: 1.0625rem;
+    margin: 0 0 2px;
+    color: var(--ea-ink);
+}
+.ea-amb-valores-sub { margin: 0; font-size: 0.7813rem; color: var(--ea-mute); }
+.ea-amb-valores .ea-input { background: var(--ea-card); }
+.ea-amb-restaurar[hidden] { display: none; }
+
+/* ---------- Editar ambiente: filas de dos campos ---------- */
 .ea-amb-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
 }
 .ea-amb-row .ea-field { margin-bottom: 6px; }
+
+/* ---------- Listado: equipos asignados a un ambiente ---------- */
 .ea-amb-devices {
     list-style: none;
     margin: 4px 0 6px;
@@ -3241,8 +3444,21 @@ body.dashboard-body { overflow-x: hidden; }
     background: var(--eden-500);
 }
 
+/* ---------- Modo oscuro ---------- */
+:root[data-theme="dark"] .ea-amb-tipo:has(input:checked) { background: rgba(74, 122, 85, 0.22); }
+:root[data-theme="dark"] .ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon { background: rgba(13, 22, 18, 0.5); }
+:root[data-theme="dark"] .ea-amb-ref-card.is-usado { border-color: var(--eden-500); }
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-amb-tipo, .ea-amb-tipo-check { transition: none; }
+}
+
 @media (max-width: 560px) {
     .ea-amb-row { grid-template-columns: 1fr; }
+
+    /* El cartelito de estado baja debajo del título en vez de apretarlo. */
+    .ea-amb-valores-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .ea-amb-restaurar { width: 100%; justify-content: center; }
 
     /* Apilados y a todo el ancho: en celular, dos botones lado a lado quedan
        angostos y se toca el equivocado. */

@@ -4,13 +4,21 @@ document.addEventListener("DOMContentLoaded", function () {
     var navbar = document.querySelector(".ea-navbar");
     var navLinks = Array.prototype.slice.call(document.querySelectorAll(".ea-nav-links a[href^='#']"));
 
-    /* -------- Navbar shrink on scroll + altura dinámica -------- */
+    /* -------- Navbar: se achica al scrollear + alto real -------- */
     function syncNavbarScrolled() {
         if (!navbar) return;
+        var estaba = navbar.classList.contains("is-scrolled");
         navbar.classList.toggle("is-scrolled", window.scrollY > 14);
+        // Al volver arriba la barra recupera su alto de reposo: hay que remedirlo.
+        if (estaba && !navbar.classList.contains("is-scrolled")) syncNavHeight();
     }
+
+    /* --ea-nav-h: el alto que el contenido reserva debajo del navbar (en la
+       landing es fixed). Se mide SOLO en reposo, porque scrolleado la barra
+       está achicada, y se vuelve a medir cuando cargan fuentes e imágenes,
+       que cambian el alto después del DOMContentLoaded. */
     function syncNavHeight() {
-        if (!navbar) return;
+        if (!navbar || navbar.classList.contains("is-scrolled")) return;
         var h = Math.round(navbar.getBoundingClientRect().height);
         document.documentElement.style.setProperty("--ea-nav-h", h + "px");
     }
@@ -18,6 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
     syncNavHeight();
     window.addEventListener("scroll", syncNavbarScrolled, { passive: true });
     window.addEventListener("resize", syncNavHeight);
+    window.addEventListener("load", syncNavHeight);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavHeight);
 
     /* -------- Mobile nav drawer -------- */
     var navToggle = document.querySelector("[data-ea-nav-toggle]");
