@@ -1,0 +1,507 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Models\UserModel;
+use App\Services\CommandService;
+use App\Services\PanelService;
+use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
+
+/**
+ * PanelController — el corazón del área privada (dashboard).
+ *
+ * Maneja: el panel principal (bienvenida o monitor según haya dispositivos),
+ * el switcher de dispositivo activo, el perfil del usuario,
+ * la carga manual de mediciones, el cambio de modo (automático/manual)
+ * y el control de actuadores.
+ *
+ * Patrón general de los métodos POST: cada paso que puede fallar devuelve
+ * un RedirectResponse (guard clause); si devuelve null, el flujo sigue.
+ * La lógica pesada vive en los services (PanelService, CommandService)
+ * — este controller solo orquesta.
+ *
+ * Lo que este controller NO hace: decidir cuándo prender un actuador. Eso lo
+ * decide el ESP32 con los umbrales que le da DeviceConfigService. Desde acá
+ * el usuario solo puede pasar a modo manual y mandar órdenes puntuales.
+ */
+class PanelController extends BaseController
+{
+    // =========================================================================
+    // LISTAS BLANCAS
+    // Valores permitidos para modo y actuadores. Todo lo que llega por POST
+    // se compara contra estas constantes: si no está acá, se rechaza.
+    // =========================================================================
+    private const MODOS = ['automatic', 'manual'];
+    private const ACTUADORES = ['fan', 'aromatizer', 'alert_led'];
+    private const VALORES_ACTUADOR = ['on', 'off'];
+
+    // =========================================================================
+    // PANEL PRINCIPAL
+    // =========================================================================
+    public function index(): string|RedirectResponse
+    {
+        $userId = $this->usuarioActual();
+
+        // Si la cuenta aún no tiene dispositivos, mostramos la pantalla de
+        // bienvenida (CTAs: conectar dispositivo o comprar). No se auto-crea
+        // nada en silencio: el panel monitor solo aparece con un equipo real
+        // conectado por el QR de vinculación.
+        $cantidadDispositivos = (new \App\Models\DeviceModel())
+            ->where('user_id', $userId)
+            ->countAllResults();
+
+        if ($cantidadDispositivos === 0) {
+            $usuario = (new UserModel())->obtenerPorId($userId);
+            return view('panel/bienvenida', [
+                'usuario' => $usuario ?? ['nombre' => 'usuario', 'apellido' => ''],
+            ]);
+        }
+
+        $activeDeviceId = $this->dispositivoActivo($userId);
+
+        return view('panel', [
+            'panel' => (new PanelService())->obtenerVistaPanel($userId, $activeDeviceId),
+        ]);
+    }
+
+    // =========================================================================
+    // REFRESCO EN VIVO
+    // Devuelve los MISMOS datos que usa la vista, pero en JSON, para que el
+    // panel se actualice solo sin recargar la página.
+    //
+    // Reusa PanelService::obtenerVistaPanel(): no hay una segunda versión de
+    // la lógica que pueda quedar desincronizada con lo que se dibuja.
+    // GET → exento del filtro CSRF.
+    // =========================================================================
+    public function datos(): ResponseInterface
+    {
+        $userId = $this->usuarioActual();
+
+        try {
+            $panel = (new PanelService())->obtenerVistaPanel($userId, $this->dispositivoActivo($userId));
+        } catch (\RuntimeException $e) {
+            // La cuenta se quedó sin dispositivos mientras la página estaba
+            // abierta. El navegador recarga y cae en la pantalla de bienvenida.
+            return $this->response->setStatusCode(ResponseInterface::HTTP_CONFLICT)
+                ->setJSON(['ok' => false, 'motivo' => 'sin_dispositivo']);
+        }
+
+        return $this->response->setJSON([
+            'ok'   => true,
+            'view' => $panel['view'] ?? [],
+        ]);
+    }
+
+    // =========================================================================
+    // DISPOSITIVO ACTIVO (switcher del panel)
+    // =========================================================================
+
+    /**
+     * Cambia el dispositivo activo del panel monitor. El id se valida contra
+     * los dispositivos del usuario antes de guardarlo en sesión.
+     */
+    public function seleccionarDispositivo(): RedirectResponse
+    {
+        $deviceId = (int) $this->request->getPost('device_id');
+        $userId   = $this->usuarioActual();
+
+        if ($deviceId > 0) {
+            $existe = (new \App\Models\DeviceModel())
+                ->where('id', $deviceId)
+                ->where('user_id', $userId)
+                ->countAllResults();
+
+            if ($existe > 0) {
+                session()->set('active_device_id', $deviceId);
+            }
+        }
+
+        return redirect()->to('/panel');
+    }
+
+    /** Devuelve el id de dispositivo activo en sesión si pertenece al usuario. */
+    private function dispositivoActivo(int $userId): ?int
+    {
+        $candidato = (int) session()->get('active_device_id');
+
+        if ($candidato <= 0) {
+            return null;
+        }
+
+        $valido = (new \App\Models\DeviceModel())
+            ->where('id', $candidato)
+            ->where('user_id', $userId)
+            ->countAllResults() > 0;
+
+        if (! $valido) {
+            session()->remove('active_device_id');
+            return null;
+        }
+
+        return $candidato;
+    }
+
+    // =========================================================================
+    // PERFIL DE USUARIO Y COMPRA
+    // Ver/editar datos personales y contraseña. Ambos cambios exigen
+    // confirmar la contraseña actual (validarAutenticacionPerfil).
+    // =========================================================================
+
+    /** Muestra el perfil; si el usuario ya no existe en la base, cierra sesión. */
+    public function perfil(): string|RedirectResponse
+    {
+        $usuario = (new UserModel())->obtenerPorId($this->usuarioActual());
+
+        if (! $usuario) {
+            session()->destroy();
+
+            return redirect()->to('/login')->with('error', 'Tu sesion expiro. Inicia sesion nuevamente.');
+        }
+
+        return view('perfil_usuario', [
+            'usuario' => $usuario,
+        ]);
+    }
+
+    public function actualizarPerfil(): RedirectResponse
+    {
+        $datos = $this->leerDatosPerfil();
+
+        if ($redirect = $this->validarFormularioPerfil($datos)) {
+            return $redirect;
+        }
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->obtenerPorId($this->usuarioActual());
+
+        if ($redirect = $this->validarAutenticacionPerfil($usuario, $datos['current_password'])) {
+            return $redirect;
+        }
+        
+        $datos['email'] = (string) $usuario['email'];
+
+        if ($usuarios->existeCorreoOUsuarioExcepto((int) $usuario['id'], $datos['email'], $datos['usuario'])) {
+            return $this->redirigirConInputYDato('/panel/perfil', 'errors', [
+                'unique' => 'El correo o el nombre de usuario ya pertenecen a otra cuenta.',
+            ]);
+        }
+
+        $usuarios->actualizarPerfil((int) $usuario['id'], $datos);
+        session()->set('user_name', trim($datos['nombre'] . ' ' . $datos['apellido']));
+
+        return redirect()->to('/panel/perfil')->with('success', 'Datos actualizados correctamente.');
+    }
+
+    public function actualizarPassword(): RedirectResponse
+    {
+        $datos = $this->leerDatosPassword();
+
+        if ($redirect = $this->validarFormularioPassword($datos)) {
+            return $redirect;
+        }
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->obtenerPorId($this->usuarioActual());
+
+        if ($redirect = $this->validarAutenticacionPerfil($usuario, $datos['current_password'])) {
+            return $redirect;
+        }
+
+        $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
+
+        return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
+    }
+
+    /** Página estática de compra (checkout con MercadoPago, sin cobro en línea). */
+    public function compra(): string
+    {
+        return view('compra_mercadopago');
+    }
+
+    // =========================================================================
+    // CAMBIO DE MODO
+    // =========================================================================
+    public function cambiarModo()
+    {
+        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
+            return $redirect;
+        }
+
+        $modo = (string) $this->request->getPost('mode');
+
+        if (! $this->modoValido($modo)) {
+            return $this->redirigirAlPanelConError('El modo seleccionado no es válido.');
+        }
+
+        ['device' => $device, 'space' => $space] = $this->obtenerContexto();
+
+        (new CommandService())->changeOperatingMode((int) $device['id'], $modo, $this->usuarioActual());
+
+        return $this->redirigirAlPanelConExito($this->crearMensajeCambioModo($modo, $device, $space));
+    }
+
+    // =========================================================================
+    // CONTROL DE ACTUADORES
+    // =========================================================================
+    public function cambiarActuador()
+    {
+        if ($redirect = $this->redireccionarSiFaltaDispositivo()) {
+            return $redirect;
+        }
+
+        $actuador = (string) $this->request->getPost('actuator');
+        $valor    = (string) $this->request->getPost('value');
+
+        if (! $this->accionActuadorValida($actuador, $valor)) {
+            return $this->redirigirAlPanelConError('La acción seleccionada no es válida.');
+        }
+
+        ['device' => $device] = $this->obtenerContexto();
+
+        if (! $this->estaEnModoManual((int) $device['id'])) {
+            return $this->redirigirAlPanelConError('Activa el modo manual para controlar actuadores.');
+        }
+
+        // La orden queda encolada. NO se marca como aplicada acá: el equipo la
+        // consulta, la ejecuta físicamente y recién entonces la confirma.
+        (new CommandService())->encolarComandoManual(
+            (int) $device['id'],
+            $actuador,
+            $valor,
+            $this->usuarioActual()
+        );
+
+        return $this->redirigirAlPanelConExito('Orden enviada. El equipo la aplica en unos segundos.');
+    }
+
+    // =========================================================================
+    // ARMADO DEL PANEL
+    // =========================================================================
+    /**
+     * Dispositivo y ambiente activos, para las acciones del panel (modo y
+     * actuadores). El guard redireccionarSiFaltaDispositivo() ya garantizó
+     * que la cuenta tenga al menos un dispositivo vinculado.
+     */
+    private function obtenerContexto(): array
+    {
+        $panel = (new PanelService())->obtenerDatos($this->usuarioActual());
+
+        return [
+            'device' => $panel['device_raw'],
+            'space'  => $panel['space_raw'],
+        ];
+    }
+
+    // =========================================================================
+    // DATOS Y VALIDACION
+    // =========================================================================
+    private function leerDatosPerfil(): array
+    {
+        // El email NO se lee del POST: en el formulario es de solo lectura, así
+        // que nunca viaja. Lo pone actualizarPerfil() desde la fila del usuario.
+        // Leerlo de acá era el bug: quedaba vacío y la regla 'required' hacía
+        // fallar la validación siempre, con lo cual no se guardaba nada.
+        return [
+            'nombre'           => trim((string) $this->request->getPost('nombre')),
+            'apellido'         => trim((string) $this->request->getPost('apellido')),
+            'usuario'          => trim((string) $this->request->getPost('usuario')),
+            'current_password' => (string) $this->request->getPost('current_password'),
+        ];
+    }
+
+    private function leerDatosPassword(): array
+    {
+        return [
+            'current_password' => (string) $this->request->getPost('current_password'),
+            'password'         => (string) $this->request->getPost('password'),
+            'password_confirm' => (string) $this->request->getPost('password_confirm'),
+        ];
+    }
+
+    private function validarFormularioPerfil(array $datos): ?RedirectResponse
+    {
+        // Sin regla para 'email': no es editable, no se postea y lo resuelve
+        // actualizarPerfil() desde la base.
+        $reglas = [
+            'nombre'           => 'required|min_length[2]|max_length[120]',
+            'apellido'         => 'required|min_length[2]|max_length[120]',
+            'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
+            'current_password' => 'required|max_length[255]',
+        ];
+
+        // Sin estos, CI4 responde en inglés ("The nombre field is required").
+        $mensajes = [
+            'nombre' => [
+                'required'   => 'Escribi tu nombre.',
+                'min_length' => 'El nombre tiene que tener al menos 2 caracteres.',
+            ],
+            'apellido' => [
+                'required'   => 'Escribi tu apellido.',
+                'min_length' => 'El apellido tiene que tener al menos 2 caracteres.',
+            ],
+            'usuario' => [
+                'required'    => 'Escribi tu nombre de usuario.',
+                'min_length'  => 'El nombre de usuario tiene que tener al menos 3 caracteres.',
+                'regex_match' => 'El usuario solo puede contener letras, numeros, puntos, guiones y guion bajo.',
+            ],
+            'current_password' => [
+                'required' => 'Ingresa tu contrasena actual para confirmar el cambio.',
+            ],
+        ];
+
+        if ($this->validateData($datos, $reglas, $mensajes)) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'errors', $this->validator->getErrors());
+    }
+
+    private function validarFormularioPassword(array $datos): ?RedirectResponse
+    {
+        $reglas = [
+            'current_password' => 'required|max_length[255]',
+            'password'         => 'required|min_length[8]|max_length[255]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
+            'password_confirm' => 'required|matches[password]',
+        ];
+
+        $mensajes = [
+            'password' => [
+                'regex_match' => 'La contrasena debe incluir al menos una letra mayuscula, una minuscula y un numero.',
+            ],
+            'password_confirm' => [
+                'matches' => 'La confirmacion de contrasena no coincide.',
+            ],
+        ];
+
+        if ($this->validateData($datos, $reglas, $mensajes)) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'errors', $this->validator->getErrors());
+    }
+
+    private function validarAutenticacionPerfil(?array $usuario, string $password): ?RedirectResponse
+    {
+        if ($usuario && password_verify($password, (string) $usuario['password_hash'])) {
+            return null;
+        }
+
+        return $this->redirigirConInputYDato('/panel/perfil', 'error', 'No pudimos autenticarte. Ingresa tu contrasena actual para confirmar el cambio.');
+    }
+
+    private function redirigirConInputYDato(string $ruta, string $clave, mixed $valor): RedirectResponse
+    {
+        return redirect()->to($ruta)
+            ->withInput()
+            ->with($clave, $valor);
+    }
+
+    // =========================================================================
+    // VALIDADORES DE MODO Y ACTUADOR
+    // =========================================================================
+    private function modoValido(string $modo): bool
+    {
+        return in_array($modo, self::MODOS, true);
+    }
+
+    private function accionActuadorValida(string $actuador, string $valor): bool
+    {
+        return in_array($actuador, self::ACTUADORES, true)
+            && in_array($valor, self::VALORES_ACTUADOR, true);
+    }
+
+    private function estaEnModoManual(int $deviceId): bool
+    {
+        $estado = (new CommandService())->getStateByDeviceId($deviceId);
+
+        return ($estado['operating_mode'] ?? 'automatic') === 'manual';
+    }
+
+    /**
+     * El cambio de modo no acciona nada acá: solo queda anotado en
+     * `device_states`. El equipo lo lee la próxima vez que pide su
+     * configuración y a partir de ahí decide (automático) o se limita a
+     * obedecer los comandos del usuario (manual).
+     */
+    private function crearMensajeCambioModo(string $modo, array $device, array $space): string
+    {
+        return $modo === 'manual'
+            ? 'Modo manual activado. El equipo va a esperar tus órdenes.'
+            : 'Modo automático activado. El equipo vuelve a regularse solo.';
+    }
+
+    // =========================================================================
+    // RESPUESTAS
+    // =========================================================================
+    private function redirigirAlPanelConError(string $mensaje): RedirectResponse
+    {
+        return redirect()->to('/panel')->with('error', $mensaje);
+    }
+
+    private function redirigirAlPanelConExito(string $mensaje): RedirectResponse
+    {
+        return redirect()->to('/panel')->with('success', $mensaje);
+    }
+
+    // =========================================================================
+    // SESION
+    // =========================================================================
+    private function usuarioActual(): int
+    {
+        return (int) session()->get('user_id');
+    }
+
+    // =========================================================================
+    // PROTECCION DE ACCESO
+    // Sólo permite ejecutar la acción si el usuario tiene al menos un
+    // dispositivo. Si no, lo manda al panel para ver la pantalla de bienvenida.
+    // =========================================================================
+    private function redireccionarSiFaltaDispositivo(): ?RedirectResponse
+    {
+        $cantidad = (new \App\Models\DeviceModel())
+            ->where('user_id', $this->usuarioActual())
+            ->countAllResults();
+
+        if ($cantidad > 0) {
+            return null;
+        }
+
+        return redirect()->to('/panel')
+            ->with('error', 'Primero vinculá un dispositivo para poder realizar esta acción.');
+    }
+}
+
+/* ============================================================================
+   GLOSARIO DE MÉTODOS DE ESTE ARCHIVO
+
+   Métodos públicos (responden a rutas):
+   - index()                 → bienvenida (0 dispositivos) o panel monitor (≥1)
+   - seleccionarDispositivo()→ guarda en sesión el dispositivo activo del switcher
+   - perfil()                → muestra los datos del usuario
+   - actualizarPerfil()      → guarda nombre/apellido/email/usuario (pide contraseña)
+   - actualizarPassword()    → cambia la contraseña (pide la actual)
+   - compra()                → página de compra (checkout sin cobro en línea)
+   - cambiarModo()           → cambia automatic/manual vía CommandService
+   - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual)
+
+   Helpers privados:
+   - dispositivoActivo()     → valida el active_device_id de sesión (pertenencia)
+   - obtenerContexto()       → devuelve device_raw y space_raw del panel
+   - leerDatos*()            → leen el POST (perfil, password)
+   - validarFormulario*()    → corren la validación; null = OK, redirect = error
+   - validarAutenticacionPerfil() → exige la contraseña actual para confirmar cambios
+   - modoValido()/accionActuadorValida() → chequeo contra las listas blancas
+   - estaEnModoManual()      → lee operating_mode del estado del dispositivo
+   - crearMensajeCambioModo()→ arma el flash; en automático corre la automatización
+   - redirigirAlPanelConError()/ConExito() → redirect a /panel con mensaje flash
+   - redirigirConInputYDato()→ redirect + withInput + flash
+   - usuarioActual()         → user_id guardado en sesión
+   - redireccionarSiFaltaDispositivo() → guard: sin dispositivos no hay acciones
+
+   Funciones del framework (CI4) usadas acá:
+   - view() / redirect() / session() / $this->request->getPost()
+   - countAllResults()       → (Model) cuenta filas que cumplen los where()
+   - $this->validateData()   → valida un array contra reglas CI4
+   - in_array($v, $lista, true) → (PHP) pertenencia estricta a la lista blanca
+   ============================================================================ */

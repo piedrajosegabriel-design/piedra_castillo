@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:/xampp/php/php.exe\" -l \"C:/xampp/htdocs/piedra_castillo/app/Views/inicio.php\")",
+      "Bash(node -e \"require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/inicio.js','utf8'\\);new Function\\(require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/inicio.js','utf8'\\)\\);console.log\\('inicio.js syntax OK'\\);new Function\\(require\\('fs'\\).readFileSync\\('C:/xampp/htdocs/piedra_castillo/public/JS/tema.js','utf8'\\)\\);console.log\\('tema.js syntax OK'\\);\")",
+      "Bash(curl -s \"http://localhost/piedra_castillo/public/\")"
+    ]
+  }
+}
