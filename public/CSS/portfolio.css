@@ -211,7 +211,7 @@
 
 .ea-pf-card__eyebrow {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -244,7 +244,7 @@
     padding: 4px 10px;
     border-radius: var(--ea-r-pill);
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     background: var(--ea-rule-soft);
@@ -410,7 +410,7 @@
     display: block;
     margin-top: 6px;
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(236, 242, 232, 0.65);
@@ -465,7 +465,7 @@
     border: 1px solid rgba(20, 32, 26, 0.1);
     box-shadow: var(--ea-shadow-sm);
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.06em;
     color: var(--ea-ink);
     pointer-events: auto;
@@ -509,7 +509,7 @@
     align-items: center;
     gap: 8px;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -780,7 +780,7 @@
     display: grid;
     place-items: center;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     color: var(--ea-mute);
     text-transform: uppercase;
@@ -822,7 +822,7 @@
 
 .ea-pf-team__role {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--eden-700);
@@ -876,7 +876,7 @@
     background: rgba(20, 50, 38, 0.10); /* tono sutil, contrasta en claro y oscuro */
     color: var(--ea-primary);
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     line-height: 1.4;
     border: 1px solid var(--ea-rule-soft);
@@ -984,7 +984,7 @@
 
 .ea-pf-metric__label {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1021,7 +1021,7 @@
 
 .ea-pf-stat__label {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1249,7 +1249,7 @@
 
 .ea-pf-date__label {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -1301,7 +1301,7 @@
 .ea-pf-pipeline__num {
     display: block;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     color: var(--ea-mute);
 }
@@ -1353,7 +1353,7 @@
 
 .ea-pf-chart__meta {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     color: var(--ea-mute);
 }
@@ -1413,7 +1413,7 @@
     background: var(--ea-card-soft);
     color: var(--ea-ink-2);
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     border-bottom: 1px solid var(--ea-rule);
@@ -1466,7 +1466,7 @@
     background: rgba(200, 156, 122, 0.18);
     color: #7a4a23;
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     align-self: flex-start;
@@ -1918,7 +1918,7 @@
 .ea-cost-open__split { margin: 0; }
 .ea-cost-open__split figcaption {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2122,7 +2122,7 @@
 }
 .ea-cost-tile__label {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2167,7 +2167,7 @@
 }
 .ea-cost-chart figcaption {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2258,7 +2258,7 @@
 .ea-cost-chip__group {
     grid-area: group;
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2342,7 +2342,7 @@
 }
 .ea-cost-method__data dt {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ea-mute);

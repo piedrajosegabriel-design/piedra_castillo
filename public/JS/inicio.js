@@ -307,6 +307,11 @@ document.addEventListener("DOMContentLoaded", function () {
     var expSection = document.querySelector("[data-ea-experience]");
     if (expSection) {
         var EA_LOG = "[EdenAir Experience]";
+        // Los console.info de abajo son instrumentacion para diagnosticar el
+        // video cuando no arranca. Se disparaban en cada carga y llenaban la
+        // consola; ahora hay que encenderlos a proposito. Los console.warn NO
+        // dependen de esto: avisan de fallas reales y tienen que verse siempre.
+        var EA_DEPURAR = false;
         var expVideo    = expSection.querySelector("[data-ea-experience-video]");
         var expFallback = expSection.querySelector("[data-ea-experience-fallback]");
         var expTexts    = Array.prototype.slice.call(expSection.querySelectorAll(".ea-experience-text"));
@@ -326,14 +331,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         cacheExpGeometry();
 
-        // Debug útil para diagnosticar
-        if (window.console && console.info) {
+        // Que falte el <video> es una falla real, no diagnostico: se avisa siempre.
+        if (!expVideo && window.console && console.warn) {
+            console.warn(EA_LOG, "No se encontró el elemento <video>");
+        }
+
+        // Lo demas es instrumentacion: solo con EA_DEPURAR encendido.
+        if (EA_DEPURAR && window.console && console.info) {
             console.info(EA_LOG, "Section detectada");
             if (expVideo) {
                 var initialSrc = expVideo.getAttribute("data-ea-experience-src") || expVideo.currentSrc || expVideo.src;
                 console.info(EA_LOG, "src final:", initialSrc);
-            } else {
-                console.warn(EA_LOG, "No se encontró el elemento <video>");
             }
         }
 
@@ -364,7 +372,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!expVideo || !isFinite(expVideo.duration) || expVideo.duration <= 0) return;
             ready = true;
             hideFallback();
-            if (window.console && console.info) {
+            if (EA_DEPURAR && window.console && console.info) {
                 console.info(EA_LOG, "READY ✓ duration =", expVideo.duration.toFixed(2), "s · networkState =", expVideo.networkState, "· readyState =", expVideo.readyState, "· currentTime inicial =", expVideo.currentTime);
             }
             syncExperience();
@@ -394,18 +402,18 @@ document.addEventListener("DOMContentLoaded", function () {
             window.addEventListener("click",      unlockOnce, { passive: true, once: true });
 
             expVideo.addEventListener("loadstart", function () {
-                if (window.console && console.info) console.info(EA_LOG, "loadstart · currentSrc =", expVideo.currentSrc);
+                if (EA_DEPURAR && window.console && console.info) console.info(EA_LOG, "loadstart · currentSrc =", expVideo.currentSrc);
             });
             expVideo.addEventListener("loadedmetadata", function () {
-                if (window.console && console.info) console.info(EA_LOG, "loadedmetadata · duration =", expVideo.duration);
+                if (EA_DEPURAR && window.console && console.info) console.info(EA_LOG, "loadedmetadata · duration =", expVideo.duration);
                 markReady();
             });
             expVideo.addEventListener("loadeddata", function () {
-                if (window.console && console.info) console.info(EA_LOG, "loadeddata · readyState =", expVideo.readyState);
+                if (EA_DEPURAR && window.console && console.info) console.info(EA_LOG, "loadeddata · readyState =", expVideo.readyState);
                 markReady();
             });
             expVideo.addEventListener("canplay", function () {
-                if (window.console && console.info) console.info(EA_LOG, "canplay · readyState =", expVideo.readyState);
+                if (EA_DEPURAR && window.console && console.info) console.info(EA_LOG, "canplay · readyState =", expVideo.readyState);
                 markReady();
             });
             expVideo.addEventListener("progress", function () {

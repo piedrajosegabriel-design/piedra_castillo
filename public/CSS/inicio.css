@@ -537,7 +537,7 @@
 
 .ea-hardware-item small {
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     color: var(--ea-mute);
     text-transform: uppercase;
@@ -1340,9 +1340,10 @@ section[id] { scroll-margin-top: 90px; }
 /* ---- Tipografía: jerarquía clara ---- */
 .ea-hud-key {
     font-family: var(--ea-font-mono);
-    font-size: 0.5rem;
+    /* Era 8px de base: ilegible. Ahora 11px. */
+    font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(140, 200, 192, 0.62);
     line-height: 1;
@@ -1380,7 +1381,7 @@ section[id] { scroll-margin-top: 90px; }
 
 .ea-hud-unit {
     font-family: var(--ea-font-mono);
-    font-size: 0.5938rem;
+    font-size: 0.6875rem;
     font-weight: 400;
     color: rgba(140, 200, 192, 0.62);
     letter-spacing: 0.02em;
@@ -1805,7 +1806,7 @@ section[id] { scroll-margin-top: 90px; }
         max-width: 84vw;
         line-height: 1.45;
     }
-    .ea-experience-kicker { font-size: 0.625rem; letter-spacing: 0.2em; margin-bottom: 6px; }
+    .ea-experience-kicker { font-size: 0.6875rem; letter-spacing: 0.2em; margin-bottom: 6px; }
     .ea-experience-line { width: 26px; margin-right: 10px; }
 
     /* En mobile alineamos todo a la izquierda, evitamos derecha que se corta */
@@ -2151,7 +2152,7 @@ section[id] { scroll-margin-top: 90px; }
 }
 .ea-core-center-sub {
     font-family: var(--ea-font-mono);
-    font-size: 0.5938rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: rgba(184, 213, 208, 0.85);
@@ -2220,7 +2221,7 @@ section[id] { scroll-margin-top: 90px; }
 }
 .ea-core-mod-val {
     font-family: var(--ea-font-mono);
-    font-size: 0.5938rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(184, 213, 208, 0.85);
@@ -2293,7 +2294,7 @@ section[id] { scroll-margin-top: 90px; }
     .ea-core { width: min(560px, 92vw); }
     .ea-core-mod { padding: 8px 12px; }
     .ea-core-mod-key { font-size: 0.75rem; }
-    .ea-core-mod-val { font-size: 0.5625rem; }
+    .ea-core-mod-val { font-size: 0.6875rem; }
 }
 
 /* ---------- Mobile: layout más compacto, evitar superposición ---------- */
@@ -2305,11 +2306,11 @@ section[id] { scroll-margin-top: 90px; }
         border-radius: 10px;
     }
     .ea-core-mod-key { font-size: 0.6875rem; }
-    .ea-core-mod-val { font-size: 0.5313rem; letter-spacing: 0.18em; }
+    .ea-core-mod-val { font-size: 0.6875rem; letter-spacing: 0.18em; }
     .ea-core-mod::before { top: 6px; left: 6px; width: 3px; height: 3px; }
     .ea-core-center-label { font-size: 1.125rem; }
-    .ea-core-center-sub   { font-size: 0.5313rem; letter-spacing: 0.28em; }
-    .ea-core-facts li { font-size: 0.5938rem; letter-spacing: 0.18em; }
+    .ea-core-center-sub   { font-size: 0.6875rem; letter-spacing: 0.28em; }
+    .ea-core-facts li { font-size: 0.6875rem; letter-spacing: 0.18em; }
     .ea-core-facts li span { font-size: 2rem; }
 }
 
@@ -2491,7 +2492,7 @@ section[id] { scroll-margin-top: 90px; }
     border: 1px solid rgba(201, 216, 112, 0.34);
     color: #e7eebf;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }

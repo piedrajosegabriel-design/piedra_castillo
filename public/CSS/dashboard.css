@@ -197,7 +197,7 @@ body.dashboard-body { overflow-x: hidden; }
     align-items: center;
     gap: 10px;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     font-weight: 500;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -523,7 +523,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-sidebar-word span {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -534,7 +534,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-sidebar-section {
     font-family: var(--ea-font-mono);
-    font-size: 0.5938rem;
+    font-size: 0.6875rem;
     font-weight: 500;
     color: var(--ea-mute);
     letter-spacing: 0.14em;
@@ -593,7 +593,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-sidebar-meta {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     color: var(--ea-mute);
     background: var(--ead-card-bg);
     border: 1px solid var(--ead-line);
@@ -887,7 +887,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-header-name small {
     color: var(--ea-mute);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     line-height: 1;
     margin-top: 2px;
     font-family: var(--ea-font-mono);
@@ -990,7 +990,7 @@ body.dashboard-body { overflow-x: hidden; }
     padding: 0 9px;
     border-radius: 999px;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     font-weight: 500;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -1120,7 +1120,7 @@ body.dashboard-body { overflow-x: hidden; }
     color: var(--ea-ink);
 }
 
-.ea-card-meta { font-size: 0.6563rem; color: var(--ea-mute); letter-spacing: 0.06em; }
+.ea-card-meta { font-size: 0.6875rem; color: var(--ea-mute); letter-spacing: 0.06em; }
 
 /* =====================================================================
    HERO · Resumen del ambiente
@@ -1315,7 +1315,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-hero-foot-label {
     font-family: var(--ea-font-mono);
-    font-size: 0.5938rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     /* Blanco puro: era el texto mas chico del hero y el de peor contraste
@@ -1382,7 +1382,7 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 .ea-hero-trend-label {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.94);
@@ -1396,7 +1396,7 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-hero-trend-escala {
     display: flex;
     justify-content: space-between;
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     color: rgba(255, 255, 255, 0.94);
     padding-bottom: 8px;
 }
@@ -1416,7 +1416,7 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 .ea-hero-indice-label {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.94);
@@ -1585,7 +1585,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-sensor-hint > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.ea-gauge-legend { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font-size: 0.6563rem; }
+.ea-gauge-legend { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font-size: 0.6875rem; }
 .ea-gauge-legend i {
     width: 10px;
     height: 8px;
@@ -1733,7 +1733,7 @@ body.dashboard-body { overflow-x: hidden; }
 :root[data-theme="dark"] .ea-actuator-toggle.is-on { background: var(--eden-500); border-color: var(--eden-500); }
 :root[data-theme="dark"] .ea-actuator-toggle.is-on .ea-actuator-toggle-thumb { background: var(--eden-900); }
 
-.ea-actuator-badge { font-size: 0.625rem; }
+.ea-actuator-badge { font-size: 0.6875rem; }
 
 .ea-actuators-note {
     margin: 0;
@@ -1804,7 +1804,7 @@ body.dashboard-body { overflow-x: hidden; }
     color: var(--ea-mute);
     font-family: var(--ea-font-mono);
     font-weight: 500;
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     border-bottom: 1px solid var(--ead-line);
@@ -1947,7 +1947,7 @@ body.dashboard-body { overflow-x: hidden; }
     align-items: baseline;
     gap: 7px;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -2183,7 +2183,7 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-plan-benefits-label {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -2746,7 +2746,7 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-dev-meta dt { color: var(--ea-mute); margin: 0; }
 .ea-dev-meta dd { margin: 0; color: var(--ea-ink-2); text-align: right; font-weight: 500; }
 .ea-dev-tag {
-    font-size: 0.5938rem; text-transform: uppercase; letter-spacing: 0.08em;
+    font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em;
     padding: 1px 5px; border-radius: 5px; margin-left: 4px;
     background: var(--ea-rule-soft); color: var(--ea-mute); font-weight: 600;
 }
@@ -3030,7 +3030,7 @@ body.dashboard-body { overflow-x: hidden; }
 }
 .ea-device-switcher-label {
     font-family: var(--ea-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ea-mute);
@@ -3492,7 +3492,7 @@ body.dashboard-body { overflow-x: hidden; }
     display: inline-block;
     margin-left: 10px;
     font-family: var(--ea-font-mono);
-    font-size: 0.6563rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.04em;
     color: var(--ea-mute);
     white-space: nowrap;
