@@ -1,0 +1,2497 @@
+/* =====================================================================
+   EdenAir — Sistema visual de marca
+   Tokens, tipografía, layout y componentes reutilizables (.ea-*)
+
+   QUÉ ES ESTE ARCHIVO: el CSS GLOBAL del proyecto. Se carga en TODAS
+   las páginas (lo incluye partials/head.php). Acá viven las variables
+   (colores, espaciados, easing), el modo oscuro y los componentes
+   compartidos. Los estilos propios de cada página están en su archivo:
+   inicio.css · portfolio.css · dashboard.css.
+
+   ÍNDICE (buscá el banner "----------" con estos nombres):
+     1. Tokens (variables :root: colores, easing, sombras)
+     2. Modo oscuro ([data-theme="dark"])
+     3. Reset suave + Base (body, tipografía)
+     4. Layout shell (.ea-shell, .ea-page)
+     5. Logo / wordmark
+     6. Navbar + mega menú del portfolio + drawer móvil
+     7. Botones (.ea-button y variantes)
+     8. Cards / Page header / Badges
+     9. Forms / Messages / Tables
+    10. Stats / sensor card · Hero público · Feature grid
+    11. Auth (login/registro) + strength meter
+    12. Environment selector · Footer · Utility
+    13. Overrides para dashboard.css (re-skin paleta EdenAir)
+    14. Barra de scroll moderna flotante
+   ===================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");
+
+/* ---------- Tokens ---------------------------------------------------- */
+:root {
+    /* Easing — strong custom curves used throughout the system */
+    --ea-ease-out:     cubic-bezier(0.23, 1, 0.32, 1);   /* snappy entries, instant response feel */
+    --ea-ease-in-out:  cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen movement */
+    --ea-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1); /* soft bounce for popovers/reveal */
+
+    /* Greens */
+    --eden-900: #0e1f17;
+    --eden-800: #16301f;
+    --eden-700: #1c4029;
+    --eden-600: #2b5638;
+    --eden-500: #4a7a55;
+    --eden-400: #82a987;
+    --eden-300: #bcd2bd;
+    --eden-200: #dbe6d9;
+    --eden-100: #ecf2e8;
+
+    /* Neutros — más claros y aireados (menos peso del verde oscuro) */
+    --ea-paper: #f6f4ec;   /* fondo principal claro */
+    --ea-linen: #eaf1ea;   /* fondo secundario suave, ligero matiz fresco */
+    --ea-card: #ffffff;
+    --ea-ink: #14231b;     /* texto principal */
+    --ea-ink-2: #45544a;   /* texto secundario, algo más fresco */
+    --ea-mute: #6e7d73;    /* texto suave */
+
+    /* Fondo alternativo aireado (aqua muy sutil) */
+    --ea-air-bg: #eef7f4;
+
+    /* Acentos */
+    --ea-citrus: #c9d870;  /* cítrico moderado */
+    --ea-breath: #b8d5d0;  /* menta suave */
+    --ea-air:    #8fd6c8;  /* aqua / aire limpio (acento fresco nuevo) */
+    --ea-air-ink: #2f7d72; /* aqua legible para texto sobre claro */
+    --ea-clay:   #c89c7a;
+    --ea-earth:  #a65b3d;
+
+    /* Estados semánticos */
+    --ea-success: #4a7a55;
+    --ea-success-soft: rgba(74, 122, 85, 0.14);
+    --ea-info: #2f8a7e;                          /* información / humedad / aire (aqua legible) */
+    --ea-info-soft: rgba(143, 214, 200, 0.20);
+    --ea-warning: #c89c7a;
+    --ea-warning-soft: rgba(200, 156, 122, 0.18);
+    --ea-danger: #a65b3d;
+    --ea-danger-soft: rgba(166, 91, 61, 0.16);
+
+    /* ---- Alias semánticos centralizados (nueva nomenclatura) ---------- */
+    --ea-bg:           var(--ea-paper);
+    --ea-bg-soft:      var(--ea-linen);
+    --ea-bg-air:       var(--ea-air-bg);
+    --ea-surface:      var(--ea-card);
+    --ea-primary:      #2f6b4f;   /* verde primario principal, más fresco que eden-700 */
+    --ea-primary-dark: #143326;   /* verde profundo: contraste, footer, texto fuerte */
+    --ea-primary-med:  #4a7a55;
+    --ea-primary-soft: #a9cdb6;
+    --ea-accent:       var(--ea-citrus);
+    --ea-accent-air:   var(--ea-air);
+    --ea-text:         var(--ea-ink);
+    --ea-text-muted:   var(--ea-mute);
+    --ea-border:       var(--ea-rule);
+
+    /* Alias de compatibilidad con la nomenclatura del brand kit (brief §5).
+       Apuntan a tokens ya existentes para no duplicar valores ni romper estilos. */
+    --ea-bg-main:      var(--ea-paper);
+    --ea-primary-mid:  var(--ea-primary-med);
+    --ea-accent-mint:  var(--ea-breath);
+    --ea-accent-citrus: var(--ea-citrus);
+    --ea-text-soft:    var(--ea-mute);
+
+    /* Líneas */
+    --ea-rule: rgba(20, 35, 27, 0.11);
+    --ea-rule-soft: rgba(20, 35, 27, 0.055);
+
+    /* Radios */
+    --ea-r-xs: 6px;
+    --ea-r-sm: 10px;
+    --ea-r-md: 14px;
+    --ea-r-lg: 22px;
+    --ea-r-xl: 30px;
+    --ea-r-pill: 999px;
+
+    /* Sombras */
+    --ea-shadow-sm: 0 6px 16px rgba(20, 32, 26, 0.06);
+    --ea-shadow-md: 0 14px 32px rgba(20, 32, 26, 0.08);
+    --ea-shadow-lg: 0 28px 56px rgba(20, 32, 26, 0.12);
+
+    /* Espaciados (compactos por defecto) */
+    --ea-gap-xs: 6px;
+    --ea-gap-sm: 10px;
+    --ea-gap-md: 14px;
+    --ea-gap-lg: 22px;
+    --ea-gap-xl: 36px;
+
+    /* Tipografía */
+    --ea-font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ea-font-serif: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    --ea-font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    /* Offset para anclas con header fijo */
+    --ea-scroll-offset: 96px;
+
+    color-scheme: light;
+}
+
+/* ---------- Modo oscuro ---------------------------------------------- */
+:root[data-theme="dark"] {
+    --ea-paper: #0e1f17;       /* fondo principal oscuro (verde profundo, no negro) */
+    --ea-linen: #13261d;       /* fondo secundario oscuro */
+    --ea-card: #1a2c23;        /* card oscura con más lift (evita empastado) */
+    --ea-card-soft: #21342a;
+    --ea-ink: #f4f1ea;         /* texto principal */
+    --ea-ink-2: #c8d4c6;       /* texto secundario más claro y legible */
+    --ea-mute: #93a194;
+
+    --ea-air-bg: #13261d;
+
+    /* Aqua pop sobre fondos oscuros */
+    --ea-air-ink: #8fd6c8;
+    --ea-info: #8fd6c8;
+
+    /* Bordes y divisores con matiz aqua/verde (no gris): el modo oscuro se
+       ve limpio, cohesivo y "diseñado", nunca embarrado ni grisáceo. */
+    --ea-rule: rgba(143, 214, 200, 0.15);
+    --ea-rule-soft: rgba(143, 214, 200, 0.07);
+    --ea-border: #2b5638;
+
+    /* Primario más luminoso en oscuro para mantener jerarquía */
+    --ea-primary: #4f9a6f;
+    --ea-primary-soft: rgba(143, 214, 200, 0.2);
+
+    --ea-success-soft: rgba(74, 122, 85, 0.34);
+    --ea-info-soft: rgba(143, 214, 200, 0.18);
+    --ea-warning-soft: rgba(200, 156, 122, 0.24);
+    --ea-danger-soft: rgba(166, 91, 61, 0.28);
+
+    --ea-shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --ea-shadow-md: 0 14px 32px rgba(0, 0, 0, 0.55);
+    --ea-shadow-lg: 0 28px 56px rgba(0, 0, 0, 0.6);
+
+    color-scheme: dark;
+}
+
+/* Token auxiliar para light (mismo blanco roto) */
+:root {
+    --ea-card-soft: #fbfaf5;
+}
+
+/* ---------- Reset suave ---------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó mirando la pantalla con el zoom del navegador en
+   125%, así que al 100% —que es como entra cualquiera— todo quedaba chico.
+
+   Los tamaños de letra están en rem, o sea relativos a este font-size. Con
+   subirlo acá, escala toda la tipografía de las cuatro hojas de estilo de
+   una sola vez. Los títulos grandes no están en rem: usan clamp() con vw,
+   así que ya crecen solos con el ancho de la ventana.
+
+   Los saltos son por ancho de ventana, no por zoom: no hay forma de leer el
+   zoom desde CSS, pero es lo mismo: en una pantalla de 1920 al 100% la
+   ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no se toca nada,
+   así que notebooks chicas y celulares quedan igual que antes. */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--ea-scroll-offset);
+}
+
+@media (min-width: 1400px) { html { font-size: 18px; } }   /* ~112% */
+@media (min-width: 1700px) { html { font-size: 20px; } }   /* = el 125% del navegador */
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
+
+/* Cualquier sección con id como destino directo de un anchor */
+section[id],
+article[id],
+div[id] {
+    scroll-margin-top: var(--ea-scroll-offset);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+figure {
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: var(--eden-700);
+    color: var(--eden-100);
+}
+
+/* ---------- Base ------------------------------------------------------ */
+body.ea-body {
+    min-height: 100vh;
+    font-family: var(--ea-font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ea-ink);
+    background: var(--ea-paper);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "ss02" on;
+}
+
+/* Modo oscuro premium: brillos sutiles aqua + cítrico sobre el verde
+   profundo (no un negro plano). Da profundidad sin ensuciar. */
+:root[data-theme="dark"] body.ea-body {
+    background:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%),
+        var(--ea-paper);
+}
+
+.ea-serif {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+}
+
+.ea-mono {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7813rem;
+    letter-spacing: 0.04em;
+}
+
+.ea-eyebrow {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.ea-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--eden-500);
+    flex-shrink: 0;
+}
+
+.ea-eyebrow.is-plain::before {
+    display: none;
+}
+
+/* ---------- Layout shell --------------------------------------------- */
+.ea-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-page {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+}
+
+/* En una pantalla ancha, 1280 dejaba 320px muertos de cada lado: el
+   contenido ocupaba dos tercios y todo parecía lejos. Se ensancha junto con
+   la tipografía, en los mismos saltos. */
+@media (min-width: 1400px) { .ea-page { max-width: 1400px; } }
+@media (min-width: 1700px) { .ea-page { max-width: 1600px; } }
+
+.ea-section {
+    padding: clamp(36px, 6vw, 72px) 0;
+    position: relative;
+}
+
+.ea-section + .ea-section {
+    border-top: 1px solid var(--ea-rule);
+}
+
+.ea-section-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--ea-gap-lg);
+    align-items: end;
+    margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.ea-section-head h2 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 10px 0 0;
+}
+
+.ea-section-head h2 em {
+    font-style: italic;
+    color: var(--eden-500);
+}
+
+.ea-section-head p {
+    font-size: 1.0625rem;
+    color: var(--ea-ink-2);
+    max-width: 56ch;
+    margin: 0;
+}
+
+@media (max-width: 820px) {
+    .ea-section-head {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Logo / wordmark adaptable -------------------------------- */
+.ea-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.ea-logo--stacked {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
+}
+
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* Marca "e": un solo trazo con un degradado de 3 stops que salen de variables,
+   así el mismo SVG sirve en toda la página. La clase se la pone marca_e()
+   (app/Helpers/eden_helper.php), de modo que la landing, el pie, el sidebar y
+   el loader dibujan exactamente el mismo logo.
+   --ea-elogo-a → inicio (profundo)
+   --ea-elogo-b → medio (verde)
+   --ea-elogo-c → final (aqua / aire) */
+
+/* Sobre fondo claro: verde profundo → aqua. */
+.ea-logo-mark--e {
+    --ea-elogo-a: var(--ea-primary-dark);  /* #143326 */
+    --ea-elogo-b: var(--ea-primary);       /* #2f6b4f */
+    --ea-elogo-c: #3fae97;                  /* aqua-verde */
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s var(--ea-ease-out);
+}
+
+/* Sobre fondo oscuro: crema → aqua-mint con un halo suave. Vale para el modo
+   oscuro y para el tono "cream" (el pie, que siempre va sobre oscuro). */
+:root[data-theme="dark"] .ea-logo-mark--e,
+.ea-logo--tone-cream .ea-logo-mark--e {
+    --ea-elogo-a: #F6F4EC;                  /* crema brillante */
+    --ea-elogo-b: #8FD6C8;                  /* aqua vibrante */
+    --ea-elogo-c: #5BE5B6;                  /* aqua-mint luminoso */
+    filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
+}
+
+/* Tono "moss": variante monocroma verde, igual en claro y en oscuro. */
+.ea-logo--tone-moss .ea-logo-mark--e,
+:root[data-theme="dark"] .ea-logo--tone-moss .ea-logo-mark--e {
+    --ea-elogo-a: var(--eden-700);
+    --ea-elogo-b: var(--eden-600);
+    --ea-elogo-c: var(--eden-500);
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.ea-logo-word {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ea-logo--tone-ink   .ea-logo-word     { color: var(--ea-ink); }
+.ea-logo--tone-ink   .ea-logo-word em  { color: var(--eden-500); font-style: italic; }
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word    { color: var(--eden-100); }
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word em { color: var(--eden-300); }
+
+.ea-logo--tone-cream .ea-logo-word     { color: var(--eden-100); }
+.ea-logo--tone-cream .ea-logo-word em  { color: var(--ea-citrus); font-style: italic; }
+
+.ea-logo--tone-moss  .ea-logo-word     { color: var(--eden-500); }
+.ea-logo--tone-moss  .ea-logo-word em  { color: var(--eden-300); font-style: italic; }
+
+.ea-logo-text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1;
+}
+
+.ea-logo-sub {
+    font-family: var(--ea-font-mono);
+    font-size: 0.6563rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    line-height: 1;
+}
+
+.ea-logo--tone-cream .ea-logo-sub { color: rgba(236, 242, 232, 0.65); }
+
+.ea-slogan {
+    font-family: var(--ea-font-serif);
+    font-style: italic;
+    color: var(--ea-ink-2);
+    margin: 12px 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+}
+
+/* ---------- Navbar ---------------------------------------------------- */
+.ea-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.92);
+    backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--ea-rule);
+}
+
+:root[data-theme="dark"] .ea-navbar {
+    background: rgba(13, 22, 18, 0.88);
+}
+
+.ea-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ea-gap-md);
+    /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
+       mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
+       los botones quedaban pegados al borde de la ventana. */
+    padding-block: var(--ea-nav-pad, 12px);
+}
+
+.ea-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--ea-ink);
+}
+
+.ea-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+}
+
+.ea-brand-text strong {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--ea-ink);
+}
+
+.ea-brand-text strong em {
+    font-style: italic;
+    color: var(--eden-500);
+}
+
+:root[data-theme="dark"] .ea-brand-text strong em {
+    color: var(--eden-300);
+}
+
+.ea-brand-text small {
+    font-family: var(--ea-font-mono);
+    font-size: 0.6563rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    margin-top: 4px;
+}
+
+.ea-nav-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ea-gap-sm);
+}
+
+/* ---------- Portfolio mega menú (estilo Apple, glassmorphism) -------- */
+.ea-mega {
+    position: relative;
+    list-style: none;
+}
+
+.ea-mega-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--ea-r-pill);
+    font-size: 0.8438rem;
+    font-weight: 500;
+    color: var(--ea-ink-2);
+    cursor: pointer;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-mega-trigger::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--eden-500);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.ea-mega:hover .ea-mega-trigger,
+.ea-mega.is-open .ea-mega-trigger,
+.ea-mega-trigger.is-active {
+    color: var(--eden-700);
+}
+
+.ea-mega-trigger:focus-visible {
+    outline: 2px solid var(--eden-500);
+    outline-offset: 3px;
+    color: var(--eden-700);
+}
+
+.ea-mega:hover .ea-mega-trigger::after,
+.ea-mega.is-open .ea-mega-trigger::after,
+.ea-mega-trigger.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+:root[data-theme="dark"] .ea-mega-trigger { color: var(--ea-ink-2); }
+:root[data-theme="dark"] .ea-mega:hover .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega.is-open .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega-trigger.is-active { color: var(--eden-300); }
+:root[data-theme="dark"] .ea-mega-trigger::after { background: var(--eden-300); }
+
+.ea-mega-caret {
+    transition: transform 0.28s cubic-bezier(.2,.7,.2,1);
+}
+
+.ea-mega:hover .ea-mega-caret,
+.ea-mega.is-open .ea-mega-caret {
+    transform: rotate(180deg);
+}
+
+.ea-mega-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: min(540px, calc(100vw - 32px));
+    padding-top: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.28s cubic-bezier(.2,.7,.2,1), transform 0.28s cubic-bezier(.2,.7,.2,1), visibility 0s linear 0.28s;
+    z-index: 60;
+}
+
+/* Bridge invisible: evita perder el hover entre trigger y panel */
+.ea-mega-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: transparent;
+}
+
+.ea-mega:hover .ea-mega-panel,
+.ea-mega.is-open .ea-mega-panel,
+.ea-mega:focus-within .ea-mega-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+.ea-mega-inner {
+    background: rgba(248, 248, 242, 0.97);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+    border: 1px solid rgba(20, 32, 26, 0.1);
+    border-radius: var(--ea-r-lg);
+    box-shadow: var(--ea-shadow-lg);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ea-mega-inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 80% at 0% 0%, rgba(201, 216, 112, 0.18), transparent 55%),
+                radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.18), transparent 60%);
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+:root[data-theme="dark"] .ea-mega-inner {
+    background: rgba(13, 22, 18, 0.97);
+    border-color: rgba(236, 242, 232, 0.14);
+}
+
+:root[data-theme="dark"] .ea-mega-inner::before {
+    background: radial-gradient(120% 80% at 0% 0%, rgba(74, 122, 85, 0.32), transparent 55%),
+                radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.16), transparent 60%);
+}
+
+.ea-mega-head {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.ea-mega-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6563rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+}
+
+.ea-mega-title {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.375rem;
+    letter-spacing: -0.012em;
+    margin: 6px 0 4px;
+    color: var(--ea-ink);
+}
+
+.ea-mega-title em {
+    font-style: italic;
+    color: var(--eden-500);
+}
+
+:root[data-theme="dark"] .ea-mega-title { color: var(--eden-100); }
+:root[data-theme="dark"] .ea-mega-title em { color: var(--eden-300); }
+
+.ea-mega-lede {
+    font-size: 0.8125rem;
+    color: var(--ea-ink-2);
+    margin: 0;
+}
+
+.ea-mega-list {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ea-mega-list a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: var(--ea-r-md);
+    border: 1px solid transparent;
+    color: var(--ea-ink);
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.ea-mega-list a:hover,
+.ea-mega-list a:focus-visible {
+    background: rgba(74, 122, 85, 0.08);
+    border-color: rgba(74, 122, 85, 0.18);
+    outline: none;
+    transform: translateX(2px);
+}
+
+:root[data-theme="dark"] .ea-mega-list a { color: var(--eden-100); }
+:root[data-theme="dark"] .ea-mega-list a:hover,
+:root[data-theme="dark"] .ea-mega-list a:focus-visible {
+    background: rgba(74, 122, 85, 0.28);
+    border-color: rgba(188, 210, 189, 0.22);
+}
+
+.ea-mega-link-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.ea-mega-link-hint {
+    display: block;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6563rem;
+    letter-spacing: 0.06em;
+    color: var(--ea-mute);
+    margin-top: 4px;
+}
+
+.ea-mega-foot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ea-rule-soft);
+    flex-wrap: wrap;
+}
+
+.ea-mega-foot-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6563rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+}
+
+.ea-mega-foot-tag strong {
+    color: var(--eden-700);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+:root[data-theme="dark"] .ea-mega-foot-tag strong { color: var(--eden-300); }
+
+.ea-mega-foot-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ea-citrus);
+    box-shadow: 0 0 0 0 rgba(201, 216, 112, 0.55);
+    animation: ea-mega-foot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ea-mega-foot-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(201, 216, 112, 0.55); }
+    70%  { box-shadow: 0 0 0 8px rgba(201, 216, 112, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 216, 112, 0); }
+}
+
+.ea-mega-foot-link {
+    font-family: var(--ea-font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--eden-700);
+    transition: color 0.18s ease;
+}
+
+.ea-mega-foot-link:hover { color: var(--eden-800); }
+
+:root[data-theme="dark"] .ea-mega-foot-link { color: var(--eden-300); }
+:root[data-theme="dark"] .ea-mega-foot-link:hover { color: var(--ea-citrus); }
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-mega-panel,
+    .ea-mega-caret,
+    .ea-mega-list a { transition: none; }
+    .ea-mega-foot-dot { animation: none; }
+}
+
+@media (max-width: 700px) {
+    .ea-mega-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+    /* En mobile el navbar oculta los nav-links; el portfolio entra al drawer */
+    .ea-mega { display: none; }
+}
+
+/* ---------- Navbar links + mobile drawer (compartido entre páginas) --- */
+/* Al scrollear la barra se achica: el alto lo pone el padding vertical del
+   .ea-navbar-inner, asi que el que cambia es --ea-nav-pad (12px en reposo,
+   6px al scrollear). Ponerle padding al <header> lo agrandaba en vez de
+   achicarlo, porque se sumaba al del inner. */
+.ea-navbar { --ea-nav-pad: 12px; transition: box-shadow 0.25s ease, background-color 0.25s ease; }
+.ea-navbar-inner { transition: padding-block 0.25s ease; }
+
+.ea-navbar.is-scrolled {
+    --ea-nav-pad: 6px;
+    box-shadow: var(--ea-shadow-sm);
+    background: rgba(244, 241, 234, 0.96);
+}
+
+:root[data-theme="dark"] .ea-navbar.is-scrolled {
+    background: rgba(13, 22, 18, 0.94);
+}
+
+.ea-nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+    list-style: none;
+    padding: 0;
+}
+
+.ea-nav-links a {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: var(--ea-r-pill);
+    font-size: 0.8438rem;
+    color: var(--ea-ink-2);
+    font-weight: 500;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--eden-500);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.ea-nav-links a:hover,
+.ea-nav-links a.is-active {
+    color: var(--eden-700);
+}
+
+.ea-nav-links a:hover::after,
+.ea-nav-links a.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+:root[data-theme="dark"] .ea-nav-links a { color: var(--ea-ink-2); }
+:root[data-theme="dark"] .ea-nav-links a:hover,
+:root[data-theme="dark"] .ea-nav-links a.is-active { color: var(--eden-300); }
+:root[data-theme="dark"] .ea-nav-links a::after { background: var(--eden-300); }
+
+@media (max-width: 900px) {
+    .ea-nav-links { display: none; }
+}
+
+.ea-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 50;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+    color: var(--ea-ink);
+    box-shadow: var(--ea-shadow-sm);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-nav-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.3);
+}
+
+.ea-nav-toggle-bars {
+    position: relative;
+    width: 18px;
+    height: 14px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ea-nav-toggle-bars span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+    transform-origin: center;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(2) { opacity: 0; }
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+.ea-mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(13, 22, 18, 0.96);
+    backdrop-filter: blur(14px);
+    color: var(--eden-100);
+    padding: 80px 28px 32px;
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.ea-mobile-nav.is-open {
+    display: flex;
+    opacity: 1;
+    transform: none;
+}
+
+.ea-mobile-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-mobile-nav a {
+    display: block;
+    padding: 14px 16px;
+    border-radius: var(--ea-r-md);
+    font-family: var(--ea-font-serif);
+    font-size: 1.5rem;
+    letter-spacing: -0.012em;
+    color: var(--eden-100);
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ea-mobile-nav a:hover,
+.ea-mobile-nav a:focus-visible {
+    background: rgba(74, 122, 85, 0.28);
+    border-color: rgba(188, 210, 189, 0.18);
+    outline: none;
+}
+
+.ea-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(236, 242, 232, 0.1);
+}
+
+.ea-mobile-nav-actions .ea-button-secondary {
+    background: rgba(236, 242, 232, 0.08);
+    color: var(--eden-100);
+    border-color: rgba(236, 242, 232, 0.22);
+}
+
+.ea-mobile-nav-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 6px 4px 14px;
+    border-bottom: 1px solid rgba(236, 242, 232, 0.08);
+    margin-bottom: 6px;
+}
+
+.ea-mobile-nav-theme-label {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.58);
+}
+
+@media (max-width: 900px) {
+    .ea-nav-toggle { display: inline-flex; }
+    .ea-landing .ea-navbar .ea-nav-actions { display: none; }
+}
+
+body.ea-nav-open {
+    overflow: hidden;
+}
+
+/* ---------- Interruptor claro / oscuro --------------------------------
+   El HTML está en app/Views/partials/theme_toggle.php y la lógica en
+   public/JS/tema.js. Antes este bloque viajaba embebido en el propio partial
+   y se repetía en cada página que lo incluía; vive acá porque todas cargan
+   este archivo. dashboard.css lo achica para la barra del panel con
+   selectores más específicos (.ea-header .ea-theme-switch ...). ------- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    background: var(--eden-100);
+    border: 1px solid var(--ea-rule);
+    border-radius: 999px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: var(--ea-card);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(20, 32, 26, 0.18);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--eden-700);
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ea-theme-sun  { opacity: 1; transform: scale(1); }
+.ea-theme-moon { opacity: 0; transform: scale(0.4) rotate(-25deg); }
+
+/* Encendido = modo oscuro: la pastilla se corre y cambia sol por luna. */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: var(--eden-800);
+    border-color: var(--eden-700);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(26px);
+    background: var(--eden-700);
+    color: var(--eden-100);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun  { opacity: 0; transform: scale(0.4) rotate(25deg); }
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon { opacity: 1; transform: scale(1) rotate(0); }
+
+/* ---------- Botones --------------------------------------------------- */
+.ea-button,
+.ea-button-primary,
+.ea-button-secondary,
+.ea-button-ghost {
+    --btn-bg: var(--eden-700);
+    --btn-color: var(--eden-100);
+    --btn-border: transparent;
+
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--ea-r-pill);
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    font-family: var(--ea-font-sans);
+    font-weight: 500;
+    font-size: 0.8438rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        background-color 0.16s var(--ea-ease-out),
+        border-color 0.16s var(--ea-ease-out),
+        color 0.16s var(--ea-ease-out),
+        transform 0.14s var(--ea-ease-out),
+        box-shadow 0.16s var(--ea-ease-out);
+    box-shadow: var(--ea-shadow-sm);
+}
+
+/* ---- Touch: zona táctil mínima de 44px en pantallas chicas ---- */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary,
+    .ea-button-ghost {
+        min-height: 44px;
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
+/* ---- Press feedback: buttons must feel responsive when pressed ---- */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+        transition-duration: 0.08s;
+    }
+}
+/* Touch devices: scale feedback on tap too (no hover false-positives here since :active is safe) */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+    }
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+    }
+}
+
+.ea-button:focus-visible,
+.ea-button-primary:focus-visible,
+.ea-button-secondary:focus-visible,
+.ea-button-ghost:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+.ea-button-primary {
+    --btn-bg: var(--ea-primary);
+    --btn-color: #ffffff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --btn-bg: var(--eden-700);
+        transform: translateY(-1px);
+        box-shadow: var(--ea-shadow-md);
+    }
+}
+
+.ea-button-secondary {
+    --btn-bg: transparent;
+    --btn-color: var(--ea-ink);
+    --btn-border: var(--ea-rule);
+    box-shadow: none;
+}
+
+.ea-button-secondary {
+    color: var(--ea-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --btn-bg: var(--eden-100);
+        --btn-border: var(--eden-300);
+        color: var(--eden-700);
+    }
+}
+
+:root[data-theme="dark"] .ea-button-secondary {
+    --btn-border: rgba(236, 242, 232, 0.18);
+    color: var(--eden-100);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --btn-bg: rgba(74, 122, 85, 0.22);
+        --btn-border: var(--eden-500);
+        color: var(--eden-300);
+    }
+}
+
+.ea-button-ghost {
+    --btn-bg: transparent;
+    --btn-color: var(--eden-500);
+    --btn-border: transparent;
+    box-shadow: none;
+    padding: 8px 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover { --btn-bg: var(--eden-100); }
+    :root[data-theme="dark"] .ea-button-ghost:hover { --btn-bg: rgba(74, 122, 85, 0.22); }
+}
+
+:root[data-theme="dark"] .ea-button-ghost { --btn-color: var(--eden-300); }
+
+.ea-button-block {
+    width: 100%;
+}
+
+.ea-button-sm {
+    padding: 7px 13px;
+    font-size: 0.7813rem;
+}
+
+/* CTA de compra destacado — disponible en todas las páginas (landing y panel). */
+.ea-button-buy {
+    --btn-bg: linear-gradient(120deg, var(--ea-primary) 0%, #3c7a57 52%, #4e9069 100%);
+    --btn-color: #ffffff;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    padding-inline: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 10px 26px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+}
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    opacity: 0.7;
+    animation: ea-buy-glow 3.6s ease-in-out infinite;
+}
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    animation: ea-buy-shine 4.8s ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --btn-bg: linear-gradient(120deg, var(--eden-700) 0%, var(--ea-primary) 55%, #3c7a57 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(47, 107, 79, 0.4), inset 0 0 0 1px rgba(201, 216, 112, 0.55);
+    }
+}
+@keyframes ea-buy-glow { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.85; } }
+@keyframes ea-buy-shine { 0%, 62% { left: -120%; } 88%, 100% { left: 140%; } }
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before { animation: none !important; }
+    .ea-button-buy::after { display: none; }
+}
+
+.ea-button:disabled,
+.ea-button-primary:disabled,
+.ea-button-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Cards ----------------------------------------------------- */
+.ea-card {
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule-soft);
+    border-radius: var(--ea-r-lg);
+    padding: clamp(16px, 2.4vw, 24px);
+    box-shadow: var(--ea-shadow-sm);
+    position: relative;
+}
+
+.ea-card--flush {
+    padding: 0;
+}
+
+.ea-card--ink {
+    background: var(--eden-900);
+    color: var(--eden-100);
+    border-color: transparent;
+}
+
+.ea-card--ink .ea-eyebrow,
+.ea-card--ink .ea-eyebrow::before {
+    color: rgba(236, 242, 232, 0.7);
+    background: var(--eden-300);
+}
+
+.ea-card--green {
+    background: var(--eden-700);
+    color: var(--eden-100);
+    border-color: transparent;
+}
+
+.ea-card--moss {
+    background: var(--eden-500);
+    color: var(--eden-100);
+    border-color: transparent;
+}
+
+.ea-card--cream {
+    background: var(--ea-linen);
+    border-color: transparent;
+}
+
+:root[data-theme="dark"] .ea-card--cream {
+    background: var(--ea-card-soft);
+    border: 1px solid var(--ea-rule-soft);
+}
+
+/* ---------- Page header ---------------------------------------------- */
+.ea-page-header {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--ea-gap-lg);
+    align-items: end;
+    padding: clamp(24px, 4vw, 40px) 0 clamp(16px, 2.4vw, 28px);
+}
+
+.ea-page-header h1 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin: 10px 0 0;
+}
+
+.ea-page-header h1 em {
+    font-style: italic;
+    color: var(--eden-500);
+}
+
+.ea-page-header .ea-lede {
+    font-size: 1.0625rem;
+    color: var(--ea-ink-2);
+    max-width: 52ch;
+}
+
+@media (max-width: 820px) {
+    .ea-page-header {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Badges / Status ------------------------------------------ */
+.ea-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ea-r-pill);
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--eden-100);
+    color: var(--eden-700);
+    border: 1px solid transparent;
+    line-height: 1;
+}
+
+.ea-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+.ea-badge--neutral {
+    background: var(--ea-rule-soft);
+    color: var(--ea-ink-2);
+}
+
+.ea-badge--success,
+.ea-badge-success {
+    background: var(--ea-success-soft);
+    color: var(--eden-700);
+}
+
+.ea-badge--info {
+    background: var(--ea-info-soft);
+    color: #2f6a6f;
+}
+
+.ea-badge--warning,
+.ea-badge-warning {
+    background: var(--ea-warning-soft);
+    color: #7a4a23;
+}
+
+.ea-badge--danger,
+.ea-badge-danger {
+    background: var(--ea-danger-soft);
+    color: var(--ea-earth);
+}
+
+:root[data-theme="dark"] .ea-badge--success { color: var(--eden-300); }
+:root[data-theme="dark"] .ea-badge--info { color: var(--ea-breath); }
+:root[data-theme="dark"] .ea-badge--warning { color: var(--ea-clay); }
+:root[data-theme="dark"] .ea-badge--danger { color: #e08465; }
+
+/* ---------- Forms ----------------------------------------------------- */
+.ea-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ea-gap-md);
+    width: 100%;
+}
+
+.ea-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ea-field label,
+.ea-label {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ea-ink-2);
+}
+
+.ea-input,
+.ea-field input[type="text"],
+.ea-field input[type="email"],
+.ea-field input[type="password"],
+.ea-field input[type="number"],
+.ea-field input[type="search"],
+.ea-field input[type="tel"],
+.ea-field input[type="url"],
+.ea-field select,
+.ea-field textarea {
+    appearance: none;
+    width: 100%;
+    background: var(--ea-card);
+    color: var(--ea-ink);
+    border: 1px solid var(--ea-rule);
+    border-radius: var(--ea-r-sm);
+    padding: 11px 14px;
+    font-family: var(--ea-font-sans);
+    font-size: 0.9063rem;
+    line-height: 1.4;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-input::placeholder,
+.ea-field input::placeholder,
+.ea-field textarea::placeholder {
+    color: var(--ea-mute);
+    opacity: 0.85;
+}
+
+.ea-input:focus,
+.ea-field input:focus,
+.ea-field select:focus,
+.ea-field textarea:focus {
+    outline: none;
+    border-color: var(--eden-500);
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.22);
+}
+
+:root[data-theme="dark"] .ea-input,
+:root[data-theme="dark"] .ea-field input,
+:root[data-theme="dark"] .ea-field select,
+:root[data-theme="dark"] .ea-field textarea {
+    background: var(--ea-card-soft);
+    border-color: var(--ea-rule);
+}
+
+:root[data-theme="dark"] .ea-input:focus,
+:root[data-theme="dark"] .ea-field input:focus,
+:root[data-theme="dark"] .ea-field select:focus,
+:root[data-theme="dark"] .ea-field textarea:focus {
+    border-color: var(--eden-300);
+    box-shadow: 0 0 0 3px rgba(188, 210, 189, 0.18);
+}
+
+.ea-field .ea-hint,
+.ea-hint {
+    font-family: var(--ea-font-sans);
+    font-size: 0.7813rem;
+    color: var(--ea-mute);
+}
+
+.ea-field-row {
+    display: grid;
+    gap: var(--ea-gap-md);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ---------- Contraseña con ojo ----------------------------------------
+   El botón va ADENTRO del campo, contra el borde derecho. El input reserva
+   ese espacio con padding-right para que el texto nunca pase por abajo del
+   ícono. El área táctil es de 44px: el mínimo cómodo en un celular.        */
+.ea-password {
+    position: relative;
+    display: block;
+}
+
+/* Los dos tipos, porque el campo pasa a type="text" al mostrar la clave.
+   Van con [type] a propósito: así empatan en especificidad con la regla
+   general de .ea-field input[type="password"] (línea ~1491) y ganan por
+   venir después. Con `.ea-password input` a secas, perdían y el texto
+   quedaba pasando por abajo del ojo.                                      */
+.ea-password input[type="password"],
+.ea-password input[type="text"] {
+    width: 100%;
+    padding-right: 48px;
+}
+
+.ea-password-ojo {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ea-r-sm, 8px);
+    background: transparent;
+    color: var(--ea-text-soft, #7b8794);
+    cursor: pointer;
+    transition: color .18s ease, background-color .18s ease;
+}
+
+.ea-password-ojo:hover,
+.ea-password-ojo:focus-visible {
+    color: var(--ea-brand, #2f9e77);
+    background: rgba(127, 127, 127, .12);
+}
+
+.ea-password-ojo svg {
+    width: 21px;
+    height: 21px;
+    display: block;
+}
+
+/* Con la contraseña oculta se ofrece "ver"; con la contraseña a la vista,
+   "ocultar". Solo uno de los dos íconos está presente a la vez.            */
+.ea-password-ojo .ea-ojo-ocultar,
+.ea-password-ojo[data-visible="true"] .ea-ojo-ver {
+    display: none;
+}
+
+.ea-password-ojo[data-visible="true"] .ea-ojo-ocultar {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-password-ojo {
+        transition: none;
+    }
+}
+
+/* ---------- Messages -------------------------------------------------- */
+.ea-message {
+    border-radius: var(--ea-r-md);
+    padding: 14px 18px;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.ea-message::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+    background: currentColor;
+}
+
+.ea-message--error {
+    background: var(--ea-danger-soft);
+    color: var(--ea-earth);
+    border-color: rgba(166, 91, 61, 0.32);
+}
+
+.ea-message--success {
+    background: var(--ea-success-soft);
+    color: var(--eden-700);
+    border-color: rgba(74, 122, 85, 0.32);
+}
+
+.ea-message--info {
+    background: var(--ea-info-soft);
+    color: #2f6a6f;
+    border-color: rgba(106, 155, 159, 0.32);
+}
+
+:root[data-theme="dark"] .ea-message--success {
+    color: var(--eden-300);
+    border-color: rgba(74, 122, 85, 0.4);
+}
+
+:root[data-theme="dark"] .ea-message--error {
+    color: #e08465;
+    border-color: rgba(166, 91, 61, 0.45);
+}
+
+:root[data-theme="dark"] .ea-message--info {
+    color: var(--ea-breath);
+    border-color: rgba(106, 155, 159, 0.4);
+}
+
+.ea-message ul {
+    margin: 4px 0 0;
+    padding: 0 0 0 18px;
+    list-style: disc;
+}
+
+/* ---------- Tables ---------------------------------------------------- */
+.ea-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--ea-r-md);
+    border: 1px solid var(--ea-rule);
+    background: var(--ea-card);
+}
+
+.ea-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.ea-table th,
+.ea-table td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ea-rule-soft);
+    vertical-align: middle;
+}
+
+.ea-table th {
+    font-family: var(--ea-font-mono);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.7188rem;
+    color: var(--ea-mute);
+    background: rgba(236, 242, 232, 0.42);
+}
+
+:root[data-theme="dark"] .ea-table th {
+    background: rgba(236, 242, 232, 0.04);
+}
+
+.ea-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.ea-table tbody tr:hover {
+    background: rgba(236, 242, 232, 0.4);
+}
+
+:root[data-theme="dark"] .ea-table tbody tr:hover {
+    background: rgba(236, 242, 232, 0.04);
+}
+
+/* ---------- Stats / sensor card -------------------------------------- */
+.ea-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--ea-gap-md);
+}
+
+.ea-stat-card {
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule-soft);
+    border-radius: var(--ea-r-lg);
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: var(--ea-shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ea-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ea-shadow-md);
+}
+
+.ea-stat-card .ea-stat-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.ea-stat-card .ea-stat-label {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+}
+
+.ea-stat-card .ea-stat-value {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(28px, 3.6vw, 40px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ea-ink);
+}
+
+.ea-stat-card .ea-stat-unit {
+    font-family: var(--ea-font-mono);
+    font-size: 0.8125rem;
+    color: var(--ea-mute);
+    letter-spacing: 0.08em;
+}
+
+.ea-stat-card .ea-stat-detail {
+    font-size: 0.8438rem;
+    color: var(--ea-ink-2);
+    line-height: 1.5;
+}
+
+.ea-stat-card::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+    background: var(--eden-500);
+    opacity: 0.85;
+}
+
+.ea-stat-card.tone-success::before { background: var(--ea-success); }
+.ea-stat-card.tone-info::before { background: var(--ea-info); }
+.ea-stat-card.tone-warning::before { background: var(--ea-warning); }
+.ea-stat-card.tone-danger::before { background: var(--ea-danger); }
+.ea-stat-card.tone-neutral::before { background: var(--eden-400); }
+
+/* ---------- Hero (public pages) -------------------------------------- */
+.ea-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(40px, 7vw, 88px) 0;
+    background:
+        radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.18), transparent 55%),
+        radial-gradient(ellipse at bottom left, rgba(188, 210, 189, 0.22), transparent 55%),
+        var(--ea-paper);
+}
+
+:root[data-theme="dark"] .ea-hero {
+    background:
+        radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.22), transparent 55%),
+        radial-gradient(ellipse at bottom left, rgba(28, 64, 41, 0.5), transparent 60%),
+        var(--ea-paper);
+}
+
+.ea-hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--ea-gap-xl);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.ea-hero-title {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 14px 0 18px;
+}
+
+.ea-hero-title em {
+    font-style: italic;
+    color: var(--eden-500);
+}
+
+.ea-hero-lede {
+    font-size: 1.0313rem;
+    line-height: 1.55;
+    color: var(--ea-ink-2);
+    max-width: 52ch;
+    margin: 0 0 22px;
+}
+
+.ea-hero-tagline {
+    font-family: var(--ea-font-serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 28px);
+    color: var(--eden-700);
+    line-height: 1.2;
+    margin: 0 0 28px;
+}
+
+:root[data-theme="dark"] .ea-hero-tagline {
+    color: var(--eden-300);
+}
+
+.ea-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.ea-hero-pattern {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+}
+
+@media (max-width: 920px) {
+    .ea-hero-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Feature grid (inicio) ------------------------------------ */
+.ea-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--ea-gap-lg);
+}
+
+.ea-feature-card {
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule-soft);
+    border-radius: var(--ea-r-lg);
+    padding: clamp(18px, 2.4vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--ea-shadow-sm);
+}
+
+.ea-feature-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--eden-300);
+    box-shadow: var(--ea-shadow-md);
+}
+
+.ea-feature-card h3 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+}
+
+.ea-feature-card p {
+    color: var(--ea-ink-2);
+    font-size: 0.9063rem;
+    line-height: 1.55;
+}
+
+.ea-feature-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--ea-r-md);
+    background: var(--eden-100);
+    color: var(--eden-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-theme="dark"] .ea-feature-icon {
+    background: rgba(74, 122, 85, 0.2);
+    color: var(--eden-300);
+}
+
+/* ---------- Auth (login / registro / recuperación) --------------------
+   Una sola columna: el formulario centrado, sin panel decorativo. */
+.ea-auth {
+    min-height: calc(100vh - 88px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-auth-main {
+    width: 100%;
+    padding: clamp(32px, 5vw, 64px) 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--ea-gap-md);
+    background: var(--ea-paper);
+}
+
+.ea-auth-card {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ea-gap-md);
+}
+
+.ea-auth-card h1,
+.ea-auth-card h2 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.75rem;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    color: var(--ea-ink);
+}
+
+.ea-auth-card p.ea-lede {
+    color: var(--ea-ink-2);
+    font-size: 0.9375rem;
+}
+
+.ea-auth-foot {
+    display: flex;
+    /* Con la tipografia mas grande los dos enlaces del login no entraban
+       en una linea y el segundo se salia de la tarjeta. Que bajen. */
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.ea-auth-link {
+    font-family: var(--ea-font-sans);
+    text-wrap: nowrap;
+    color: var(--eden-700);
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.18s ease;
+}
+
+.ea-auth-link:hover {
+    border-color: var(--eden-500);
+}
+
+:root[data-theme="dark"] .ea-auth-link {
+    color: var(--eden-300);
+}
+
+@media (max-width: 960px) {
+    .ea-auth-main {
+        padding: 40px 20px;
+    }
+}
+
+/* ---------- Strength meter (registro) -------------------------------- */
+.ea-strength {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ea-strength-track {
+    width: 100%;
+    height: 8px;
+    border-radius: var(--ea-r-pill);
+    background: var(--ea-rule-soft);
+    overflow: hidden;
+}
+
+.ea-strength-track span {
+    display: block;
+    height: 100%;
+    width: 10%;
+    background: var(--eden-500);
+    border-radius: var(--ea-r-pill);
+    transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+/* ---------- Environment selector ------------------------------------- */
+.ea-env-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--ea-gap-md);
+}
+
+.ea-env-card {
+    position: relative;
+    background: var(--ea-card);
+    border: 1px solid var(--ea-rule);
+    border-radius: var(--ea-r-lg);
+    padding: 16px 18px 18px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.ea-env-card input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+}
+
+.ea-env-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--eden-400);
+}
+
+.ea-env-card.activa,
+.ea-env-card:has(input:checked) {
+    background: var(--eden-700);
+    color: var(--eden-100);
+    border-color: var(--eden-700);
+    box-shadow: var(--ea-shadow-md);
+}
+
+.ea-env-card:focus-within {
+    border-color: var(--eden-500);
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.22);
+}
+
+.ea-env-card .ea-env-code {
+    font-family: var(--ea-font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--eden-100);
+    border-radius: 50%;
+    color: var(--eden-700);
+}
+
+.ea-env-card.activa .ea-env-code,
+.ea-env-card:has(input:checked) .ea-env-code {
+    background: var(--eden-500);
+    color: var(--eden-100);
+}
+
+.ea-env-card strong {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+}
+
+.ea-env-card small {
+    color: var(--ea-ink-2);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+}
+
+.ea-env-card.activa small,
+.ea-env-card:has(input:checked) small {
+    color: rgba(236, 242, 232, 0.78);
+}
+
+.ea-env-card .ea-env-range {
+    margin-top: auto;
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.06em;
+    color: var(--ea-mute);
+}
+
+.ea-env-card.activa .ea-env-range,
+.ea-env-card:has(input:checked) .ea-env-range {
+    color: rgba(236, 242, 232, 0.78);
+}
+
+/* ---------- Footer ---------------------------------------------------- */
+.ea-footer {
+    background: var(--eden-900);
+    color: rgba(236, 242, 232, 0.78);
+    padding: clamp(36px, 5.5vw, 60px) 0 24px;
+    margin-top: auto;
+}
+
+.ea-footer-inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: var(--ea-gap-lg);
+    align-items: start;
+}
+
+.ea-footer p {
+    color: rgba(236, 242, 232, 0.7);
+    font-size: 0.9063rem;
+    max-width: 40ch;
+    margin-top: 18px;
+    line-height: 1.55;
+}
+
+.ea-footer h4 {
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.5);
+    margin-bottom: 12px;
+}
+
+.ea-footer ul li,
+.ea-footer span {
+    color: rgba(236, 242, 232, 0.78);
+    font-size: 0.875rem;
+}
+
+.ea-footer-bottom {
+    border-top: 1px solid rgba(236, 242, 232, 0.1);
+    margin-top: 40px;
+    padding-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.5);
+}
+
+@media (max-width: 820px) {
+    .ea-footer-inner {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Utility --------------------------------------------------- */
+.ea-stack { display: flex; flex-direction: column; gap: var(--ea-gap-sm); }
+.ea-stack-lg { display: flex; flex-direction: column; gap: var(--ea-gap-lg); }
+.ea-row { display: flex; flex-wrap: wrap; gap: var(--ea-gap-sm); align-items: center; }
+.ea-spread { display: flex; justify-content: space-between; align-items: center; gap: var(--ea-gap-md); }
+.ea-tight { line-height: 1.1; }
+.ea-mute { color: var(--ea-mute); }
+.ea-center { text-align: center; }
+.ea-hidden,
+.oculto { display: none !important; }
+
+.ea-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--eden-100);
+    border-radius: var(--ea-r-pill);
+    color: var(--eden-700);
+    font-family: var(--ea-font-mono);
+    font-size: 0.7188rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .ea-tag {
+    background: rgba(74, 122, 85, 0.18);
+    color: var(--eden-300);
+}
+
+.ea-breathe { animation: ea-breathe 6s ease-in-out infinite; transform-origin: center; }
+
+@keyframes ea-breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.92; }
+}
+
+/* =====================================================================
+   Overrides para dashboard.css — re-skin con paleta EdenAir
+   El dashboard ya usa CSS variables; las reasignamos para alinear.
+   ===================================================================== */
+body.dashboard-body,
+body.dashboard-body {
+    font-family: var(--ea-font-sans);
+}
+
+:root {
+    /* Mapeo de tokens del dashboard a la paleta EdenAir */
+    --bg: var(--ea-paper);
+    --bg-soft: var(--ea-linen);
+    --surface: var(--ea-card);
+    --surface-soft: rgba(255, 255, 255, 0.7);
+    --text: var(--ea-ink);
+    --muted: var(--ea-mute);
+    --accent: var(--eden-700);
+    --accent-dark: var(--eden-800);
+    --accent-soft: var(--eden-100);
+    --warm: var(--ea-clay);
+    --warm-soft: var(--ea-warning-soft);
+    --info: #2f6a6f;
+    --info-soft: var(--ea-info-soft);
+    --success: var(--ea-success);
+    --success-soft: var(--ea-success-soft);
+    --danger: var(--ea-earth);
+    --danger-soft: var(--ea-danger-soft);
+    --line: var(--ea-rule);
+    --shadow: var(--ea-shadow-md);
+    --shadow-soft: var(--ea-shadow-sm);
+    --radius-xl: var(--ea-r-xl);
+    --radius-lg: var(--ea-r-lg);
+    --radius-md: var(--ea-r-md);
+    --radius-sm: var(--ea-r-sm);
+}
+
+:root[data-theme="dark"] {
+    --bg: var(--ea-paper);
+    --bg-soft: var(--ea-linen);
+    --surface: var(--ea-card);
+    --surface-soft: rgba(22, 34, 28, 0.82);
+    --text: var(--ea-ink);
+    --muted: var(--ea-mute);
+    --accent: var(--eden-300);
+    --accent-dark: var(--eden-500);
+    --accent-soft: rgba(74, 122, 85, 0.22);
+    --warm: var(--ea-clay);
+    --warm-soft: rgba(200, 156, 122, 0.22);
+    --info: var(--ea-breath);
+    --info-soft: rgba(184, 213, 208, 0.18);
+    --success: var(--eden-300);
+    --success-soft: rgba(188, 210, 189, 0.18);
+    --danger: #d97a59;
+    --danger-soft: rgba(217, 122, 89, 0.2);
+    --line: rgba(236, 242, 232, 0.12);
+}
+
+/* Branding tipográfico del dashboard */
+body.dashboard-body {
+    background:
+        radial-gradient(circle at top left, rgba(74, 122, 85, 0.16), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(188, 210, 189, 0.18), transparent 30%),
+        linear-gradient(180deg, var(--ea-paper) 0%, var(--ea-linen) 100%);
+}
+
+:root[data-theme="dark"] body.dashboard-body {
+    background:
+        radial-gradient(circle at top left, rgba(74, 122, 85, 0.22), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(28, 64, 41, 0.5), transparent 38%),
+        linear-gradient(180deg, var(--ea-paper) 0%, #050e0a 100%);
+}
+
+.dashboard-body h1,
+.dashboard-body h2,
+.dashboard-body h3 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+}
+
+.dashboard-body .metric-value,
+.dashboard-body .progress-ring-inner strong,
+.dashboard-body .hero-panel h1 {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-body .eyebrow,
+.dashboard-body .metric-title,
+.dashboard-body .metric-mark,
+.dashboard-body .status-pill,
+.dashboard-body .tag-pill,
+.dashboard-body .environment-badge {
+    font-family: var(--ea-font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.dashboard-body .brand-mark,
+.dashboard-body .dashboard-loader-mark {
+    font-family: var(--ea-font-serif);
+    font-style: italic;
+}
+
+.dashboard-body .brand-copy strong {
+    font-family: var(--ea-font-serif);
+    font-weight: 400;
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-body .brand-copy small {
+    font-family: var(--ea-font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.6563rem;
+    color: var(--ea-mute);
+}
+
+/* Ajustes finos de colores semánticos en pills */
+.dashboard-body .status-success,
+.dashboard-body .badge-success { color: var(--eden-700); background: var(--ea-success-soft); }
+.dashboard-body .status-warning,
+.dashboard-body .badge-warning { color: #7a4a23; background: var(--ea-warning-soft); }
+.dashboard-body .status-danger,
+.dashboard-body .badge-danger { color: var(--ea-earth); background: var(--ea-danger-soft); }
+.dashboard-body .status-info,
+.dashboard-body .badge-info { color: #2f6a6f; background: var(--ea-info-soft); }
+.dashboard-body .status-neutral,
+.dashboard-body .badge-neutral { color: var(--ea-ink-2); background: var(--ea-rule-soft); }
+
+:root[data-theme="dark"] .dashboard-body .status-success { color: var(--eden-300); }
+:root[data-theme="dark"] .dashboard-body .status-warning { color: var(--ea-clay); }
+:root[data-theme="dark"] .dashboard-body .status-danger { color: #e08465; }
+:root[data-theme="dark"] .dashboard-body .status-info { color: var(--ea-breath); }
+
+/* Transición de tema:
+   Antes usábamos la View Transitions API con una expansión circular.
+   El problema: el navegador re-mapeaba el scroll a la nueva instantánea y
+   movía la posición. Lo cambiamos por transiciones CSS de colores sobre el
+   shell — ver `.ea-body`/cards más abajo — que NO afectan el scroll. */
+
+/* ============================================================
+   Barra de scroll moderna flotante (EdenAir)
+   La inyecta JS/ea-scrollbar.js en la landing y el panel. Thumb fino tipo
+   píldora, redondeado, sin track ni marco; aparece al scrollear/hover y se
+   desvanece al quedar quieto. Es arrastrable.
+
+   El scrollbar nativo del documento sólo se oculta cuando esta barra está
+   activa (html.ea-floatbar-on), para no afectar al resto de páginas. El
+   scrollbar interno del sidebar del panel queda intacto (su selector es
+   propio: .ea-sidebar::-webkit-scrollbar).
+   ============================================================ */
+html.ea-floatbar-on { scrollbar-width: none; }                  /* Firefox */
+html.ea-floatbar-on::-webkit-scrollbar { width: 0; height: 0; } /* WebKit  */
+
+.ea-floatbar {
+    position: fixed;
+    top: 8px;
+    right: 4px;
+    bottom: 8px;
+    width: 12px;             /* zona de agarre; el thumb visible es más fino */
+    z-index: 90;             /* sobre navbar/menús (≤60), bajo el loader (100) */
+    pointer-events: none;    /* el track nunca bloquea clicks */
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+.ea-floatbar.is-active { opacity: 1; }
+
+.ea-floatbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 2px;
+    width: 4px;
+    min-height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--ea-air, #8fd6c8) 92%, transparent),
+        color-mix(in srgb, var(--ea-primary, #2f6b4f) 92%, transparent)
+    );
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 2px 10px -3px color-mix(in srgb, var(--ea-primary, #2f6b4f) 55%, transparent);
+    pointer-events: auto;    /* sólo el thumb captura el arrastre */
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+    transition: width 0.18s ease, right 0.18s ease, background 0.2s ease;
+}
+.ea-floatbar-thumb:hover,
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    width: 7px;
+    right: 0;
+}
+.ea-floatbar.is-dragging .ea-floatbar-thumb { cursor: grabbing; }
+
+:root[data-theme="dark"] .ea-floatbar-thumb {
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--ea-air, #8fd6c8) 96%, transparent),
+        color-mix(in srgb, var(--eden-500, #4a7a55) 94%, transparent)
+    );
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 2px 12px -3px color-mix(in srgb, var(--ea-air, #8fd6c8) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-floatbar,
+    .ea-floatbar-thumb { transition: none; }
+    .ea-floatbar.is-active { opacity: 0.85; }
+}
+
+/* Táctil: dejamos el scroll nativo del sistema (overlay y autodesvanecido).
+   Ocultamos la barra custom y restauramos el scrollbar nativo. */
+@media (hover: none) and (pointer: coarse) {
+    .ea-floatbar { display: none; }
+    html.ea-floatbar-on { scrollbar-width: auto; }
+    html.ea-floatbar-on::-webkit-scrollbar { width: auto; height: auto; }
+}
