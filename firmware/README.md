@@ -38,9 +38,11 @@ Esta es la idea central, y conviene tenerla clara antes de tocar codigo:
 
 | | Quien lo hace | Donde |
 |---|---|---|
-| Leer el sensor | ESP32 | `sensor.py` |
+| Leer temperatura, humedad y CO2 | ESP32 | `sensor.py` |
+| Leer la calidad de aire | ESP32 | `aire.py` |
 | **Decidir que actuador prender** | **ESP32** | **`reglas.py`** |
-| Mover los reles | ESP32 | `actuadores.py` |
+| Emitir la orden infrarroja | ESP32 | `infrarrojo.py` |
+| Mover los reles y los LEDs | ESP32 | `actuadores.py` |
 | Guardar el historial | Servidor | `MeasurementService.php` |
 | Definir los umbrales | Servidor (los edita el usuario) | `/panel/ambientes` |
 | Mostrar el dashboard | Servidor | `PanelService.php` |
@@ -62,16 +64,48 @@ obedecer las ordenes que el usuario manda desde el dashboard.
 
 | Archivo | Que hace | Se toca? |
 |---|---|---|
-| `config.py` | Direccion del servidor, pines, credenciales del AP | **Si**, es lo unico que se edita por placa |
+| `config.py` | Direccion del servidor, pines, tiempos, credenciales del AP | **Si**, es lo unico que se edita por placa |
 | `main.py` | El ciclo principal. Orquesta, no calcula | Rara vez |
 | `reglas.py` | **Las decisiones.** Puro: recibe numeros, devuelve decision | Si cambian las reglas |
-| `sensor.py` | Lee el SCD41 por I2C | Si cambias de sensor |
-| `actuadores.py` | Mueve los pines de los reles | Si cambias el hardware |
+| `sensor.py` | Lee el SCD41 por I2C (temperatura, humedad, CO2) | Si cambias de sensor |
+| `aire.py` | Lee el MQ-135 por ADC (calidad de aire) | Si cambias de sensor |
+| `infrarrojo.py` | Emite la trama de 38 kHz y espera su confirmacion | Si cambias el emisor o el receptor |
+| `actuadores.py` | Mueve los pines de los reles y de los LEDs | Si cambias el hardware |
 | `red.py` | WiFi + portal de configuracion | Casi nunca |
 | `servidor.py` | Las llamadas HTTP a la API | Si cambia la API |
 
-Estan separados a proposito: podes cambiar de sensor sin tocar las reglas, o
-afinar las reglas sin saber nada de I2C.
+Son **nueve archivos**. Estan separados a proposito: podes cambiar de sensor sin
+tocar las reglas, o afinar las reglas sin saber nada de I2C.
+
+### La regla de oro de la logica
+
+EdenAir mide **cuatro** variables pero solo puede **actuar** sobre **dos**:
+
+| Variable | Que hace el equipo | Con que |
+|---|---|---|
+| Temperatura | **ACTUA** | Ordena el aire acondicionado, por infrarrojo |
+| Humedad | **ACTUA** | Enciende el atomizador, y solo para SUBIRLA |
+| CO2 | **AVISA** | LED rojo + mensaje en el panel |
+| Calidad de aire | **AVISA** | LED rojo + mensaje en el panel |
+
+El CO2 y la calidad de aire solo avisan porque el sistema **no renueva el aire**:
+no hay extractor ni ventilacion. Encender algo no cambiaria el numero. Y no es
+una limitacion de la maqueta: es una decision de producto. EdenAir no comanda
+equipos que el usuario no tenga instalados, asi que en esos casos decide la
+persona y el equipo se lo dice.
+
+### La maqueta no define la logica
+
+El cooler de 30 mm **representa** un aire acondicionado. En la maqueta gira como
+indicador y no baja la temperatura; en una casa, del otro lado hay un aire
+acondicionado que si enfria. **El codigo es el del producto real.** Por eso la
+histeresis de apagado a 24 grados esta implementada aunque en la maqueta la
+temperatura no baje sola: es la regla del producto.
+
+Si en la maqueta el aire queda encendido porque la temperatura no baja, esta
+bien: es exactamente lo que haria el sistema real mientras el ambiente siga
+caliente. Para la demo se saca la fuente de calor y baja sola. **No hay ningun
+temporizador de compensacion, ninguna lectura simulada y ningun modo "demo".**
 
 ---
 
@@ -97,26 +131,82 @@ Si tu modulo trae mas pines (`ADDR`, `INT`), dejalos sin conectar.
 El cable USB va de la ESP32 a la computadora: sirve para alimentarla **y** para
 programarla desde Thonny. No hace falta fuente aparte.
 
-### Sin actuadores todavia
+### El mapa de pines completo
 
-En `config.py` los tres actuadores vienen en `None`:
+Cuando esta todo armado, `config.py` queda asi:
+
+| GPIO | Componente | Notas |
+|---|---|---|
+| 21 | SDA — SCD41 | I2C, alimentado con **3V3** |
+| 22 | SCL — SCD41 | I2C |
+| 34 | MQ-135 (AO) | Solo entrada. **Siempre por el divisor 20k/10k** |
+| 26 | Rele IN1 — aire acondicionado (cooler) | **Activo en bajo** |
+| 27 | Rele IN2 — atomizador | **Activo en bajo** |
+| 25 | Emisor IR (KY-005) | Trama de 38 kHz, por transistor |
+| 33 | Receptor IR (VS1838B) | Alimentado con **3V3** |
+| 14 | LED verde | Resistencia 220-330 ohm |
+| 16 | LED rojo | Resistencia 220-330 ohm |
+| 17 | LED azul | Resistencia 220-330 ohm |
+
+Reglas electricas que **no** se negocian:
+
+- **Los reles son activos en bajo.** El firmware los inicializa con
+  `Pin(n, Pin.OUT, value=1)`, o sea apagados **en el mismo momento** en que el
+  pin pasa a ser salida. Con `Pin(n, Pin.OUT)` a secas hay una ventana en la que
+  la salida vale 0 y el rele pega un golpe solo al arrancar.
+- **El SCD41 y el receptor IR van a 3V3**, nunca a 5 V.
+- **El MQ-135 se alimenta con 5 V** (tiene calefactor interno), pero su `AO`
+  **nunca** va directo a un GPIO: entra por el divisor resistivo.
+- La ESP32 se alimenta por USB; el resto (MQ-135, reles, cooler, atomizador)
+  desde la fuente externa de 5 V / 3 A, con **GND comun en estrella**.
+
+### Armando por partes
+
+Cualquier pin de `config.py` puede quedar en `None`:
 
 ```python
-PIN_VENTILADOR = None
-PIN_AROMATIZADOR = None
-PIN_LED_ALERTA = None
+PIN_RELE_AIRE = None
+PIN_MQ135 = None
+PIN_IR_EMISOR = None
+PIN_LED_VERDE = None
 ```
 
-Eso significa "no los arme". El equipo **no toca esos pines** y **no le dice al
-servidor que estan encendidos**, asi el panel no muestra un ventilador que no
-existe. En la consola vas a ver:
+`None` significa "todavia no lo arme". El equipo **no toca ese pin** y **no le
+informa nada al servidor sobre ese componente**, asi el panel no muestra
+encendido algo que no existe. Con **solo el SCD41** el equipo ya se vincula,
+mide y reporta. En la consola vas a ver:
 
 ```
 Sin actuadores conectados: el equipo solo mide y reporta.
+Sin MQ-135: la calidad de aire se calcula con la formula de respaldo.
 ```
 
 Cuando armes uno, le pones su numero de pin y volves a subir `config.py`. Nada
 mas cambia.
+
+### Los dos sensores
+
+| | SCD41 | MQ-135 |
+|---|---|---|
+| Mide | Temperatura, humedad y CO2 | Calidad de aire |
+| Como | I2C, sensor NDIR real | ADC, resistencia quimica |
+| Alimentacion | 3V3 | 5 V (calefactor) |
+| Listo en | Segundos | **5 minutos de warm-up** |
+| Se muestra como | Grados, % y ppm | Indice 0-100, **nunca en ppm** |
+
+El MQ-135 no da ppm confiables sin calibracion de laboratorio, asi que EdenAir
+lo convierte a un indice relativo de 0 a 100 con su etiqueta (Excelente, Buena,
+Aceptable, Mala). Los dos extremos de esa conversion se calibran una vez por
+placa con `MQ135_CRUDO_LIMPIO` y `MQ135_CRUDO_SUCIO` en `config.py`.
+
+**El MQ-135 y el atomizador se pelean.** La niebla del atomizador es vapor de
+agua, pero el sensor la lee como contaminante: sin proteccion, el equipo diria
+"aire malo" justo cuando esta humidificando, y como el atomizador se enciende
+por humedad baja quedaria realimentandose. Por eso, mientras el atomizador esta
+encendido **y 90 segundos despues**, se ignora al MQ-135: se congela el ultimo
+valor bueno y no se dispara ninguna alerta de aire. Fisicamente ademas van en
+paredes opuestas y el MQ con visera, pero el enmascarado por software es la
+proteccion real.
 
 ---
 
@@ -160,8 +250,9 @@ Es el **valor de fabrica**, no una condena: si despues la IP cambia, se
 corrige desde el portal del celular (*Opciones avanzadas*) y queda guardada en
 `servidor.json`. No hay que volver a abrir Thonny por un cambio de red.
 
-Despues revisa los pines (`PIN_VENTILADOR`, `PIN_I2C_SDA`, etc.) segun como
-tengas armado el circuito.
+Despues revisa los pines (`PIN_RELE_AIRE`, `PIN_MQ135`, `PIN_I2C_SDA`, etc.)
+segun como tengas armado el circuito, y deja en `None` lo que todavia no
+armaste.
 
 ---
 
@@ -170,12 +261,12 @@ tengas armado el circuito.
 1. **Ver → Archivos** (para tener el panel de archivos)
 2. Arriba vas a ver tu PC; abajo, **Dispositivo MicroPython**
 3. Navega en el panel de arriba hasta esta carpeta `firmware/`
-4. Selecciona **los 7 archivos `.py`**
+4. Selecciona **los 9 archivos `.py`**
 5. Click derecho → **Subir a /**
 
-Deberian quedar los 7 en el panel del dispositivo.
+Deberian quedar los 9 en el panel del dispositivo.
 
-> **Importante:** hay que subir los 7, no solo `main.py`. Si falta uno, la
+> **Importante:** hay que subir los 9, no solo `main.py`. Si falta uno, la
 > placa arranca y falla con `ImportError: no module named ...`.
 
 6. Apreta el boton de **reset** de la placa (o Ctrl+D en la consola de Thonny)
@@ -265,16 +356,58 @@ Para dejar una placa como recien salida, borra desde Thonny los archivos
 ## El ciclo, ya funcionando
 
 ```
-cada 5 minutos:              cada 15 segundos:
-  leer el SCD41                consultar ordenes del usuario
-  calcular el indice           aplicarlas y confirmarlas
+cada 8 segundos:               cada 15 segundos:
+  leer el SCD41                  consultar ordenes del usuario
+  leer el MQ-135                 aplicarlas y confirmarlas
   DECIDIR (reglas.py)
-  mover los reles            cada hora:
-  reportar al servidor         refrescar los umbrales
+  emitir la orden IR           cada hora:
+  mover reles y LEDs             refrescar los umbrales
+  reportar al servidor
 ```
 
 Fijate el orden: **primero acciona, despues reporta**. Si el servidor no
 contesta, el ambiente igual quedo regulado.
+
+Eran 5 minutos. En una feria de ciencias hay que poder **ver la reaccion en
+vivo**: si el ciclo tarda cinco minutos, el jurado se va antes de que el cooler
+arranque. Ocho segundos es tambien el ritmo natural del SCD41, que entrega un
+dato nuevo cada cinco.
+
+### Las protecciones
+
+Ninguna de estas es un parche para la maqueta: todas existen en el producto real.
+
+| Proteccion | Cuanto | Para que |
+|---|---|---|
+| Tiempo minimo del rele | 30 s | Que no traquetee cuando el valor queda justo en el umbral |
+| Limite de tramas IR | 1 cada 60 s | No saturar el receptor ni el ambiente |
+| Espera de confirmacion IR | hasta 1 s | Saber si la orden llego, sin colgar el ciclo |
+| Warm-up del MQ-135 | 300 s | Su lectura no sirve hasta que el calefactor este listo |
+| Enmascarado del MQ-135 | mientras atomiza + 90 s | La niebla ensucia la lectura |
+| Ciclo del atomizador | 60 s ON / 120 s OFF | No encharcar ni vaciar el deposito |
+
+Prioridad de decisiones: **calidad de aire y CO2 (avisar) → temperatura →
+humedad**.
+
+### La cadena infrarroja
+
+La orden del aire acondicionado **no** sale por el cable del rele: sale por
+infrarrojo, igual que con un control remoto.
+
+```
+ESP32 --(trama NEC 38 kHz)--> receptor VS1838B --> rele --> cooler + LED azul
+```
+
+Despues de emitir, el firmware espera **hasta 1 segundo** la confirmacion del
+receptor:
+
+- **Confirma** → prende el aire y reporta `ir_confirmado = true`.
+- **No confirma** → **prende el aire igual** y reporta `ir_confirmado = false`.
+  El panel muestra *"Orden enviada, sin confirmacion IR"*.
+
+La confirmacion **no es una condicion**: una demostracion no se puede caer
+porque un LED infrarrojo quedo mal apuntado. Pero el dato viaja al panel,
+porque es justamente el que delata que la cadena esta fallando.
 
 ---
 
@@ -286,11 +419,48 @@ Cinco llamadas. Estan en `servidor.py`, una funcion por cada una.
 |---|---|---|
 | POST | `/api/devices/pair` | Darse de alta. Devuelve `device_uid` y `api_token`. **200** = vinculado, **202** = todavia nadie apreto "Conectar". Lleva tambien `session`: el codigo que el portal ya le dio al celular |
 | GET | `/api/devices/{uid}/config` | Con que umbrales decidir, y en que modo esta |
-| POST | `/api/devices/{uid}/measurements` | Subir la medicion y que actuadores quedaron encendidos |
+| POST | `/api/devices/{uid}/measurements` | Subir la medicion, que actuadores quedaron encendidos y el diagnostico del equipo |
 | GET | `/api/devices/{uid}/commands/pending` | Ordenes manuales del usuario |
 | POST | `/api/devices/{uid}/commands/{id}/executed` | Confirmar que se aplico una orden |
 
 Todas menos `pair` llevan el header `X-Device-Token`.
+
+### Que manda el equipo en cada medicion
+
+```json
+{
+  "temperature": 27.4,
+  "humidity": 36.2,
+  "co2_ppm": 1180,
+  "air_quality_index": 62,
+  "air_quality_source": "sensor",
+  "actuadores": {
+    "fan": "on", "aromatizer": "on", "alert_led": "on",
+    "green_led": "off", "blue_led": "on"
+  },
+  "motivo": "calidad de aire mala, CO2 alto, temperatura alta, humedad baja",
+  "diagnostico": {
+    "estado_aire": "ok",
+    "ir_confirmado": false,
+    "avisos": ["ventilar", "aire_acondicionado", "ir_sin_confirmar", "humidificando"]
+  }
+}
+```
+
+Dos cosas que conviene entender de este JSON:
+
+- **`fan`, `aromatizer` y `alert_led` no cambiaron de nombre.** Son los nombres
+  internos desde la primera version y siguen igual aunque su etiqueta visible
+  sea otra (`fan` = aire acondicionado, `aromatizer` = humidificador). Cambiarlos
+  romperia todo el historial ya guardado.
+- **Los `avisos` son codigos, no frases.** El texto que ve la persona lo pone la
+  web (`PanelService::AVISOS`), asi se puede reescribir un mensaje sin
+  reprogramar la placa.
+
+Y que baja el equipo en su configuracion (`GET .../config`): `umbrales` (donde
+ENCIENDE cada regla), `apagado` (donde APAGA: la histeresis ya calculada por el
+servidor), `critico` (el CO2 que ya es grave), `tiempos` (las protecciones) e
+`intervalos`.
 
 ### Probar la API sin la placa
 
@@ -316,22 +486,40 @@ cualquier Python de escritorio. Se puede probar sin ESP32:
 ```python
 import reglas
 
-umbrales = {"temp_min": 18.0, "temp_max": 24.0,
-            "hum_min": 40.0, "hum_max": 55.0, "co2_max": 900}
+cfg = {
+    "umbrales": {"temp_min": 20.0, "temp_max": 26.0, "hum_min": 40.0,
+                 "hum_max": 60.0, "co2_max": 1000, "aire_min": 70},
+    "apagado":  {"temp": 24.0, "hum": 48.0, "co2": 850, "aire": 75},
+    "critico":  {"co2": 1400, "co2_salida": 1100},
+    "tiempos":  {"atomizador_on": 60, "atomizador_off": 120},
+}
 
-cfg = {"umbrales": umbrales,
-       "margenes_alerta": {"temp": 2.0, "hum": 8.0, "co2": 250, "aire": 45},
-       "aire_aromatizador": 60}
+d = reglas.Decisor()
 
-medicion = {"temperature": 27.0, "humidity": 47.0, "co2_ppm": 600}
-medicion["air_quality_index"] = reglas.calcular_indice_aire(27.0, 47.0, 600, umbrales)
+# Ambiente caliente y seco, con el aire cargado.
+medicion = {"temperature": 27.0, "humidity": 36.0, "co2_ppm": 1200,
+            "air_quality_index": 62, "aire_confiable": True}
 
-print(reglas.decidir(medicion, cfg))
-# ({'fan': 'on', 'aromatizer': 'off', 'alert_led': 'on'}, 'temperatura alta, desvio grave')
+print(d.decidir(medicion, cfg, ahora=0))
+# ({'fan': 'on', 'aromatizer': 'on', 'alert_led': 'on',
+#   'green_led': 'off', 'blue_led': 'on'},
+#  ['ventilar', 'aire_acondicionado', 'humidificando'],
+#  'calidad de aire mala, CO2 alto, temperatura alta, humedad baja')
+
+# La misma temperatura, un rato despues: 25 grados NO apaga el aire.
+# Esa es la histeresis: enciende a 26, corta recien abajo de 24.
+medicion["temperature"] = 25.0
+print(d.decidir(medicion, cfg, ahora=10)[0]["fan"])   # -> 'on'
+
+medicion["temperature"] = 23.5
+print(d.decidir(medicion, cfg, ahora=20)[0]["fan"])   # -> 'off'
 ```
 
 Esa es la ventaja de tenerlo separado: la parte que mas importa se puede
-probar sin hardware.
+probar sin hardware. `Decisor` es un objeto y no una funcion suelta porque
+tiene que **recordar** en que estado quedo cada regla (la histeresis) y en que
+momento del ciclo esta el atomizador. Igual sigue siendo puro: el momento
+actual se le pasa como un numero (`ahora`), no lo consulta.
 
 ---
 
@@ -353,12 +541,18 @@ probar sin hardware.
 | Sintoma | Causa probable |
 |---|---|
 | `ImportError: no module named 'urequests'` | Falta instalar la libreria (paso 2) |
-| `ImportError: no module named 'reglas'` | Subiste solo `main.py`. Hay que subir los 7 |
+| `ImportError: no module named 'reglas'` | Subiste solo `main.py`. Hay que subir los 9 |
+| `ImportError: no module named 'aire'` o `'infrarrojo'` | Son los dos archivos nuevos. Subilos tambien |
 | `No se detecta el SCD41 en I2C` | Cableado, o los pines de `config.py` no coinciden |
 | `No se pudo contactar al servidor` | La IP del servidor esta mal, o Apache apagado, o la PC en otra red. **Se corrige desde el portal**, no hace falta Thonny |
 | Se queda en `Todavia nadie apreto 'Conectar'` | Correcto: entra a la web y apreta Conectar. Reintenta solo cada 15 s |
-| El actuador funciona al reves | Cambia `RELES_INVERTIDOS` en `config.py` |
-| Aprieto un boton del panel y no pasa nada | Ese actuador esta en `None` en `config.py`. La orden queda pendiente a proposito: el equipo no confirma algo que no hizo |
+| El rele funciona al reves | Cambia `RELES_INVERTIDOS` en `config.py` |
+| Un rele pega un golpe al enchufar la placa | No deberia pasar: se inicializa apagado desde el constructor. Si pasa, el rele no es activo en bajo -> `RELES_INVERTIDOS = False` |
+| Aprieto un boton del panel y no pasa nada | O ese actuador esta en `None` en `config.py`, o el rele todavia esta cumpliendo sus 30 s de tiempo minimo. La orden queda pendiente a proposito: el equipo no confirma algo que no hizo |
+| El panel dice `Sensor de aire calentando` y no cambia | Normal durante los primeros 5 minutos. Si sigue, el MQ-135 no esta llegando al GPIO 34 |
+| La calidad de aire se queda clavada en 0 o en 100 | Falta el divisor 20k/10k, o hay que recalibrar `MQ135_CRUDO_LIMPIO` / `MQ135_CRUDO_SUCIO` con lo que devuelve `medidor.crudo()` |
+| El panel dice `Orden enviada, sin confirmacion IR` | El emisor y el receptor no se ven. Enfrentalos, sacale lo que tengan en el medio, revisa que el receptor este a **3V3** |
+| El cooler queda encendido y no se apaga | **Correcto** si la temperatura no bajo de 24 grados. Saca la fuente de calor y espera: no hay ningun apagado por tiempo, a proposito |
 
 ---
 
@@ -367,15 +561,23 @@ probar sin hardware.
 Las reglas viven en `reglas.py`, pero **los numeros los manda el servidor**.
 Segun que quieras cambiar:
 
-- **Un umbral de un ambiente** (que el aula tolere hasta 26 °C):
-  desde la web, en `/panel/ambientes`. No se toca el firmware.
-- **Un margen de alerta o el umbral del aromatizador**:
-  en `app/Services/DeviceConfigService.php`, las constantes de arriba.
-  Tampoco se toca el firmware.
-- **La regla en si** (que el aromatizador dependa del CO2 y no del indice):
-  ahi si, `reglas.py`, y hay que volver a subir el archivo.
+- **Un umbral de un ambiente** (que el aula tolere hasta 28 °C, o que avise con
+  la calidad de aire debajo de 65): desde la web, en `/panel/ambientes`. Ahi se
+  editan tambien las histeresis y el CO2 critico, en *Ajustes avanzados*.
+  No se toca el firmware.
+- **Un tiempo o una proteccion** (el minimo del rele, el warm-up del MQ-135, el
+  ciclo del atomizador): en `app/Services/DeviceConfigService.php`, las
+  constantes de arriba. Tampoco se toca el firmware: viajan en el bloque
+  `tiempos` de la configuracion.
+- **Un mensaje del panel**: en `app/Services/PanelService.php`, la constante
+  `AVISOS`. El firmware manda codigos, no frases.
+- **La regla en si** (que la humedad alta encienda algo, que el CO2 accione en
+  vez de avisar): ahi si, `reglas.py`, y hay que volver a subir el archivo.
 
-> Si cambias la formula del indice de aire en `reglas.py`, cambiala tambien en
+> La formula de `calcular_indice_aire()` ya **no** es la fuente normal del
+> indice: desde que hay MQ-135, el numero que vale es el medido y el servidor lo
+> guarda tal cual. La formula quedo como respaldo para cuando el sensor no esta
+> o esta calentando. Si igual la cambias, cambiala tambien en
 > `MeasurementService::calcularIndiceAire()`. Las dos tienen que dar el mismo
 > numero: una decide y la otra es la que se muestra en el panel. Estan
 > verificadas como identicas, incluido el redondeo (ver `_redondear`).

@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS spaces (
     min_humidity DECIMAL(5,2) NOT NULL DEFAULT 40.00,
     max_humidity DECIMAL(5,2) NOT NULL DEFAULT 60.00,
     max_co2 INT UNSIGNED NOT NULL DEFAULT 1000,
+    -- Umbrales de la logica de control (los edita el usuario en /panel/ambientes).
+    -- min_air_quality: debajo de este indice el equipo pide ventilar (no acciona).
+    -- *_hysteresis: cuanto tiene que mejorar el valor para que la regla se apague.
+    -- critical_co2: a partir de aca el aviso de CO2 pasa a ser critico.
+    min_air_quality INT UNSIGNED NOT NULL DEFAULT 70,
+    temp_hysteresis DECIMAL(4,2) NOT NULL DEFAULT 2.00,
+    hum_hysteresis DECIMAL(4,2) NOT NULL DEFAULT 8.00,
+    co2_hysteresis INT UNSIGNED NOT NULL DEFAULT 150,
+    air_hysteresis INT UNSIGNED NOT NULL DEFAULT 5,
+    critical_co2 INT UNSIGNED NOT NULL DEFAULT 1400,
     created_at DATETIME NULL,
     updated_at DATETIME NULL,
     PRIMARY KEY (id),
@@ -132,6 +142,8 @@ CREATE TABLE IF NOT EXISTS measurements (
     co2_ppm INT UNSIGNED NOT NULL,
     air_quality_index INT UNSIGNED NOT NULL,
     air_quality_label VARCHAR(30) NOT NULL,
+    -- 'sensor' = lo midio el MQ-135; 'calculado' = formula de respaldo.
+    air_quality_source VARCHAR(20) NOT NULL DEFAULT 'calculado',
     notes TEXT NULL,
     captured_at DATETIME NOT NULL,
     created_at DATETIME NULL,
@@ -167,6 +179,17 @@ CREATE TABLE IF NOT EXISTS device_states (
     fan_state VARCHAR(10) NOT NULL DEFAULT 'off',
     aromatizer_state VARCHAR(10) NOT NULL DEFAULT 'off',
     alert_led_state VARCHAR(10) NOT NULL DEFAULT 'off',
+    -- Los otros dos LEDs. El rojo sigue llamandose alert_led_state para no
+    -- romper el historial ya guardado en device_commands.
+    green_led_state VARCHAR(10) NOT NULL DEFAULT 'off',
+    blue_led_state VARCHAR(10) NOT NULL DEFAULT 'off',
+    -- Diagnostico que reporta el equipo con cada medicion.
+    -- ir_confirmed: 1 confirmada, 0 emitida sin confirmar, NULL sin ordenes.
+    -- air_sensor_status: 'ok' | 'warmup' | 'pausa' | 'ausente' (MQ-135).
+    -- avisos: codigos JSON que la web traduce a mensajes.
+    ir_confirmed TINYINT(1) NULL,
+    air_sensor_status VARCHAR(20) NOT NULL DEFAULT 'ok',
+    avisos TEXT NULL,
     last_reason TEXT NULL,
     updated_by VARCHAR(40) NOT NULL DEFAULT 'system',
     created_at DATETIME NULL,

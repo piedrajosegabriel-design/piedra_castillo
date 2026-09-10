@@ -25,6 +25,14 @@ class DeviceStateModel extends Model
         'fan_state',
         'aromatizer_state',
         'alert_led_state',
+        // Los otros dos LEDs del equipo. El rojo sigue llamándose
+        // alert_led_state para no romper el historial ya guardado.
+        'green_led_state',
+        'blue_led_state',
+        // Diagnóstico que reporta el equipo con cada medición.
+        'ir_confirmed',
+        'air_sensor_status',
+        'avisos',
         'last_reason',
         'updated_by',
     ];
@@ -37,6 +45,12 @@ class DeviceStateModel extends Model
    GLOSARIO DE ESTE ARCHIVO (solo configuración, sin métodos propios)
    - operating_mode       → 'automatic' (el sistema decide) o 'manual' (el usuario)
    - fan_state / aromatizer_state / alert_led_state → 'on'/'off' de cada actuador
+                           (fan = aire acondicionado, aromatizer = humidificador,
+                            alert_led = LED rojo)
+   - green_led_state / blue_led_state → los otros dos LEDs del equipo
+   - ir_confirmed         → 1/0/NULL: si el receptor confirmó la orden infrarroja
+   - air_sensor_status    → 'ok' | 'warmup' | 'pausa' | 'ausente' (MQ-135)
+   - avisos               → códigos JSON del último reporte, que la web traduce
    - last_reason          → texto con la última regla/causa del cambio
    - updated_by           → origen del cambio: web / automation / device-api...
    - $allowedFields       → lista blanca de columnas escribibles

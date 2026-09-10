@@ -29,6 +29,15 @@ class SpaceModel extends Model
         'min_humidity',
         'max_humidity',
         'max_co2',
+        // Umbrales de la lógica de control nueva: el mínimo de calidad de aire
+        // que dispara el aviso, cuánto tiene que mejorar cada variable para
+        // que la regla se apague (histéresis) y el CO₂ que ya es crítico.
+        'min_air_quality',
+        'temp_hysteresis',
+        'hum_hysteresis',
+        'co2_hysteresis',
+        'air_hysteresis',
+        'critical_co2',
     ];
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
@@ -42,4 +51,8 @@ class SpaceModel extends Model
    - min/max_temperature → rango ideal de temperatura (°C)
    - min/max_humidity    → rango ideal de humedad (%)
    - max_co2             → límite de CO₂ (ppm) antes de considerarlo alto
+   - min_air_quality     → índice 0–100 debajo del cual se avisa "ventilá"
+   - *_hysteresis        → cuánto tiene que mejorar el valor para que la regla
+                           se apague (evita que el actuador oscile)
+   - critical_co2        → ppm a partir de los cuales el aviso es crítico
    ============================================================================ */

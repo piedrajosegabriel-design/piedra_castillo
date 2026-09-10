@@ -27,7 +27,8 @@ El backend y la web estan terminados y esperan al hardware. La arquitectura fina
   ni pasos intermedios.
 - Ambientes por espacio: oficina, aula, hogar, dormitorio o personalizable.
 - Dashboard con temperatura, humedad, CO2 y calidad del aire.
-- Estados de actuadores: ventilador, aromatizador y LED de alerta.
+- Estados de actuadores: aire acondicionado (por infrarrojo), humidificador
+  y los tres LEDs de estado (verde, azul y rojo).
 - Modo automatico y modo manual.
 - Control manual desde la web.
 - Guardado de comandos en MySQL.
@@ -326,7 +327,7 @@ Ciclo normal:
   4. Leer sensores
   5. POST mediciones al backend
   6. GET comandos pendientes
-  7. Ejecutar ventilador / aromatizador / LED
+  7. Ejecutar aire acondicionado / humidificador / LEDs
   8. POST confirmacion de ejecucion
   9. Repetir ciclo
 ```

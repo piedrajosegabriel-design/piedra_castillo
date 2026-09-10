@@ -10,20 +10,32 @@ use InvalidArgumentException;
    QUÉ HACE: guarda las mediciones REALES que manda el hardware
    y dispara la automatización con cada una.
 
-   El dispositivo (ESP32 + sensor SCD41) mide tres cosas:
-   temperatura, humedad y CO₂. El índice de calidad de aire NO
-   es un sensor: es una cuenta, y la hace este servicio a partir
-   de esos tres valores y de los rangos del ambiente.
+   El dispositivo mide CUATRO cosas: temperatura, humedad y CO₂
+   con el SCD41, y la calidad de aire con el MQ-135.
+
+   DE DÓNDE SALE EL ÍNDICE DE CALIDAD DE AIRE
+   Antes era siempre una cuenta hecha acá a partir de las otras
+   tres variables, porque no había sensor. Ahora lo MIDE el
+   MQ-135 y el equipo lo manda ya resuelto: este servicio lo
+   guarda tal cual, sin recalcularlo. La fórmula quedó como
+   RESPALDO para dos casos concretos: que el MQ-135 no esté
+   conectado, o que todavía esté calentando (sus primeros cinco
+   minutos no son confiables).
+
+   `air_quality_source` guarda de dónde salió cada número
+   ('sensor' o 'calculado') para que el panel no tenga que
+   adivinar.
 
    Este servicio NO inventa datos. Si falta un valor obligatorio,
    corta con una excepción: es preferible un error visible a un
    número inventado en el panel.
 
-   TAMPOCO DECIDE NADA. Quien decide prender el ventilador o el
-   aromatizador es el ESP32, comparando la medición con los
-   umbrales que le mandó el servidor (ver DeviceConfigService).
-   Si el equipo informa qué actuadores quedaron encendidos, este
-   servicio se limita a REGISTRAR ese estado.
+   TAMPOCO DECIDE NADA. Quien decide prender el aire
+   acondicionado o el humidificador es el ESP32, comparando la
+   medición con los umbrales que le mandó el servidor (ver
+   DeviceConfigService). Si el equipo informa qué actuadores
+   quedaron encendidos, este servicio se limita a REGISTRAR ese
+   estado.
 
      ESP32     →  mide, decide, acciona, y recién ahí reporta
      servidor  →  valida, guarda y muestra
@@ -72,23 +84,28 @@ class MeasurementService
         $humedad     = $this->exigirNumero($datos, 'humidity');
         $co2         = (int) $this->exigirNumero($datos, 'co2_ppm');
 
-        // El índice puede venir calculado por el dispositivo; si no, lo hacemos acá.
-        $indiceAire = isset($datos['air_quality_index']) && $datos['air_quality_index'] !== ''
+        // EL VALOR DEL EQUIPO MANDA. Si vino un índice, es el que el equipo usó
+        // para decidir: recalcularlo acá haría que el panel mostrara un número
+        // distinto del que movió los actuadores. Solo se calcula si no vino.
+        $midioElEquipo = isset($datos['air_quality_index']) && $datos['air_quality_index'] !== '';
+
+        $indiceAire = $midioElEquipo
             ? max(0, min(100, (int) $datos['air_quality_index']))
             : $this->calcularIndiceAire($temperatura, $humedad, $co2, $space);
 
         $medicionId = (int) $this->mediciones->insert([
-            'device_id'         => $device['id'],
-            'user_id'           => $device['user_id'],
-            'space_id'          => $device['space_id'],
-            'source'            => $origen,
-            'temperature'       => round($temperatura, 1),
-            'humidity'          => round($humedad, 1),
-            'co2_ppm'           => $co2,
-            'air_quality_index' => $indiceAire,
-            'air_quality_label' => $this->etiquetaAire($indiceAire),
-            'notes'             => trim((string) ($datos['notes'] ?? '')) ?: null,
-            'captured_at'       => (string) ($datos['captured_at'] ?? date('Y-m-d H:i:s')),
+            'device_id'          => $device['id'],
+            'user_id'            => $device['user_id'],
+            'space_id'           => $device['space_id'],
+            'source'             => $origen,
+            'temperature'        => round($temperatura, 1),
+            'humidity'           => round($humedad, 1),
+            'co2_ppm'            => $co2,
+            'air_quality_index'  => $indiceAire,
+            'air_quality_label'  => $this->etiquetaAire($indiceAire),
+            'air_quality_source' => $this->origenDelIndice($datos, $midioElEquipo),
+            'notes'              => trim((string) ($datos['notes'] ?? '')) ?: null,
+            'captured_at'        => (string) ($datos['captured_at'] ?? date('Y-m-d H:i:s')),
         ]);
 
         $medicion = $this->mediciones->find($medicionId);
@@ -102,7 +119,13 @@ class MeasurementService
             $cambios = $this->comandos->registrarEstadoReportado(
                 (int) $device['id'],
                 $datos['actuadores'],
-                trim((string) ($datos['motivo'] ?? ''))
+                trim((string) ($datos['motivo'] ?? '')),
+                // Diagnóstico del equipo: confirmación infrarroja, estado del
+                // MQ-135 y avisos. Es lo que le permite al panel explicar lo
+                // que muestra en vez de que el usuario tenga que adivinar.
+                isset($datos['diagnostico']) && is_array($datos['diagnostico'])
+                    ? $datos['diagnostico']
+                    : []
             );
         }
 
@@ -110,6 +133,24 @@ class MeasurementService
             'measurement' => $medicion,
             'actuadores'  => $cambios,
         ];
+    }
+
+    /**
+     * De dónde salió el índice de calidad de aire de esta medición.
+     *
+     * Lo dice el equipo, que es el único que sabe si su MQ-135 estaba
+     * midiendo o si tuvo que caer a la fórmula. Si no lo dice (una carga
+     * manual, un equipo con firmware viejo), el índice lo calculó el servidor.
+     */
+    private function origenDelIndice(array $datos, bool $midioElEquipo): string
+    {
+        if (! $midioElEquipo) {
+            return 'calculado';
+        }
+
+        return ((string) ($datos['air_quality_source'] ?? '')) === 'sensor'
+            ? 'sensor'
+            : 'calculado';
     }
 
     // -------------------------------------------------------------------------
@@ -140,10 +181,17 @@ class MeasurementService
     // -------------------------------------------------------------------------
 
     /**
+     * Índice de calidad de aire de RESPALDO (0–100, más alto es mejor).
+     *
      * Arranca en 100 y descuenta puntos por cada desvío respecto del ambiente:
      * temperatura lejos del centro del rango, humedad fuera de rango y CO₂ por
-     * encima del límite. Es una fórmula propia y simple, pensada para que el
-     * número reaccione de forma creíble a lo que mide el SCD41.
+     * encima del límite.
+     *
+     * OJO: esto NO es lo que se muestra normalmente. Desde que el equipo tiene
+     * MQ-135, el índice que vale es el medido y este servicio lo respeta. Esta
+     * cuenta se usa solo cuando el equipo no manda ninguno (carga manual) y es
+     * la misma que tiene el firmware en reglas.py, para que los dos lados den
+     * el mismo número.
      */
     public function calcularIndiceAire(float $temperatura, float $humedad, int $co2, array $space): int
     {
@@ -191,14 +239,16 @@ class MeasurementService
 
    Público:
    - registrar($device, $space, $datos, $origen)
-       → valida, guarda la medición y registra los actuadores que el equipo
-         informó. Devuelve ['measurement' => ..., 'actuadores' => cambios]
-   - calcularIndiceAire($temp, $hum, $co2, $space) → índice 0–100
+       → valida, guarda la medición y registra los actuadores y el diagnóstico
+         que el equipo informó. Devuelve ['measurement' => ..., 'actuadores' => cambios]
+   - calcularIndiceAire($temp, $hum, $co2, $space) → índice 0–100 de RESPALDO,
+         solo para cuando el equipo no manda ninguno
    - etiquetaAire($indice) → 'Excelente' | 'Buena' | 'Aceptable' | 'Mala'
 
-   Privado:
+   Privados:
    - exigirNumero($datos, $campo) → el valor o una excepción si falta / está
                                     fuera del rango físico posible
+   - origenDelIndice($datos, $midioElEquipo) → 'sensor' o 'calculado'
 
    Conceptos:
    - InvalidArgumentException → error de datos; el controller lo traduce a

@@ -199,9 +199,9 @@ ob_start(); ?>
                             </div>
                             <span class="ea-hud-link" aria-hidden="true"></span>
                         </div>
-                        <div class="ea-hud-panel" data-position="bl" data-metric="ventilador">
+                        <div class="ea-hud-panel" data-position="bl" data-metric="aire_acondicionado">
                             <div class="ea-hud-data">
-                                <span class="ea-hud-key">Ventilador</span>
+                                <span class="ea-hud-key">Aire acondicionado</span>
                                 <span class="ea-hud-val"><b data-value data-text>Activo</b></span>
                             </div>
                             <span class="ea-hud-link" aria-hidden="true"></span>
@@ -351,7 +351,7 @@ ob_start(); ?>
                             </svg>
                         </span>
                         <h3>Control de actuadores</h3>
-                        <p>Ventilador, aromatizador, LED de alerta y humidificador en modo automático o manual desde el mismo panel.</p>
+                        <p>Aire acondicionado, humidificador y los tres LEDs de estado, en modo automático o manual desde el mismo panel.</p>
                     </article>
 
                     <article class="ea-feature-card" data-reveal-child>
@@ -470,7 +470,7 @@ ob_start(); ?>
                             <span class="ea-core-mod-val">índice</span>
                         </article>
                         <article class="ea-core-mod" data-tone="leaf" style="--ang: 115deg; --r:42;">
-                            <span class="ea-core-mod-key">Ventilación</span>
+                            <span class="ea-core-mod-key">Aire acond.</span>
                             <span class="ea-core-mod-val">auto</span>
                         </article>
                         <article class="ea-core-mod" data-tone="cool" style="--ang: 167deg; --r:42;">
@@ -478,16 +478,16 @@ ob_start(); ?>
                             <span class="ea-core-mod-val">auto</span>
                         </article>
                         <article class="ea-core-mod" data-tone="leaf" style="--ang:-141deg; --r:42;">
-                            <span class="ea-core-mod-key">Purificación</span>
-                            <span class="ea-core-mod-val">auto</span>
+                            <span class="ea-core-mod-key">Alertas</span>
+                            <span class="ea-core-mod-val">aviso</span>
                         </article>
                     </div>
                 </div>
 
                 <ul class="ea-core-facts" aria-label="Capacidades de Eden Air">
                     <li><span>4</span> variables monitoreadas</li>
-                    <li><span>3</span> módulos regulados</li>
-                    <li><span>24/7</span> aire optimizado</li>
+                    <li><span>2</span> equipos comandados</li>
+                    <li><span>24/7</span> monitoreo continuo</li>
                 </ul>
             </div>
         </section>
@@ -553,7 +553,7 @@ ob_start(); ?>
                         <li class="ea-tech-card ea-tech-card--bl">
                             <span class="ea-tech-card-dot" aria-hidden="true"></span>
                             <span class="ea-tech-card-key">Automatización</span>
-                            <span class="ea-tech-card-val">Activa ventilación, humidificación y aroma</span>
+                            <span class="ea-tech-card-val">Ordena el aire acondicionado y el humidificador</span>
                         </li>
                         <li class="ea-tech-card ea-tech-card--br">
                             <span class="ea-tech-card-dot" aria-hidden="true"></span>
@@ -600,7 +600,7 @@ ob_start(); ?>
                     <div class="ea-flow-step" data-reveal-child>
                         <span class="ea-flow-num" aria-hidden="true"></span>
                         <h4>Actúa</h4>
-                        <p>Ventilación, humidificación y purificación responden solas.</p>
+                        <p>El aire acondicionado y el humidificador responden solos. Si hay que ventilar, te avisa.</p>
                     </div>
                 </div>
 
@@ -652,7 +652,7 @@ ob_start(); ?>
                                         <text x="12" y="14.5" text-anchor="middle" font-size="7" font-family="DM Mono, monospace" fill="currentColor" stroke="none">CO₂</text>
                                     </svg>
                                 </span>
-                                <div><strong>CO₂</strong><small>ppm · ventilación</small></div>
+                                <div><strong>CO₂</strong><small>ppm · aviso</small></div>
                             </div>
                             <div class="ea-hardware-item tone-citrus">
                                 <span class="ea-hardware-item-ico">
@@ -669,7 +669,7 @@ ob_start(); ?>
                     <article class="ea-hardware-block" data-reveal-child>
                         <p class="ea-eyebrow">Actuadores</p>
                         <h3>Qué se controla</h3>
-                        <p class="ea-hardware-desc">Cuatro dispositivos que responden a las reglas o al control manual desde el panel.</p>
+                        <p class="ea-hardware-desc">Dos equipos que el sistema comanda, más los avisos visuales. Todo responde a las reglas o al control manual desde el panel.</p>
 
                         <div class="ea-hardware-list">
                             <div class="ea-hardware-item tone-info">
@@ -679,7 +679,7 @@ ob_start(); ?>
                                         <path d="M12 10c0-3 1-6 4-6 0 3-1.4 5-4 6Zm0 4c0 3-1 6-4 6 0-3 1.4-5 4-6Zm-2-2c-3 0-6-1-6-4 3 0 5 1.4 6 4Zm4 0c3 0 6 1 6 4-3 0-5-1.4-6-4Z"/>
                                     </svg>
                                 </span>
-                                <div><strong>Ventilador</strong><small>Renueva el aire</small></div>
+                                <div><strong>Aire acondicionado</strong><small>Recibe la orden por infrarrojo</small></div>
                             </div>
                             <div class="ea-hardware-item tone-citrus">
                                 <span class="ea-hardware-item-ico">
@@ -688,7 +688,7 @@ ob_start(); ?>
                                         <path d="M9 14c-1 1.5-1 3 0 4M15 14c1 1.5 1 3 0 4"/>
                                     </svg>
                                 </span>
-                                <div><strong>Aromatizador</strong><small>Neutraliza olores</small></div>
+                                <div><strong>Humidificador</strong><small>Sube la humedad por ciclos</small></div>
                             </div>
                             <div class="ea-hardware-item tone-warning">
                                 <span class="ea-hardware-item-ico">
@@ -697,7 +697,7 @@ ob_start(); ?>
                                         <path d="M10 21h4"/>
                                     </svg>
                                 </span>
-                                <div><strong>LED de alerta</strong><small>Aviso visual</small></div>
+                                <div><strong>Tres LEDs</strong><small>Verde, azul y rojo</small></div>
                             </div>
                             <div class="ea-hardware-item tone-success">
                                 <span class="ea-hardware-item-ico">
@@ -706,7 +706,7 @@ ob_start(); ?>
                                         <path d="M8.5 13.5c.6 1.6 2 2.7 3.5 2.7"/>
                                     </svg>
                                 </span>
-                                <div><strong>Humidificador</strong><small>Regula humedad</small></div>
+                                <div><strong>Esencia opcional</strong><small>Perfuma, si querés cargarla</small></div>
                             </div>
                         </div>
                     </article>
@@ -720,8 +720,12 @@ ob_start(); ?>
         <section class="ea-section" id="automatizacion" data-reveal>
             <div class="ea-page">
                 <div class="ea-section-head">
-                    <h2>Cuatro reglas. <em>Cero supervisión.</em></h2>
-                    <p>Cada regla es transparente, editable y siempre activa.</p>
+                    <h2>Cuatro reglas. <em>Dos actúan, dos avisan.</em></h2>
+                    <p>
+                        Cada regla es transparente, editable y siempre activa. Eden Air comanda
+                        únicamente lo que puede: sobre el CO₂ y la calidad de aire te avisa, porque
+                        renovar el aire lo decidís vos.
+                    </p>
                 </div>
 
                 <div class="ea-rules">
@@ -732,7 +736,7 @@ ob_start(); ?>
                         </header>
                         <p class="ea-rule-cond"><span class="ea-rule-var">CO₂</span> <span class="ea-rule-op">&gt;</span> <span class="ea-rule-val">1000 ppm</span></p>
                         <p class="ea-rule-arrow" aria-hidden="true">↓</p>
-                        <p class="ea-rule-action">Encender <strong>ventilador</strong> hasta renovar el aire.</p>
+                        <p class="ea-rule-action">Encender el <strong>LED rojo</strong> y avisarte: ventilá el ambiente.</p>
                     </article>
 
                     <article class="ea-rule" data-reveal-child>
@@ -742,7 +746,7 @@ ob_start(); ?>
                         </header>
                         <p class="ea-rule-cond"><span class="ea-rule-var">Humedad</span> <span class="ea-rule-op">&lt;</span> <span class="ea-rule-val">40 %</span></p>
                         <p class="ea-rule-arrow" aria-hidden="true">↓</p>
-                        <p class="ea-rule-action">Activar <strong>humidificador</strong> hasta recuperar el confort.</p>
+                        <p class="ea-rule-action">Activar el <strong>humidificador</strong>, por ciclos, hasta recuperar el confort.</p>
                     </article>
 
                     <article class="ea-rule" data-reveal-child>
@@ -750,19 +754,19 @@ ob_start(); ?>
                             <span class="ea-rule-num">03</span>
                             <span class="ea-badge ea-badge--warning">Calor</span>
                         </header>
-                        <p class="ea-rule-cond"><span class="ea-rule-var">Temperatura</span> <span class="ea-rule-op">&gt;</span> <span class="ea-rule-val">28 °C</span></p>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">Temperatura</span> <span class="ea-rule-op">&gt;</span> <span class="ea-rule-val">26 °C</span></p>
                         <p class="ea-rule-arrow" aria-hidden="true">↓</p>
-                        <p class="ea-rule-action">Encender <strong>ventilador</strong> para refrescar el ambiente.</p>
+                        <p class="ea-rule-action">Ordenar por <strong>infrarrojo</strong> el encendido del aire acondicionado.</p>
                     </article>
 
                     <article class="ea-rule" data-reveal-child>
                         <header class="ea-rule-head">
                             <span class="ea-rule-num">04</span>
-                            <span class="ea-badge ea-badge--success">Aire pesado</span>
+                            <span class="ea-badge ea-badge--warning">Aire pesado</span>
                         </header>
-                        <p class="ea-rule-cond"><span class="ea-rule-var">Calidad</span> <span class="ea-rule-op">&lt;</span> <span class="ea-rule-val">60 / 100</span></p>
+                        <p class="ea-rule-cond"><span class="ea-rule-var">Calidad</span> <span class="ea-rule-op">&lt;</span> <span class="ea-rule-val">70 / 100</span></p>
                         <p class="ea-rule-arrow" aria-hidden="true">↓</p>
-                        <p class="ea-rule-action">Activar <strong>aromatizador</strong> y mostrar <strong>LED</strong>.</p>
+                        <p class="ea-rule-action">Encender el <strong>LED rojo</strong> y avisarte: ventilá el ambiente.</p>
                     </article>
                 </div>
 

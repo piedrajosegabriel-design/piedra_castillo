@@ -397,7 +397,7 @@ $sitemap = [
                     </article>
                     <article class="ea-pf-journey__step">
                         <h4>Acción automática</h4>
-                        <p>Se activan o representan actuadores: aire por IR, aromatizador, humidificación y LED.</p>
+                        <p>Se activan o representan actuadores: aire acondicionado por IR, humidificación y los tres LEDs.</p>
                     </article>
                     <article class="ea-pf-journey__step">
                         <h4>Mejora del confort</h4>
@@ -425,7 +425,7 @@ $sitemap = [
                     <div class="ea-pf-metric">
                         <span class="ea-pf-metric__num">3+</span>
                         <span class="ea-pf-metric__label">Actuadores integrados</span>
-                        <span class="ea-pf-metric__hint">Aire IR · Aromatizador · LED</span>
+                        <span class="ea-pf-metric__hint">Aire IR · Humidificador · LEDs</span>
                     </div>
                     <div class="ea-pf-metric">
                         <span class="ea-pf-metric__num">24/7</span>
@@ -1157,7 +1157,7 @@ $sitemap = [
                         <h3 class="ea-pf-card__title">Lo que hoy el cliente no tiene</h3>
                         <ul class="ea-comp-checks">
                             <li>Un único sistema que <strong>mide y además actúa</strong> sobre el ambiente.</li>
-                            <li>Automatización ambiental por espacio (confort, ahorro, ventilación).</li>
+                            <li>Automatización ambiental por espacio (confort, ahorro, avisos de ventilación).</li>
                             <li>Perfiles personalizados por ambiente, <strong>sin costo extra</strong>.</li>
                             <li>Vinculación directa: se escanea un QR y el equipo se da de alta solo.</li>
                             <li>Arquitectura preparada para crecer (API y multi-dispositivo).</li>

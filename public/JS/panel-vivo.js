@@ -6,10 +6,14 @@
    verla. Durante una demostracion eso parece que el sistema no recibe nada.
 
    COMO FUNCIONA
-     Cada 30 segundos le pide a GET panel/datos el MISMO bloque de datos que
+     Cada 10 segundos le pide a GET panel/datos el MISMO bloque de datos que
      usa la vista, y reemplaza solo los textos que cambiaron. No recarga la
      pagina: no parpadea, no se mueve el scroll y no se pierde nada de lo que
      estabas mirando.
+
+     Eran 30 segundos cuando el equipo medía cada 5 minutos. Ahora mide cada 8,
+     y un panel que mira cada medio minuto se pierde tres de cada cuatro
+     lecturas: en una demostracion eso es justo lo que hay que ver.
 
    COMO ENCUENTRA QUE ACTUALIZAR
      Por atributos puestos en panel.php:
@@ -17,6 +21,8 @@
        data-vivo-sensor="temp"    -> la tarjeta de un sensor
        data-vivo-tono             -> elemento cuya clase tone-* hay que cambiar
        data-vivo-spark            -> las dos curvas del grafico de tendencia
+       data-vivo-mensajes         -> la tira de avisos del equipo
+       data-vivo-led="green_led"  -> cada uno de los tres LEDs
 
    SI EL SERVIDOR NO CONTESTA no pasa nada: se muestra el ultimo dato bueno
    y se reintenta en el proximo ciclo. Nunca se borra lo que ya estaba.
@@ -30,14 +36,16 @@
     var URL_DATOS = raiz.getAttribute("data-url-datos");
     if (!URL_DATOS) { return; }
 
-    var CADA_MS = 30000;          // cada cuanto preguntar
+    var CADA_MS = 10000;          // cada cuanto preguntar
     var TONOS = ["success", "warning", "danger", "neutral", "info"];
 
-    // El equipo manda una medicion cada 5 minutos (INTERVALO_MEDICION en
-    // firmware/config.py). Recien despues de perder DOS ciclos seguidos tiene
-    // sentido avisar que algo anda mal: antes de eso seria una falsa alarma
-    // cada vez que el panel mira entre medicion y medicion.
-    var VIEJO_SEG = 11 * 60;
+    // El equipo manda una medicion cada 8 segundos (INTERVALO_MEDICION en
+    // firmware/config.py; antes eran 5 minutos). Con ese ritmo, tres minutos
+    // sin nada nuevo ya no es "todavia no le toco": es que algo se corto.
+    //
+    // El numero tiene que quedar MUY por encima del intervalo real igual: un
+    // reintento de WiFi o un servidor lento no pueden disparar la alarma.
+    var VIEJO_SEG = 3 * 60;
 
     // Momento de la ULTIMA MEDICION, en segundos desde 1970, tal como lo
     // calculo el servidor. Es lo que mide el sello.
@@ -84,8 +92,11 @@
         // trendMin/trendMax son los topes de la curva de tendencia: si entran
         // lecturas nuevas la escala cambia, y dejarlos fijos haria que el
         // dibujo y sus numeros dijeran cosas distintas.
+        // aireOrigen: si el indice lo midio el MQ-135 o se estimo. Cambia solo
+        // (el sensor entra en pausa cuando humidifica), asi que se refresca
+        // como cualquier otro texto.
         ["estadoLabel", "estadoTitulo", "estadoDetalle", "ultimaLectura",
-         "trendMin", "trendMax"].forEach(function (clave) {
+         "aireOrigen", "trendMin", "trendMax"].forEach(function (clave) {
             var el = document.querySelector('[data-vivo="' + clave + '"]');
             texto(el, view[clave]);
         });
@@ -123,6 +134,10 @@
             }
         });
 
+        // ---- Mensajes del equipo y LEDs ----
+        pintarMensajes(view.mensajes);
+        pintarLeds(view.leds);
+
         // ---- Historial de lecturas ----
         pintarHistorial(view.historial);
 
@@ -141,6 +156,66 @@
         if (t === "warning") { return "Atención"; }
         if (t === "neutral") { return "Sin datos"; }
         return "Normal";
+    }
+
+    // -----------------------------------------------------------------------
+    // Mensajes del equipo
+    //
+    // Son la parte que mas cambia del panel: aparecen y desaparecen segun lo
+    // que este haciendo el equipo ("aire acondicionado activado", "ventila el
+    // ambiente", "medicion de aire en pausa"). Si no se refrescaran, el panel
+    // mostraria un pedido que ya no corresponde.
+    //
+    // Igual que el historial, se arman con createElement y textContent: lo que
+    // viene del servidor nunca se pega como HTML.
+    // -----------------------------------------------------------------------
+    var firmaMensajes = null;
+
+    function pintarMensajes(mensajes) {
+        var caja = document.querySelector("[data-vivo-mensajes]");
+        if (!caja || Object.prototype.toString.call(mensajes) !== "[object Array]") { return; }
+
+        // Firma barata: los codigos en orden. Si no cambiaron, no se rehace
+        // nada y no parpadea.
+        var firma = mensajes.map(function (m) { return m.codigo; }).join("|");
+        if (firma === firmaMensajes) { return; }
+        firmaMensajes = firma;
+
+        while (caja.firstChild) { caja.removeChild(caja.firstChild); }
+
+        caja.hidden = mensajes.length === 0;
+
+        mensajes.forEach(function (msg) {
+            var p = document.createElement("p");
+            p.className = "ea-msg tone-" + (msg.tono || "neutral");
+
+            var punto = document.createElement("span");
+            punto.className = "ea-dot";
+            punto.setAttribute("aria-hidden", "true");
+
+            p.appendChild(punto);
+            p.appendChild(document.createTextNode(msg.texto || ""));
+            caja.appendChild(p);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Los tres LEDs del equipo
+    //
+    // No se reconstruyen: son siempre los mismos tres y solo cambia si estan
+    // encendidos. Alcanza con tocar la clase y la palabra de estado.
+    // -----------------------------------------------------------------------
+    function pintarLeds(leds) {
+        if (Object.prototype.toString.call(leds) !== "[object Array]") { return; }
+
+        leds.forEach(function (led) {
+            var el = document.querySelector('[data-vivo-led="' + led.clave + '"]');
+            if (!el) { return; }
+
+            el.classList.toggle("is-on", !!led.encendido);
+            tono(el, led.tono);
+            texto(el.querySelector('[data-vivo="estado"]'), led.encendido ? "encendido" : "apagado");
+        });
     }
 
     // -----------------------------------------------------------------------
@@ -401,6 +476,10 @@
    - tono(el, nuevo)      → reemplaza la clase tone-* (success/warning/danger)
    - pintar(view)         → aplica todo el bloque de datos a la página
    - etiquetaTono(t)      → "danger" → "Crítico" (igual que en panel.php)
+
+   Mensajes y LEDs:
+   - pintarMensajes(m)    → rehace la tira de avisos si cambiaron los códigos
+   - pintarLeds(l)        → enciende/apaga los tres LEDs del equipo
 
    Historial:
    - pintarHistorial(h)   → rehace las filas de la tabla si llegó algo nuevo

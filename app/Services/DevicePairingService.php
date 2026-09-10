@@ -504,13 +504,19 @@ class DevicePairingService
         ]);
 
         $this->states->insert([
-            'device_id'        => $deviceId,
-            'operating_mode'   => 'automatic',
-            'fan_state'        => 'off',
-            'aromatizer_state' => 'off',
-            'alert_led_state'  => 'off',
-            'last_reason'      => 'Equipo conectado por QR de vinculación.',
-            'updated_by'       => 'system',
+            'device_id'         => $deviceId,
+            'operating_mode'    => 'automatic',
+            'fan_state'         => 'off',
+            'aromatizer_state'  => 'off',
+            'alert_led_state'   => 'off',
+            'green_led_state'   => 'off',
+            'blue_led_state'    => 'off',
+            // Todavía no mandó ninguna orden infrarroja ni reportó su MQ-135.
+            'ir_confirmed'      => null,
+            'air_sensor_status' => 'ok',
+            'avisos'            => null,
+            'last_reason'       => 'Equipo conectado por QR de vinculación.',
+            'updated_by'        => 'system',
         ]);
 
         $cierre = [

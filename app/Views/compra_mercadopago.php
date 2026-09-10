@@ -12,7 +12,7 @@ $beneficios = [
     'Acceso completo al dashboard en tiempo real',
     'Temperatura, humedad, CO₂ y calidad de aire',
     'Historial de mediciones y recomendaciones automáticas',
-    'Automatización de ventilación, humidificación y aroma',
+    'Automatización de aire acondicionado y humidificación',
     'Configuración de ambientes y multi-dispositivo',
 ];
 

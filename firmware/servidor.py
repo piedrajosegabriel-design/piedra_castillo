@@ -132,16 +132,31 @@ class Servidor:
     # -----------------------------------------------------------------------
     # 3) Subir una medicion (con lo que el equipo decidio hacer)
     # -----------------------------------------------------------------------
-    def enviar_medicion(self, medicion, actuadores, motivo):
+    def enviar_medicion(self, medicion, actuadores, motivo, diagnostico=None):
+        """
+        Sube una medicion con lo que el equipo decidio hacer.
+
+        `diagnostico` es lo que le permite al panel explicar lo que muestra sin
+        adivinar: en que estado esta el MQ-135 (midiendo, calentando, en pausa
+        por humidificacion), si la orden infrarroja fue confirmada, y la lista
+        de avisos que la web traduce a mensajes. Es opcional a proposito: un
+        equipo viejo que no lo mande sigue siendo valido.
+        """
         cuerpo = {
             "temperature": medicion["temperature"],
             "humidity": medicion["humidity"],
             "co2_ppm": medicion["co2_ppm"],
             "air_quality_index": medicion["air_quality_index"],
+            # De donde salio ese indice: "sensor" (MQ-135) o "calculado"
+            # (formula de respaldo). El servidor NO lo recalcula.
+            "air_quality_source": medicion.get("air_quality_source", "calculado"),
             # Que quedo encendido despues de decidir, y por que.
             "actuadores": actuadores,
             "motivo": motivo,
         }
+
+        if diagnostico:
+            cuerpo["diagnostico"] = diagnostico
 
         estado, datos = self._pedir(
             "POST", "/api/devices/%s/measurements" % self.device_uid, cuerpo

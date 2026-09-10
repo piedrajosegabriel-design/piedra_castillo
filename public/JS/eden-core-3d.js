@@ -529,11 +529,11 @@ async function refreshSensores(endpoint, root) {
         applyNumeric(cards, 'temperatura',  sensores.temperatura);
         applyNumeric(cards, 'humedad',      sensores.humedad);
 
-        // Métricas textuales (CO2, calidad de aire, ventilador, humidificación)
-        applyText(cards, 'co2',            sensores.co2?.texto);
-        applyText(cards, 'calidad_aire',   sensores.calidad_aire?.texto);
-        applyText(cards, 'ventilador',     sensores.ventilador?.texto);
-        applyText(cards, 'humidificacion', sensores.humidificacion?.texto);
+        // Métricas textuales (CO2, calidad de aire, aire acondicionado, humidificación)
+        applyText(cards, 'co2',                sensores.co2?.texto);
+        applyText(cards, 'calidad_aire',       sensores.calidad_aire?.texto);
+        applyText(cards, 'aire_acondicionado', sensores.aire_acondicionado?.texto);
+        applyText(cards, 'humidificacion',     sensores.humidificacion?.texto);
     } catch (err) {
         console.warn('[EdenCore] no se pudieron leer sensores:', err);
     }

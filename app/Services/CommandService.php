@@ -42,10 +42,30 @@ class CommandService
     private DeviceStateModel $stateModel;
 
     // Traduce el command_type al nombre de la columna que guarda su estado.
+    //
+    // Son los tres que EXISTEN DESDE LA PRIMERA VERSIÓN y los únicos que el
+    // usuario puede mandar a mano. Sus nombres internos no cambian aunque su
+    // etiqueta visible sí lo haya hecho (fan = aire acondicionado,
+    // aromatizer = humidificador / atomizador): renombrarlos rompería todo el
+    // historial ya guardado en `device_commands`.
     private array $actuatorMap = [
         'fan'        => 'fan_state',
         'aromatizer' => 'aromatizer_state',
         'alert_led'  => 'alert_led_state',
+    ];
+
+    /**
+     * Los dos LEDs que se agregaron con la lógica nueva.
+     *
+     * Se guardan igual que los otros PERO NO DEJAN HISTORIAL: son
+     * indicadores, no acciones. El verde se prende cada vez que el ambiente
+     * vuelve a estar en rango, así que anotarlo llenaría `device_commands` de
+     * filas que no cuentan nada. Lo que importa —el aire, el humidificador y
+     * la alerta— sí queda registrado.
+     */
+    private array $indicadorMap = [
+        'green_led' => 'green_led_state',
+        'blue_led'  => 'blue_led_state',
     ];
 
     public function __construct()
@@ -156,14 +176,21 @@ class CommandService
      *
      * Actualiza `device_states` siempre, y deja una fila en `device_commands`
      * SOLO por los actuadores que cambiaron. Así el historial cuenta "a las
-     * 14:03 el equipo prendió el ventilador porque el CO₂ estaba alto", sin
-     * llenarse de filas repetidas en cada medición.
+     * 14:03 el equipo prendió el aire acondicionado porque la temperatura
+     * estaba alta", sin llenarse de filas repetidas en cada medición.
      *
      * @param array<string,string> $actuadores ['fan' => 'on', 'aromatizer' => 'off', ...]
+     * @param array<string,mixed>  $diagnostico ['ir_confirmado' => bool|null,
+     *                                           'estado_aire'   => 'ok'|'warmup'|'pausa'|'ausente',
+     *                                           'avisos'        => ['ventilar', ...]]
      * @return array<int,string> los actuadores que cambiaron
      */
-    public function registrarEstadoReportado(int $deviceId, array $actuadores, string $motivo = ''): array
-    {
+    public function registrarEstadoReportado(
+        int $deviceId,
+        array $actuadores,
+        string $motivo = '',
+        array $diagnostico = []
+    ): array {
         $estado = $this->asegurarEstado($deviceId);
         $cambios     = [];
         $actualizar  = [];
@@ -195,10 +222,85 @@ class CommandService
             ]);
         }
 
+        // Los LEDs indicadores: se guardan, no se historizan.
+        foreach ($this->indicadorMap as $tipo => $campo) {
+            if (! isset($actuadores[$tipo])) {
+                continue;
+            }
+
+            $valor = $actuadores[$tipo] === 'on' ? 'on' : 'off';
+
+            if (($estado[$campo] ?? 'off') !== $valor) {
+                $actualizar[$campo] = $valor;
+            }
+        }
+
+        $actualizar += $this->cambiosDeDiagnostico($estado, $diagnostico);
+
         if ($actualizar !== []) {
             $actualizar['last_reason'] = $motivo !== '' ? $motivo : 'Ajuste decidido por el equipo.';
             $actualizar['updated_by']  = 'device';
             $this->stateModel->update($estado['id'], $actualizar);
+        }
+
+        return $cambios;
+    }
+
+    /**
+     * Los campos de diagnóstico que efectivamente cambiaron.
+     *
+     * Se compara antes de escribir para no dar un UPDATE cada ocho segundos
+     * con exactamente los mismos valores: el equipo reporta seguido y la
+     * mayoría de las veces no cambió nada.
+     *
+     * @param array<string,mixed> $diagnostico lo que mandó el equipo
+     * @return array<string,mixed> solo lo distinto
+     */
+    private function cambiosDeDiagnostico(array $estado, array $diagnostico): array
+    {
+        if ($diagnostico === []) {
+            return [];
+        }
+
+        $cambios = [];
+
+        // ir_confirmado: true / false / null (null = todavía no se mandó
+        // ninguna orden infrarroja, o el equipo no tiene la cadena armada).
+        if (array_key_exists('ir_confirmado', $diagnostico)) {
+            $valor = $diagnostico['ir_confirmado'] === null
+                ? null
+                : (int) (bool) $diagnostico['ir_confirmado'];
+
+            // La base devuelve '1'/'0' como texto, así que hay que normalizar
+            // antes de comparar: si no, siempre parecería distinto.
+            $guardado = $estado['ir_confirmed'] ?? null;
+            $guardado = ($guardado === null || $guardado === '') ? null : (int) $guardado;
+
+            if ($guardado !== $valor) {
+                $cambios['ir_confirmed'] = $valor;
+            }
+        }
+
+        if (isset($diagnostico['estado_aire'])) {
+            $valor = (string) $diagnostico['estado_aire'];
+
+            if (($estado['air_sensor_status'] ?? '') !== $valor) {
+                $cambios['air_sensor_status'] = $valor;
+            }
+        }
+
+        if (isset($diagnostico['avisos']) && is_array($diagnostico['avisos'])) {
+            // Se guardan como JSON: son códigos ('ventilar', 'co2_critico'),
+            // y el texto que ve la persona lo pone PanelService. Así se puede
+            // reescribir un mensaje sin reprogramar la placa.
+            $valor = json_encode(array_values(array_map(
+                static fn ($aviso): string => (string) $aviso,
+                $diagnostico['avisos']
+            )), JSON_UNESCAPED_UNICODE);
+
+            if (($estado['avisos'] ?? '') !== $valor) {
+                $cambios['avisos'] = $valor;
+            }
         }
 
         return $cambios;
@@ -317,13 +419,18 @@ class CommandService
         }
 
         $estadoId = (int) $this->stateModel->insert([
-            'device_id'        => $deviceId,
-            'operating_mode'   => 'automatic',
-            'fan_state'        => 'off',
-            'aromatizer_state' => 'off',
-            'alert_led_state'  => 'off',
-            'last_reason'      => 'Estado inicial creado al recibir la primera medición.',
-            'updated_by'       => 'system',
+            'device_id'         => $deviceId,
+            'operating_mode'    => 'automatic',
+            'fan_state'         => 'off',
+            'aromatizer_state'  => 'off',
+            'alert_led_state'   => 'off',
+            'green_led_state'   => 'off',
+            'blue_led_state'    => 'off',
+            'ir_confirmed'      => null,
+            'air_sensor_status' => 'ok',
+            'avisos'            => null,
+            'last_reason'       => 'Estado inicial creado al recibir la primera medición.',
+            'updated_by'        => 'system',
         ]);
 
         return $this->stateModel->find($estadoId);
@@ -370,8 +477,10 @@ class CommandService
    - encolarComandoManual()      → orden del usuario: queda PENDIENTE hasta
                                    que el equipo la aplique y la confirme
    - registrarEstadoReportado()  → guarda lo que el equipo decidió por su
-                                   cuenta; anota en el historial solo los
-                                   actuadores que realmente cambiaron
+                                   cuenta más su diagnóstico; anota en el
+                                   historial solo los actuadores que realmente
+                                   cambiaron (los LEDs verde y azul se guardan
+                                   pero no se historizan: son indicadores)
    - getPendingCommands()        → cola pendiente del dispositivo (para la API)
    - markCommandAsExecuted()     → lo llama el equipo tras aplicar la orden;
                                    es lo único que cambia device_states
@@ -382,6 +491,8 @@ class CommandService
 
    Privados:
    - cancelPendingByType()       → cancela pendientes de un mismo command_type
+   - cambiosDeDiagnostico()      → solo los campos de diagnóstico que cambiaron
+                                   (confirmación IR, estado del MQ-135, avisos)
    - buildReasonFromCommand()    → saca el 'reason' del payload JSON
 
    Conceptos:

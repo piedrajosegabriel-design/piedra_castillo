@@ -7,21 +7,23 @@ QUE HACE ESTE ARCHIVO: orquestar. No mide, no decide, no habla HTTP: le pide
 cada cosa al modulo que corresponde. Si algo no funciona, el problema esta en
 ese modulo, no aca.
 
-  red.py        -> conectarse al WiFi (y pedirlo por el portal si no lo tiene)
-  servidor.py   -> hablar con la API de EdenAir
-  sensor.py     -> leer el SCD41
-  reglas.py     -> DECIDIR que actuadores prender
-  actuadores.py -> mover los reles
-  config.py     -> los valores propios de esta placa
+  red.py         -> conectarse al WiFi (y pedirlo por el portal si no lo tiene)
+  servidor.py    -> hablar con la API de EdenAir
+  sensor.py      -> leer el SCD41 (temperatura, humedad, CO2)
+  aire.py        -> leer el MQ-135 (calidad de aire)
+  reglas.py      -> DECIDIR que actuadores prender
+  infrarrojo.py  -> emitir la orden del aire acondicionado
+  actuadores.py  -> mover los reles y los LEDs
+  config.py      -> los valores propios de esta placa
 
 EL CICLO
   1. Conectarse al WiFi.
   2. Pedir credenciales al servidor (una sola vez en la vida del equipo).
   3. Bajar la configuracion: con que umbrales decidir.
   4. Para siempre:
-       - medir
+       - medir (SCD41 + MQ-135)
        - decidir localmente y accionar
-       - reportar la medicion y lo que hizo
+       - reportar la medicion, lo que hizo y como esta cada sensor
        - revisar si el usuario mando alguna orden manual
        - cada tanto, refrescar la configuracion
 
@@ -33,10 +35,12 @@ deja de hacer es reportar.
 import json
 import time
 
+import aire
 import config
 import red
 import reglas
 from actuadores import Actuadores
+from infrarrojo import Infrarrojo
 from sensor import SCD41, ErrorSensor
 from servidor import ErrorServidor, Servidor, SinVentana
 
@@ -147,11 +151,12 @@ def bajar_config(api, anterior=None):
     """
     try:
         nueva = api.config()
-        print("Config: %s | %.1f-%.1f C | %.0f-%.0f %% | max %s ppm | modo %s" % (
+        print("Config: %s | aire ON >%.1f C / OFF <%.1f C | hum ON <%.0f %% / OFF >%.0f %% | CO2 aviso %s ppm | aire min %s | modo %s" % (
             nueva["ambiente"]["nombre"],
-            nueva["umbrales"]["temp_min"], nueva["umbrales"]["temp_max"],
-            nueva["umbrales"]["hum_min"], nueva["umbrales"]["hum_max"],
+            nueva["umbrales"]["temp_max"], nueva["apagado"]["temp"],
+            nueva["umbrales"]["hum_min"], nueva["apagado"]["hum"],
             nueva["umbrales"]["co2_max"],
+            nueva["umbrales"]["aire_min"],
             nueva["modo"],
         ))
         return nueva
@@ -160,6 +165,84 @@ def bajar_config(api, anterior=None):
             print("No se pudo refrescar la config (%s). Sigo con la anterior." % e)
             return anterior
         raise
+
+
+def sincronizar_tiempos(cfg, salidas, medidor, cadena):
+    """
+    Aplica los tiempos que mando el servidor a los objetos que ya estaban
+    creados.
+
+    Los objetos se arman antes de tener configuracion (el MQ-135 tiene que
+    empezar a calentar apenas se enchufa la placa, no cuando aparece internet),
+    asi que los valores de config.py son el arranque y estos son el ajuste.
+    """
+    tiempos = cfg.get("tiempos", {})
+
+    salidas.minimo_estado = tiempos.get("rele_minimo", salidas.minimo_estado)
+    medidor.warmup = tiempos.get("mq135_warmup", medidor.warmup)
+    medidor.enmascarado = tiempos.get("mq135_enmascarado", medidor.enmascarado)
+    cadena.minimo_entre_tramas = tiempos.get("ir_minimo", cadena.minimo_entre_tramas)
+    cadena.espera_ms = tiempos.get("ir_espera_ms", cadena.espera_ms)
+
+
+# ---------------------------------------------------------------------------
+# Medicion
+# ---------------------------------------------------------------------------
+def medir(sensor, medidor, salidas, cfg, ahora):
+    """
+    Junta en un solo diccionario todo lo que se midio en este ciclo.
+
+    Devuelve (medicion, estado_aire). Lanza ErrorSensor si el SCD41 no
+    contesta: sin el no hay medicion posible.
+
+    DE DONDE SALE LA CALIDAD DE AIRE
+      - del MQ-135, si esta conectado y ya termino de calentar  -> "sensor"
+      - de la formula de respaldo de reglas.py, si no           -> "calculado"
+
+    Mientras el atomizador esta echando niebla (y un rato despues) el MQ-135
+    queda enmascarado: devuelve congelado su ultimo valor bueno y avisa que
+    esta en pausa. Es vapor de agua, no contaminacion, y sin esto el equipo
+    diria "aire malo" justo cuando esta humidificando.
+    """
+    co2, temperatura, humedad = sensor.leer()
+
+    indice, estado_aire = medidor.leer(ahora, atomizando=salidas.encendido("aromatizer"))
+
+    if indice is None:
+        indice = reglas.calcular_indice_aire(temperatura, humedad, co2, cfg["umbrales"])
+        origen = "calculado"
+    else:
+        origen = "sensor"
+
+    return {
+        "temperature": temperatura,
+        "humidity": humedad,
+        "co2_ppm": co2,
+        "air_quality_index": indice,
+        "air_quality_source": origen,
+        # Solo una lectura fresca del MQ-135 puede levantar o bajar una alerta
+        # de calidad de aire. Congelada o calculada, no.
+        "aire_confiable": estado_aire == aire.OK,
+    }, estado_aire
+
+
+def avisos_de_los_sensores(estado_aire, salidas, avisos):
+    """
+    Suma a los avisos de reglas.py los que no son decisiones sino diagnostico
+    del hardware. Son los que le explican al usuario por que el panel esta
+    mostrando lo que muestra.
+    """
+    if estado_aire == aire.WARMUP:
+        avisos.append(reglas.AVISO_AIRE_CALENTANDO)
+    elif estado_aire == aire.PAUSA:
+        avisos.append(reglas.AVISO_AIRE_EN_PAUSA)
+
+    # La orden salio pero el receptor no la confirmo. El aire se encendio
+    # igual: esto no bloquea nada, es un dato de diagnostico.
+    if salidas.encendido("fan") and salidas.ir_confirmado is False:
+        avisos.append(reglas.AVISO_IR_SIN_CONFIRMAR)
+
+    return avisos
 
 
 # ---------------------------------------------------------------------------
@@ -172,9 +255,10 @@ def atender_comandos(api, salidas):
     Solo tienen efecto en modo manual; en automatico manda reglas.py.
 
     Una orden se confirma UNICAMENTE si se pudo cumplir de verdad. Si pide un
-    actuador que no esta conectado, se deja pendiente: confirmarla haria que el
-    panel mostrara encendido algo que no existe. El servidor no acumula mas de
-    una pendiente por actuador, asi que no se llena la cola.
+    actuador que no esta conectado, o si el rele todavia esta cumpliendo su
+    tiempo minimo, se deja pendiente: confirmarla haria que el panel mostrara
+    encendido algo que no lo esta. El servidor no acumula mas de una pendiente
+    por actuador, asi que no se llena la cola.
     """
     try:
         pendientes = api.comandos_pendientes()
@@ -193,6 +277,11 @@ def atender_comandos(api, salidas):
             continue
 
         salidas.aplicar({tipo: valor})
+
+        if salidas.estado.get(tipo) != valor:
+            print("Orden demorada:", tipo, "espera su tiempo minimo de rele.")
+            continue
+
         print("Orden del usuario:", tipo, "->", valor)
 
         try:
@@ -207,14 +296,31 @@ def atender_comandos(api, salidas):
 def main():
     print("\n=== Eden Air ===")
 
-    salidas = Actuadores()
+    # La cadena infrarroja y los actuadores se arman juntos: la orden del aire
+    # acondicionado sale por infrarrojo y recien despues mueve el rele.
+    cadena = Infrarrojo(config.PIN_IR_EMISOR, config.PIN_IR_RECEPTOR)
+    salidas = Actuadores(cadena)
     salidas.apagar_todo()
+
+    # El MQ-135 empieza a calentar AHORA, no cuando aparezca internet: son
+    # cinco minutos y no tiene sentido desperdiciarlos esperando al WiFi.
+    medidor = aire.MedidorAire(config.PIN_MQ135)
 
     if salidas.hay_alguno():
         print("Actuadores conectados:", ", ".join(salidas.conectados()))
     else:
         print("Sin actuadores conectados: el equipo solo mide y reporta.")
         print("Cuando armes uno, ponele su pin en config.py.")
+
+    if medidor.presente():
+        print("MQ-135 conectado. Calentando %s s antes de creerle." % medidor.warmup)
+    else:
+        print("Sin MQ-135: la calidad de aire se calcula con la formula de respaldo.")
+
+    if not cadena.hay_emisor():
+        print("Sin emisor infrarrojo: el rele del aire se activa directo.")
+    elif not cadena.hay_receptor():
+        print("Sin receptor infrarrojo: se emite la trama pero nadie la confirma.")
 
     # 1) WiFi. No devuelve hasta estar conectado (abre el portal si hace falta).
     red.asegurar_conexion()
@@ -240,10 +346,20 @@ def main():
             print("Sin configuracion todavia (%s). Reintento." % e)
             time.sleep(config.REINTENTO_RED)
 
+    sincronizar_tiempos(cfg, salidas, medidor, cadena)
+
+    decisor = reglas.Decisor()
+
     ultima_config = time.time()
     ultima_medicion = 0
+    ultimos_comandos = 0
 
     # 4) Ciclo principal.
+    #
+    # Cada tarea tiene su propio reloj y la vuelta es corta. Antes la vuelta
+    # duraba lo que el intervalo de comandos, asi que ese numero terminaba
+    # marcando tambien el ritmo de las mediciones: pedir mediciones cada 8 s
+    # no servia de nada si el ciclo dormia 15.
     while True:
         try:
             ahora = time.time()
@@ -254,25 +370,17 @@ def main():
                 ultima_medicion = ahora
 
                 try:
-                    co2, temperatura, humedad = sensor.leer()
+                    medicion, estado_aire = medir(sensor, medidor, salidas, cfg, ahora)
                 except ErrorSensor as e:
                     print("Lectura fallida:", e)
                     time.sleep(5)
                     continue
 
-                medicion = {
-                    "temperature": temperatura,
-                    "humidity": humedad,
-                    "co2_ppm": co2,
-                }
-                medicion["air_quality_index"] = reglas.calcular_indice_aire(
-                    temperatura, humedad, co2, cfg["umbrales"]
-                )
-
-                print("%.1f C  %.1f %%  %s ppm  aire %s (%s)" % (
-                    temperatura, humedad, co2,
+                print("%.1f C  %.1f %%  %s ppm  aire %s/100 %s (%s)" % (
+                    medicion["temperature"], medicion["humidity"], medicion["co2_ppm"],
                     medicion["air_quality_index"],
                     reglas.etiqueta_aire(medicion["air_quality_index"]),
+                    medicion["air_quality_source"] if estado_aire == aire.OK else estado_aire,
                 ))
 
                 # ESTA ES LA DECISION, Y ES LOCAL.
@@ -280,37 +388,50 @@ def main():
                 #   - sin actuadores armados -> no hay nada que decidir
                 #   - modo manual            -> manda el usuario, el equipo no decide
                 #   - modo automatico        -> el equipo decide y acciona
+                avisos = []
+
                 if not salidas.hay_alguno():
                     motivo = "Solo sensor: sin actuadores conectados."
                 elif cfg.get("modo") == "automatic":
-                    deseado, motivo = reglas.decidir(medicion, cfg)
-                    cambios = salidas.aplicar(deseado)
+                    deseado, avisos, motivo = decisor.decidir(medicion, cfg, ahora)
+                    cambios = salidas.aplicar(deseado, ahora)
                     if cambios:
                         print("  -> cambia:", ", ".join(cambios), "|", motivo)
+                    if salidas.demorados:
+                        print("  -> espera tiempo minimo de rele:", ", ".join(salidas.demorados))
                 else:
                     motivo = "Modo manual: manda el usuario."
+
+                avisos = avisos_de_los_sensores(estado_aire, salidas, avisos)
 
                 # Recien ahora se avisa al servidor. Si falla, no importa:
                 # el ambiente ya quedo regulado.
                 try:
-                    api.enviar_medicion(medicion, salidas.como_dict(), motivo)
+                    api.enviar_medicion(medicion, salidas.como_dict(), motivo, {
+                        "estado_aire": estado_aire,
+                        "ir_confirmado": salidas.ir_confirmado,
+                        "avisos": avisos,
+                    })
                 except ErrorServidor as e:
                     print("  (no se pudo reportar: %s)" % e)
 
             # ---- Ordenes manuales ----
-            atender_comandos(api, salidas)
+            if ahora - ultimos_comandos >= intervalos.get("comandos", config.INTERVALO_COMANDOS):
+                ultimos_comandos = ahora
+                atender_comandos(api, salidas)
 
             # ---- Refrescar configuracion ----
             if ahora - ultima_config >= intervalos.get("config", config.INTERVALO_CONFIG):
                 ultima_config = ahora
                 cfg = bajar_config(api, cfg)
+                sincronizar_tiempos(cfg, salidas, medidor, cadena)
 
             # ---- Reconectar si se cayo el WiFi ----
             if not red.hay_internet():
                 print("WiFi caido. Reconectando...")
                 red.asegurar_conexion()
 
-            time.sleep(intervalos.get("comandos", config.INTERVALO_COMANDOS))
+            time.sleep(config.INTERVALO_CICLO)
 
         except Exception as e:
             # Nada puede tumbar el ciclo: si el equipo se apaga, el ambiente

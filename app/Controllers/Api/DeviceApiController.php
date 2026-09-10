@@ -24,10 +24,24 @@ use CodeIgniter\HTTP\ResponseInterface;
  *   GET  .../commands/pending    → el ESP32 pregunta qué comandos ejecutar
  *   POST .../commands/N/executed → el ESP32 confirma que ejecutó un comando
  *
- * Cuerpo esperado en measurements (lo que da el sensor SCD41):
- *   { "temperature": 24.6, "humidity": 58.2, "co2_ppm": 812 }
- * El índice de calidad de aire lo calcula el servidor; el dispositivo puede
- * mandarlo (air_quality_index, 0–100) pero no está obligado.
+ * Cuerpo esperado en measurements:
+ *   {
+ *     "temperature": 24.6, "humidity": 38.2, "co2_ppm": 812,
+ *     "air_quality_index": 78, "air_quality_source": "sensor",
+ *     "actuadores": {"fan": "on", "aromatizer": "off", "alert_led": "off",
+ *                    "green_led": "off", "blue_led": "on"},
+ *     "motivo": "temperatura alta",
+ *     "diagnostico": {"estado_aire": "ok", "ir_confirmado": true,
+ *                     "avisos": ["aire_acondicionado"]}
+ *   }
+ *
+ * El índice de calidad de aire lo MIDE el equipo con su MQ-135 y el servidor
+ * lo guarda tal cual: recalcularlo haría que el panel mostrara un número
+ * distinto del que movió los actuadores. Si el equipo no manda ninguno (carga
+ * manual, firmware viejo), ahí sí lo calcula MeasurementService.
+ *
+ * `actuadores` y `diagnostico` son opcionales: un equipo que solo mide sigue
+ * siendo válido y el servidor no inventa el estado de lo que no existe.
  */
 class DeviceApiController extends BaseController
 {

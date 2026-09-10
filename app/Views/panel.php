@@ -11,9 +11,10 @@
  *
  * ORDEN DE LA PANTALLA (cada dato aparece UNA sola vez):
  *   1. HERO      · el diagnóstico: cómo está el ambiente ahora
- *   2. SENSORES  · los 4 valores medidos, con su rango ideal
- *   3. CONTROL   · actuadores + modo de operación + automatizaciones
- *   4. LECTURAS  · historial reciente
+ *   2. MENSAJES  · qué está haciendo el equipo y qué necesita de vos
+ *   3. SENSORES  · los 4 valores medidos, con su rango ideal
+ *   4. CONTROL   · LEDs + actuadores + modo de operación + reglas
+ *   5. LECTURAS  · historial reciente
  *
  * ANIMACIONES: no viven acá. Los JS las enganchan por atributos data-*:
  *   data-vivo*      → panel-vivo.js refresca los números sin recargar
@@ -159,6 +160,14 @@ $this->setData([
                     <?php /* Este texto lo reescribe panel-vivo.js con view.sensores[].rango,
                              así que arranca con el MISMO valor que va a poner el JS. */ ?>
                     <span class="ea-hero-indice-hint" data-vivo="rango"><?= esc((string) ($indiceAire['rango'] ?? '')) ?></span>
+
+                    <?php /* DE DÓNDE SALIÓ ESTE NÚMERO. Un índice medido por el
+                             sensor de aire y uno estimado con una fórmula no valen
+                             lo mismo, así que el panel lo aclara en vez de
+                             presentarlos como si fueran la misma cosa. */ ?>
+                    <?php if (($view['aireOrigen'] ?? '') !== ''): ?>
+                        <span class="ea-hero-indice-fuente" data-vivo="aireOrigen"><?= esc((string) $view['aireOrigen']) ?></span>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
@@ -200,7 +209,30 @@ $this->setData([
     </section>
 
     <!-- =====================================================================
-         2. SENSORES
+         2. MENSAJES DEL EQUIPO
+         Lo que el equipo está haciendo y lo que necesita de la persona.
+         Es el bloque más importante de la lógica nueva: EdenAir mide cuatro
+         variables pero solo puede actuar sobre dos, así que sobre CO₂ y
+         calidad de aire lo único que puede hacer es PEDIR que ventiles. Si eso
+         no está escrito en algún lado, el usuario mira un número rojo y no
+         sabe qué se espera de él.
+
+         El texto no lo inventa la vista: viene de PanelService::mensajes(),
+         que traduce los códigos que manda el firmware.
+         ===================================================================== -->
+    <?php $mensajes = (array) ($view['mensajes'] ?? []); ?>
+    <section class="ea-msgs ea-reveal" data-vivo-mensajes <?= $mensajes === [] ? 'hidden' : '' ?>
+             aria-label="Mensajes del equipo">
+        <?php foreach ($mensajes as $msg): ?>
+            <p class="ea-msg tone-<?= esc((string) ($msg['tono'] ?? 'neutral')) ?>">
+                <span class="ea-dot" aria-hidden="true"></span>
+                <?= esc((string) ($msg['texto'] ?? '')) ?>
+            </p>
+        <?php endforeach; ?>
+    </section>
+
+    <!-- =====================================================================
+         3. SENSORES
          El único lugar donde aparecen los valores medidos. La banda verde del
          medidor es el rango ideal del ambiente; el pin, la lectura actual.
          ===================================================================== -->
@@ -249,13 +281,37 @@ $this->setData([
     </div>
 
     <!-- =====================================================================
-         3. CONTROL
-         Actuadores (con el selector de modo en su cabecera, porque es lo que
-         decide si podés tocarlos) + las reglas que los mueven solos.
+         4. CONTROL
+         Los tres LEDs (lo mismo que se ve en el equipo de lejos), después los
+         actuadores —con el selector de modo en su cabecera, porque es lo que
+         decide si podés tocarlos— y las reglas que los mueven solos.
          ===================================================================== -->
     <div class="ea-sec" id="configuracion">
         <h2>Control</h2>
     </div>
+
+    <?php /* LOS TRES LEDs. Están acá para que la maqueta y la pantalla digan
+             lo mismo: si alguien mira el equipo y después mira el panel, tiene
+             que encontrar el mismo color encendido. */ ?>
+    <section class="ea-leds ea-reveal" data-vivo-leds aria-label="Estado del equipo">
+        <span class="ea-leds-title">Estado del equipo</span>
+
+        <ul class="ea-leds-list">
+            <?php foreach (($view['leds'] ?? []) as $led): $on = ! empty($led['encendido']); ?>
+                <li class="ea-led <?= $on ? 'is-on' : '' ?> tone-<?= esc((string) ($led['tono'] ?? 'neutral')) ?>"
+                    data-vivo-led="<?= esc((string) ($led['clave'] ?? ''), 'attr') ?>">
+                    <span class="ea-led-dot" aria-hidden="true"></span>
+                    <span class="ea-led-body">
+                        <strong class="ea-led-name">
+                            <?= esc((string) ($led['titulo'] ?? '')) ?>
+                            <span class="ea-led-state" data-vivo="estado"><?= $on ? 'encendido' : 'apagado' ?></span>
+                        </strong>
+                        <span class="ea-led-detail"><?= esc((string) ($led['detalle'] ?? '')) ?></span>
+                    </span>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </section>
 
     <div class="ea-ops-grid">
 
@@ -331,21 +387,35 @@ $this->setData([
 
         <article class="ea-card ea-rules-card" id="automatizaciones">
             <div class="ea-card-head">
-                <h3>Automatizaciones</h3>
+                <h3>Reglas del equipo</h3>
                 <span class="ea-mono ea-card-meta">
                     <?= (int) ($view['reglasActivas'] ?? 0) ?> de <?= count($view['reglas'] ?? []) ?> aplicándose
                 </span>
             </div>
 
+            <?php /* EL CHIP "actúa" / "avisa" NO ES DECORACIÓN. EdenAir mide
+                     cuatro variables pero solo puede actuar sobre dos: sobre el
+                     CO₂ y la calidad de aire únicamente avisa, porque el sistema
+                     no renueva el aire. Sin esta distinción el panel prometería
+                     algo que el equipo no puede hacer. */ ?>
             <ul class="ea-rules-list">
-                <?php foreach (($view['reglas'] ?? []) as $regla): $activa = ! empty($regla['activa']); ?>
+                <?php foreach (($view['reglas'] ?? []) as $regla):
+                    $activa = ! empty($regla['activa']);
+                    $actua  = ($regla['tipo'] ?? 'actua') === 'actua';
+                ?>
                     <li class="ea-rule">
                         <span class="ea-rule-state tone-<?= $activa ? 'success' : 'neutral' ?>" aria-hidden="true"></span>
                         <div class="ea-rule-body">
                             <p class="ea-rule-text">
+                                <span class="ea-rule-kind <?= $actua ? 'is-actua' : 'is-avisa' ?>">
+                                    <?= $actua ? 'actúa' : 'avisa' ?>
+                                </span>
                                 Cuando <strong><?= esc((string) ($regla['cuando'] ?? '')) ?></strong>,
                                 <span><?= esc(mb_strtolower((string) ($regla['accion'] ?? ''))) ?>.</span>
                             </p>
+                            <?php if (($regla['detalle'] ?? '') !== ''): ?>
+                                <p class="ea-rule-hint"><?= esc((string) $regla['detalle']) ?></p>
+                            <?php endif; ?>
                         </div>
                         <span class="ea-badge tone-<?= $activa ? 'success' : 'neutral' ?> ea-rule-badge">
                             <span class="ea-dot"></span><?= $activa ? 'Aplicándose' : 'En espera' ?>
@@ -356,15 +426,15 @@ $this->setData([
 
             <p class="ea-actuators-note">
                 <?= $modoManual
-                    ? 'Modo manual: reglas modificables.'
-                    : 'Modo automático: reglas automaticas.' ?>
+                    ? 'Modo manual: las reglas quedan en pausa y mandás vos desde los interruptores.'
+                    : 'Modo automático: el equipo aplica estas reglas por su cuenta, incluso sin internet.' ?>
             </p>
         </article>
 
     </div>
 
     <!-- =====================================================================
-         4. LECTURAS
+         5. LECTURAS
          Historial reciente. Se ven 3 filas; el resto lo despliega dashboard.js
          con el botón "Ver más" (las filas extra llevan la clase is-extra).
          ===================================================================== -->

@@ -30,6 +30,8 @@ class MeasurementModel extends Model
         'co2_ppm',
         'air_quality_index',
         'air_quality_label',
+        // 'sensor' (lo midió el MQ-135) o 'calculado' (fórmula de respaldo).
+        'air_quality_source',
         'notes',
         'captured_at',
     ];
@@ -44,6 +46,7 @@ class MeasurementModel extends Model
                            (carga manual), 'seed'/'sim' (simulada)
    - temperature/humidity→ °C y % de humedad relativa
    - co2_ppm             → CO₂ en partes por millón
-   - air_quality_index   → índice 0–100 calculado; air_quality_label = texto
+   - air_quality_index   → índice 0–100; air_quality_label = texto
+   - air_quality_source  → 'sensor' (MQ-135) o 'calculado' (fórmula de respaldo)
    - captured_at         → momento real de la medición (≠ created_at)
    ============================================================================ */

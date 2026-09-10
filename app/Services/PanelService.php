@@ -34,18 +34,23 @@ class PanelService
 {
     // =========================================================================
     // UMBRALES — el único lugar del panel donde se decide qué está "fuera de
-    // rango". Los usan por igual las tarjetas de sensores, las reglas de
-    // automatización, el estado general y la tabla de lecturas.
+    // rango". Los usan por igual las tarjetas de sensores, las reglas, el
+    // estado general y la tabla de lecturas.
+    //
+    // OJO CON LA DIFERENCIA: el panel PINTA, el equipo DECIDE. Los números que
+    // deciden son los del ambiente (los edita el usuario y se los manda
+    // DeviceConfigService al ESP32). Los de acá abajo son solo márgenes de
+    // severidad: a partir de cuánto un desvío se pinta rojo en vez de amarillo.
+    // Los umbrales que sí decide el equipo —CO₂ crítico y calidad de aire
+    // mínima— se leen del ambiente, no se escriben acá.
     // =========================================================================
 
     /** Margen (en °C y en puntos de humedad) a partir del cual el desvío es grave. */
-    private const MARGEN_TEMP  = 2.0;
-    private const MARGEN_HUM   = 10.0;
-    private const MARGEN_CO2   = 250;
+    private const MARGEN_TEMP = 2.0;
+    private const MARGEN_HUM  = 10.0;
 
-    /** Calidad de aire (0–100, más alto es mejor). */
-    private const AIRE_MALO    = 55;
-    private const AIRE_REGULAR = 70;
+    /** Cuántos puntos por debajo del mínimo de aire el desvío ya es grave. */
+    private const MARGEN_AIRE = 15;
 
     /** Escalas de los medidores (mínimo y máximo del gauge de cada variable). */
     private const ESCALA_TEMP = [10.0, 35.0];
@@ -161,7 +166,14 @@ class PanelService
         ];
     }
 
-    /** Rangos ideales del ambiente, ya casteados. */
+    /**
+     * Rangos ideales del ambiente, ya casteados, MÁS los umbrales de control.
+     *
+     * Los de control (mínimo de calidad de aire, histéresis, CO₂ crítico) los
+     * resuelve EnvironmentPresetService::control(), que es el mismo método que
+     * usa DeviceConfigService para armar lo que se le manda al equipo. Así lo
+     * que el panel dice que va a pasar es exactamente lo que el equipo hace.
+     */
     private function perfil(array $espacio): array
     {
         return [
@@ -170,6 +182,23 @@ class PanelService
             'min_humidity'    => (float) $espacio['min_humidity'],
             'max_humidity'    => (float) $espacio['max_humidity'],
             'max_co2'         => (int) $espacio['max_co2'],
+        ] + $this->presets->control($espacio);
+    }
+
+    /**
+     * Los umbrales de APAGADO del ambiente (la histéresis ya resuelta).
+     *
+     * Misma cuenta que hace DeviceConfigService para el equipo. Se muestran en
+     * las reglas del panel porque son la mitad de la explicación: sin ellos
+     * parece que el aire se apaga apenas baja un décimo del máximo, y no es así.
+     */
+    private function apagado(array $perfil): array
+    {
+        return [
+            'temp' => $perfil['max_temperature'] - $perfil['temp_hysteresis'],
+            'hum'  => $perfil['min_humidity'] + $perfil['hum_hysteresis'],
+            'co2'  => max(0, $perfil['max_co2'] - $perfil['co2_hysteresis']),
+            'aire' => min(100, $perfil['min_air_quality'] + $perfil['air_hysteresis']),
         ];
     }
 
@@ -227,30 +256,39 @@ class PanelService
         return ($valor > $max || $valor < $min) ? 'warning' : 'success';
     }
 
+    /**
+     * CO₂: amarillo cuando pasa el límite del ambiente, rojo cuando llega al
+     * crítico. Son los mismos dos números con los que decide el equipo, así
+     * que el color y el LED rojo siempre cuentan la misma historia.
+     */
     private function evaluarCo2(?int $valor, array $perfil): string
     {
         if ($valor === null) {
             return 'neutral';
         }
 
-        if ($valor > $perfil['max_co2'] + self::MARGEN_CO2) {
+        if ($valor > $perfil['critical_co2']) {
             return 'danger';
         }
 
         return $valor > $perfil['max_co2'] ? 'warning' : 'success';
     }
 
-    private function evaluarAire(?int $valor): string
+    /**
+     * Calidad de aire: amarillo por debajo del mínimo del ambiente (que es
+     * cuando el equipo pide ventilar), rojo bastante más abajo.
+     */
+    private function evaluarAire(?int $valor, array $perfil): string
     {
         if ($valor === null) {
             return 'neutral';
         }
 
-        if ($valor < self::AIRE_MALO) {
+        if ($valor < $perfil['min_air_quality'] - self::MARGEN_AIRE) {
             return 'danger';
         }
 
-        return $valor < self::AIRE_REGULAR ? 'warning' : 'success';
+        return $valor < $perfil['min_air_quality'] ? 'warning' : 'success';
     }
 
     /** El peor de varios tonos manda: danger > warning > success. */
@@ -317,9 +355,9 @@ class PanelService
                 'valor'    => $lec['aire'] === null ? '--' : (string) $lec['aire'],
                 'unidad'   => '/100 · ' . mb_strtolower($lec['etiqueta_aire']),
                 'tono'     => $tonos['aire'],
-                'rango'    => 'Buena a partir de ' . self::AIRE_REGULAR . '/100',
+                'rango'    => 'Buena a partir de ' . $perfil['min_air_quality'] . '/100',
                 'pct'      => $this->posicion($lec['aire'] === null ? null : (float) $lec['aire'], 0, 100),
-                'bandLow'  => (float) self::AIRE_REGULAR,
+                'bandLow'  => (float) $perfil['min_air_quality'],
                 'bandHigh' => 100.0,
                 'accent'   => 'citrus',
             ],
@@ -338,13 +376,32 @@ class PanelService
         ];
     }
 
-    /** Las 3 tarjetas de actuadores según el estado actual del dispositivo. */
+    /**
+     * Las tarjetas de actuadores según el estado actual del dispositivo.
+     *
+     * LAS CLAVES NO SON LAS ETIQUETAS. `fan`, `aromatizer` y `alert_led` son
+     * los nombres internos de siempre (base de datos, API y firmware) y no se
+     * tocan: renombrarlos rompería el historial guardado. Lo que cambió es qué
+     * son en la maqueta y, por lo tanto, cómo se llaman en pantalla.
+     */
     private function actuadores(?array $estado): array
     {
         $definicion = [
-            ['fan',        'Aire acondicionado', 'Refresca el ambiente cuando sube la temperatura o el CO₂.'],
-            ['aromatizer', 'Aromatizador',       'Acompaña cuando la calidad del aire baja.'],
-            ['alert_led',  'Luz de alerta',      'Marca visualmente una condición fuera de rango.'],
+            [
+                'fan',
+                'Aire acondicionado',
+                'Recibe la orden por infrarrojo cuando la temperatura pasa el máximo del ambiente.',
+            ],
+            [
+                'aromatizer',
+                'Humidificador / atomizador',
+                'Sube la humedad, por ciclos, cuando baja del mínimo. Puede llevar esencia para perfumar.',
+            ],
+            [
+                'alert_led',
+                'Luz de alerta',
+                'LED rojo: se enciende cuando el CO₂ o la calidad de aire piden ventilar.',
+            ],
         ];
 
         $salida = [];
@@ -367,38 +424,198 @@ class PanelService
     }
 
     /**
-     * Reglas de automatización mostradas en el panel. Usan los mismos umbrales
-     * que los sensores, así lo que se ve en la tarjeta coincide siempre con el
-     * color de la lectura.
+     * Los tres LEDs del equipo: el resumen visual de todo, de un vistazo.
+     *
+     * Es lo mismo que se ve en la maqueta parada a un metro de distancia, y
+     * por eso está en el panel: si el jurado mira el equipo y mira la pantalla,
+     * tienen que decir lo mismo.
+     *
+     * El rojo se sigue llamando `alert_led` en la base por compatibilidad.
+     */
+    private function leds(?array $estado): array
+    {
+        $definicion = [
+            ['green_led', 'Verde', 'Todo normal, monitoreo pasivo.',           'success'],
+            ['blue_led',  'Azul',  'Orden de aire acondicionado activa.',      'info'],
+            ['alert_led', 'Rojo',  'Alerta: CO₂ alto o calidad de aire mala.', 'danger'],
+        ];
+
+        $salida = [];
+
+        foreach ($definicion as [$clave, $titulo, $detalle, $tono]) {
+            $encendido = ($estado[$clave . '_state'] ?? 'off') === 'on';
+
+            $salida[] = [
+                'clave'     => $clave,
+                'titulo'    => $titulo,
+                'detalle'   => $detalle,
+                'encendido' => $encendido,
+                'tono'      => $encendido ? $tono : 'neutral',
+            ];
+        }
+
+        return $salida;
+    }
+
+    /**
+     * Reglas mostradas en el panel, con los mismos números que usa el equipo.
+     *
+     * LA COLUMNA QUE MÁS IMPORTA ES 'tipo'. EdenAir mide cuatro variables pero
+     * solo puede ACTUAR sobre dos: temperatura (aire acondicionado) y humedad
+     * (humidificador). Sobre CO₂ y calidad de aire solo AVISA, porque el
+     * sistema no renueva el aire: no hay extractor. En esos casos decide la
+     * persona, y el panel tiene que decirlo con todas las letras en vez de
+     * dejar pensar que algo se va a encender solo.
      */
     private function reglas(array $lec, array $perfil): array
     {
+        $off = $this->apagado($perfil);
+
         return [
             [
+                'cuando' => 'la calidad de aire baja de ' . $perfil['min_air_quality'] . '/100',
+                'accion' => 'Avisar: ventilá el ambiente',
+                'tipo'   => 'avisa',
+                'detalle' => 'El aviso se levanta al recuperar ' . $off['aire'] . '/100.',
+                'activa' => $lec['aire'] !== null && $lec['aire'] < $perfil['min_air_quality'],
+            ],
+            [
                 'cuando' => 'el CO₂ supera ' . $perfil['max_co2'] . ' ppm',
-                'accion' => 'Encender ventilación',
+                'accion' => 'Avisar: ventilá el ambiente',
+                'tipo'   => 'avisa',
+                'detalle' => 'Crítico arriba de ' . $perfil['critical_co2'] . ' ppm. El aviso se levanta por debajo de ' . $off['co2'] . ' ppm.',
                 'activa' => $lec['co2'] !== null && $lec['co2'] > $perfil['max_co2'],
             ],
             [
                 'cuando' => sprintf('la temperatura supera %.1f °C', $perfil['max_temperature']),
-                'accion' => 'Encender aire acondicionado',
+                'accion' => 'Encender el aire acondicionado',
+                'tipo'   => 'actua',
+                'detalle' => sprintf('La orden sale por infrarrojo. Corta por debajo de %.1f °C.', $off['temp']),
                 'activa' => $lec['temp'] !== null && $lec['temp'] > $perfil['max_temperature'],
             ],
             [
-                'cuando' => 'la calidad de aire baja de ' . self::AIRE_REGULAR . '/100',
-                'accion' => 'Encender aromatizador',
-                'activa' => $lec['aire'] !== null && $lec['aire'] < self::AIRE_REGULAR,
+                'cuando' => sprintf('la humedad baja de %.0f %%', $perfil['min_humidity']),
+                'accion' => 'Encender el humidificador',
+                'tipo'   => 'actua',
+                'detalle' => sprintf('Trabaja por ciclos de 60 s. Corta por encima de %.0f %%.', $off['hum']),
+                'activa' => $lec['hum'] !== null && $lec['hum'] < $perfil['min_humidity'],
             ],
             [
-                'cuando' => 'una lectura queda muy fuera de rango',
-                'accion' => 'Encender luz de alerta',
-                'activa' => $lec['aire'] !== null && (
-                    $lec['co2'] > $perfil['max_co2'] + self::MARGEN_CO2
-                    || $lec['temp'] > $perfil['max_temperature'] + self::MARGEN_TEMP
-                    || $lec['aire'] < self::AIRE_MALO
-                ),
+                'cuando' => sprintf('la humedad supera %.0f %%', $perfil['max_humidity']),
+                'accion' => 'Avisar: el equipo no puede bajarla',
+                'tipo'   => 'avisa',
+                'detalle' => 'El atomizador solo agrega humedad; no hay deshumidificador.',
+                'activa' => $lec['hum'] !== null && $lec['hum'] > $perfil['max_humidity'],
             ],
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Mensajes de estado
+    // -------------------------------------------------------------------------
+
+    /**
+     * Catálogo de avisos: código del equipo → texto y tono para la pantalla.
+     *
+     * El firmware manda CÓDIGOS ('ventilar', 'co2_critico'), no frases. Así se
+     * puede reescribir un mensaje, corregirle una coma o traducirlo sin
+     * volver a programar la ESP32. El orden de este array es el orden en que
+     * se muestran: primero lo urgente.
+     */
+    private const AVISOS = [
+        'co2_critico'        => ['CO₂ crítico: ventilá el ambiente ahora.', 'danger'],
+        'ventilar'           => ['Ventilá el ambiente.', 'danger'],
+        'aire_acondicionado' => ['Aire acondicionado activado.', 'info'],
+        'ir_sin_confirmar'   => ['Orden enviada, sin confirmación IR.', 'warning'],
+        'humidificando'      => ['Humidificador en marcha.', 'info'],
+        'humedad_alta'       => ['Humedad alta. EdenAir solo puede subirla, así que únicamente lo informa.', 'warning'],
+        'aire_en_pausa'      => ['Medición de aire en pausa por humidificación.', 'neutral'],
+        'aire_calentando'    => ['Sensor de aire calentando.', 'neutral'],
+    ];
+
+    /**
+     * Los mensajes que el equipo quiere mostrar ahora.
+     *
+     * Salen de dos lados que se completan: la lista de avisos que mandó el
+     * equipo, y el estado de su sensor de aire (por si el equipo tiene un
+     * firmware anterior a los avisos y solo reporta el estado). Se recorre el
+     * catálogo y no la lista recibida, así el orden es siempre el mismo y un
+     * código desconocido no ensucia la pantalla.
+     */
+    private function mensajes(?array $estado): array
+    {
+        $codigos = [];
+
+        $crudos = json_decode((string) ($estado['avisos'] ?? ''), true);
+
+        if (is_array($crudos)) {
+            $codigos = array_map(static fn ($c): string => (string) $c, $crudos);
+        }
+
+        // El estado del MQ-135 vale por sí solo: es lo que explica por qué el
+        // índice de aire está quieto o todavía no es confiable.
+        $sensorAire = (string) ($estado['air_sensor_status'] ?? 'ok');
+
+        if ($sensorAire === 'warmup') {
+            $codigos[] = 'aire_calentando';
+        } elseif ($sensorAire === 'pausa') {
+            $codigos[] = 'aire_en_pausa';
+        }
+
+        $salida = [];
+
+        foreach (self::AVISOS as $codigo => [$texto, $tono]) {
+            if (in_array($codigo, $codigos, true)) {
+                $salida[] = ['codigo' => $codigo, 'texto' => $texto, 'tono' => $tono];
+            }
+        }
+
+        return $salida;
+    }
+
+    /**
+     * Qué LED manda ahora: 'Rojo', 'Azul', 'Verde' o 'Apagados'.
+     *
+     * Sirve para el resumen de una línea. Se recorre de mayor a menor
+     * urgencia, que es el mismo orden en que los mira una persona: si hay rojo
+     * prendido, lo demás no importa.
+     */
+    private function ledActivo(array $leds): string
+    {
+        foreach (['alert_led', 'blue_led', 'green_led'] as $clave) {
+            foreach ($leds as $led) {
+                if ($led['clave'] === $clave && $led['encendido']) {
+                    return $led['titulo'];
+                }
+            }
+        }
+
+        return 'Apagados';
+    }
+
+    /**
+     * De dónde salió el índice de calidad de aire de la última lectura, en
+     * texto corto para poner debajo del número.
+     *
+     * No es un detalle técnico de más: un índice medido por el MQ-135 y uno
+     * estimado con una fórmula no valen lo mismo, y el panel no puede
+     * presentarlos como si fueran la misma cosa.
+     */
+    private function origenDelAire(?array $medicion, ?array $estado): string
+    {
+        $sensorAire = (string) ($estado['air_sensor_status'] ?? 'ok');
+
+        if ($sensorAire === 'pausa') {
+            return 'último valor válido · medición en pausa';
+        }
+
+        if ($sensorAire === 'warmup') {
+            return 'estimado · el sensor está calentando';
+        }
+
+        return ((string) ($medicion['air_quality_source'] ?? 'calculado')) === 'sensor'
+            ? 'medido por el sensor de aire'
+            : 'estimado a partir de las otras variables';
     }
 
     /**
@@ -413,7 +630,7 @@ class PanelService
             $tono = $this->tonoGeneral([
                 $this->evaluarTemp($lec['temp'], $perfil),
                 $this->evaluarCo2($lec['co2'], $perfil),
-                $this->evaluarAire($lec['aire']),
+                $this->evaluarAire($lec['aire'], $perfil),
             ]);
 
             return [
@@ -469,7 +686,7 @@ class PanelService
             'temp' => $this->evaluarTemp($lec['temp'], $perfil),
             'hum'  => $this->evaluarHumedad($lec['hum'], $perfil),
             'co2'  => $this->evaluarCo2($lec['co2'], $perfil),
-            'aire' => $this->evaluarAire($lec['aire']),
+            'aire' => $this->evaluarAire($lec['aire'], $perfil),
         ];
 
         $fueraDeRango = count(array_filter(
@@ -487,6 +704,8 @@ class PanelService
 
         $actuadores = $this->actuadores($ctx['estado']);
         $reglas     = $this->reglas($lec, $perfil);
+        $leds       = $this->leds($ctx['estado']);
+        $mensajes   = $sinLecturas ? [] : $this->mensajes($ctx['estado']);
         $nombre     = (string) $ctx['usuario']['nombre'] . ' ' . (string) $ctx['usuario']['apellido'];
 
         return [
@@ -518,6 +737,19 @@ class PanelService
                 $fueraDeRango > 0 => 'Hay ' . $fueraDeRango . ' lectura' . ($fueraDeRango === 1 ? '' : 's') . ' fuera del rango de este ambiente.',
                 default         => 'Las cuatro variables se mantienen dentro del rango de este ambiente.',
             },
+
+            // Los mensajes que manda el equipo con cada medición: qué está
+            // haciendo, qué necesita de la persona y en qué estado están sus
+            // sensores. Es lo que convierte un número en una instrucción.
+            'mensajes'     => $mensajes,
+
+            // Los tres LEDs del equipo, para que la maqueta y la pantalla
+            // digan lo mismo.
+            'leds'         => $leds,
+            'ledActivo'    => $this->ledActivo($leds),
+
+            // De dónde salió el índice de calidad de aire de esta lectura.
+            'aireOrigen'   => $sinLecturas ? '' : $this->origenDelAire($ctx['ultima'], $ctx['estado']),
             'ultimaLectura' => $ctx['ultima'] ? $this->fechaHumana($ctx['ultima']['captured_at']) : 'Sin lecturas',
 
             // La MISMA fecha en segundos desde 1970. La necesita panel-vivo.js
@@ -621,8 +853,13 @@ class PanelService
 
    Bloques visuales (privados):
    - sensores()   → las 4 tarjetas con medidor
-   - actuadores() → fan / aromatizer / alert_led con su estado
-   - reglas()     → automatizaciones (mismos umbrales que los sensores)
+   - actuadores() → fan (aire acondicionado) / aromatizer (humidificador) /
+                    alert_led (luz de alerta) con su estado
+   - leds()       → los tres LEDs del equipo: verde, azul y rojo
+   - ledActivo()  → cuál de los tres manda ahora
+   - reglas()     → qué hace el equipo con cada variable, y si ACTÚA o AVISA
+   - mensajes()   → los avisos del equipo, traducidos por el catálogo AVISOS
+   - origenDelAire() → si el índice lo midió el MQ-135 o se estimó
    - historial()  → filas de la tabla con su tono
    - sparkPath()  → serie de temperatura → path SVG de la mini-curva
 

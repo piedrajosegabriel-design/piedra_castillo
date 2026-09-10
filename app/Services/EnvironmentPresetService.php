@@ -10,6 +10,9 @@ namespace App\Services;
    límite de CO₂. También arma los datos listos para insertar en
    `spaces`, resuelve los nombres legibles y formatea los rangos
    para las vistas.
+   Además define los valores de la lógica de control que no
+   dependen del cuarto (histéresis, mínimo de calidad de aire y
+   CO₂ crítico): están en CONTROL y los hereda cada preset.
    Es el único service SIN modelos: solo constantes y helpers
    (no toca la base de datos).
    SE RELACIONA CON: lo usan DevicePairingService (al crear
@@ -23,8 +26,40 @@ namespace App\Services;
 class EnvironmentPresetService
 {
     // -------------------------------------------------------------------------
+    // Valores de la lógica de control que NO dependen del tipo de ambiente.
+    //
+    // Un aula y un dormitorio quieren temperaturas distintas, pero ninguno de
+    // los dos quiere que el relé traquetee: la histéresis y los umbrales de
+    // aviso son propiedades del sistema, no del cuarto. Se definen una sola
+    // vez acá y cada preset los hereda; el usuario igual puede moverlos desde
+    // /panel/ambientes si quiere afinar su equipo.
+    // -------------------------------------------------------------------------
+    private const CONTROL = [
+        // Debajo de este índice (0–100) el equipo prende el LED rojo y pide
+        // ventilar. No enciende ningún actuador: EdenAir no renueva el aire.
+        'min_air_quality' => 70,
+
+        // Cuánto tiene que mejorar cada variable para que la regla se apague.
+        //   temperatura → enciende sobre el máximo, corta 2 °C por debajo
+        //   humedad     → enciende bajo el mínimo, corta 8 puntos por encima
+        //   CO₂         → avisa sobre el máximo, deja de avisar 150 ppm abajo
+        //   aire        → avisa bajo el mínimo, deja de avisar 5 puntos arriba
+        'temp_hysteresis' => 2.0,
+        'hum_hysteresis'  => 8.0,
+        'co2_hysteresis'  => 150,
+        'air_hysteresis'  => 5,
+
+        // Por encima de esto el aviso de CO₂ deja de ser "alto" y pasa a ser
+        // crítico (mismo LED rojo, mensaje más fuerte en el panel).
+        'critical_co2' => 1400,
+    ];
+
+    // -------------------------------------------------------------------------
     // Catálogo de presets: la "fuente de la verdad" de los rangos por tipo.
     // 'icono' es una clave del catálogo de icono() (app/Helpers/eden_helper.php).
+    //
+    // Los valores de control (histéresis, calidad de aire, CO₂ crítico) NO se
+    // repiten acá: los agrega getPreset() desde CONTROL.
     // -------------------------------------------------------------------------
     private const PRESETS = [
         'oficina' => [
@@ -39,7 +74,7 @@ class EnvironmentPresetService
         ],
         'aula' => [
             'label'           => 'Aula',
-            'description'     => 'Aire renovado para sostener la concentración del curso.',
+            'description'     => 'Aire estable para sostener la concentración del curso.',
             'icono'           => 'aula',
             'min_temperature' => 20.0,
             'max_temperature' => 24.0,
@@ -47,13 +82,16 @@ class EnvironmentPresetService
             'max_humidity'    => 60.0,
             'max_co2'         => 1000,
         ],
+        // 'hogar' es además el preset de respaldo: si llega un tipo que no
+        // existe, se usa este. Por eso es el que lleva los valores de base de
+        // la lógica nueva: 26 °C de máximo, 40 % de mínimo y 1000 ppm.
         'hogar' => [
             'label'           => 'Hogar',
             'description'     => 'Balance general para los ambientes de uso diario.',
             'icono'           => 'casa',
             'min_temperature' => 20.0,
             'max_temperature' => 26.0,
-            'min_humidity'    => 35.0,
+            'min_humidity'    => 40.0,
             'max_humidity'    => 60.0,
             'max_co2'         => 1000,
         ],
@@ -72,7 +110,7 @@ class EnvironmentPresetService
             'description'     => 'Los valores los elegís vos, sin seguir ningún tipo.',
             'icono'           => 'ajustes',
             'min_temperature' => 20.0,
-            'max_temperature' => 25.0,
+            'max_temperature' => 26.0,
             'min_humidity'    => 40.0,
             'max_humidity'    => 60.0,
             'max_co2'         => 1000,
@@ -86,16 +124,41 @@ class EnvironmentPresetService
         'min_humidity',
         'max_humidity',
         'max_co2',
+        'min_air_quality',
+        'temp_hysteresis',
+        'hum_hysteresis',
+        'co2_hysteresis',
+        'air_hysteresis',
+        'critical_co2',
+    ];
+
+    /**
+     * Los campos "avanzados": los que no describen el confort del ambiente
+     * sino cómo se comporta el control. El formulario los muestra aparte y
+     * plegados, para que la pantalla siga siendo simple.
+     */
+    public const CAMPOS_CONTROL = [
+        'min_air_quality',
+        'temp_hysteresis',
+        'hum_hysteresis',
+        'co2_hysteresis',
+        'air_hysteresis',
+        'critical_co2',
     ];
 
     // -------------------------------------------------------------------------
     // Acceso al catálogo
     // -------------------------------------------------------------------------
 
-    /** Un preset por su clave; si no existe, cae al de 'hogar'. */
+    /**
+     * Un preset por su clave; si no existe, cae al de 'hogar'.
+     *
+     * Los valores de control se agregan acá y no se escriben en cada preset:
+     * son los mismos para todos los tipos y así no se puede olvidar uno.
+     */
     public function getPreset(string $type): array
     {
-        return self::PRESETS[$type] ?? self::PRESETS['hogar'];
+        return (self::PRESETS[$type] ?? self::PRESETS['hogar']) + self::CONTROL;
     }
 
     /** ¿Es una clave de tipo que existe? (para validar lo que llega por POST) */
@@ -115,7 +178,12 @@ class EnvironmentPresetService
     {
         $catalogo = [];
 
-        foreach (self::PRESETS as $clave => $preset) {
+        foreach (array_keys(self::PRESETS) as $clave) {
+            // getPreset() y no PRESETS a secas: así los valores de control
+            // (histéresis, calidad de aire) viajan a la vista junto al resto y
+            // el selector del formulario los puede cargar de una.
+            $preset = $this->getPreset($clave);
+
             $catalogo[] = [
                 'clave'       => $clave,
                 'label'       => $preset['label'],
@@ -153,6 +221,16 @@ class EnvironmentPresetService
             'min_humidity'     => $this->toFloat($data['min_humidity'] ?? null, $preset['min_humidity']),
             'max_humidity'     => $this->toFloat($data['max_humidity'] ?? null, $preset['max_humidity']),
             'max_co2'          => $this->toInt($data['max_co2'] ?? null, $preset['max_co2']),
+
+            // Valores de la lógica de control. Si el formulario no los mandó
+            // (por ejemplo, un alta automática al vincular un equipo) quedan
+            // los del preset, que son los recomendados.
+            'min_air_quality'  => $this->toInt($data['min_air_quality'] ?? null, $preset['min_air_quality']),
+            'temp_hysteresis'  => $this->toFloat($data['temp_hysteresis'] ?? null, $preset['temp_hysteresis']),
+            'hum_hysteresis'   => $this->toFloat($data['hum_hysteresis'] ?? null, $preset['hum_hysteresis']),
+            'co2_hysteresis'   => $this->toInt($data['co2_hysteresis'] ?? null, $preset['co2_hysteresis']),
+            'air_hysteresis'   => $this->toInt($data['air_hysteresis'] ?? null, $preset['air_hysteresis']),
+            'critical_co2'     => $this->toInt($data['critical_co2'] ?? null, $preset['critical_co2']),
         ];
     }
 
@@ -209,12 +287,44 @@ class EnvironmentPresetService
         $preset = $this->getPreset((string) ($space['environment_type'] ?? 'hogar'));
 
         foreach (self::CAMPOS as $campo) {
-            if (abs((float) $space[$campo] - (float) $preset[$campo]) > 0.001) {
+            // ?? $preset[$campo]: una fila guardada antes de que existieran los
+            // campos de control no está "a medida", le falta el dato. Tratarla
+            // como distinta haría que todos los ambientes viejos aparecieran
+            // como ajustados a mano sin que nadie los tocara.
+            $valor = $space[$campo] ?? $preset[$campo];
+
+            if (abs((float) $valor - (float) $preset[$campo]) > 0.001) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // Valores efectivos de un ambiente
+    // -------------------------------------------------------------------------
+
+    /**
+     * Los umbrales de control de un ambiente, ya casteados y con respaldo.
+     *
+     * Es el único lugar que sabe qué hacer cuando una fila de `spaces` todavía
+     * no tiene los campos nuevos: usa los del preset. Lo consumen
+     * DeviceConfigService (lo que se le manda al equipo) y PanelService (lo que
+     * se muestra), así los dos leen exactamente los mismos números.
+     */
+    public function control(array $space): array
+    {
+        $preset = $this->getPreset((string) ($space['environment_type'] ?? 'hogar'));
+
+        return [
+            'min_air_quality' => (int)   ($space['min_air_quality'] ?? $preset['min_air_quality']),
+            'temp_hysteresis' => (float) ($space['temp_hysteresis'] ?? $preset['temp_hysteresis']),
+            'hum_hysteresis'  => (float) ($space['hum_hysteresis']  ?? $preset['hum_hysteresis']),
+            'co2_hysteresis'  => (int)   ($space['co2_hysteresis']  ?? $preset['co2_hysteresis']),
+            'air_hysteresis'  => (int)   ($space['air_hysteresis']  ?? $preset['air_hysteresis']),
+            'critical_co2'    => (int)   ($space['critical_co2']    ?? $preset['critical_co2']),
+        ];
     }
 
     // -------------------------------------------------------------------------
@@ -266,7 +376,12 @@ class EnvironmentPresetService
    - getEnvironmentLabel()  → etiqueta del tipo ('aula' → 'Aula')
    - formatearRangos()      → los rangos en texto corto para mostrar
    - siguePreset($space)    → ¿los números son los del tipo o están a medida?
-   - soloCampos()           → los 5 campos numéricos de un preset
+   - control($space)        → los umbrales de control efectivos del ambiente
+                              (histéresis, calidad de aire mínima, CO₂ crítico),
+                              con respaldo al preset si la fila es anterior a
+                              esos campos. Lo leen DeviceConfigService y
+                              PanelService, así los dos usan los mismos números
+   - soloCampos()           → los campos numéricos de un preset
    - toFloat()/toInt()      → conversión con fallback al valor del preset
    - ?? (null coalescing)   → (PHP) "usá esto, y si es null, esto otro"
    - private const PRESETS  → constante de clase: datos fijos, sin base de datos

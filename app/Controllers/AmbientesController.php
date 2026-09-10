@@ -85,6 +85,11 @@ class AmbientesController extends BaseController
             'catalogo'   => $presets->getCatalogo(),
             'nombre'     => $presets->getDisplayName($ambiente),
             'sigue_tipo' => $presets->siguePreset($ambiente),
+            // Los umbrales de la lógica de control (histéresis, calidad de
+            // aire mínima, CO₂ crítico). Van aparte porque una fila guardada
+            // antes de que existieran no los tiene, y control() resuelve ese
+            // caso con los valores recomendados en vez de mostrar campos vacíos.
+            'control'    => $presets->control($ambiente),
         ]);
     }
 
@@ -119,19 +124,21 @@ class AmbientesController extends BaseController
             'min_humidity'     => $this->request->getPost('min_humidity'),
             'max_humidity'     => $this->request->getPost('max_humidity'),
             'max_co2'          => $this->request->getPost('max_co2'),
+            // Umbrales de la lógica de control.
+            'min_air_quality'  => $this->request->getPost('min_air_quality'),
+            'temp_hysteresis'  => $this->request->getPost('temp_hysteresis'),
+            'hum_hysteresis'   => $this->request->getPost('hum_hysteresis'),
+            'co2_hysteresis'   => $this->request->getPost('co2_hysteresis'),
+            'air_hysteresis'   => $this->request->getPost('air_hysteresis'),
+            'critical_co2'     => $this->request->getPost('critical_co2'),
         ]);
 
-        if ($datos['min_temperature'] >= $datos['max_temperature']) {
-            return $this->volverAlForm($id, 'La temperatura mínima debe ser menor que la máxima.');
+        if ($error = $this->revisarRangos($datos)) {
+            return $this->volverAlForm($id, $error);
         }
-        if ($datos['min_humidity'] >= $datos['max_humidity']) {
-            return $this->volverAlForm($id, 'La humedad mínima debe ser menor que la máxima.');
-        }
-        if ($datos['min_humidity'] < 0 || $datos['max_humidity'] > 100) {
-            return $this->volverAlForm($id, 'La humedad se mide en porcentaje: tiene que quedar entre 0 % y 100 %.');
-        }
-        if ($datos['max_co2'] <= 0) {
-            return $this->volverAlForm($id, 'El límite de CO₂ debe ser mayor que cero.');
+
+        if ($error = $this->revisarControl($datos)) {
+            return $this->volverAlForm($id, $error);
         }
 
         (new SpaceModel())->update($id, $datos);
@@ -143,6 +150,72 @@ class AmbientesController extends BaseController
     // =========================================================================
     // HELPERS
     // =========================================================================
+
+    /**
+     * Coherencia de los rangos de confort. Devuelve el motivo del rechazo, o
+     * null si están bien.
+     */
+    private function revisarRangos(array $datos): ?string
+    {
+        if ($datos['min_temperature'] >= $datos['max_temperature']) {
+            return 'La temperatura mínima debe ser menor que la máxima.';
+        }
+        if ($datos['min_humidity'] >= $datos['max_humidity']) {
+            return 'La humedad mínima debe ser menor que la máxima.';
+        }
+        if ($datos['min_humidity'] < 0 || $datos['max_humidity'] > 100) {
+            return 'La humedad se mide en porcentaje: tiene que quedar entre 0 % y 100 %.';
+        }
+        if ($datos['max_co2'] <= 0) {
+            return 'El límite de CO₂ debe ser mayor que cero.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Coherencia de los umbrales de control.
+     *
+     * LA REGLA DE FONDO: cada histéresis define DÓNDE APAGA una regla, y ese
+     * punto tiene que quedar adentro del rango del ambiente. Si el aire
+     * acondicionado cortara por debajo de la temperatura mínima, no cortaría
+     * nunca; si el humidificador cortara por encima de la humedad máxima,
+     * tampoco. Un número mal puesto acá no rompe la web: deja al equipo
+     * regulando para siempre, que es peor porque no se ve.
+     */
+    private function revisarControl(array $datos): ?string
+    {
+        if ($datos['min_air_quality'] < 1 || $datos['min_air_quality'] > 99) {
+            return 'La calidad de aire mínima se mide de 0 a 100: elegí un valor entre 1 y 99.';
+        }
+
+        if ($datos['temp_hysteresis'] <= 0 || $datos['hum_hysteresis'] <= 0
+            || $datos['co2_hysteresis'] <= 0 || $datos['air_hysteresis'] <= 0) {
+            return 'Las histéresis tienen que ser mayores que cero: son la diferencia entre encender y apagar.';
+        }
+
+        if (($datos['max_temperature'] - $datos['temp_hysteresis']) <= $datos['min_temperature']) {
+            return 'La histéresis de temperatura es demasiado grande: el aire acondicionado cortaría por debajo del mínimo del ambiente y nunca se apagaría.';
+        }
+
+        if (($datos['min_humidity'] + $datos['hum_hysteresis']) >= $datos['max_humidity']) {
+            return 'La histéresis de humedad es demasiado grande: el humidificador cortaría por encima del máximo del ambiente.';
+        }
+
+        if (($datos['max_co2'] - $datos['co2_hysteresis']) <= 0) {
+            return 'La histéresis de CO₂ es demasiado grande: el aviso nunca se levantaría.';
+        }
+
+        if (($datos['min_air_quality'] + $datos['air_hysteresis']) > 100) {
+            return 'La calidad de aire mínima más su histéresis no puede pasar de 100: el aviso nunca se levantaría.';
+        }
+
+        if ($datos['critical_co2'] <= $datos['max_co2']) {
+            return 'El CO₂ crítico tiene que ser mayor que el límite del ambiente.';
+        }
+
+        return null;
+    }
 
     /** Devuelve el user_id guardado en sesión por el login. */
     private function usuarioActual(): int
@@ -179,6 +252,10 @@ class AmbientesController extends BaseController
    - actualizar($id)  → guarda (valida tipo, min/max y CO₂)
 
    Helpers privados:
+   - revisarRangos()      → coherencia de los rangos de confort (min < max…)
+   - revisarControl()     → coherencia de los umbrales de control: que el punto
+                            de apagado de cada regla quede dentro del rango, si
+                            no el actuador no se apagaría nunca
    - usuarioActual()      → user_id de la sesión
    - ambienteDelUsuario() → busca el ambiente y chequea que sea del usuario
    - volverAlForm()       → redirect al form con withInput() y mensaje de error
