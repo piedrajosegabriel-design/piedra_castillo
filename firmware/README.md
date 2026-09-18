@@ -356,7 +356,7 @@ Para dejar una placa como recien salida, borra desde Thonny los archivos
 ## El ciclo, ya funcionando
 
 ```
-cada 8 segundos:               cada 15 segundos:
+cada 30 segundos:              cada 15 segundos:
   leer el SCD41                  consultar ordenes del usuario
   leer el MQ-135                 aplicarlas y confirmarlas
   DECIDIR (reglas.py)
@@ -370,8 +370,9 @@ contesta, el ambiente igual quedo regulado.
 
 Eran 5 minutos. En una feria de ciencias hay que poder **ver la reaccion en
 vivo**: si el ciclo tarda cinco minutos, el jurado se va antes de que el cooler
-arranque. Ocho segundos es tambien el ritmo natural del SCD41, que entrega un
-dato nuevo cada cinco.
+arranque. Treinta segundos alcanzan para verla y no llenan la base: 2.880
+mediciones por dia, contra 10.800 si fuera cada 8. Menos de 5 no tiene
+sentido: el SCD41 no entrega un dato nuevo antes.
 
 ### Las protecciones
 

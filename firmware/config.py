@@ -81,23 +81,23 @@ PIN_MQ135 = 34
 #      llego; en una instalacion real, del otro lado hay un aire acondicionado
 #      que si enfria. La logica del firmware es exactamente la misma.
 # IN2: atomizador ultrasonico (humidificador; opcionalmente con esencia).
-PIN_RELE_AIRE = 26
-PIN_RELE_ATOMIZADOR = 27
+PIN_RELE_AIRE = None        # 26 cuando este conectado
+PIN_RELE_ATOMIZADOR = None  # 27 cuando este conectado
 
 # --- Cadena infrarroja -----------------------------------------------------
 # El emisor (KY-005) manda la trama de 38 kHz por transistor; el receptor
 # (VS1838B, alimentado con 3V3) la confirma. Recien con la orden emitida se
 # energiza el rele del aire: es la misma cadena que usa un control remoto.
-PIN_IR_EMISOR = 25
-PIN_IR_RECEPTOR = 33
+PIN_IR_EMISOR = None    # 25 cuando este conectado
+PIN_IR_RECEPTOR = None  # 33 cuando este conectado
 
 # --- LEDs de estado (con resistencia de 220-330 ohm) -----------------------
 # Verde: todo normal, monitoreo pasivo.
 # Rojo:  alerta (CO2 alto o calidad de aire mala).
 # Azul:  orden de aire acondicionado activa.
-PIN_LED_VERDE = 14
-PIN_LED_ROJO = 16
-PIN_LED_AZUL = 17
+PIN_LED_VERDE = None  # 14 cuando este conectado
+PIN_LED_ROJO = None   # 16 cuando este conectado
+PIN_LED_AZUL = None   # 17 cuando este conectado
 
 # Si tus reles se activan con 0 en vez de 1 (los mas comunes son asi, y los de
 # esta maqueta tambien), dejalo en True. Si el actuador funciona al reves de lo
@@ -128,9 +128,11 @@ MQ135_MUESTRAS = 16
 # El servidor manda los suyos en la configuracion; estos se usan mientras
 # todavia no la pudo descargar.
 
-# Cada cuanto medir y decidir. Bajo a proposito: en una demostracion hay que
-# poder ver la reaccion en vivo, no dentro de cinco minutos.
-INTERVALO_MEDICION = 8
+# Cada cuanto medir y decidir. El que manda es el del servidor
+# (DeviceConfigService::INTERVALO_MEDICION); este vale hasta bajarlo. 30 s
+# todavia deja ver la reaccion en vivo sin llenar la base: 2.880 filas por dia
+# en vez de 10.800. No bajar de 5: el SCD41 no da un dato nuevo antes.
+INTERVALO_MEDICION = 30
 
 # Cada cuanto preguntar por ordenes manuales del usuario y refrescar umbrales.
 INTERVALO_COMANDOS = 15

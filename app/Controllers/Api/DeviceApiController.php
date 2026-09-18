@@ -214,7 +214,10 @@ class DeviceApiController extends BaseController
         $device      = $deviceModel->where('device_uid', $deviceUid)->first();
 
         if (! $device) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Dispositivo no encontrado.');
+            // InvalidArgumentException y no PageNotFoundException: los endpoints
+            // solo atrapan la primera. La otra escapaba y, en development, CI4
+            // devolvia la traza completa (~93 KB): la ESP32 moria con MemoryError.
+            throw new \InvalidArgumentException('Dispositivo no encontrado.');
         }
 
         $token = $this->request->getHeaderLine('X-Device-Token');

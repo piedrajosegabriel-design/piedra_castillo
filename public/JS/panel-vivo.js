@@ -11,9 +11,9 @@
      pagina: no parpadea, no se mueve el scroll y no se pierde nada de lo que
      estabas mirando.
 
-     Eran 30 segundos cuando el equipo medía cada 5 minutos. Ahora mide cada 8,
-     y un panel que mira cada medio minuto se pierde tres de cada cuatro
-     lecturas: en una demostracion eso es justo lo que hay que ver.
+     Eran 30 segundos cuando el equipo medía cada 5 minutos. Ahora mide cada
+     30: mirando cada 10, una medicion nueva aparece como mucho 10 segundos
+     despues de llegar al servidor.
 
    COMO ENCUENTRA QUE ACTUALIZAR
      Por atributos puestos en panel.php:
@@ -39,8 +39,8 @@
     var CADA_MS = 10000;          // cada cuanto preguntar
     var TONOS = ["success", "warning", "danger", "neutral", "info"];
 
-    // El equipo manda una medicion cada 8 segundos (INTERVALO_MEDICION en
-    // firmware/config.py; antes eran 5 minutos). Con ese ritmo, tres minutos
+    // El equipo manda una medicion cada 30 segundos (INTERVALO_MEDICION en
+    // DeviceConfigService.php; antes eran 5 minutos). Con ese ritmo, tres minutos
     // sin nada nuevo ya no es "todavia no le toco": es que algo se corto.
     //
     // El numero tiene que quedar MUY por encima del intervalo real igual: un

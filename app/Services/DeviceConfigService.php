@@ -46,8 +46,12 @@ class DeviceConfigService
     // en config.py como arranque, para el rato en que todavía no bajó nada.
     // -------------------------------------------------------------------------
 
-    /** Segundos entre mediciones. Bajo a propósito: la demo se ve en vivo. */
-    public const INTERVALO_MEDICION = 8;
+    /**
+     * Segundos entre mediciones. 30 y no 8: con 8 eran unas 10.800 filas y
+     * otras tantas peticiones por día; con 30 son 2.880, y la reacción sigue
+     * viéndose en vivo. No bajar de 5: el SCD41 no da un dato nuevo antes.
+     */
+    public const INTERVALO_MEDICION = 30;
 
     /** Segundos entre consultas de comandos manuales. */
     public const INTERVALO_COMANDOS = 15;

@@ -73,7 +73,9 @@ class Servidor:
             estado = respuesta.status_code
             try:
                 datos = respuesta.json()
-            except (ValueError, OSError):
+            except (ValueError, OSError, MemoryError):
+                # MemoryError: una respuesta demasiado grande (por ejemplo una
+                # pagina de error del servidor) no puede tumbar el equipo.
                 datos = {}
 
             return estado, datos
