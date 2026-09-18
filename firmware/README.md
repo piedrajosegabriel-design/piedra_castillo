@@ -139,7 +139,7 @@ Cuando esta todo armado, `config.py` queda asi:
 |---|---|---|
 | 21 | SDA — SCD41 | I2C, alimentado con **3V3** |
 | 22 | SCL — SCD41 | I2C |
-| 34 | MQ-135 (AO) | Solo entrada. **Siempre por el divisor 20k/10k** |
+| 34 | MQ-135 (AO) | Solo entrada. **Siempre por el divisor 10k/10k** |
 | 26 | Rele IN1 — aire acondicionado (cooler) | **Activo en bajo** |
 | 27 | Rele IN2 — atomizador | **Activo en bajo** |
 | 25 | Emisor IR (KY-005) | Trama de 38 kHz, por transistor |
@@ -551,7 +551,7 @@ actual se le pasa como un numero (`ahora`), no lo consulta.
 | Un rele pega un golpe al enchufar la placa | No deberia pasar: se inicializa apagado desde el constructor. Si pasa, el rele no es activo en bajo -> `RELES_INVERTIDOS = False` |
 | Aprieto un boton del panel y no pasa nada | O ese actuador esta en `None` en `config.py`, o el rele todavia esta cumpliendo sus 30 s de tiempo minimo. La orden queda pendiente a proposito: el equipo no confirma algo que no hizo |
 | El panel dice `Sensor de aire calentando` y no cambia | Normal durante los primeros 5 minutos. Si sigue, el MQ-135 no esta llegando al GPIO 34 |
-| La calidad de aire se queda clavada en 0 o en 100 | Falta el divisor 20k/10k, o hay que recalibrar `MQ135_CRUDO_LIMPIO` / `MQ135_CRUDO_SUCIO` con lo que devuelve `medidor.crudo()` |
+| La calidad de aire se queda clavada en 0 o en 100 | Falta el divisor 10k/10k, o hay que recalibrar `MQ135_CRUDO_LIMPIO` / `MQ135_CRUDO_SUCIO` con lo que devuelve `medidor.crudo()` |
 | El panel dice `Orden enviada, sin confirmacion IR` | El emisor y el receptor no se ven. Enfrentalos, sacale lo que tengan en el medio, revisa que el receptor este a **3V3** |
 | El cooler queda encendido y no se apaga | **Correcto** si la temperatura no bajo de 24 grados. Saca la fuente de calor y espera: no hay ningun apagado por tiempo, a proposito |
 

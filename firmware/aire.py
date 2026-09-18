@@ -23,8 +23,8 @@ logica de control:
    usaban la base de datos y el panel.
 
 CABLEADO (ver config.py): el modulo se alimenta con 5 V (calefactor), pero su
-salida analogica NUNCA va directo al GPIO. Va por un divisor 20k/10k, que baja
-la tension a un tercio y la deja dentro de lo que tolera la ESP32.
+salida analogica NUNCA va directo al GPIO. Va por un divisor 10k/10k, que baja
+la tension a la mitad (5 V -> 2.5 V) y la deja dentro de lo que tolera la ESP32.
 """
 
 import time

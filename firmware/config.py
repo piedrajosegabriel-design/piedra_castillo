@@ -72,8 +72,9 @@ PIN_I2C_SCL = 22
 
 # --- MQ-135 (calidad de aire), salida analogica por ADC --------------------
 # El modulo se alimenta con 5 V porque tiene calefactor interno, pero su AO
-# NUNCA va directo a un GPIO: entra por un divisor resistivo de 20 kohm entre
-# AO y el nodo, y 10 kohm del nodo a GND. El GPIO 34 es solo-entrada.
+# NUNCA va directo a un GPIO: entra por un divisor resistivo de 10 kohm entre
+# AO y el nodo, y 10 kohm del nodo a GND. Deja pasar la mitad: con AO a 5 V
+# llegan 2.5 V, por debajo de los 3.3 V del pin. El GPIO 34 es solo-entrada.
 PIN_MQ135 = 34
 
 # --- Reles (activos en BAJO: 0 = encendido) --------------------------------
