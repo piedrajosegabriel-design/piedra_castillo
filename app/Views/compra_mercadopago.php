@@ -1,12 +1,18 @@
 <?php
 /**
  * COMPRAR EDENAIR — la pantalla del producto.
- * Ruta: /panel/compra · Controlador: PanelController::compra
+ * Ruta: /panel/compra · Controlador: CompraController::index
+ * Recibe: $producto (CompraService::producto) y $compras (CompraService::listarDeUsuario)
  *
- * La compra todavía es simulada: el botón no cobra nada, solo muestra el aviso
- * de abajo (lo maneja public/JS/compra.js). Cuando se integre el pago real,
- * el <button data-plan-buy> pasa a ser el submit de un formulario.
+ * El cobro es real, con Mercado Pago (Checkout Pro): el botón es el submit de
+ * un formulario POST a /panel/compra/pagar, que genera el link de pago y manda
+ * al usuario a la página de Mercado Pago. Al terminar, Mercado Pago lo devuelve
+ * acá con el resultado como mensaje flash. compra.js solo maneja el estado
+ * "cargando" del botón.
  */
+$producto = $producto ?? ['nombre' => 'EdenAir Core', 'precio' => '', 'moneda' => 'ARS', 'configurado' => false];
+$compras  = $compras ?? [];
+
 $beneficios = [
     'Dispositivo EdenAir (módulo ESP32) listo para usar',
     'Acceso completo al dashboard en tiempo real',
@@ -46,7 +52,7 @@ $this->setData([
                             <?= icono('carrito', 13) ?>
                             Comprá tu dispositivo
                         </span>
-                        <h2 id="compraTitulo" class="ea-plan-title ea-serif">EdenAir Core</h2>
+                        <h2 id="compraTitulo" class="ea-plan-title ea-serif"><?= esc($producto['nombre']) ?></h2>
                         <p class="ea-plan-desc">
                             El dispositivo inteligente más el acceso completo al dashboard
                             para monitorear y mejorar la calidad del ambiente.
@@ -55,20 +61,29 @@ $this->setData([
 
                     <div class="ea-plan-price">
                         <span class="ea-plan-currency">$</span>
-                        <span class="ea-plan-amount">450.000</span>
-                        <span class="ea-plan-period">ARS · pago único<br>compra del producto</span>
+                        <span class="ea-plan-amount"><?= esc($producto['precio']) ?></span>
+                        <span class="ea-plan-period"><?= esc($producto['moneda']) ?> · pago único<br>compra del producto</span>
                     </div>
 
-                    <div class="ea-plan-cta">
-                        <button type="button" class="ea-plan-btn" data-plan-buy>
+                    <!-- El monto NO viaja en el formulario: lo pone el servidor
+                         (CompraService::PRECIO). Solo va el token CSRF. -->
+                    <form class="ea-plan-cta" action="<?= site_url('panel/compra/pagar') ?>" method="post" data-plan-form>
+                        <?= csrf_field() ?>
+                        <button type="submit" class="ea-plan-btn" data-plan-buy
+                                <?= $producto['configurado'] ? '' : 'disabled' ?>>
+                            <span class="ea-plan-btn-spinner" aria-hidden="true"></span>
                             <?= icono('carrito', 16) ?>
-                            <span>Comprar EdenAir</span>
+                            <span data-plan-buy-text>Comprar EdenAir</span>
                         </button>
                         <p class="ea-plan-note">
                             <?= icono('candado', 12) ?>
-                            Compra segura · Mercado Pago
+                            <?php if ($producto['configurado']): ?>
+                                Pago seguro · Mercado Pago
+                            <?php else: ?>
+                                Pagos no disponibles · falta configurar Mercado Pago
+                            <?php endif; ?>
                         </p>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Derecha: qué incluye (la lista sale del array $beneficios) -->
@@ -88,10 +103,29 @@ $this->setData([
         </article>
     </section>
 
-    <!-- ===== Aviso de compra simulada (lo muestra compra.js al apretar) ===== -->
-    <div class="ea-plan-toast" data-plan-toast role="status" aria-live="polite">
-        <span class="ea-plan-toast-ico" aria-hidden="true"><?= icono('check', 14) ?></span>
-        <span>¡Compra simulada exitosa! Pronto activaremos el cobro real.</span>
-    </div>
+    <?php if ($compras !== []): ?>
+        <!-- ===== Tus compras (estado según Mercado Pago) ===== -->
+        <section class="ea-plan-history" aria-labelledby="comprasTitulo">
+            <h3 id="comprasTitulo" class="ea-plan-history-title">Tus compras</h3>
+            <ul class="ea-plan-history-list">
+                <?php foreach ($compras as $c): ?>
+                    <li class="ea-plan-history-item">
+                        <div class="ea-plan-history-main">
+                            <span class="ea-plan-history-name"><?= esc($c['producto']) ?></span>
+                            <span class="ea-plan-history-meta ea-mono">
+                                <?= esc(date('d/m/Y H:i', strtotime($c['fecha']))) ?> · <?= esc($c['referencia']) ?>
+                            </span>
+                        </div>
+                        <div class="ea-plan-history-side">
+                            <span class="ea-plan-history-amount">$ <?= esc($c['monto']) ?> <small><?= esc($c['moneda']) ?></small></span>
+                            <span class="ea-badge tone-<?= esc($c['estado_tono']) ?>">
+                                <span class="ea-dot"></span><?= esc($c['estado_label']) ?>
+                            </span>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+    <?php endif; ?>
 
 <?= $this->endSection() ?>
