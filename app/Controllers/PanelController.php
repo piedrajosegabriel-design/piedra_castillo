@@ -143,9 +143,10 @@ class PanelController extends BaseController
     }
 
     // =========================================================================
-    // PERFIL DE USUARIO Y COMPRA
+    // PERFIL DE USUARIO
     // Ver/editar datos personales y contraseña. Ambos cambios exigen
     // confirmar la contraseña actual (validarAutenticacionPerfil).
+    // (La compra con Mercado Pago vive en CompraController.)
     // =========================================================================
 
     /** Muestra el perfil; si el usuario ya no existe en la base, cierra sesión. */
@@ -211,12 +212,6 @@ class PanelController extends BaseController
         $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
 
         return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
-    }
-
-    /** Página estática de compra (checkout con MercadoPago, sin cobro en línea). */
-    public function compra(): string
-    {
-        return view('compra_mercadopago');
     }
 
     // =========================================================================
@@ -481,7 +476,6 @@ class PanelController extends BaseController
    - perfil()                → muestra los datos del usuario
    - actualizarPerfil()      → guarda nombre/apellido/email/usuario (pide contraseña)
    - actualizarPassword()    → cambia la contraseña (pide la actual)
-   - compra()                → página de compra (checkout sin cobro en línea)
    - cambiarModo()           → cambia automatic/manual vía CommandService
    - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual)
 

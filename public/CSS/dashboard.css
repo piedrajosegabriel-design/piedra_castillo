@@ -931,8 +931,16 @@ body.dashboard-body { overflow-x: hidden; }
     color: var(--ea-earth);
 }
 
+/* Ni éxito ni error: ej. "tu pago quedó pendiente". */
+.ea-flash-info {
+    background: color-mix(in oklab, var(--ea-breath) 18%, transparent);
+    border-color: color-mix(in oklab, var(--ea-breath) 45%, transparent);
+    color: #2f6a6f;
+}
+
 :root[data-theme="dark"] .ea-flash-success { color: var(--eden-300); }
 :root[data-theme="dark"] .ea-flash-danger  { color: #f2b79e; }
+:root[data-theme="dark"] .ea-flash-info    { color: var(--ea-breath); }
 
 .ea-flash ul { margin: 4px 0 0; padding-left: 20px; list-style: disc; }
 
@@ -2234,6 +2242,13 @@ body.dashboard-body { overflow-x: hidden; }
     justify-content: center;
 }
 
+/* Los mensajes flash (resultado del pago) con el mismo ancho que la tarjeta. */
+.ea-plan-content > .ea-flash {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 14px;
+}
+
 .ea-plan-stage {
     width: 100%;
     display: flex;
@@ -2522,8 +2537,38 @@ body.dashboard-body { overflow-x: hidden; }
     outline-offset: 2px;
 }
 
-.ea-plan-btn.is-done {
+/* Mientras se genera el link de Mercado Pago (lo pone compra.js). */
+.ea-plan-btn.is-loading {
+    cursor: progress;
     background: linear-gradient(180deg, var(--eden-700), var(--eden-800));
+}
+
+.ea-plan-btn.is-loading svg { display: none; }
+
+.ea-plan-btn-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    animation: ea-plan-giro 0.7s linear infinite;
+}
+
+.ea-plan-btn.is-loading .ea-plan-btn-spinner { display: inline-block; }
+
+@keyframes ea-plan-giro { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-plan-btn-spinner { animation-duration: 2s; }
+}
+
+/* Sin credenciales de Mercado Pago en el .env el botón queda apagado. */
+.ea-plan-btn:disabled:not(.is-loading) {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
+    transform: none;
 }
 
 .ea-plan-note {
@@ -2540,46 +2585,72 @@ body.dashboard-body { overflow-x: hidden; }
 
 .ea-plan-note svg { opacity: 0.7; }
 
-.ea-plan-toast {
-    position: fixed;
-    left: 50%;
-    bottom: 28px;
-    transform: translate(-50%, 16px);
-    z-index: 90;
-    display: inline-flex;
-    align-items: center;
+/* ---- Tus compras (historial debajo de la tarjeta) ---- */
+.ea-plan-history {
+    width: 100%;
+    max-width: 900px;
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    padding: 11px 16px;
-    border-radius: 999px;
-    background: var(--eden-800);
-    color: #f4faf0;
-    font-size: 0.8125rem;
+}
+
+.ea-plan-history-title {
+    margin: 0;
+    font-family: var(--ea-font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ea-mute);
     font-weight: 600;
-    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-:root[data-theme="dark"] .ea-plan-toast {
-    background: color-mix(in oklab, var(--eden-500) 18%, #0e1a14);
-    border: 1px solid rgba(201, 216, 112, 0.25);
+.ea-plan-history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--ead-line);
+    border-radius: var(--ead-radius);
+    background: var(--ead-card-bg);
+    overflow: hidden;
 }
 
-.ea-plan-toast.is-visible {
-    opacity: 1;
-    transform: translate(-50%, 0);
+.ea-plan-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
 }
 
-.ea-plan-toast-ico {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--ea-citrus);
-    color: var(--eden-800);
-    display: grid;
-    place-items: center;
+.ea-plan-history-item + .ea-plan-history-item { border-top: 1px dashed var(--ead-line); }
+
+.ea-plan-history-main,
+.ea-plan-history-side {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
 }
+
+.ea-plan-history-main { flex-direction: column; align-items: flex-start; gap: 3px; }
+
+.ea-plan-history-name { font-weight: 700; color: var(--ea-ink); font-size: 0.9063rem; }
+
+.ea-plan-history-meta {
+    color: var(--ea-mute);
+    font-size: 0.7188rem;
+    overflow-wrap: anywhere;
+}
+
+.ea-plan-history-amount {
+    font-weight: 700;
+    color: var(--ea-ink);
+    font-size: 0.9063rem;
+    white-space: nowrap;
+}
+
+.ea-plan-history-amount small { color: var(--ea-mute); font-weight: 600; font-size: 0.6875rem; }
 
 .confirm-lock {
     overflow: hidden;
@@ -2682,6 +2753,8 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-leds-list { grid-template-columns: 1fr; gap: 10px; }
 
     .ea-plan-card { padding: 28px; max-width: 520px; }
+    .ea-plan-history,
+    .ea-plan-content > .ea-flash { max-width: 520px; }
     .ea-plan-grid { grid-template-columns: 1fr; gap: 22px; }
     .ea-plan-right { padding-left: 0; padding-top: 22px; border-left: 0; border-top: 1px dashed var(--ead-line); }
 }
@@ -2754,8 +2827,8 @@ body.dashboard-body { overflow-x: hidden; }
     .ea-plan-card { padding: 24px 20px; border-radius: var(--ead-radius); }
     .ea-plan-period { align-self: baseline; flex-basis: 100%; margin-bottom: 0; }
     .ea-plan-price { flex-wrap: wrap; }
-    .ea-plan-toast { left: 16px; right: 16px; bottom: 18px; transform: translateY(16px); justify-content: center; }
-    .ea-plan-toast.is-visible { transform: translateY(0); }
+    .ea-plan-history-item { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+    .ea-plan-history-side { width: 100%; justify-content: space-between; }
     .ea-mode-switch { justify-content: stretch; width: 100%; }
     .ea-mode-opt { flex: 1; justify-content: center; }
     .ea-header-titles p { display: none; }

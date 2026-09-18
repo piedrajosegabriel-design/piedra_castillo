@@ -270,6 +270,39 @@ CREATE TABLE IF NOT EXISTS device_pairings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- =========================================================
+-- TABLA: purchases  (compras cobradas con Mercado Pago)
+-- Una fila por cada vez que el usuario aprieta "Comprar" y se
+-- genera su link de pago. El cobro pasa en la pagina de Mercado
+-- Pago; aca queda que se genero, para quien y como termino.
+-- reference viaja a Mercado Pago como external_reference: es lo
+-- que une un pago con esta fila.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS purchases (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT UNSIGNED NOT NULL,
+    reference VARCHAR(40) NOT NULL,
+    -- Producto y monto congelados al momento de la compra.
+    product VARCHAR(120) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'ARS',
+    status VARCHAR(20) NOT NULL DEFAULT 'iniciada',  -- iniciada | pendiente | aprobada | rechazada | cancelada | devuelta
+    mp_preference_id VARCHAR(80) NULL,
+    mp_payment_id VARCHAR(40) NULL,
+    -- Estado crudo de Mercado Pago (approved, in_process, rejected...).
+    mp_status VARCHAR(30) NULL,
+    mp_status_detail VARCHAR(60) NULL,
+    payment_method VARCHAR(40) NULL,
+    paid_at DATETIME NULL,
+    created_at DATETIME NULL,
+    updated_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_purchase_reference (reference),
+    KEY idx_purchase_user (user_id),
+    KEY idx_purchase_payment (mp_payment_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- =========================================================
 -- TABLA: migrations  (control interno de CodeIgniter)
 -- CodeIgniter anota aca que migraciones ya corrio en esta base.
 -- Se crea y se completa a mano para que una base armada con este
@@ -300,6 +333,8 @@ SELECT * FROM (
     UNION ALL SELECT '2026-05-31-000003', 'App\\Database\\Migrations\\AllowMultipleSpacesPerUser',   'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-08-02-000001', 'App\\Database\\Migrations\\ReplaceClaimCodesWithPairing', 'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-08-05-000001', 'App\\Database\\Migrations\\AddSessionCodeToPairings',     'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-09-08-000001', 'App\\Database\\Migrations\\ActualizarLogicaControl',      'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-09-15-000001', 'App\\Database\\Migrations\\CreatePurchasesTable',         'default', 'App', UNIX_TIMESTAMP(), 1
 ) AS nuevas
 WHERE NOT EXISTS (SELECT 1 FROM migrations);
 
@@ -368,6 +403,9 @@ DEALLOCATE PREPARE stmt;
 --
 -- device_pairings:
 --   ventanas de vinculacion abiertas al apretar "Conectar" (QR + espera).
+--
+-- purchases:
+--   compras de EdenAir cobradas con Mercado Pago y su estado.
 --
 -- migrations:
 --   control interno de CodeIgniter (que migraciones ya se aplicaron).

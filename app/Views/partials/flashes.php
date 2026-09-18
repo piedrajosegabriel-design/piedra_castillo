@@ -8,14 +8,20 @@
  *
  * Quién los escribe: los controladores, con
  *   return redirect()->to('...')->with('success', 'Listo');
+ *   return redirect()->to('...')->with('info', 'Tu pago quedó pendiente');
  *   return redirect()->back()->with('errors', $validacion->getErrors());
  */
 $exito   = session()->getFlashdata('success');
+$aviso   = session()->getFlashdata('info');
 $error   = session()->getFlashdata('error');
 $errores = session()->getFlashdata('errors') ?? [];
 ?>
 <?php if ($exito): ?>
     <div class="ea-flash ea-flash-success"><?= esc($exito) ?></div>
+<?php endif; ?>
+
+<?php if ($aviso): ?>
+    <div class="ea-flash ea-flash-info"><?= esc($aviso) ?></div>
 <?php endif; ?>
 
 <?php if ($error): ?>

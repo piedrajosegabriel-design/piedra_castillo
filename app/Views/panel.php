@@ -108,7 +108,7 @@ $this->setData([
                 </span>
             </div>
 
-            <p class="ea-hero-eyebrow">Hola, <?= esc((string) ($view['userName'] ?? 'bienvenido')) ?></p>
+            <p class="ea-hero-eyebrow">Hola, <?= esc(($view['userName'])) ?></p>
             <h2 class="ea-serif ea-hero-title" data-vivo="estadoTitulo"><?= esc((string) ($view['estadoTitulo'] ?? '')) ?></h2>
             <p class="ea-hero-diag" data-vivo="estadoDetalle"><?= esc((string) ($view['estadoDetalle'] ?? '')) ?></p>
 
@@ -119,7 +119,7 @@ $this->setData([
                 </span>
                 <span class="ea-hero-foot-item">
                     <span class="ea-hero-foot-label">Dispositivo</span>
-                    <span class="ea-hero-foot-val"><?= esc((string) ($view['deviceName'] ?? '—')) ?></span>
+                    <span class="ea-hero-foot-val"><?= esc(($view['deviceName'] ?? '—')) ?></span>
                 </span>
                 <span class="ea-hero-foot-item ea-hero-foot-conn">
                     <span class="ea-conn-dot"></span>

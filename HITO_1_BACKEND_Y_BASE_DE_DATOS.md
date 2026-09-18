@@ -253,7 +253,9 @@ colección de rutas que CI4 inyecta.
 | GET | `panel` | `PanelController::index` (bienvenida o panel monitor). |
 | GET/POST | `panel/perfil` | `perfil` / `actualizarPerfil`. |
 | POST | `panel/password` | `actualizarPassword`. |
-| GET | `panel/compra` | `compra`. |
+| GET | `panel/compra` | `CompraController::index` (producto + "Tus compras"). |
+| POST | `panel/compra/pagar` | `pagar` (crea la preferencia en Mercado Pago y redirige a su checkout). |
+| GET | `panel/compra/resultado` | `resultado` (vuelta de Mercado Pago: confirma el pago contra la API). |
 | GET | `panel/dispositivos` | `DispositivosController::index` (Mis dispositivos). |
 | GET | `panel/dispositivos/conectar` | `conectar` (pantalla del QR). |
 | POST | `panel/dispositivos/conectar` | `iniciar` (abre la ventana y devuelve el QR, JSON). |
@@ -282,6 +284,12 @@ Sin filtro `auth` (autentican con token de dispositivo), exentas de CSRF.
 | POST | `api/devices/(:segment)/measurements` | `DeviceApiController::storeMeasurement/$1`. Acepta además `actuadores` y `motivo`: lo que el equipo hizo antes de avisar. |
 | GET | `api/devices/(:segment)/commands/pending` | `pendingCommands/$1`. |
 | POST | `api/devices/(:segment)/commands/(:num)/executed` | `markCommandExecuted/$1/$2`. |
+
+### 6.5 Webhook de Mercado Pago
+Sin sesión y exento de CSRF (`api/*`). Quien llama es Mercado Pago.
+| Método | Ruta | Acción |
+|---|---|---|
+| POST | `api/pagos/mercadopago` | `Api\MercadoPagoController::notificacion`. El aviso solo trae el id del pago: se consulta a la API antes de tocar `purchases`. Verifica `x-signature` si hay `mercadopago.webhookSecret`. |
 
 ---
 
@@ -351,7 +359,6 @@ private function iniciarSesion(array $usuario): void {
 | `perfil()` | Muestra el perfil; si el usuario no existe, cierra sesión. | `UserModel::obtenerPorId` |
 | `actualizarPerfil()` | Valida, confirma identidad con la contraseña actual, verifica unicidad y guarda. | `UserModel::existeCorreoOUsuarioExcepto`, `UserModel::actualizarPerfil` |
 | `actualizarPassword()` | Valida y confirma identidad antes de cambiar el hash. | `UserModel::actualizarHashContrasena` |
-| `compra()` | Muestra `compra_mercadopago`. | vista |
 | `guardarMedicion()` | Guarda una medición manual y dispara automatización. | `redireccionarSiFaltaDispositivo`, `obtenerContexto`, `MeasurementService::registrar` |
 | `cambiarModo()` | Cambia automático/manual (lista blanca). Solo lo anota: el equipo lo lee en su próxima consulta de configuración. | `CommandService::changeOperatingMode` |
 | `cambiarActuador()` | Enciende/apaga un actuador, solo en modo manual. | `CommandService::queueAndExecuteManualCommand` |

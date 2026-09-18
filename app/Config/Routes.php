@@ -10,6 +10,7 @@ use CodeIgniter\Router\RouteCollection;
  *   2) Grupo 'guest'       → solo SIN sesión (login, registro, recuperación)
  *   3) Grupo 'panel'       → solo CON sesión (filtro 'auth'): el área privada
  *   4) Grupo 'api/devices' → el ESP32 (autentica por token, no por sesión)
+ *      + api/pagos/mercadopago → avisos de Mercado Pago (sin sesión)
  */
 
 // =============================================================================
@@ -63,7 +64,12 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->get('perfil', 'PanelController::perfil');
     $routes->post('perfil', 'PanelController::actualizarPerfil');
     $routes->post('password', 'PanelController::actualizarPassword');
-    $routes->get('compra', 'PanelController::compra');
+
+    // Compra con Mercado Pago: pantalla, generar el link de pago (POST con
+    // CSRF) y la vuelta desde Mercado Pago, donde se confirma el pago real.
+    $routes->get('compra', 'CompraController::index');
+    $routes->post('compra/pagar', 'CompraController::pagar');
+    $routes->get('compra/resultado', 'CompraController::resultado');
 
     // Mis dispositivos + conexión de un equipo nuevo por QR.
     // No hay formulario de alta: el equipo se da de alta solo contra la API
@@ -104,6 +110,11 @@ $routes->group('api/devices', static function ($routes) {
     $routes->get('(:segment)/commands/pending', 'Api\DeviceApiController::pendingCommands/$1');
     $routes->post('(:segment)/commands/(:num)/executed', 'Api\DeviceApiController::markCommandExecuted/$1/$2');
 });
+
+// Avisos (webhooks) de Mercado Pago cuando un pago cambia de estado. Sin
+// sesión y exento de CSRF (api/*): quien llama es Mercado Pago. No se le cree
+// nada: el controller consulta el pago a la API antes de tocar la compra.
+$routes->post('api/pagos/mercadopago', 'Api\MercadoPagoController::notificacion');
 
 // Endpoint público de lectura ambiental usado por el core 3D del hero.
 // Devuelve la ÚLTIMA medición real cargada por cualquier dispositivo Eden Air:

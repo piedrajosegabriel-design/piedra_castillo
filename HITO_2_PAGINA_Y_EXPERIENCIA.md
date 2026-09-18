@@ -135,7 +135,7 @@ buscan con Ctrl+F.
 | `acceso.js` | login, registro, recuperar, restablecer | Mostrar/ocultar contraseña y bloqueo del botón al enviar. |
 | `registro.js` | registro | Medidor de seguridad y coincidencia de contraseñas. |
 | `conectar.js` / `vinculacion.js` | conexión por QR | Sondeo del estado de la vinculación. |
-| `compra.js` | compra | Aviso de compra simulada. |
+| `compra.js` | compra | Estado "Conectando con Mercado Pago…" del botón (evita doble clic). |
 | `navbar.js` | páginas públicas | Mega menú de Portfolio. |
 
 **Convención `*-gsap.js`:** la interacción "funcional" (menús, formularios)
@@ -445,13 +445,26 @@ de recuperación; quitarlo rompería el flujo `recuperar`/`restablecer`.
 
 ### 3.8 Compra — `app/Views/compra_mercadopago.php`
 
-**Ruta:** `GET panel/compra` → `PanelController::compra()`.
+**Rutas:** `GET panel/compra` → `CompraController::index()` ·
+`POST panel/compra/pagar` → `pagar()` · `GET panel/compra/resultado` → `resultado()` ·
+`POST api/pagos/mercadopago` → `Api\MercadoPagoController::notificacion()` (webhook).
 
-- Marco visual del dashboard (sidebar + header).
-- Producto: "Eden Air Core", **pago único**.
-- El checkout todavía **no procesa el cobro**: la pasarela de MercadoPago no
-  está integrada y la vista lo aclara (*"Compra simulada · sin integración de
-  pago todavía"*). El precio que se muestra es de referencia.
+- Marco visual del dashboard (sidebar + header). Solo con sesión iniciada.
+- Producto: "EdenAir Core", **pago único** de $450.000 ARS. El precio vive en
+  `CompraService::PRECIO`: la vista lo muestra desde ahí y el formulario no
+  manda ningún monto.
+- **Cobro real con Mercado Pago (Checkout Pro).** El botón es el submit de un
+  formulario POST con CSRF. El servidor crea una *preferencia* en la API de
+  Mercado Pago, guarda la compra en `purchases` como `iniciada` y redirige a la
+  página de pago de Mercado Pago. La web nunca ve datos de tarjeta.
+- Al volver, `resultado()` **no confía en la URL**: consulta el pago a la API
+  y actualiza la compra (`aprobada`, `pendiente`, `rechazada`...). El resultado
+  se muestra como mensaje flash y queda en el historial "Tus compras".
+- Con el sitio publicado, Mercado Pago además avisa por webhook cada cambio
+  (ej. un pago en efectivo que se acredita días después). En localhost no llega,
+  por eso la pantalla re-consulta las compras abiertas de los últimos días.
+- Credenciales en el `.env` (`mercadopago.accessToken`), nunca en el código.
+  Cliente de la API escrito a mano en `app/Libraries/MercadoPago.php` (sin Composer).
 
 ---
 
@@ -615,8 +628,9 @@ Otros pendientes de hardware:
 - Ya existen `GET api/devices/{uid}/commands/pending` y `POST .../commands/{id}/executed`; falta conectarlos.
 - Alternar `status` `active`/`offline` según `last_seen_at` (el alta del
   `device_uid` ya la resuelve `POST api/devices/pair`).
-- Pago real (MercadoPago / Stripe): falta integrar la pasarela; hoy el checkout
-  no cobra.
+- Pago con Mercado Pago: integrado (§3.8). Para producción falta cargar las
+  credenciales de la cuenta real y, en el panel de Mercado Pago, la clave de
+  Webhooks (`mercadopago.webhookSecret`).
 
 ---
 
@@ -674,7 +688,7 @@ Casos que conviene mirar:
 - Cambiar contraseña (actual + nueva + confirmación).
 - No se muestran roles.
 
-**Compra** (`/panel/compra`) — vista de checkout; el cobro todavía no se procesa.
+**Compra** (`/panel/compra`) — cobro con Mercado Pago (Checkout Pro) e historial "Tus compras".
 
 ---
 
@@ -712,7 +726,7 @@ Casos que conviene mirar:
 | 28 | Endpoint real de telemetría conectado al ESP32 | ⏳ Hardware |
 | 29 | Lecturas reales de sensores y comandos a actuadores | ⏳ Hardware |
 | 30 | Firmware: punto de acceso `EdenAir-Setup` + portal cautivo + `POST api/devices/pair` | ⏳ Hardware (§8) |
-| 31 | Pago real (MercadoPago / Stripe) | ⏳ Pendiente de integrar la pasarela |
+| 31 | Pago real con Mercado Pago | ✅ Checkout Pro + confirmación contra la API + webhook (§3.8) |
 
 ---
 
