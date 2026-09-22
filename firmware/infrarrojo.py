@@ -78,6 +78,15 @@ class Infrarrojo:
         self._ultima_trama = 0
         self._ultima_confirmacion = None
 
+        # Que orden llevaba la ultima trama. El limite de tiempo es contra la
+        # insistencia, no contra los cambios: repetir "encender" a un aire que
+        # ya lo recibio no aporta nada, pero pasar de encender a apagar es
+        # informacion nueva y tiene que viajar. Sin esto el rele (que tiene su
+        # propio reloj, mas corto) podia mover el aire sin que saliera trama.
+        # Arranca en None para que la primera orden despues de prender la
+        # placa salga siempre.
+        self._ultima_orden = None
+
         if pin_emisor is not None:
             self._pwm = PWM(Pin(pin_emisor))
             self._pwm.freq(PORTADORA_HZ)
@@ -98,16 +107,25 @@ class Infrarrojo:
     def hay_receptor(self):
         return self._receptor is not None
 
-    def puede_emitir(self, ahora=None):
+    def puede_emitir(self, orden=None, ahora=None):
         """
-        True si ya paso el tiempo minimo desde la ultima trama.
+        True si la orden es distinta de la ultima emitida, o si es la misma y
+        ya paso el tiempo minimo desde la ultima trama.
 
         El limite existe para no bombardear el ambiente con tramas: un aire
         acondicionado real tampoco necesita que le repitan la orden cada ocho
-        segundos, y un receptor saturado empieza a perder tramas.
+        segundos, y un receptor saturado empieza a perder tramas. Pero solo
+        frena repeticiones: un cambio de orden nunca espera, porque si
+        esperara el rele conmutaria sin que el aire se entere.
+
+        Sin orden solo se mira el reloj, que es la respuesta prudente cuando
+        no se sabe que se va a mandar.
         """
         if not self.hay_emisor():
             return False
+
+        if orden is not None and orden != self._ultima_orden:
+            return True
 
         ahora = time.time() if ahora is None else ahora
 
@@ -124,20 +142,22 @@ class Infrarrojo:
           True  -> el receptor confirmo que la trama salio al aire
           False -> se emitio pero nadie la confirmo dentro del plazo
           None  -> no habia nada que confirmar (sin emisor o sin receptor
-                   armados), o todavia no se cumplio el minimo entre tramas y
-                   se mantiene la ultima confirmacion conocida
+                   armados), o es la misma orden que la anterior, todavia no
+                   se cumplio el minimo entre tramas y se mantiene la ultima
+                   confirmacion conocida
         """
         ahora = time.time() if ahora is None else ahora
 
         if not self.hay_emisor():
             return None
 
-        if not self.puede_emitir(ahora):
+        if not self.puede_emitir(orden, ahora):
             return self._ultima_confirmacion
 
         self._pulsos = 0
         self._emitir(orden)
         self._ultima_trama = ahora
+        self._ultima_orden = orden
 
         if not self.hay_receptor():
             self._ultima_confirmacion = None
@@ -234,7 +254,8 @@ GLOSARIO DE ESTE ARCHIVO
 - Infrarrojo(pin_emisor, pin_receptor) -> la cadena; cualquiera de los dos
   puede ser None ("no lo arme todavia")
 - hay_emisor() / hay_receptor()  -> que partes estan realmente conectadas
-- puede_emitir(ahora)            -> si ya paso el minimo entre tramas
+- puede_emitir(orden, ahora)     -> orden nueva: siempre; repetida: si ya
+                                   paso el minimo entre tramas
 - enviar_orden(orden, ahora)     -> emite y confirma: True / False / None
 - _emitir(orden)                 -> arma la trama NEC completa
 - _byte(valor)                   -> ocho bits, del menos al mas significativo
