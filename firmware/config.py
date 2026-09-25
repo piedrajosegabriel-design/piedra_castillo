@@ -82,23 +82,23 @@ PIN_MQ135 = 34
 #      llego; en una instalacion real, del otro lado hay un aire acondicionado
 #      que si enfria. La logica del firmware es exactamente la misma.
 # IN2: atomizador ultrasonico (humidificador; opcionalmente con esencia).
-PIN_RELE_AIRE = None        # 26 cuando este conectado
-PIN_RELE_ATOMIZADOR = None  # 27 cuando este conectado
+PIN_RELE_AIRE = 26        
+PIN_RELE_ATOMIZADOR = 27  
 
 # --- Cadena infrarroja -----------------------------------------------------
 # El emisor (KY-005) manda la trama de 38 kHz por transistor; el receptor
 # (VS1838B, alimentado con 3V3) la confirma. Recien con la orden emitida se
 # energiza el rele del aire: es la misma cadena que usa un control remoto.
-PIN_IR_EMISOR = None    # 25 cuando este conectado
-PIN_IR_RECEPTOR = None  # 33 cuando este conectado
+PIN_IR_EMISOR = 25    
+PIN_IR_RECEPTOR = 33  
 
 # --- LEDs de estado (con resistencia de 220-330 ohm) -----------------------
 # Verde: todo normal, monitoreo pasivo.
 # Rojo:  alerta (CO2 alto o calidad de aire mala).
 # Azul:  orden de aire acondicionado activa.
-PIN_LED_VERDE = None  # 14 cuando este conectado
-PIN_LED_ROJO = None   # 16 cuando este conectado
-PIN_LED_AZUL = None   # 17 cuando este conectado
+PIN_LED_VERDE = 14  
+PIN_LED_ROJO = 16   
+PIN_LED_AZUL = 17   
 
 # Si tus reles se activan con 0 en vez de 1 (los mas comunes son asi, y los de
 # esta maqueta tambien), dejalo en True. Si el actuador funciona al reves de lo
