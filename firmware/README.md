@@ -381,7 +381,7 @@ Ninguna de estas es un parche para la maqueta: todas existen en el producto real
 | Proteccion | Cuanto | Para que |
 |---|---|---|
 | Tiempo minimo del rele | 30 s | Que no traquetee cuando el valor queda justo en el umbral |
-| Limite de tramas IR | 1 cada 60 s | No saturar el receptor ni el ambiente |
+| Limite de tramas IR | La misma orden, 1 cada 60 s. Una orden distinta sale siempre | No saturar el receptor ni el ambiente, sin que el rele se mueva nunca sin trama |
 | Espera de confirmacion IR | hasta 1 s | Saber si la orden llego, sin colgar el ciclo |
 | Warm-up del MQ-135 | 300 s | Su lectura no sirve hasta que el calefactor este listo |
 | Enmascarado del MQ-135 | mientras atomiza + 90 s | La niebla ensucia la lectura |
@@ -398,6 +398,13 @@ infrarrojo, igual que con un control remoto.
 ```
 ESP32 --(trama NEC 38 kHz)--> receptor VS1838B --> rele --> cooler + LED azul
 ```
+
+El limite de 60 s entre tramas **solo frena repeticiones**. Repetir
+"encender" a un aire que ya lo recibio no aporta nada, asi que eso espera.
+Pero pasar de encender a apagar (o al reves) es informacion nueva y sale en el
+momento, sin mirar el reloj. Si no fuera asi, el rele (que puede conmutar cada
+30 s) moveria el aire sin que haya salido trama, y el aire dejaria de estar
+comandado por infrarrojo.
 
 Despues de emitir, el firmware espera **hasta 1 segundo** la confirmacion del
 receptor:
