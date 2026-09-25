@@ -54,15 +54,14 @@ $this->setData([
                         </span>
                         <h2 id="compraTitulo" class="ea-plan-title ea-serif"><?= esc($producto['nombre']) ?></h2>
                         <p class="ea-plan-desc">
-                            El dispositivo inteligente más el acceso completo al dashboard
-                            para monitorear y mejorar la calidad del ambiente.
+                            <?= esc($producto['descripcion'])?>
                         </p>
                     </header>
 
                     <div class="ea-plan-price">
                         <span class="ea-plan-currency">$</span>
                         <span class="ea-plan-amount"><?= esc($producto['precio']) ?></span>
-                        <span class="ea-plan-period"><?= esc($producto['moneda']) ?> · pago único<br>compra del producto</span>
+                        <span class="ea-plan-period"><?= esc($producto['moneda']) ?> · pago único</span>
                     </div>
 
                     <!-- El monto NO viaja en el formulario: lo pone el servidor

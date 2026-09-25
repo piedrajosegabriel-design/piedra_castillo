@@ -45,7 +45,7 @@ class CompraService
     // el monto, así que no se puede comprar más barato tocando el HTML.
     // -------------------------------------------------------------------------
     public const PRODUCTO_ID = 'eden-air-core';
-    public const PRODUCTO    = 'EdenAir Core';
+    public const PRODUCTO    = 'EdenAir';
     public const DESCRIPCION = 'Dispositivo EdenAir (módulo ESP32) + acceso completo al dashboard';
     public const PRECIO      = 450000;
     public const MONEDA      = 'ARS';
