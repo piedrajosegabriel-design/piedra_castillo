@@ -117,8 +117,8 @@ RELES_INVERTIDOS = True
 # ADC (0-4095) despues del divisor. Se ajustan una vez por placa:
 #   - dejar el equipo en aire limpio 10 min -> ese valor va en CRUDO_LIMPIO
 #   - acercar un marcador o alcohol         -> ese valor va en CRUDO_SUCIO
-MQ135_CRUDO_LIMPIO = 700    # aire limpio  -> indice 100
-MQ135_CRUDO_SUCIO = 2800    # aire viciado -> indice 0
+MQ135_CRUDO_LIMPIO = 105    # aire limpio  -> indice 100
+MQ135_CRUDO_SUCIO = 340    # aire viciado -> indice 0
 
 # Cuantas lecturas del ADC se promedian por medicion, para filtrar ruido.
 MQ135_MUESTRAS = 16
