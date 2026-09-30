@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="es-AR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Guía del firmware EdenAir</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Identidad EdenAir. Modo claro forzado: no hay variante oscura a proposito.
+   Las fuentes IBM Plex se usan si estan instaladas en la compu; como el
+   archivo no carga nada de internet, si no estan cae a las del sistema.
+   --------------------------------------------------------------------------- */
+:root {
+  --fondo: #EDE9E0;
+  --panel: #FAF8F4;
+  --tinta: #23262A;
+  --tinta-2: rgba(35, 38, 42, 0.72);
+  --tinta-3: rgba(35, 38, 42, 0.52);
+  --linea: rgba(35, 38, 42, 0.14);
+  --linea-suave: rgba(35, 38, 42, 0.08);
+  --verde: #14706E;
+  --verde-osc: #0C5654;
+  --terracota: #B2402E;
+  --azul: #2E5A7D;
+  --ambar: #8A5115;
+  --verde-tinte: rgba(20, 112, 110, 0.09);
+  --terracota-tinte: rgba(178, 64, 46, 0.08);
+  --azul-tinte: rgba(46, 90, 125, 0.08);
+  --ambar-tinte: rgba(138, 81, 21, 0.09);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --indice: 272px;
+  --radio: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; color-scheme: light; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+
+code {
+  background: var(--linea-suave);
+  padding: 0.08em 0.36em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+a { color: var(--verde); }
+
+/* ---------------------------------------------------------------------------
+   Indice lateral fijo
+   --------------------------------------------------------------------------- */
+.indice {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--indice);
+  overflow-y: auto;
+  padding: 28px 18px 40px 24px;
+  border-right: 1px solid var(--linea);
+  background: var(--fondo);
+}
+
+.marca {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--verde);
+  margin: 0 0 4px;
+}
+
+.indice h2 {
+  font-size: 17px;
+  line-height: 1.3;
+  margin: 0 0 22px;
+  font-weight: 600;
+}
+
+.indice h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  margin: 20px 0 6px;
+}
+
+.indice ul { list-style: none; margin: 0; padding: 0; }
+
+.indice a {
+  display: block;
+  padding: 4px 10px;
+  margin-left: -10px;
+  border-radius: 6px;
+  color: var(--tinta-2);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+  border-left: 2px solid transparent;
+}
+
+.indice a:hover { color: var(--tinta); background: var(--linea-suave); }
+
+.indice a.activo {
+  color: var(--verde-osc);
+  background: var(--verde-tinte);
+  border-left-color: var(--verde);
+}
+
+.indice a .mono { font-size: 13px; }
+
+/* ---------------------------------------------------------------------------
+   Columna principal
+   --------------------------------------------------------------------------- */
+.contenido {
+  margin-left: var(--indice);
+  padding: 0 40px 80px;
+  max-width: calc(var(--indice) + 1060px);
+}
+
+.cabecera {
+  padding: 26px 0 0;
+}
+
+.cabecera h1 {
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.cabecera p {
+  margin: 0 0 14px;
+  color: var(--tinta-2);
+  max-width: 72ch;
+}
+
+/* Solo el buscador queda fijo arriba: la cabecera entera tapaba media
+   pantalla en el celular. */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--fondo);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--linea);
+  margin-bottom: 22px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.buscador {
+  flex: 1 1 320px;
+  position: relative;
+}
+
+.buscador input {
+  width: 100%;
+  font: inherit;
+  font-size: 15px;
+  color: var(--tinta);
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 10px 14px;
+}
+
+.buscador input:focus {
+  outline: 2px solid var(--verde);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.contador {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--tinta-3);
+  min-width: 18ch;
+}
+
+.boton {
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--verde-osc);
+  background: transparent;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.boton:hover { background: var(--verde-tinte); border-color: var(--verde); }
+
+/* ---------------------------------------------------------------------------
+   Secciones plegables
+   --------------------------------------------------------------------------- */
+details.seccion {
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  margin: 0 0 12px;
+  scroll-margin-top: 84px;
+}
+
+details.seccion > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 15px 20px 15px 44px;
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+details.seccion > summary::-webkit-details-marker { display: none; }
+
+details.seccion > summary::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 22px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--tinta-3);
+  border-bottom: 2px solid var(--tinta-3);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+details.seccion[open] > summary::before { transform: rotate(45deg); top: 20px; }
+
+details.seccion > summary:hover { background: var(--linea-suave); border-radius: var(--radio); }
+
+details.seccion > summary:focus-visible { outline: 2px solid var(--verde); outline-offset: -2px; border-radius: var(--radio); }
+
+.titulo {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.titulo.mono { font-size: 16px; }
+
+.resumen {
+  color: var(--tinta-2);
+  font-size: 14.5px;
+}
+
+.cuerpo {
+  padding: 4px 22px 22px 44px;
+  border-top: 1px solid var(--linea-suave);
+}
+
+.cuerpo > p, .cuerpo li { max-width: 78ch; }
+
+.cuerpo h4 {
+  font-size: 13px;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  margin: 20px 0 6px;
+}
+
+.separador {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-3);
+  margin: 30px 0 10px 2px;
+}
+
+/* Ficha de cada modulo: que hace / que entra / que sale */
+.ficha {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 18px;
+  margin: 14px 0 4px;
+}
+
+.ficha dt {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--verde-osc);
+  padding-top: 3px;
+}
+
+.ficha dd { margin: 0; }
+
+/* Notas de color */
+.nota {
+  border-left: 3px solid var(--azul);
+  background: var(--azul-tinte);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  margin: 14px 0;
+  max-width: 82ch;
+}
+
+.nota.alerta { border-color: var(--terracota); background: var(--terracota-tinte); }
+.nota.abierta { border-color: var(--ambar); background: var(--ambar-tinte); }
+.nota.bien { border-color: var(--verde); background: var(--verde-tinte); }
+
+.nota strong:first-child { display: block; margin-bottom: 2px; }
+
+.etiqueta {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+
+.e-actua { color: var(--verde); }
+.e-avisa { color: var(--terracota); }
+.e-info  { color: var(--azul); }
+.e-duda  { color: var(--ambar); }
+.e-muerta { color: var(--terracota); }
+
+/* ---------------------------------------------------------------------------
+   Tablas
+   --------------------------------------------------------------------------- */
+.tabla-caja {
+  overflow-x: auto;
+  margin: 14px 0 6px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--linea-suave);
+}
+
+thead th {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+  background: var(--fondo);
+  border-bottom: 1px solid var(--linea);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+tbody tr:last-child td { border-bottom: 0; }
+
+tbody tr:hover td { background: rgba(20, 112, 110, 0.035); }
+
+td.valor {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--verde-osc);
+  white-space: nowrap;
+}
+
+td.lugar { font-family: var(--mono); font-size: 12.5px; color: var(--tinta-2); }
+td.lugar code { background: transparent; padding: 0; white-space: normal; }
+
+td.sube { color: var(--azul); }
+td.baja { color: var(--terracota); }
+
+td.gpio {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--verde-osc);
+}
+
+tr.oculta { display: none; }
+
+tr.sin-resultados td {
+  color: var(--tinta-3);
+  font-style: italic;
+  text-align: center;
+  padding: 14px;
+}
+
+.leyenda {
+  font-size: 13px;
+  color: var(--tinta-3);
+  margin: 4px 0 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Recorrido de un ciclo
+   --------------------------------------------------------------------------- */
+ol.pasos {
+  list-style: none;
+  counter-reset: paso;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+ol.pasos > li {
+  counter-increment: paso;
+  position: relative;
+  padding: 0 0 18px 50px;
+  max-width: 84ch;
+}
+
+ol.pasos > li::before {
+  content: counter(paso);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--verde);
+  color: var(--panel);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+
+ol.pasos > li::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 36px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--linea);
+}
+
+ol.pasos > li:last-child::after { display: none; }
+
+ol.pasos > li > strong { display: block; font-size: 15.5px; padding-top: 4px; }
+
+ol.pasos ul { margin: 6px 0 0; padding-left: 18px; }
+ol.pasos ul li { margin: 3px 0; }
+
+.fase {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin-left: 6px;
+}
+
+.preguntas { padding-left: 20px; }
+.preguntas li { margin: 0 0 12px; max-width: 82ch; }
+.preguntas li::marker { color: var(--ambar); font-family: var(--mono); font-weight: 600; }
+
+/* ---------------------------------------------------------------------------
+   Celular y pantallas angostas: el indice pasa arriba
+   --------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .indice {
+    position: static;
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--linea);
+    padding: 20px 16px;
+  }
+  .indice nav { columns: 2; column-gap: 20px; }
+  .indice h3 { break-after: avoid; }
+  .indice ul { break-inside: avoid; }
+  .contenido { margin-left: 0; padding: 0 16px 60px; }
+  .cabecera { padding-top: 16px; }
+  .barra { gap: 8px; }
+  .contador { min-width: 0; order: 3; }
+  .cabecera h1 { font-size: 22px; }
+  details.seccion > summary { padding-left: 38px; }
+  details.seccion > summary::before { left: 16px; }
+  .cuerpo { padding: 4px 14px 18px 16px; }
+  .ficha { grid-template-columns: 1fr; gap: 2px 0; }
+  .ficha dd { margin-bottom: 10px; }
+  details.seccion { scroll-margin-top: 130px; }
+}
+
+@media (max-width: 520px) {
+  .indice nav { columns: 1; }
+}
+
+@media print {
+  .indice, .barra { display: none; }
+  .contenido { margin: 0; }
+  .barra { position: static; }
+  details.seccion { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<aside class="indice">
+  <p class="marca">EdenAir</p>
+  <h2>Guía del firmware</h2>
+  <nav aria-label="Índice">
+    <h3>Módulos</h3>
+    <ul>
+      <li><a href="#mod-main"><span class="mono">main.py</span></a></li>
+      <li><a href="#mod-sensor"><span class="mono">sensor.py</span></a></li>
+      <li><a href="#mod-aire"><span class="mono">aire.py</span></a></li>
+      <li><a href="#mod-reglas"><span class="mono">reglas.py</span></a></li>
+      <li><a href="#mod-actuadores"><span class="mono">actuadores.py</span></a></li>
+      <li><a href="#mod-infrarrojo"><span class="mono">infrarrojo.py</span></a></li>
+      <li><a href="#mod-red"><span class="mono">red.py</span></a></li>
+      <li><a href="#mod-servidor"><span class="mono">servidor.py</span></a></li>
+      <li><a href="#mod-config"><span class="mono">config.py</span></a></li>
+    </ul>
+    <h3>Tablas</h3>
+    <ul>
+      <li><a href="#tiempos">Tiempos</a></li>
+      <li><a href="#umbrales">Umbrales</a></li>
+      <li><a href="#quien-gana">Quién gana: servidor o firmware</a></li>
+      <li><a href="#pines">Pines</a></li>
+    </ul>
+    <h3>Recorridos</h3>
+    <ul>
+      <li><a href="#ciclo">Qué pasa en un ciclo</a></li>
+      <li><a href="#si-falla">Si falla X</a></li>
+    </ul>
+    <h3>Pendientes</h3>
+    <ul>
+      <li><a href="#preguntas">Preguntas abiertas</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="contenido">
+
+  <header class="cabecera">
+    <h1>Qué gobierna cada cosa en el firmware</h1>
+    <p>Cada dato de esta guía sale del código real de la carpeta <code>firmware/</code> y de los servicios PHP que le mandan la configuración. Lo que no está escrito en el código no se inventó: está al final, como pregunta abierta. Las líneas citadas corresponden al estado del código cuando se generó la guía; si editás un archivo, pueden correrse.</p>
+  </header>
+
+  <div class="barra">
+      <label class="buscador">
+        <input id="buscar" type="search" placeholder="Buscar en todas las tablas: rele, 30, config.py, CO2, pulso..." autocomplete="off" spellcheck="false" aria-label="Buscar en las tablas">
+      </label>
+      <span class="contador" id="contador" aria-live="polite"></span>
+      <button class="boton" type="button" id="abrir-todo">Abrir todo</button>
+      <button class="boton" type="button" id="cerrar-todo">Cerrar todo</button>
+  </div>
+
+  <!-- =====================================================================
+       MODULOS
+       ===================================================================== -->
+  <p class="separador">Módulos</p>
+
+  <details class="seccion" id="mod-main">
+    <summary><span class="titulo mono">main.py</span><span class="resumen">El director de orquesta: no mide ni decide, le pide cada cosa al módulo que corresponde.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Arma los objetos, se conecta al WiFi, consigue credenciales y configuración, y después da vueltas para siempre: medir, decidir, accionar, reportar, atender órdenes manuales y refrescar la configuración cada tanto.</dd>
+        <dt>Qué le entra</dt>
+        <dd>Nada por parámetro: MicroPython lo corre solo al arrancar la placa. Lee <code>config.py</code>, <code>credenciales.json</code> (con <code>leer_credenciales()</code>) y la configuración que baja del servidor (con <code>bajar_config()</code>).</dd>
+        <dt>Qué devuelve</dt>
+        <dd>Nada. <code>main()</code> no termina nunca, salvo que falte el SCD41: ahí imprime el error y hace <code>return</code> (<code>main.py:335</code>). Su “salida” son los efectos: relés que se mueven y mediciones que llegan al servidor.</dd>
+      </dl>
+      <h4>Funciones que conviene conocer</h4>
+      <ul>
+        <li><code>medir()</code>: junta SCD41 + MQ-135 en un solo diccionario y decide de dónde sale el índice de aire (“sensor” o “calculado”).</li>
+        <li><code>sincronizar_tiempos()</code>: pisa los tiempos de <code>config.py</code> con los que mandó el servidor en el bloque <code>tiempos</code>.</li>
+        <li><code>atender_comandos()</code>: aplica las órdenes manuales del panel y las confirma solo si se cumplieron de verdad.</li>
+        <li><code>avisos_de_los_sensores()</code>: suma los avisos de diagnóstico (MQ-135 calentando o en pausa, IR sin confirmar).</li>
+      </ul>
+      <div class="nota"><strong>Lo que define su carácter</strong>El paso “decidir y accionar” no depende del servidor. Si se corta internet, el equipo sigue regulando; lo único que deja de hacer es reportar. Y el <code>except Exception</code> general (<code>main.py:436</code>) hace que ningún error tumbe el ciclo: imprime, espera <code>REINTENTO_RED</code> y sigue.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-sensor">
+    <summary><span class="titulo mono">sensor.py</span><span class="resumen">Habla I2C con el SCD41 y devuelve CO2, temperatura y humedad.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Pone al SCD41 en modo de medición periódica, espera a que tenga un dato nuevo, lo lee, verifica el checksum y lo convierte a unidades. Si el sensor deja de entregar datos, lo rearranca una vez antes de rendirse.</dd>
+        <dt>Qué le entra</dt>
+        <dd>Los pines <code>PIN_I2C_SDA</code> y <code>PIN_I2C_SCL</code> de <code>config.py</code>. La lectura se pide con <code>SCD41().leer(espera_maxima=10)</code>.</dd>
+        <dt>Qué devuelve</dt>
+        <dd>Una tupla <code>(co2_ppm, temperatura_c, humedad_pct)</code>: el CO2 entero, temperatura y humedad con un decimal. Si algo sale mal, lanza <code>ErrorSensor</code>.</dd>
+      </dl>
+      <h4>Funciones que conviene conocer</h4>
+      <ul>
+        <li><code>hay_dato()</code>: le pregunta al sensor si tiene una medición nueva.</li>
+        <li><code>rearrancar()</code>: PARAR, esperar 1000 ms, ARRANCAR. Existe por una falla real del 11/08/2026.</li>
+        <li><code>_descartar_si_hace_falta()</code>: tira la primera lectura después de arrancar, que puede venir con valores imposibles.</li>
+        <li><code>_crc8()</code>: el checksum que pide la hoja de datos de Sensirion. Si no coincide, el dato se descarta.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-aire">
+    <summary><span class="titulo mono">aire.py</span><span class="resumen">Lee el MQ-135 y lo convierte a un índice de 0 a 100, diciendo si hay que creerle.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Promedia varias lecturas del ADC, las pasa a índice con una regla de tres entre los dos extremos calibrados, e ignora al sensor mientras calienta o mientras el atomizador echa niebla.</dd>
+        <dt>Qué le entra</dt>
+        <dd>El pin <code>PIN_MQ135</code> al crearlo. En cada lectura: <code>ahora</code> y <code>atomizando</code> (si el atomizador está encendido, que main.py saca de <code>salidas.encendido("aromatizer")</code>).</dd>
+        <dt>Qué devuelve</dt>
+        <dd><code>leer()</code> devuelve <code>(indice, estado)</code>. El índice va de 0 a 100 (más alto es mejor) o es <code>None</code>. El estado es uno de cuatro: <code>"ausente"</code>, <code>"warmup"</code>, <code>"pausa"</code> u <code>"ok"</code>.</dd>
+      </dl>
+      <div class="nota"><strong>Por qué importa el estado</strong>Solo una lectura en estado <code>"ok"</code> puede levantar o bajar la alerta de calidad de aire (<code>aire_confiable</code> en <code>main.py:225</code>). Congelada (pausa) o calculada (warm-up o ausente), no.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-reglas">
+    <summary><span class="titulo mono">reglas.py</span><span class="resumen">El cerebro: decide qué prender. Es puro, no toca pines ni red ni reloj.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Compara la medición con los umbrales que mandó el servidor y decide el estado de cada actuador, con histéresis (dos umbrales por regla) y con el ciclo encendido/apagado del atomizador.</dd>
+        <dt>Qué le entra</dt>
+        <dd><code>Decisor().decidir(medicion, config, ahora)</code>. <code>medicion</code> trae <code>temperature</code>, <code>humidity</code>, <code>co2_ppm</code>, <code>air_quality_index</code> y <code>aire_confiable</code>. <code>config</code> es lo que bajó del servidor (<code>umbrales</code>, <code>apagado</code>, <code>critico</code>, <code>tiempos</code>). <code>ahora</code> es un número de segundos, solo para los ciclos.</dd>
+        <dt>Qué devuelve</dt>
+        <dd>Tres cosas: <code>(actuadores, avisos, motivo)</code>. <code>actuadores</code> es un diccionario con <code>"on"</code> u <code>"off"</code> para <code>fan</code>, <code>aromatizer</code>, <code>alert_led</code>, <code>green_led</code> y <code>blue_led</code>. <code>avisos</code> es una lista de códigos (la web pone el texto). <code>motivo</code> es el texto que queda en el historial.</dd>
+      </dl>
+      <h4>La regla de oro</h4>
+      <p>Mide cuatro variables pero actúa sobre dos. <span class="etiqueta e-actua">actúa</span> temperatura (aire acondicionado) y humedad baja (atomizador). <span class="etiqueta e-avisa">avisa</span> CO2 y calidad de aire: no hay extractor, así que encender algo no cambiaría el número.</p>
+      <h4>También tiene</h4>
+      <ul>
+        <li><code>calcular_indice_aire()</code>: índice de respaldo cuando no hay MQ-135 o está calentando. Es la misma fórmula que el servidor.</li>
+        <li><code>etiqueta_aire()</code>: 85 o más “Excelente”, 70 o más “Buena”, 55 o más “Aceptable”, menos “Mala”.</li>
+        <li><code>_redondear()</code>: redondea como PHP y no como Python, para que equipo y servidor den el mismo número.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-actuadores">
+    <summary><span class="titulo mono">actuadores.py</span><span class="resumen">El único que toca pines de salida: convierte decisiones en voltaje.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Lleva cada relé y LED al estado pedido. Solo mueve lo que cambia, respeta el tiempo mínimo de los relés, manda la trama infrarroja antes de mover el relé del aire y maneja el atomizador con toques de botón.</dd>
+        <dt>Qué le entra</dt>
+        <dd>En el constructor, la cadena infrarroja (<code>Actuadores(cadena)</code>). En cada uso, <code>aplicar(deseado, ahora)</code>, donde <code>deseado</code> es el diccionario que devolvió reglas.py o una orden manual.</dd>
+        <dt>Qué devuelve</dt>
+        <dd><code>aplicar()</code> devuelve la lista de los que movió. Además deja dos datos: <code>demorados</code> (relés que querían cambiar pero no cumplieron su tiempo mínimo) e <code>ir_confirmado</code> (<code>True</code>, <code>False</code> o <code>None</code>). <code>como_dict()</code> da el estado para el reporte.</dd>
+      </dl>
+      <h4>El atomizador va por pulsos</h4>
+      <p>El relé IN2 está soldado sobre el botón del módulo, así que cerrarlo y abrirlo es un toque. El ciclo medido del módulo es: continuo, intermitente, continuo y apagado. Por eso 1 pulso enciende y 3 apagan. <code>_pulsar()</code> manda los toques; <code>_escribir()</code> elige pulsos o nivel según el actuador.</p>
+      <div class="nota alerta"><strong>El módulo no le dice a la placa en qué modo está</strong>Los toques cuentan desde donde el firmware cree que está el módulo. <code>apagar_todo()</code> saltea el atomizador si no está registrado como encendido, porque 3 toques a un módulo apagado lo encienden. Si se desincronizan (por ejemplo, al reiniciar solo la ESP32 con el módulo andando), no se corrige solo: ver “Si falla X”.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-infrarrojo">
+    <summary><span class="titulo mono">infrarrojo.py</span><span class="resumen">Emite la orden del aire acondicionado por infrarrojo, como un control remoto.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Arma una trama NEC (dirección <code>0x0E</code>, orden <code>0xA1</code> encender o <code>0xA2</code> apagar) modulada a 38 kHz y cuenta si el receptor VS1838B vio pulsos. No decide cuándo emitir ni mueve el relé.</dd>
+        <dt>Qué le entra</dt>
+        <dd>Los pines del emisor y del receptor al crearlo. En cada uso, <code>enviar_orden(orden, ahora)</code>.</dd>
+        <dt>Qué devuelve</dt>
+        <dd><code>True</code> si el receptor la confirmó, <code>False</code> si se emitió y nadie la vio, o <code>None</code> si no hay emisor o receptor armado. Si es la misma orden que la anterior y no pasaron 60 s, no emite y devuelve la última confirmación conocida.</dd>
+      </dl>
+      <div class="nota"><strong>La confirmación no es condición</strong>Si no confirma, el aire se enciende igual y se informa <code>ir_sin_confirmar</code>. Una orden distinta de la anterior sale siempre, sin mirar el reloj: así el relé nunca se mueve sin que haya salido trama.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-red">
+    <summary><span class="titulo mono">red.py</span><span class="resumen">WiFi y portal: si no sabe a qué red conectarse, arma la suya y le pregunta al celular.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Se conecta con la red guardada en <code>wifi.json</code>. Si no hay o falla, levanta el punto de acceso <code>EdenAir-Setup</code> con un DNS y una página propios, recibe red y clave del celular, las prueba y, si fallan, reabre el portal mostrando el motivo.</dd>
+        <dt>Qué le entra</dt>
+        <dd><code>wifi.json</code>, <code>sesion.json</code> y lo que el usuario manda desde el formulario del portal (red, clave y, opcionalmente, la dirección del servidor).</dd>
+        <dt>Qué devuelve</dt>
+        <dd><code>asegurar_conexion()</code> devuelve la IP y no vuelve hasta estar conectado. <code>hay_internet()</code> devuelve si está conectado; <code>mac()</code>, la MAC en formato <code>AA:BB:CC:DD:EE:FF</code>; <code>leer_sesion()</code>, el código pendiente o <code>None</code>.</dd>
+      </dl>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-servidor">
+    <summary><span class="titulo mono">servidor.py</span><span class="resumen">El único que habla HTTP con la API de EdenAir: cinco llamadas, una función por cada una.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Traduce el contrato HTTP a funciones de Python y cierra siempre la respuesta, para que el equipo no se quede sin memoria después de horas.</dd>
+        <dt>Qué le entra</dt>
+        <dd><code>device_uid</code> y <code>api_token</code> (salvo para <code>vincular</code>) y los datos de cada llamada. La dirección sale de <code>config.servidor()</code> en cada pedido.</dd>
+        <dt>Qué devuelve</dt>
+        <dd><code>vincular()</code> devuelve <code>(device_uid, api_token)</code>; <code>config()</code>, el diccionario de configuración; <code>enviar_medicion()</code>, la respuesta; <code>comandos_pendientes()</code>, una lista; <code>confirmar_comando()</code>, <code>True</code> o <code>False</code>. Los errores salen como <code>ErrorServidor</code>, y <code>SinVentana</code> cuando nadie apretó “Conectar” (HTTP 202).</dd>
+      </dl>
+    </div>
+  </details>
+
+  <details class="seccion" id="mod-config">
+    <summary><span class="titulo mono">config.py</span><span class="resumen">Lo único que se toca por placa: servidor, pines, calibración y tiempos de arranque.</span></summary>
+    <div class="cuerpo">
+      <dl class="ficha">
+        <dt>Qué hace</dt>
+        <dd>Guarda lo que cambia de un equipo a otro. No tiene los umbrales de temperatura, humedad, CO2 ni aire: esos los manda siempre el servidor.</dd>
+        <dt>Qué le entra</dt>
+        <dd>Nada, son constantes. La única función, <code>servidor()</code>, lee <code>servidor.json</code> si existe.</dd>
+        <dt>Qué devuelve</dt>
+        <dd>Las constantes, y <code>servidor()</code> devuelve la URL a usar: la del portal (<code>servidor.json</code>) o, si no hay, <code>SERVIDOR_DEFECTO</code>.</dd>
+      </dl>
+      <div class="nota abierta"><strong>Dos constantes que no se leen</strong><code>ATOMIZADOR_CICLO_ON</code> y <code>ATOMIZADOR_CICLO_OFF</code> (<code>config.py:199-200</code>) no las usa ningún archivo. reglas.py tiene su propio respaldo de 60 y 120 escrito en el código (<code>reglas.py:330</code> y <code>332</code>). Cambiarlas en config.py no hace nada.</div>
+    </div>
+  </details>
+
+  <!-- =====================================================================
+       TABLAS
+       ===================================================================== -->
+  <p class="separador">Tablas</p>
+
+  <details class="seccion" id="tiempos">
+    <summary><span class="titulo">Tabla de tiempos</span><span class="resumen">Cuánto tarda cada cosa, cada cuánto se repite y qué pasa si lo movés.</span></summary>
+    <div class="cuerpo">
+      <p>“Servidor:” en la columna del lugar quiere decir que ese valor también viaja en la configuración y, una vez bajada, <strong>gana el del servidor</strong>. Los del servidor están en <code>app/Services/DeviceConfigService.php</code>.</p>
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>Qué es</th><th>Valor actual</th><th>Archivo y constante</th><th>Si lo subo</th><th>Si lo bajo</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SCD41: cada cuánto genera un dato nuevo</td>
+              <td class="valor">≈ 5 s</td>
+              <td class="lugar"><code>sensor.py</code> (docstring). Medido: 4,5 s después de arrancar (comentario de <code>rearrancar()</code>). No es una constante.</td>
+              <td class="sube">No se puede: lo fija el sensor en modo periódico.</td>
+              <td class="baja">No se puede. Por eso medir más seguido que cada 5 s no da datos nuevos.</td>
+            </tr>
+            <tr>
+              <td>SCD41: espera máxima por un dato</td>
+              <td class="valor">10 s</td>
+              <td class="lugar"><code>sensor.py:152</code> · <code>leer(espera_maxima=10)</code></td>
+              <td class="sube">Tolera un sensor lento, pero si se cuelga el ciclo queda frenado más tiempo.</td>
+              <td class="baja">Por debajo de unos 5 s declara muerto a un sensor sano y lo rearranca sin motivo.</td>
+            </tr>
+            <tr>
+              <td>SCD41: consulta “¿hay dato?”</td>
+              <td class="valor">cada 500 ms</td>
+              <td class="lugar"><code>sensor.py:95</code> · <code>_esperar_dato()</code></td>
+              <td class="sube">Se entera más tarde de que el dato está listo.</td>
+              <td class="baja">Más tráfico I2C sin ganancia real.</td>
+            </tr>
+            <tr>
+              <td>SCD41: pausa entre PARAR y ARRANCAR</td>
+              <td class="valor">1000 ms</td>
+              <td class="lugar"><code>sensor.py:128</code> · <code>rearrancar()</code></td>
+              <td class="sube">Solo hace más lento el rearranque.</td>
+              <td class="baja">Con 500 ms falla siempre: el sensor se come el ARRANCAR y queda sin medir (medido el 11/08/2026).</td>
+            </tr>
+            <tr>
+              <td>SCD41: pausa después de ARRANCAR</td>
+              <td class="valor">100 ms</td>
+              <td class="lugar"><code>sensor.py:131</code> · <code>rearrancar()</code></td>
+              <td class="sube">Rearranque apenas más lento.</td>
+              <td class="baja">El código no explica por qué 100 ms: no hay dato medido para bajarlo.</td>
+            </tr>
+            <tr>
+              <td>SCD41: peor caso de <code>leer()</code> hasta rendirse</td>
+              <td class="valor">≈ 41 s</td>
+              <td class="lugar">Calculado: 10 s (descarte) + 10 s + 1,1 s (rearranque) + 10 s (descarte) + 10 s. Después <code>main.py:376</code> espera 5 s más.</td>
+              <td class="sube">Depende de <code>espera_maxima</code>: cada segundo que sumes ahí cuenta hasta 4 veces.</td>
+              <td class="baja">Idem: bajar <code>espera_maxima</code> lo acorta, con el riesgo de la fila de arriba.</td>
+            </tr>
+            <tr>
+              <td>Bus I2C del SCD41</td>
+              <td class="valor">50 kHz</td>
+              <td class="lugar"><code>sensor.py:37</code> · <code>freq=50000</code></td>
+              <td class="sube">Lecturas más rápidas; con cables largos, en general, aparecen más errores de checksum.</td>
+              <td class="baja">Más lento y más tolerante al cableado. El código no dice por qué se eligió 50 kHz.</td>
+            </tr>
+            <tr>
+              <td>MQ-135: lectura promediada</td>
+              <td class="valor">16 muestras, 2 ms entre cada una</td>
+              <td class="lugar"><code>config.py:146</code> · <code>MQ135_MUESTRAS</code>; la pausa en <code>aire.py:129</code></td>
+              <td class="sube">Índice más estable; la lectura tarda más (como mínimo 2 ms por muestra).</td>
+              <td class="baja">El índice tiembla en el panel por el ruido del ADC.</td>
+            </tr>
+            <tr>
+              <td>MQ-135: warm-up del calefactor</td>
+              <td class="valor">300 s</td>
+              <td class="lugar"><code>config.py:190</code> · <code>MQ135_WARMUP</code>. Servidor: <code>tiempos.mq135_warmup</code></td>
+              <td class="sube">Más tiempo usando el índice “calculado”.</td>
+              <td class="baja">Alertas de aire falsas con el calefactor todavía frío.</td>
+            </tr>
+            <tr>
+              <td>MQ-135: enmascarado por niebla</td>
+              <td class="valor">mientras atomiza + 90 s</td>
+              <td class="lugar"><code>config.py:195</code> · <code>MQ135_ENMASCARADO</code>. Servidor: <code>tiempos.mq135_enmascarado</code></td>
+              <td class="sube">El índice queda congelado más tiempo después de humidificar.</td>
+              <td class="baja">La niebla que queda en el aire dispara “aire malo” falso.</td>
+            </tr>
+            <tr>
+              <td>Medir y decidir</td>
+              <td class="valor">30 s</td>
+              <td class="lugar"><code>config.py:158</code> · <code>INTERVALO_MEDICION</code>. Servidor: <code>intervalos.medicion</code></td>
+              <td class="sube">Menos filas en la base; el equipo tarda más en reaccionar.</td>
+              <td class="baja">Más filas y peticiones: con 8 s eran 10.800 por día. Menos de 5 s no sirve (el SCD41 no da un dato nuevo antes).</td>
+            </tr>
+            <tr>
+              <td>Reportar al servidor</td>
+              <td class="valor">en cada medición (30 s)</td>
+              <td class="lugar"><code>main.py:409</code> · no tiene constante propia: va atado a <code>INTERVALO_MEDICION</code></td>
+              <td class="sube">Solo se cambia cambiando el intervalo de medición.</td>
+              <td class="baja">Idem.</td>
+            </tr>
+            <tr>
+              <td>Consultar órdenes manuales</td>
+              <td class="valor">15 s</td>
+              <td class="lugar"><code>config.py:161</code> · <code>INTERVALO_COMANDOS</code>. Servidor: <code>intervalos.comandos</code></td>
+              <td class="sube">Los botones del panel tardan más en hacer efecto.</td>
+              <td class="baja">Más peticiones al servidor.</td>
+            </tr>
+            <tr>
+              <td>Refrescar la configuración (umbrales, modo, tiempos)</td>
+              <td class="valor">3600 s (1 h)</td>
+              <td class="lugar"><code>config.py:162</code> · <code>INTERVALO_CONFIG</code>. Servidor: <code>intervalos.config</code></td>
+              <td class="sube">Un cambio hecho en la web tarda más en llegar a la placa.</td>
+              <td class="baja">Más peticiones; los cambios llegan antes.</td>
+            </tr>
+            <tr>
+              <td>Vuelta del ciclo principal</td>
+              <td class="valor">1 s</td>
+              <td class="lugar"><code>config.py:166</code> · <code>INTERVALO_CICLO</code></td>
+              <td class="sube">Cada tarea arranca con más retraso respecto de su horario.</td>
+              <td class="baja">La placa da vueltas sin nada que hacer; no gana nada.</td>
+            </tr>
+            <tr>
+              <td>Reintento si el servidor no contesta</td>
+              <td class="valor">15 s</td>
+              <td class="lugar"><code>config.py:169</code> · <code>REINTENTO_RED</code>. También se usa tras un error inesperado (<code>main.py:440</code>)</td>
+              <td class="sube">Insiste menos; tarda más en recuperarse cuando el servidor vuelve.</td>
+              <td class="baja">Insiste más seguido contra un servidor caído.</td>
+            </tr>
+            <tr>
+              <td>Pausa después de una lectura fallida del SCD41</td>
+              <td class="valor">5 s</td>
+              <td class="lugar"><code>main.py:376</code> · número escrito en el código</td>
+              <td class="sube">El ciclo queda más quieto después de un fallo.</td>
+              <td class="baja">Poco efecto: la próxima medición igual espera su intervalo.</td>
+            </tr>
+            <tr>
+              <td>Reintento de vinculación (nadie apretó “Conectar”)</td>
+              <td class="valor">15 s</td>
+              <td class="lugar"><code>main.py:138</code> · número escrito en el código</td>
+              <td class="sube">Tarda más en darse de alta después del clic.</td>
+              <td class="baja">Más peticiones de alta mientras nadie está mirando.</td>
+            </tr>
+            <tr>
+              <td>Aviso de reconexión al celular</td>
+              <td class="valor">2 intentos, 3 s entre ellos</td>
+              <td class="lugar"><code>main.py:77-85</code> · <code>avisar_reconexion()</code></td>
+              <td class="sube">Más chances de que el celular se entere; el arranque tarda más.</td>
+              <td class="baja">El celular puede no enterarse de que el equipo volvió.</td>
+            </tr>
+            <tr>
+              <td>Tiempo mínimo de un relé en un estado</td>
+              <td class="valor">30 s</td>
+              <td class="lugar"><code>config.py:180</code> · <code>RELE_MINIMO_ESTADO</code>. Servidor: <code>tiempos.rele_minimo</code></td>
+              <td class="sube">Menos conmutaciones; el relé responde más tarde y las órdenes manuales quedan pendientes más tiempo.</td>
+              <td class="baja">Traqueteo cuando el valor queda justo sobre el umbral; se gasta el contacto.</td>
+            </tr>
+            <tr>
+              <td>Atomizador: duración de cada pulso (relé cerrado)</td>
+              <td class="valor">0,5 s</td>
+              <td class="lugar"><code>config.py:125</code> · <code>ATOMIZADOR_PULSO</code></td>
+              <td class="sube">Se parece más a sostener el botón, que es lo que hay que evitar. Cuánto es “demasiado” no está medido.</td>
+              <td class="baja">El módulo puede no registrar el toque. El mínimo tampoco está medido.</td>
+            </tr>
+            <tr>
+              <td>Atomizador: pausa después de cada pulso (relé abierto)</td>
+              <td class="valor">0,5 s</td>
+              <td class="lugar"><code>config.py:126</code> · <code>ATOMIZADOR_PAUSA</code></td>
+              <td class="sube">Encender y apagar tardan más, y el ciclo queda frenado mientras tanto.</td>
+              <td class="baja">Dos toques muy seguidos podrían contarse como uno (no medido).</td>
+            </tr>
+            <tr>
+              <td>Atomizador: cuánto frena el ciclo al encender / apagar</td>
+              <td class="valor">1 s / 3 s</td>
+              <td class="lugar">Calculado: pulsos × (pulso + pausa). <code>ATOMIZADOR_PULSOS_ENCENDER</code> = 1 y <code>ATOMIZADOR_PULSOS_APAGAR</code> = 3 (<code>config.py:127-128</code>)</td>
+              <td class="sube">No se sube a gusto: la cantidad de pulsos sale del ciclo del módulo.</td>
+              <td class="baja">Idem: 1 y 3 son los del módulo medido.</td>
+            </tr>
+            <tr>
+              <td>Atomizador: rato encendido dentro del ciclo</td>
+              <td class="valor">60 s</td>
+              <td class="lugar">Servidor: <code>tiempos.atomizador_on</code>. Respaldo escrito en <code>reglas.py:330</code>. <code>config.py:199</code> · <code>ATOMIZADOR_CICLO_ON</code> <span class="etiqueta e-muerta">no se usa</span></td>
+              <td class="sube">Más niebla por ciclo: riesgo de encharcar la mesa.</td>
+              <td class="baja">La humedad sube más lento; más toques por hora.</td>
+            </tr>
+            <tr>
+              <td>Atomizador: rato apagado dentro del ciclo</td>
+              <td class="valor">120 s</td>
+              <td class="lugar">Servidor: <code>tiempos.atomizador_off</code>. Respaldo escrito en <code>reglas.py:332</code>. <code>config.py:200</code> · <code>ATOMIZADOR_CICLO_OFF</code> <span class="etiqueta e-muerta">no se usa</span></td>
+              <td class="sube">La humedad sube más lento.</td>
+              <td class="baja">Encharca y vacía el depósito; la niebla no llega a mezclarse. Cada ciclo son 4 toques de relé.</td>
+            </tr>
+            <tr>
+              <td>IR: mínimo entre tramas con la misma orden</td>
+              <td class="valor">60 s</td>
+              <td class="lugar"><code>config.py:183</code> · <code>IR_MINIMO_ENTRE_TRAMAS</code>. Servidor: <code>tiempos.ir_minimo</code></td>
+              <td class="sube">Repite menos la misma orden. Una orden distinta sale igual, siempre.</td>
+              <td class="baja">Más tramas repetidas; un receptor saturado empieza a perder tramas.</td>
+            </tr>
+            <tr>
+              <td>IR: espera de confirmación del receptor</td>
+              <td class="valor">1000 ms</td>
+              <td class="lugar"><code>config.py:187</code> · <code>IR_ESPERA_CONFIRMACION_MS</code>. Servidor: <code>tiempos.ir_espera_ms</code></td>
+              <td class="sube">Si nadie confirma, el ciclo queda frenado más tiempo.</td>
+              <td class="baja">Aparecen “sin confirmación IR” falsos cuando el receptor está lejos.</td>
+            </tr>
+            <tr>
+              <td>IR: duración de la trama</td>
+              <td class="valor">≈ 70 ms</td>
+              <td class="lugar"><code>infrarrojo.py:50-55</code> · tiempos del protocolo NEC en µs (9000, 4500, 560, 560, 1690)</td>
+              <td class="sube">No se toca: es el protocolo NEC y el receptor dejaría de entenderla.</td>
+              <td class="baja">Idem.</td>
+            </tr>
+            <tr>
+              <td>IR: consulta de pulsos recibidos</td>
+              <td class="valor">cada 5 ms</td>
+              <td class="lugar"><code>infrarrojo.py:184</code> · <code>_esperar_confirmacion()</code></td>
+              <td class="sube">Confirma apenas más tarde.</td>
+              <td class="baja">Sin ganancia real: casi siempre confirma durante la propia emisión.</td>
+            </tr>
+            <tr>
+              <td>WiFi: espera para conectarse</td>
+              <td class="valor">20 s</td>
+              <td class="lugar"><code>red.py:167</code> · <code>conectar(espera=20)</code></td>
+              <td class="sube">Más paciencia con routers lentos; el portal tarda más en reabrir si la red no existe.</td>
+              <td class="baja">“Tardó demasiado” con routers que andan bien.</td>
+            </tr>
+            <tr>
+              <td>Portal: timeout de cada celular</td>
+              <td class="valor">5 s</td>
+              <td class="lugar"><code>red.py:658</code> · <code>cliente.settimeout(5)</code></td>
+              <td class="sube">Un celular colgado bloquea el portal más tiempo.</td>
+              <td class="baja">Un celular lento puede quedar cortado a mitad del formulario.</td>
+            </tr>
+            <tr>
+              <td>Portal: vuelta de espera de pedidos</td>
+              <td class="valor">1000 ms</td>
+              <td class="lugar"><code>red.py:639</code> · <code>vigilante.poll(1000)</code></td>
+              <td class="sube">Sin efecto visible: igual despierta apenas llega un pedido.</td>
+              <td class="baja">Idem.</td>
+            </tr>
+            <tr>
+              <td>HTTP a la API de EdenAir</td>
+              <td class="valor">sin timeout explícito</td>
+              <td class="lugar"><code>servidor.py</code> · <code>_pedir()</code> llama a <code>urequests</code> sin <code>timeout=</code></td>
+              <td class="sube" colspan="2">No hay valor en el código para mover. Ver “Preguntas abiertas”.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota"><strong>Cuánto tarda en reaccionar, de punta a punta</strong>Desde que la temperatura o la humedad cruzan un umbral hasta que el relé se mueve pasan hasta 30 s (la próxima medición). Si ese relé se movió hace poco, se suman hasta 30 s de tiempo mínimo. Si es el atomizador, 1 s más de pulsos. El servidor se entera en el mismo ciclo, justo después de mover el relé.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="umbrales">
+    <summary><span class="titulo">Tabla de umbrales</span><span class="resumen">Dónde se activa y dónde se suelta cada regla, con su histéresis.</span></summary>
+    <div class="cuerpo">
+      <p>Ninguno de estos números está en el firmware (salvo el respaldo del CO2 crítico). Llegan del servidor en tres bloques: <code>umbrales</code> (donde se activa), <code>apagado</code> (donde se suelta, ya calculado) y <code>critico</code>. Entre los dos umbrales, la regla sostiene lo que ya estaba: eso es la histéresis. Los valores de ejemplo son los del preset <strong>hogar</strong>, que es el que se crea al vincular un equipo.</p>
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>Regla</th><th>Qué hace</th><th>Se activa si</th><th>Se suelta si</th><th>Histéresis</th><th>Hogar</th><th>Dónde se evalúa</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aire acondicionado (temperatura)</td>
+              <td><span class="etiqueta e-actua">actúa</span> <code>fan</code> + LED azul</td>
+              <td><code>temp &gt; temp_max</code></td>
+              <td><code>temp &lt; apagado.temp</code></td>
+              <td><code>temp_hysteresis</code> = 2,0 °C</td>
+              <td class="valor">ON &gt; 26 °C<br>OFF &lt; 24 °C</td>
+              <td class="lugar"><code>reglas.py:248-251</code></td>
+            </tr>
+            <tr>
+              <td>Atomizador (humedad baja)</td>
+              <td><span class="etiqueta e-actua">actúa</span> <code>aromatizer</code>, ciclando 60 s / 120 s mientras siga baja</td>
+              <td><code>hum &lt; hum_min</code></td>
+              <td><code>hum &gt; apagado.hum</code></td>
+              <td><code>hum_hysteresis</code> = 8 puntos</td>
+              <td class="valor">ON &lt; 40 %<br>OFF &gt; 48 %</td>
+              <td class="lugar"><code>reglas.py:316-339</code></td>
+            </tr>
+            <tr>
+              <td>Humedad alta</td>
+              <td><span class="etiqueta e-avisa">avisa</span> <code>humedad_alta</code>; el equipo no puede bajarla</td>
+              <td><code>hum &gt; hum_max</code></td>
+              <td>Apenas vuelve a <code>hum_max</code> o menos</td>
+              <td>ninguna</td>
+              <td class="valor">&gt; 60 %</td>
+              <td class="lugar"><code>reglas.py:269-271</code></td>
+            </tr>
+            <tr>
+              <td>CO2 alto</td>
+              <td><span class="etiqueta e-avisa">avisa</span> LED rojo + <code>ventilar</code></td>
+              <td><code>co2 &gt; co2_max</code></td>
+              <td><code>co2 &lt; apagado.co2</code></td>
+              <td><code>co2_hysteresis</code> = 150 ppm</td>
+              <td class="valor">ON &gt; 1000<br>OFF &lt; 850</td>
+              <td class="lugar"><code>reglas.py:224-227</code></td>
+            </tr>
+            <tr>
+              <td>CO2 crítico</td>
+              <td><span class="etiqueta e-avisa">avisa</span> <code>co2_critico</code>: mismo LED rojo, mensaje más fuerte</td>
+              <td><code>co2 &gt; critico.co2</code></td>
+              <td><code>co2 &lt; critico.co2_salida</code></td>
+              <td><code>CO2_CRITICO_HISTERESIS</code> = 300 ppm (fijo en el servidor)</td>
+              <td class="valor">ON &gt; 1400<br>OFF &lt; 1100</td>
+              <td class="lugar"><code>reglas.py:229-232</code>. Única regla con respaldo en el firmware: 1400 / 1100</td>
+            </tr>
+            <tr>
+              <td>Calidad de aire mala</td>
+              <td><span class="etiqueta e-avisa">avisa</span> LED rojo + <code>ventilar</code>. Solo con lectura fresca del MQ-135</td>
+              <td><code>aire &lt; aire_min</code></td>
+              <td><code>aire &gt; apagado.aire</code></td>
+              <td><code>air_hysteresis</code> = 5 puntos</td>
+              <td class="valor">ON &lt; 70<br>OFF &gt; 75</td>
+              <td class="lugar"><code>reglas.py:212-216</code></td>
+            </tr>
+            <tr>
+              <td>LED verde</td>
+              <td><span class="etiqueta e-info">indica</span> todo normal</td>
+              <td>Ni rojo ni azul encendidos</td>
+              <td>Se prende el rojo o el azul</td>
+              <td>La de las reglas que lo apagan</td>
+              <td class="valor">—</td>
+              <td class="lugar"><code>reglas.py:276-278</code></td>
+            </tr>
+            <tr>
+              <td>Etiqueta de calidad de aire</td>
+              <td><span class="etiqueta e-info">texto</span> solo para mostrar</td>
+              <td>85 o más Excelente · 70 o más Buena · 55 o más Aceptable</td>
+              <td>Menos de 55: Mala</td>
+              <td>ninguna</td>
+              <td class="valor">—</td>
+              <td class="lugar"><code>reglas.py:137-147</code></td>
+            </tr>
+            <tr>
+              <td>Calibración del MQ-135</td>
+              <td><span class="etiqueta e-info">convierte</span> cuentas del ADC a índice</td>
+              <td>Crudo 105 o menos → índice 100</td>
+              <td>Crudo 340 o más → índice 0</td>
+              <td>no aplica</td>
+              <td class="valor">105 / 340</td>
+              <td class="lugar"><code>config.py:142-143</code> · <code>MQ135_CRUDO_LIMPIO</code> / <code>MQ135_CRUDO_SUCIO</code>. Solo firmware</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Valores de cada preset</h4>
+      <p>Salen de <code>EnvironmentPresetService::PRESETS</code>. Todos heredan los mismos valores de control (<code>CONTROL</code>): aire mínimo 70, histéresis de 2,0 °C, 8 puntos, 150 ppm y 5 puntos, y CO2 crítico de 1400.</p>
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>Preset</th><th>Temp. mín.</th><th>Temp. máx.</th><th>Hum. mín.</th><th>Hum. máx.</th><th>CO2 máx.</th><th>El aire corta a</th><th>El atomizador corta a</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>oficina</td><td class="valor">21 °C</td><td class="valor">25 °C</td><td class="valor">40 %</td><td class="valor">60 %</td><td class="valor">900 ppm</td><td class="valor">23 °C</td><td class="valor">48 %</td></tr>
+            <tr><td>aula</td><td class="valor">20 °C</td><td class="valor">24 °C</td><td class="valor">40 %</td><td class="valor">60 %</td><td class="valor">1000 ppm</td><td class="valor">22 °C</td><td class="valor">48 %</td></tr>
+            <tr><td>hogar (respaldo y alta automática)</td><td class="valor">20 °C</td><td class="valor">26 °C</td><td class="valor">40 %</td><td class="valor">60 %</td><td class="valor">1000 ppm</td><td class="valor">24 °C</td><td class="valor">48 %</td></tr>
+            <tr><td>dormitorio</td><td class="valor">18 °C</td><td class="valor">24 °C</td><td class="valor">40 %</td><td class="valor">55 %</td><td class="valor">900 ppm</td><td class="valor">22 °C</td><td class="valor">48 %</td></tr>
+            <tr><td>personalizable</td><td class="valor">20 °C</td><td class="valor">26 °C</td><td class="valor">40 %</td><td class="valor">60 %</td><td class="valor">1000 ppm</td><td class="valor">24 °C</td><td class="valor">48 %</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="leyenda">La temperatura mínima (<code>temp_min</code>) no enciende nada: solo se usa en la fórmula de respaldo del índice de aire, como centro del rango.</p>
+    </div>
+  </details>
+
+  <details class="seccion" id="quien-gana">
+    <summary><span class="titulo">Quién gana: servidor o firmware</span><span class="resumen">Cuando el mismo valor está en los dos lados, cuál se usa de verdad.</span></summary>
+    <div class="cuerpo">
+      <p>La cadena completa es: <strong>preset</strong> → <strong>fila del ambiente</strong> en la tabla <code>spaces</code> → <strong>configuración que baja la placa</strong> → <strong>reglas.py</strong>. El preset solo rellena la fila cuando se crea el ambiente o cuando un campo del formulario viene vacío. Después manda lo que está guardado en la fila, que es lo que editás en <code>/panel/ambientes</code>.</p>
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>Valor</th><th>En el firmware</th><th>En el servidor</th><th>Gana</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Umbrales de temperatura, humedad, CO2 y aire</td>
+              <td>No existen. Sin configuración, el ciclo no arranca: <code>main.py:341-347</code> reintenta hasta bajarla.</td>
+              <td>Fila de <code>spaces</code>, con respaldo al preset si falta un campo (<code>EnvironmentPresetService::control()</code>)</td>
+              <td><span class="etiqueta e-info">servidor</span> siempre</td>
+            </tr>
+            <tr>
+              <td>Preset contra fila editada</td>
+              <td>—</td>
+              <td>El preset solo completa lo que vino vacío (<code>buildSpaceData()</code>)</td>
+              <td><span class="etiqueta e-info">fila editada</span></td>
+            </tr>
+            <tr>
+              <td>CO2 crítico (1400 / 1100)</td>
+              <td>Respaldo escrito en <code>reglas.py:229</code> y <code>231</code></td>
+              <td>Bloque <code>critico</code> (<code>critical_co2</code> y 300 ppm de histéresis fija)</td>
+              <td><span class="etiqueta e-info">servidor</span>; el firmware solo si falta el bloque</td>
+            </tr>
+            <tr>
+              <td>Tiempos: relé mínimo, warm-up, enmascarado, IR mínimo, espera IR</td>
+              <td><code>config.py</code>, válidos desde el arranque</td>
+              <td>Bloque <code>tiempos</code> (<code>DeviceConfigService.php:62-75</code>)</td>
+              <td><span class="etiqueta e-info">servidor</span> desde la primera configuración (<code>sincronizar_tiempos()</code>)</td>
+            </tr>
+            <tr>
+              <td>Ciclo del atomizador (60 / 120)</td>
+              <td>Respaldo escrito en <code>reglas.py:330-332</code>. Los de <code>config.py</code> no se leen</td>
+              <td><code>tiempos.atomizador_on</code> / <code>atomizador_off</code></td>
+              <td><span class="etiqueta e-info">servidor</span></td>
+            </tr>
+            <tr>
+              <td>Intervalos de medición, comandos y configuración</td>
+              <td><code>config.py:158-162</code>, como respaldo</td>
+              <td>Bloque <code>intervalos</code></td>
+              <td><span class="etiqueta e-info">servidor</span>, leído en cada vuelta del ciclo</td>
+            </tr>
+            <tr>
+              <td>Modo automático o manual</td>
+              <td>—</td>
+              <td><code>modo</code>, según el estado del dispositivo</td>
+              <td><span class="etiqueta e-info">servidor</span></td>
+            </tr>
+            <tr>
+              <td>Pines, <code>RELES_INVERTIDOS</code>, pulsos del atomizador, calibración y muestras del MQ-135, <code>INTERVALO_CICLO</code>, <code>REINTENTO_RED</code></td>
+              <td><code>config.py</code></td>
+              <td>No viajan</td>
+              <td><span class="etiqueta e-actua">firmware</span>; solo se cambian reprogramando</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="nota"><strong>Cuándo se entera la placa de un cambio en la web</strong>En la próxima descarga de configuración: hasta 1 hora (<code>INTERVALO_CONFIG</code>) o al reiniciar. Si esa descarga falla, sigue con la configuración anterior (<code>bajar_config()</code>).</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="pines">
+    <summary><span class="titulo">Tabla de pines</span><span class="resumen">Qué hay conectado a cada GPIO y cómo se enciende.</span></summary>
+    <div class="cuerpo">
+      <p>Cualquier pin puede quedar en <code>None</code>, que quiere decir “todavía no lo armé”: el firmware no lo toca y no informa nada sobre ese componente. El único que no puede faltar es el SCD41.</p>
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>GPIO</th><th>Componente</th><th>Entrada / salida</th><th>Activo en</th><th>config.py</th><th>Notas</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="gpio">21</td>
+              <td>SCD41 · SDA (datos)</td>
+              <td>Entrada y salida (bus I2C)</td>
+              <td>No aplica (bus a 50 kHz)</td>
+              <td class="lugar">línea 70 · <code>PIN_I2C_SDA</code></td>
+              <td>Sensor alimentado con 3V3.</td>
+            </tr>
+            <tr>
+              <td class="gpio">22</td>
+              <td>SCD41 · SCL (reloj)</td>
+              <td>Salida (la ESP32 manda el reloj)</td>
+              <td>No aplica</td>
+              <td class="lugar">línea 71 · <code>PIN_I2C_SCL</code></td>
+              <td>Dirección I2C fija del sensor: <code>0x62</code>.</td>
+            </tr>
+            <tr>
+              <td class="gpio">34</td>
+              <td>MQ-135 · AO</td>
+              <td>Entrada analógica (ADC, 11 dB, 12 bits)</td>
+              <td>No aplica: más tensión, peor aire</td>
+              <td class="lugar">línea 78 · <code>PIN_MQ135</code></td>
+              <td>Solo entrada. Siempre por el divisor 10k/10k: con AO a 5 V llegan 2,5 V.</td>
+            </tr>
+            <tr>
+              <td class="gpio">26</td>
+              <td>Relé IN1 · aire acondicionado (cooler en la maqueta)</td>
+              <td>Salida</td>
+              <td>Bajo (<code>RELES_INVERTIDOS = True</code>, línea 106)</td>
+              <td class="lugar">línea 85 · <code>PIN_RELE_AIRE</code></td>
+              <td>Nace apagado desde el constructor. Se mueve después de emitir la trama IR.</td>
+            </tr>
+            <tr>
+              <td class="gpio">27</td>
+              <td>Relé IN2 · botón del atomizador (K1 y C2)</td>
+              <td>Salida, por pulsos</td>
+              <td>Bajo (<code>RELES_INVERTIDOS = True</code>, línea 106)</td>
+              <td class="lugar">línea 86 · <code>PIN_RELE_ATOMIZADOR</code></td>
+              <td>No alimenta al módulo: le da toques al botón. 1 pulso enciende, 3 apagan. Nunca sostener.</td>
+            </tr>
+            <tr>
+              <td class="gpio">25</td>
+              <td>Emisor IR (KY-005), por transistor</td>
+              <td>Salida PWM a 38 kHz</td>
+              <td>Portadora encendida = PWM al 50 %; apagada = 0 %</td>
+              <td class="lugar">línea 92 · <code>PIN_IR_EMISOR</code></td>
+              <td>Trama NEC, dirección <code>0x0E</code>.</td>
+            </tr>
+            <tr>
+              <td class="gpio">33</td>
+              <td>Receptor IR (VS1838B)</td>
+              <td>Entrada con pull-up e interrupción</td>
+              <td>Bajo: baja cuando ve la portadora (flanco de bajada)</td>
+              <td class="lugar">línea 93 · <code>PIN_IR_RECEPTOR</code></td>
+              <td>Alimentado con 3V3. Cuenta pulsos para confirmar la orden.</td>
+            </tr>
+            <tr>
+              <td class="gpio">14</td>
+              <td>LED verde · todo normal</td>
+              <td>Salida</td>
+              <td>Alto (no le afecta <code>RELES_INVERTIDOS</code>)</td>
+              <td class="lugar">línea 99 · <code>PIN_LED_VERDE</code></td>
+              <td>Resistencia de 220 a 330 ohm.</td>
+            </tr>
+            <tr>
+              <td class="gpio">16</td>
+              <td>LED rojo · alerta de CO2 o de aire</td>
+              <td>Salida</td>
+              <td>Alto</td>
+              <td class="lugar">línea 100 · <code>PIN_LED_ROJO</code></td>
+              <td>En la API se llama <code>alert_led</code>.</td>
+            </tr>
+            <tr>
+              <td class="gpio">17</td>
+              <td>LED azul · aire acondicionado activo</td>
+              <td>Salida</td>
+              <td>Alto</td>
+              <td class="lugar">línea 101 · <code>PIN_LED_AZUL</code></td>
+              <td>Resistencia de 220 a 330 ohm.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="leyenda">Activo en bajo quiere decir que el componente se enciende cuando el pin vale 0. Si un relé funciona al revés de lo esperado, no se toca el código: se cambia <code>RELES_INVERTIDOS</code>.</p>
+    </div>
+  </details>
+
+  <!-- =====================================================================
+       RECORRIDOS
+       ===================================================================== -->
+  <p class="separador">Recorridos</p>
+
+  <details class="seccion" id="ciclo">
+    <summary><span class="titulo">Qué pasa en un ciclo</span><span class="resumen">Una medición, desde el sensor hasta que el relé se mueve y el servidor se entera.</span></summary>
+    <div class="cuerpo">
+      <p>Todo esto pasa adentro del <code>while True</code> de <code>main()</code>. La vuelta dura 1 s, pero cada tarea tiene su propio reloj: medir cada 30 s, órdenes cada 15 s y configuración cada 1 h.</p>
+      <ol class="pasos">
+        <li>
+          <strong>¿Ya toca medir? <span class="fase">main.py</span></strong>
+          Compara <code>ahora - ultima_medicion</code> con <code>intervalos.medicion</code> del servidor (o <code>INTERVALO_MEDICION</code> si no vino). Si toca, anota la hora y llama a <code>medir()</code>.
+        </li>
+        <li>
+          <strong>El SCD41 entrega temperatura, humedad y CO2 <span class="fase">sensor.py</span></strong>
+          <code>sensor.leer()</code>:
+          <ul>
+            <li><code>_descartar_si_hace_falta()</code> tira la primera lectura si el sensor recién arrancó.</li>
+            <li><code>_esperar_dato()</code> pregunta con <code>hay_dato()</code> cada 500 ms, hasta 10 s. Si no llega, <code>rearrancar()</code> y otra vuelta.</li>
+            <li>Lee 9 bytes, verifica cada grupo con <code>_crc8()</code> y convierte con las fórmulas de la hoja de datos.</li>
+          </ul>
+          Si falla, sale <code>ErrorSensor</code>: main.py imprime, espera 5 s y saltea el resto del ciclo.
+        </li>
+        <li>
+          <strong>El MQ-135 da el índice de aire, o no <span class="fase">aire.py</span></strong>
+          <code>medidor.leer(ahora, atomizando=salidas.encendido("aromatizer"))</code>. Si el atomizador está encendido, estira la pausa 90 s más. Durante el warm-up devuelve <code>None</code>; en pausa, el último valor congelado; si no, <code>crudo()</code> → <code>_a_indice()</code>.
+        </li>
+        <li>
+          <strong>Si no hay índice medido, se calcula <span class="fase">reglas.py</span></strong>
+          <code>reglas.calcular_indice_aire()</code> con la fórmula de respaldo, y el origen queda como <code>"calculado"</code>. <code>medir()</code> devuelve el diccionario con <code>aire_confiable</code> = estado <code>"ok"</code>.
+        </li>
+        <li>
+          <strong>Decidir, en la placa <span class="fase">reglas.py</span></strong>
+          Solo en modo automático y con algún actuador armado: <code>decisor.decidir(medicion, cfg, ahora)</code>. En orden: calidad de aire, CO2 y CO2 crítico (avisan), temperatura (aire), <code>_decidir_atomizador()</code> (histéresis más ciclo 60/120) y los tres LEDs. Devuelve <code>(deseado, avisos, motivo)</code>. En modo manual no se decide nada.
+        </li>
+        <li>
+          <strong>Mover lo que cambia <span class="fase">actuadores.py</span></strong>
+          <code>salidas.aplicar(deseado, ahora)</code>, actuador por actuador:
+          <ul>
+            <li>Si no está armado o ya está en ese estado, lo saltea.</li>
+            <li><code>_puede_conmutar()</code>: si es relé y no cumplió 30 s, va a <code>demorados</code> y se reintenta en la próxima medición.</li>
+            <li>Si es el aire: <code>_ordenar_por_infrarrojo()</code> → <code>cadena.enviar_orden()</code> → <code>puede_emitir()</code>, <code>_emitir()</code> (trama NEC) y <code>_esperar_confirmacion()</code>, que cuenta los pulsos que sumó la interrupción <code>_contar_pulso()</code>.</li>
+            <li><code>_escribir()</code>: los LEDs y el relé del aire reciben un nivel. El atomizador recibe <code>_pulsar()</code>: 1 toque para encender, 3 para apagar.</li>
+            <li>Anota el estado nuevo y la hora en <code>estado</code> y <code>_desde</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Sumar el diagnóstico <span class="fase">main.py</span></strong>
+          <code>avisos_de_los_sensores()</code> agrega <code>aire_calentando</code>, <code>aire_en_pausa</code> o <code>ir_sin_confirmar</code> según corresponda.
+        </li>
+        <li>
+          <strong>El servidor se entera <span class="fase">servidor.py</span></strong>
+          <code>api.enviar_medicion(medicion, salidas.como_dict(), motivo, diagnostico)</code> → <code>_pedir("POST", "/api/devices/{uid}/measurements")</code>. Viajan la medición, el estado final de cada actuador, el motivo y el diagnóstico. Si falla, solo se imprime: el ambiente ya quedó regulado.
+        </li>
+        <li>
+          <strong>En la misma vuelta, si toca <span class="fase">main.py</span></strong>
+          <ul>
+            <li>Cada 15 s, <code>atender_comandos()</code>: <code>comandos_pendientes()</code> → <code>salidas.aplicar()</code> → <code>confirmar_comando()</code>, solo si el estado quedó como se pidió.</li>
+            <li>Cada 1 h, <code>bajar_config()</code> y <code>sincronizar_tiempos()</code>.</li>
+            <li>Si <code>red.hay_internet()</code> da falso, <code>red.asegurar_conexion()</code>, que no vuelve hasta reconectar.</li>
+            <li>Duerme <code>INTERVALO_CICLO</code> (1 s) y vuelve a empezar.</li>
+          </ul>
+        </li>
+      </ol>
+      <div class="nota bien"><strong>El orden es a propósito</strong>Primero acciona y después reporta. Si el servidor no contesta, el ambiente igual quedó regulado.</div>
+    </div>
+  </details>
+
+  <details class="seccion" id="si-falla">
+    <summary><span class="titulo">Si falla X</span><span class="resumen">Síntomas que ya pasaron, su causa y dónde quedó resuelto. Sacado de los comentarios del código.</span></summary>
+    <div class="cuerpo">
+      <div class="tabla-caja">
+        <table class="filtrable">
+          <thead>
+            <tr><th>Síntoma</th><th>Causa</th><th>Qué lo resuelve o qué hacer</th><th>Dónde está</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WiFi bien, comandos bien, <code>last_seen_at</code> fresco… y ni una medición durante horas (pasó 13 horas)</td>
+              <td>El SCD41 se salió del modo periódico: sigue contestando por I2C con checksum válido, pero nunca tiene un dato nuevo</td>
+              <td><code>leer()</code> lo rearranca solo si no hay dato en 10 s</td>
+              <td class="lugar"><code>sensor.py:98-111</code></td>
+            </tr>
+            <tr>
+              <td>Después de rearrancar, el sensor no vuelve a medir nunca</td>
+              <td>Con 500 ms entre PARAR y ARRANCAR, el sensor todavía procesa el PARAR y se come el ARRANCAR</td>
+              <td>Esperar 1000 ms (medido el 11/08/2026)</td>
+              <td class="lugar"><code>sensor.py:118-128</code></td>
+            </tr>
+            <tr>
+              <td>El servidor rechaza una medición con HTTP 422 recién arrancado (CO2 de 56 ppm)</td>
+              <td>La primera lectura después de arrancar puede traer valores imposibles</td>
+              <td>Se descarta con <code>_descartar_si_hace_falta()</code></td>
+              <td class="lugar"><code>sensor.py:133-138</code></td>
+            </tr>
+            <tr>
+              <td>“No se detecta el SCD41 en I2C” y el equipo no arranca</td>
+              <td>Cableado, o los pines de <code>config.py</code> no coinciden</td>
+              <td>Revisar SDA 21, SCL 22 y alimentación a 3V3</td>
+              <td class="lugar"><code>sensor.py:40-44</code></td>
+            </tr>
+            <tr>
+              <td>El panel muestra un índice distinto del que usó el equipo (humedad 70 %: 78 en la placa, 77 en el servidor)</td>
+              <td>Python redondea al par (<code>round(22.5)</code> da 22); PHP redondea hacia afuera (23)</td>
+              <td><code>_redondear()</code> imita a PHP</td>
+              <td class="lugar"><code>reglas.py:80-95</code></td>
+            </tr>
+            <tr>
+              <td>El índice del MQ-135 queda clavado en 0</td>
+              <td>Sin atenuación de 11 dB, el ADC satura enseguida</td>
+              <td><code>atten(ADC.ATTN_11DB)</code></td>
+              <td class="lugar"><code>aire.py:72-75</code></td>
+            </tr>
+            <tr>
+              <td>La calidad de aire queda clavada en 0 o en 100</td>
+              <td>Falta el divisor 10k/10k, o la calibración no corresponde a esta placa. Si <code>CRUDO_SUCIO</code> es menor o igual que <code>CRUDO_LIMPIO</code>, devuelve siempre 100</td>
+              <td>Recalibrar con <code>medidor.crudo()</code>: aire limpio 10 min y marcador o alcohol</td>
+              <td class="lugar"><code>config.py:133-143</code>, <code>aire.py:181-182</code></td>
+            </tr>
+            <tr>
+              <td>El índice de aire tiembla en el panel</td>
+              <td>Una sola lectura del MQ-135 salta decenas de cuentas por ruido eléctrico</td>
+              <td>Se promedian <code>MQ135_MUESTRAS</code> lecturas</td>
+              <td class="lugar"><code>aire.py:114-131</code></td>
+            </tr>
+            <tr>
+              <td>“Aire malo” justo cuando está humidificando</td>
+              <td>El MQ-135 lee la niebla (vapor de agua) como contaminante</td>
+              <td>Enmascarado mientras atomiza y 90 s después</td>
+              <td class="lugar"><code>aire.py:154-162</code></td>
+            </tr>
+            <tr>
+              <td>“Sensor de aire calentando” que no cambia</td>
+              <td>Normal los primeros 5 minutos. Si sigue, el MQ-135 no llega al GPIO 34</td>
+              <td>Revisar el cable de AO y el divisor</td>
+              <td class="lugar"><code>aire.py:92-99</code></td>
+            </tr>
+            <tr>
+              <td>“Orden enviada, sin confirmación IR”</td>
+              <td>Emisor y receptor no se ven, o el receptor no está a 3V3</td>
+              <td>Enfrentarlos y sacar lo que haya en el medio. El aire se enciende igual</td>
+              <td class="lugar"><code>infrarrojo.py:18-22</code></td>
+            </tr>
+            <tr>
+              <td>El relé del aire se movía sin que saliera trama IR</td>
+              <td>El límite de 60 s frenaba también los cambios de orden, y el relé tiene un reloj más corto (30 s)</td>
+              <td>Una orden distinta de la anterior sale siempre; el límite solo frena repeticiones</td>
+              <td class="lugar"><code>infrarrojo.py:81-88</code>, <code>110-132</code></td>
+            </tr>
+            <tr>
+              <td>Un relé pega un golpe solo al enchufar la placa</td>
+              <td>Con <code>Pin(n, Pin.OUT)</code> a secas la salida vale 0 un instante, y en relés activos en bajo eso es encender</td>
+              <td>El nivel de apagado va en el constructor. Si igual pasa, el relé no es activo en bajo: <code>RELES_INVERTIDOS = False</code></td>
+              <td class="lugar"><code>actuadores.py:28-31</code>, <code>92-94</code></td>
+            </tr>
+            <tr>
+              <td>El relé funciona al revés</td>
+              <td>El módulo de relés no es activo en bajo</td>
+              <td>Cambiar <code>RELES_INVERTIDOS</code>, no el código</td>
+              <td class="lugar"><code>config.py:103-106</code></td>
+            </tr>
+            <tr>
+              <td>Aprieto un botón del panel y no pasa nada</td>
+              <td>Ese actuador está en <code>None</code>, o el relé todavía cumple su tiempo mínimo</td>
+              <td>La orden queda pendiente a propósito: el equipo no confirma algo que no hizo</td>
+              <td class="lugar"><code>main.py:251-290</code></td>
+            </tr>
+            <tr>
+              <td>El cooler queda encendido y no se apaga</td>
+              <td>Correcto si la temperatura no bajó del umbral de apagado (24 °C en hogar). En la maqueta el cooler no enfría</td>
+              <td>Sacar la fuente de calor y esperar. No hay apagado por tiempo, a propósito</td>
+              <td class="lugar"><code>reglas.py:36-45</code></td>
+            </tr>
+            <tr>
+              <td>Apagar el atomizador lo encendía</td>
+              <td>Con pulsos, <code>apagar_todo()</code> le mandaba 3 toques a un módulo que ya estaba apagado</td>
+              <td>Ahora saltea el atomizador si no está registrado como encendido</td>
+              <td class="lugar"><code>actuadores.py</code> · <code>apagar_todo()</code></td>
+            </tr>
+            <tr>
+              <td>El atomizador sigue andando aunque el panel lo muestre apagado, o hace lo contrario de lo pedido</td>
+              <td>Se reinició solo la ESP32 (reset, Ctrl+D en Thonny, cuelgue) con el módulo andando. La placa arranca creyendo que está apagado y los toques cuentan desde un lugar equivocado</td>
+              <td>No se corrige por software. Antes de reiniciar la placa, apagar el atomizador con su botón. Solución de fondo: que la placa pueda ver la luz azul del módulo</td>
+              <td class="lugar"><code>actuadores.py</code> · <code>_pulsar()</code></td>
+            </tr>
+            <tr>
+              <td>“La contraseña no es correcta” con una clave bien escrita, a veces sí y a veces no</td>
+              <td>Un solo <code>recv()</code> devolvía las cabeceras sin el cuerpo del formulario, y la placa probaba una clave vacía</td>
+              <td><code>_leer_pedido()</code> lee hasta completar el <code>Content-Length</code></td>
+              <td class="lugar"><code>red.py:485-531</code></td>
+            </tr>
+            <tr>
+              <td>La página del portal llega cortada a la mitad</td>
+              <td><code>socket.send()</code> puede escribir menos de lo que se le dio</td>
+              <td><code>_enviar_todo()</code> reintenta hasta mandar todo</td>
+              <td class="lugar"><code>red.py:422-445</code></td>
+            </tr>
+            <tr>
+              <td>El celular avisa “se detectó un cambio en la red” y se desconecta del portal</td>
+              <td>La ESP32 tiene una sola antena: escanear con el punto de acceso activo la hace saltar de canal</td>
+              <td>Se escanean las redes antes de levantar el punto de acceso</td>
+              <td class="lugar"><code>red.py:568-605</code></td>
+            </tr>
+            <tr>
+              <td>El navegador del celular gira para siempre sin abrir el portal</td>
+              <td>El DHCP del punto de acceso anunciaba 0.0.0.0 como DNS</td>
+              <td><code>ap.ifconfig()</code> se anuncia a sí mismo como DNS</td>
+              <td class="lugar"><code>red.py:609-614</code></td>
+            </tr>
+            <tr>
+              <td>El portal no se abre solo en celulares con DNS privado</td>
+              <td>El celular ignora las respuestas DNS de la placa</td>
+              <td>Responder las sondas de internet con un 302 hacia el portal. Si igual no abre: entrar a <code>http://192.168.4.1</code></td>
+              <td class="lugar"><code>red.py:448-469</code>, <code>706-714</code></td>
+            </tr>
+            <tr>
+              <td>“La red tardó demasiado” cuando en realidad falta escribir la clave entera</td>
+              <td>Con menos de 8 caracteres el chip se queda 20 s en <code>STAT_CONNECTING</code></td>
+              <td>Si la clave tiene menos de 8 caracteres, ni se intenta y se avisa</td>
+              <td class="lugar"><code>red.py:174-184</code></td>
+            </tr>
+            <tr>
+              <td>El celular escanea el QR y busca una red que no existe</td>
+              <td><code>AP_SSID</code> / <code>AP_PASSWORD</code> no coinciden con lo que la web mete en el QR</td>
+              <td>Cambiar los dos lados: <code>config.py</code> y <code>DevicePairingService::AP_SSID_DEFECTO</code></td>
+              <td class="lugar"><code>config.py:54-58</code></td>
+            </tr>
+            <tr>
+              <td>“No se pudo contactar al servidor”</td>
+              <td>IP mal (<code>localhost</code> no sirve: para la ESP32 es ella misma), Apache apagado o la PC en otra red</td>
+              <td>Corregir la dirección desde el portal, en “Opciones avanzadas”</td>
+              <td class="lugar"><code>config.py:17-27</code></td>
+            </tr>
+            <tr>
+              <td>Después de unas horas el equipo se queda sin memoria</td>
+              <td>Respuestas HTTP sin cerrar dejan sockets abiertos</td>
+              <td><code>_pedir()</code> cierra siempre en el <code>finally</code></td>
+              <td class="lugar"><code>servidor.py:56-86</code></td>
+            </tr>
+            <tr>
+              <td>Una página de error grande del servidor tumba el equipo</td>
+              <td><code>MemoryError</code> al parsear la respuesta como JSON</td>
+              <td>Se atrapa y se sigue con datos vacíos</td>
+              <td class="lugar"><code>servidor.py:76-79</code></td>
+            </tr>
+            <tr>
+              <td>Queda en “Todavía nadie apretó ‘Conectar’”</td>
+              <td>Es correcto: el servidor devuelve 202 hasta que alguien abre la ventana de vinculación</td>
+              <td>Apretar “Conectar” en la web. Reintenta solo cada 15 s</td>
+              <td class="lugar"><code>main.py:136-138</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
+
+  <!-- =====================================================================
+       PENDIENTES
+       ===================================================================== -->
+  <p class="separador">Pendientes</p>
+
+  <details class="seccion" id="preguntas">
+    <summary><span class="titulo">Preguntas abiertas</span><span class="resumen">Valores que la guía necesitaría y que no están en el código.</span></summary>
+    <div class="cuerpo">
+      <p>Ninguna de estas tiene respuesta en el código, así que no se inventó un número. Son buenas preguntas para medir en la placa o para decidir antes de la presentación.</p>
+      <ol class="preguntas">
+        <li><strong>¿Cuánto espera una petición HTTP antes de rendirse?</strong> <code>servidor.py</code> llama a <code>urequests</code> sin <code>timeout=</code>. Si el servidor acepta la conexión y nunca contesta, no está claro cuánto queda frenado el ciclo. Depende de la versión de <code>urequests</code> instalada.</li>
+        <li><strong>¿Qué hacemos con <code>ATOMIZADOR_CICLO_ON</code> y <code>ATOMIZADOR_CICLO_OFF</code>?</strong> Están en <code>config.py:199-200</code> pero no los lee nadie; reglas.py usa 60 y 120 escritos a mano. ¿Se conectan o se borran?</li>
+        <li><strong>¿<code>apagar_todo()</code> debería llamarse ante un error?</strong> Su docstring dice “se usa al arrancar y ante un error grave”, pero en <code>main.py</code> solo se llama al arrancar (<code>main.py:303</code>). El <code>except Exception</code> del ciclo no apaga nada.</li>
+        <li><strong>¿Cuál es el pulso mínimo y máximo que reconoce el botón del atomizador?</strong> 0,5 s anda, pero no está medido desde cuánto deja de registrar el toque ni desde cuánto lo toma como botón sostenido.</li>
+        <li><strong>¿En qué modo vuelve el atomizador si se le corta y vuelve su USB?</strong> Se asume que apagado, pero no está escrito ni medido en el código.</li>
+        <li><strong>¿Se usa el bloque <code>actuadores</code> de la configuración?</strong> El servidor lo manda “para reconciliarse después de un reinicio” (<code>DeviceConfigService.php:167-175</code>), pero el firmware no lo lee.</li>
+        <li><strong>¿Por qué el bus I2C va a 50 kHz?</strong> <code>sensor.py:37</code> no lo explica. Si hubo un motivo (cables largos, errores de checksum), conviene escribirlo.</li>
+        <li><strong>¿Cuánto tarda de verdad una lectura del ADC del MQ-135?</strong> El código solo tiene la pausa de 2 ms entre muestras; el tiempo de conversión no está.</li>
+        <li><strong>¿Qué pasa si el ciclo se cuelga?</strong> No hay watchdog (<code>machine.WDT</code>) en el firmware, así que no hay un tiempo después del cual la placa se reinicie sola.</li>
+        <li><strong>¿Cuánto aguanta el relé del atomizador?</strong> Con humedad baja son 4 toques cada 3 minutos (unos 80 por hora). La vida útil del relé no figura en el código.</li>
+      </ol>
+    </div>
+  </details>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var buscar = document.getElementById("buscar");
+  var contador = document.getElementById("contador");
+  var secciones = Array.prototype.slice.call(document.querySelectorAll("details.seccion"));
+  var tablas = Array.prototype.slice.call(document.querySelectorAll("table.filtrable"));
+  var enlaces = Array.prototype.slice.call(document.querySelectorAll(".indice a"));
+
+  // Sin tildes y en minuscula, para que "tambien" encuentre "también".
+  function normalizar(texto) {
+    return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+
+  // Se guarda el texto de cada fila una sola vez.
+  tablas.forEach(function (tabla) {
+    var cuerpo = tabla.tBodies[0];
+    Array.prototype.forEach.call(cuerpo.rows, function (fila) {
+      fila.dataset.texto = normalizar(fila.textContent);
+    });
+
+    var columnas = tabla.tHead.rows[0].cells.length;
+    var vacia = document.createElement("tr");
+    vacia.className = "sin-resultados oculta";
+    vacia.innerHTML = '<td colspan="' + columnas + '">Ninguna fila de esta tabla coincide.</td>';
+    cuerpo.appendChild(vacia);
+    tabla._vacia = vacia;
+  });
+
+  // Secciones que abrio el buscador (y que tiene que volver a cerrar).
+  var abiertasPorBusqueda = [];
+
+  function filtrar() {
+    var consulta = normalizar(buscar.value.trim());
+    var palabras = consulta ? consulta.split(/\s+/) : [];
+    var total = 0;
+
+    abiertasPorBusqueda.forEach(function (d) { d.open = false; });
+    abiertasPorBusqueda = [];
+
+    tablas.forEach(function (tabla) {
+      var visibles = 0;
+
+      Array.prototype.forEach.call(tabla.tBodies[0].rows, function (fila) {
+        if (fila === tabla._vacia) { return; }
+
+        var coincide = palabras.every(function (p) { return fila.dataset.texto.indexOf(p) !== -1; });
+        fila.classList.toggle("oculta", !coincide);
+        if (coincide) { visibles++; }
+      });
+
+      tabla._vacia.classList.toggle("oculta", visibles > 0 || !palabras.length);
+      total += visibles;
+
+      // Mientras se busca, se abre la seccion que tiene resultados.
+      var seccion = tabla.closest("details.seccion");
+      if (palabras.length && visibles > 0 && !seccion.open) {
+        seccion.open = true;
+        abiertasPorBusqueda.push(seccion);
+      }
+    });
+
+    if (!palabras.length) {
+      contador.textContent = "";
+    } else if (total === 1) {
+      contador.textContent = "1 fila coincide";
+    } else {
+      contador.textContent = total + " filas coinciden";
+    }
+  }
+
+  buscar.addEventListener("input", filtrar);
+
+  buscar.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      buscar.value = "";
+      filtrar();
+    }
+  });
+
+  // Si la persona abre o cierra a mano, la seccion deja de ser del buscador.
+  secciones.forEach(function (d) {
+    d.querySelector("summary").addEventListener("click", function () {
+      var i = abiertasPorBusqueda.indexOf(d);
+      if (i !== -1) { abiertasPorBusqueda.splice(i, 1); }
+    });
+  });
+
+  // El indice abre la seccion antes de llevar hasta ella.
+  enlaces.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var destino = document.getElementById(a.getAttribute("href").slice(1));
+      if (!destino) { return; }
+      e.preventDefault();
+      destino.open = true;
+      destino.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (history.replaceState) { history.replaceState(null, "", "#" + destino.id); }
+      destino.querySelector("summary").focus({ preventScroll: true });
+    });
+  });
+
+  document.getElementById("abrir-todo").addEventListener("click", function () {
+    secciones.forEach(function (d) { d.open = true; });
+  });
+
+  document.getElementById("cerrar-todo").addEventListener("click", function () {
+    secciones.forEach(function (d) { d.open = false; });
+    abiertasPorBusqueda = [];
+  });
+
+  // Marca en el indice la seccion que se esta leyendo.
+  if ("IntersectionObserver" in window) {
+    var observador = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) { return; }
+        enlaces.forEach(function (a) {
+          a.classList.toggle("activo", a.getAttribute("href") === "#" + entrada.target.id);
+        });
+      });
+    }, { rootMargin: "-90px 0px -60% 0px" });
+
+    secciones.forEach(function (d) { observador.observe(d); });
+  }
+
+  // Si se abre el archivo con un #ancla, esa seccion arranca abierta.
+  if (location.hash) {
+    var inicial = document.getElementById(location.hash.slice(1));
+    if (inicial && inicial.tagName === "DETAILS") { inicial.open = true; }
+  }
+})();
+</script>
+</body>
+</html>
