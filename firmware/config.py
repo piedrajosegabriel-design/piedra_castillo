@@ -105,6 +105,28 @@ PIN_LED_AZUL = 17
 # que esperas, es esto. NO aplica a los LEDs, que siempre encienden con 1.
 RELES_INVERTIDOS = True
 
+# --- Atomizador manejado por PULSOS ----------------------------------------
+# El modulo atomizador NO se prende dandole corriente: queda alimentado todo
+# el tiempo por su propio USB a 5 V y se maneja con su boton, que cicla modos.
+# El rele IN2 esta soldado en paralelo con ese boton (almohadillas K1 y C2),
+# asi que cerrarlo y volver a abrirlo es un "toque". Ciclo MEDIDO en la placa
+# (no el de las fichas de venta, que dicen 3 modos):
+#
+#   toque 1 -> pulverizacion continua      (luz azul fija)
+#   toque 2 -> pulverizacion intermitente  (luz azul parpadeando)
+#   toque 3 -> continua otra vez
+#   toque 4 -> apagado                     (luz apagada)
+#
+# Por eso: desde apagado, 1 toque enciende; desde encendido, 3 toques apagan.
+# NUNCA dejar el rele cerrado: el modulo lo toma como boton apretado y cambia
+# de modo solo. Con ATOMIZADOR_POR_PULSOS = False vuelve el manejo viejo (nivel
+# sostenido, como el otro rele), que con este cableado NO sirve.
+ATOMIZADOR_POR_PULSOS = True
+ATOMIZADOR_PULSO = 0.5            # segundos con el rele cerrado (el "dedo")
+ATOMIZADOR_PAUSA = 0.5            # segundos con el rele abierto despues de cada toque
+ATOMIZADOR_PULSOS_ENCENDER = 1    # apagado -> continuo
+ATOMIZADOR_PULSOS_APAGAR = 3      # continuo -> intermitente -> continuo -> apagado
+
 # ---------------------------------------------------------------------------
 # CALIBRACION DEL MQ-135
 # ---------------------------------------------------------------------------

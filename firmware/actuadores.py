@@ -128,7 +128,65 @@ class Actuadores:
 
         return 1 if encendido else 0
 
+    def _pulsar(self, nombre, cantidad):
+        """
+        Manda `cantidad` toques al pin de `nombre`: cierra el rele, espera el
+        pulso, lo abre, espera la pausa. Es un dedo apretando un boton.
+
+        POR QUE EXISTE. El atomizador no se prende dandole corriente: tiene un
+        boton que cicla modos, y el rele IN2 esta soldado en paralelo con ese
+        boton. Sostener el rele cerrado seria dejar el boton apretado, y el
+        modulo cambia de modo solo. Por eso el rele termina ABIERTO pase lo que
+        pase: si algo corta el pulso a la mitad (un Ctrl+C desde Thonny, por
+        ejemplo), el finally lo abre igual.
+
+        Los niveles salen de _nivel(): "on" es rele cerrado y "off" es rele
+        abierto. Asi RELES_INVERTIDOS se sigue respetando igual que en el resto
+        de los reles.
+
+        OJO: un toque no dice "encendete" ni "apagate", dice "pasa al modo
+        siguiente". Que 1 toque encienda y 3 apaguen depende de que el modulo
+        este en el modo que el firmware cree. El modulo no le avisa a la placa
+        en que modo quedo, asi que si se desincronizan los toques siguen
+        contando desde un lugar equivocado.
+
+        Frena el ciclo mientras dura: con los valores de config.py, 1 s para
+        encender y 3 s para apagar.
+        """
+        pin = self._pines[nombre]
+        cerrado = self._nivel(nombre, "on")
+        abierto = self._nivel(nombre, "off")
+
+        pulso_ms = int(config.ATOMIZADOR_PULSO * 1000)
+        pausa_ms = int(config.ATOMIZADOR_PAUSA * 1000)
+
+        for _ in range(cantidad):
+            try:
+                pin.value(cerrado)
+                time.sleep_ms(pulso_ms)
+            finally:
+                pin.value(abierto)
+            time.sleep_ms(pausa_ms)
+
     def _escribir(self, nombre, valor):
+        """
+        Lleva el pin de un actuador a "on" u "off".
+
+        Todos se manejan sosteniendo un nivel, salvo el atomizador cuando
+        ATOMIZADOR_POR_PULSOS esta activo: ese se maneja con toques de boton
+        (ver _pulsar). Con pulsos, quien llama TIENE que asegurarse de que el
+        estado realmente cambia, porque "apagar" algo que ya esta apagado lo
+        ENCIENDE. aplicar() ya lo garantiza (saltea lo que no cambia) y
+        apagar_todo() lo chequea aparte.
+        """
+        if nombre == "aromatizer" and config.ATOMIZADOR_POR_PULSOS:
+            cantidad = (
+                config.ATOMIZADOR_PULSOS_ENCENDER if valor == "on"
+                else config.ATOMIZADOR_PULSOS_APAGAR
+            )
+            self._pulsar(nombre, cantidad)
+            return
+
         self._pines[nombre].value(self._nivel(nombre, valor))
 
     def _puede_conmutar(self, nombre, ahora):
@@ -206,8 +264,20 @@ class Actuadores:
 
         Salta el tiempo minimo a proposito: es una parada de emergencia, no una
         regulacion.
+
+        EL ATOMIZADOR POR PULSOS ES LA EXCEPCION. Los demas se apagan
+        escribiendo un nivel, y escribirlo dos veces no hace nada. El
+        atomizador se apaga con 3 toques de boton, y 3 toques a un modulo que
+        ya estaba apagado lo ENCIENDEN (apagado -> continuo -> intermitente ->
+        continuo). Por eso solo se le mandan si el firmware lo tiene registrado
+        como encendido. Al arrancar nunca lo esta (el constructor lo deja en
+        "off"), asi que el arranque no le manda ningun toque.
         """
         for nombre in self._pines:
+            if (nombre == "aromatizer" and config.ATOMIZADOR_POR_PULSOS
+                    and self.estado[nombre] != "on"):
+                continue
+
             self._escribir(nombre, "off")
             self.estado[nombre] = "off"
 
@@ -237,6 +307,7 @@ GLOSARIO DE ESTE ARCHIVO
 
 Privados:
 - _nivel(nombre, valor)         -> "on"/"off" al nivel electrico de cada tipo
+- _pulsar(nombre, cantidad)     -> N toques de boton (atomizador por pulsos)
 - _puede_conmutar(nombre, ahora)-> tiempo minimo de los reles
 - _ordenar_por_infrarrojo()     -> emite la trama antes de mover el rele
 """
