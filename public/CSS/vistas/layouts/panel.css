@@ -11,8 +11,10 @@
      · el fondo de la página, el área de contenido y la entrada animada
      · el velo oscuro detrás del menú en celular
      · el cuadro de confirmación que arma JS/dashboard.js
-     · las piezas que comparten varias pantallas del panel: la barra de
-       título de sección y las tarjetas de equipo/ambiente (.ea-dev-*)
+     · las piezas que comparten varias pantallas del panel: tarjetas,
+       insignias y botones chicos (.ea-card, .ea-badge, .ea-kbtn), el link
+       "volver", los títulos de paso, la barra de título de sección y las
+       tarjetas de equipo/ambiente (.ea-dev-*)
 
    El menú lateral y la barra superior tienen su propio archivo:
    vistas/partials/panel_sidebar.css y vistas/partials/panel_header.css.
@@ -201,8 +203,6 @@
        Si la compu pide "reducir movimiento", todas las animaciones del
        panel duran esto (prácticamente nada). */
     --panel-movimiento-reducido:    0.01ms;
-
-    /* =========== Agregado en la migración del resto de las pantallas =========== */
 
     /* ---- Tarjetas, insignias y botones del panel ------------------------- */
     --panel-tarjeta-fondo:                         var(--panel-tarjeta);   /* fondo — tarjeta */
@@ -743,7 +743,7 @@ body.dashboard-body { overflow-x: hidden; }
     padding-top: var(--confirmar-botones-margen);
 }
 
-/* ---------- Celular y tablet: botones chicos -------------------------------------------------- */
+/* ---------- Celular y tablet: botones chicos----------------------------------------------- */
 
 @media (max-width: 960px) {
     .ea-kbtn {

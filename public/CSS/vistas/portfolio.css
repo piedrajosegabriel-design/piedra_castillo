@@ -17,11 +17,11 @@
 
 :root {
     /* ---- Scroll suave: barra fija fuera del envoltorio ------------------- */
-    --portfolio-portfolio-relleno-arriba:  var(--ea-nav-h, 80px);   /* espacio interno de arriba — portfolio */
-    --portfolio-antes-fondo-imagen:        radial-gradient(rgba(74, 122, 85, 0.08) 1px, transparent 1px);   /* imagen/degradado de fondo — el componente (estado: antes) */
-    --portfolio-antes-fondo-tamano:        28px 28px;   /* tamaño del fondo — el componente (estado: antes) */
-    --portfolio-antes-opacidad:            0.55;   /* opacidad (0 = invisible, 1 = opaco) — el componente (estado: antes) */
-    --portfolio-antes-fondo-imagen-oscuro: radial-gradient(rgba(188, 210, 189, 0.06) 1px, transparent 1px);   /* imagen/degradado de fondo — el componente (estado: antes; modo oscuro) */
+    --portfolio-portfolio-relleno-arriba-respaldo: 80px;   /* espacio interno de arriba — portfolio — se usa si no hay --ea-nav-h */
+    --portfolio-antes-fondo-imagen:                radial-gradient(rgba(74, 122, 85, 0.08) 1px, transparent 1px);   /* imagen/degradado de fondo — el componente (estado: antes) */
+    --portfolio-antes-fondo-tamano:                28px 28px;   /* tamaño del fondo — el componente (estado: antes) */
+    --portfolio-antes-opacidad:                    0.55;   /* opacidad (0 = invisible, 1 = opaco) — el componente (estado: antes) */
+    --portfolio-antes-fondo-imagen-oscuro:         radial-gradient(rgba(188, 210, 189, 0.06) 1px, transparent 1px);   /* imagen/degradado de fondo — el componente (estado: antes; modo oscuro) */
 
     /* ---- Tipos compartidos ----------------------------------------------- */
     --portfolio-etiqueta-superior-separacion:      10px;   /* separación entre elementos — superior de etiqueta */
@@ -60,7 +60,7 @@
     --portfolio-bajada-color:                      var(--color-texto-secundario);   /* color del texto — bajada */
     --portfolio-bajada-ancho-max:                  60ch;   /* ancho máximo — bajada */
     --portfolio-seccion-relleno:                   clamp(64px, 9vw, 112px) 0;   /* espacio interno — sección */
-    --portfolio-seccion-seccion-borde-arriba:      1px dashed var(--color-linea);   /* borde de arriba — sección de sección */
+    --portfolio-seccion-borde-arriba:              1px dashed var(--color-linea);   /* borde de arriba — sección */
     --portfolio-seccion-cabeza-columnas:           1fr 1.6fr;   /* columnas de la grilla — cabeza de sección */
     --portfolio-seccion-cabeza-separacion:         clamp(20px, 4vw, 56px);   /* separación entre elementos — cabeza de sección */
     --portfolio-seccion-cabeza-margen-abajo:       clamp(28px, 5vw, 48px);   /* margen de abajo — cabeza de sección */
@@ -141,7 +141,7 @@
     --portfolio-estado-research-color-oscuro: var(--color-arcilla);   /* color del texto — estado (estado: research; modo oscuro) */
 
     /* ---- Portada --------------------------------------------------------- */
-    --portfolio-portada-alto-min:                  calc(100svh - var(--ea-nav-h, 72px));   /* alto mínimo — portada */
+    --portfolio-portada-alto-min-respaldo:         72px;   /* alto mínimo — portada — se usa si no hay --ea-nav-h */
     --portfolio-portada-relleno:                   clamp(56px, 8vw, 96px) 0 clamp(48px, 7vw, 80px);   /* espacio interno — portada */
     --portfolio-portada-bg-antes-filtro:           blur(70px);   /* filtro (desenfoque, brillo, sombra) — bg de portada (estado: antes) */
     --portfolio-portada-bg-antes-ancho:            520px;   /* ancho — bg de portada (estado: antes) */
@@ -246,49 +246,49 @@
     --portfolio-anim-cue-p50-transformacion:       scaleY(1.15);   /* desplazamiento/escala/giro — animación "ea-pf-cue" al 50% */
 
     /* ---- Mapa del recorrido ---------------------------------------------- */
-    --portfolio-sitemap-relleno:                   clamp(48px, 7vw, 88px) 0;   /* espacio interno — sitemap */
-    --portfolio-sitemap-borde-arriba:              1px dashed var(--color-linea);   /* borde de arriba — sitemap */
-    --portfolio-sitemap-borde-abajo:               1px dashed var(--color-linea);   /* borde de abajo — sitemap */
-    --portfolio-sitemap-cabeza-separacion:         16px;   /* separación entre elementos — cabeza de sitemap */
-    --portfolio-sitemap-cabeza-margen-abajo:       clamp(20px, 3vw, 28px);   /* margen de abajo — cabeza de sitemap */
-    --portfolio-sitemap-grilla-separacion:         clamp(12px, 1.6vw, 18px);   /* separación entre elementos — grilla de sitemap */
-    --portfolio-tile-separacion:                   12px;   /* separación entre elementos — tile */
-    --portfolio-tile-relleno:                      clamp(18px, 2.2vw, 24px);   /* espacio interno — tile */
-    --portfolio-tile-redondeo:                     var(--redondeo-grande);   /* redondeo de las esquinas — tile */
-    --portfolio-tile-fondo:                        var(--color-tarjeta);   /* fondo — tile */
-    --portfolio-tile-borde:                        1px solid var(--color-linea-suave);   /* borde — tile */
-    --portfolio-tile-sombra:                       var(--sombra-chica);   /* sombra — tile */
-    --portfolio-tile-transicion:                   transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;   /* animación de los cambios — tile */
-    --portfolio-tile-antes-fondo:                  radial-gradient(120% 80% at 100% 0%, rgba(201, 216, 112, 0.18), transparent 55%);   /* fondo — tile (estado: antes) */
-    --portfolio-tile-antes-transicion:             opacity 0.25s ease;   /* animación de los cambios — tile (estado: antes) */
-    --portfolio-tile-hover-transformacion:         translateY(-3px);   /* desplazamiento/escala/giro — tile (estado: hover) */
-    --portfolio-tile-hover-borde-color:            var(--verde-300);   /* color del borde — tile (estado: hover) */
-    --portfolio-tile-hover-sombra:                 var(--sombra-media);   /* sombra — tile (estado: hover) */
-    --portfolio-tile-cabeza-separacion:            12px;   /* separación entre elementos — cabeza de tile */
-    --portfolio-tile-numero-fuente:                var(--fuente-codigo);   /* tipografía — número de tile */
-    --portfolio-tile-numero-tamano:                0.75rem;   /* tamaño de letra — número de tile */
-    --portfolio-tile-numero-espaciado:             0.16em;   /* separación entre letras — número de tile */
-    --portfolio-tile-numero-color:                 var(--color-texto-suave);   /* color del texto — número de tile */
-    --portfolio-tile-titulo-fuente:                var(--fuente-titulos);   /* tipografía — título de tile */
-    --portfolio-tile-titulo-peso:                  400;   /* grosor de letra — título de tile */
-    --portfolio-tile-titulo-tamano:                1.375rem;   /* tamaño de letra — título de tile */
-    --portfolio-tile-titulo-interlineado:          1.1;   /* separación entre renglones — título de tile */
-    --portfolio-tile-titulo-margen:                4px 0 0;   /* margen — título de tile */
-    --portfolio-tile-titulo-color:                 var(--color-texto);   /* color del texto — título de tile */
-    --portfolio-tile-titulo-espaciado:             -0.012em;   /* separación entre letras — título de tile */
-    --portfolio-tile-titulo-color-oscuro:          var(--verde-100);   /* color del texto — título de tile (modo oscuro) */
-    --portfolio-tile-bajada-tamano:                0.8438rem;   /* tamaño de letra — bajada de tile */
-    --portfolio-tile-bajada-color:                 var(--color-texto-secundario);   /* color del texto — bajada de tile */
-    --portfolio-tile-flecha-separacion:            6px;   /* separación entre elementos — flecha de tile */
-    --portfolio-tile-flecha-fuente:                var(--fuente-codigo);   /* tipografía — flecha de tile */
-    --portfolio-tile-flecha-tamano:                0.6875rem;   /* tamaño de letra — flecha de tile */
-    --portfolio-tile-flecha-espaciado:             0.14em;   /* separación entre letras — flecha de tile */
-    --portfolio-tile-flecha-color:                 var(--verde-700);   /* color del texto — flecha de tile */
-    --portfolio-tile-flecha-transicion:            gap 0.22s ease, color 0.22s ease;   /* animación de los cambios — flecha de tile */
-    --portfolio-tile-flecha-color-oscuro:          var(--verde-300);   /* color del texto — flecha de tile (modo oscuro) */
-    --portfolio-tile-tile-flecha-hover-separacion: 12px;   /* separación entre elementos — flecha de tile tile (estado: hover) */
-    --portfolio-tile-tile-flecha-hover-color:      var(--verde-800);   /* color del texto — flecha de tile tile (estado: hover) */
-    --portfolio-tile-tile-flecha-hover-color-oscuro: var(--color-citrico);   /* color del texto — flecha de tile tile (estado: hover; modo oscuro) */
+    --portfolio-sitemap-relleno:                clamp(48px, 7vw, 88px) 0;   /* espacio interno — sitemap */
+    --portfolio-sitemap-borde-arriba:           1px dashed var(--color-linea);   /* borde de arriba — sitemap */
+    --portfolio-sitemap-borde-abajo:            1px dashed var(--color-linea);   /* borde de abajo — sitemap */
+    --portfolio-sitemap-cabeza-separacion:      16px;   /* separación entre elementos — cabeza de sitemap */
+    --portfolio-sitemap-cabeza-margen-abajo:    clamp(20px, 3vw, 28px);   /* margen de abajo — cabeza de sitemap */
+    --portfolio-sitemap-grilla-separacion:      clamp(12px, 1.6vw, 18px);   /* separación entre elementos — grilla de sitemap */
+    --portfolio-tile-separacion:                12px;   /* separación entre elementos — tile */
+    --portfolio-tile-relleno:                   clamp(18px, 2.2vw, 24px);   /* espacio interno — tile */
+    --portfolio-tile-redondeo:                  var(--redondeo-grande);   /* redondeo de las esquinas — tile */
+    --portfolio-tile-fondo:                     var(--color-tarjeta);   /* fondo — tile */
+    --portfolio-tile-borde:                     1px solid var(--color-linea-suave);   /* borde — tile */
+    --portfolio-tile-sombra:                    var(--sombra-chica);   /* sombra — tile */
+    --portfolio-tile-transicion:                transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;   /* animación de los cambios — tile */
+    --portfolio-tile-antes-fondo:               radial-gradient(120% 80% at 100% 0%, rgba(201, 216, 112, 0.18), transparent 55%);   /* fondo — tile (estado: antes) */
+    --portfolio-tile-antes-transicion:          opacity 0.25s ease;   /* animación de los cambios — tile (estado: antes) */
+    --portfolio-tile-hover-transformacion:      translateY(-3px);   /* desplazamiento/escala/giro — tile (estado: hover) */
+    --portfolio-tile-hover-borde-color:         var(--verde-300);   /* color del borde — tile (estado: hover) */
+    --portfolio-tile-hover-sombra:              var(--sombra-media);   /* sombra — tile (estado: hover) */
+    --portfolio-tile-cabeza-separacion:         12px;   /* separación entre elementos — cabeza de tile */
+    --portfolio-tile-numero-fuente:             var(--fuente-codigo);   /* tipografía — número de tile */
+    --portfolio-tile-numero-tamano:             0.75rem;   /* tamaño de letra — número de tile */
+    --portfolio-tile-numero-espaciado:          0.16em;   /* separación entre letras — número de tile */
+    --portfolio-tile-numero-color:              var(--color-texto-suave);   /* color del texto — número de tile */
+    --portfolio-tile-titulo-fuente:             var(--fuente-titulos);   /* tipografía — título de tile */
+    --portfolio-tile-titulo-peso:               400;   /* grosor de letra — título de tile */
+    --portfolio-tile-titulo-tamano:             1.375rem;   /* tamaño de letra — título de tile */
+    --portfolio-tile-titulo-interlineado:       1.1;   /* separación entre renglones — título de tile */
+    --portfolio-tile-titulo-margen:             4px 0 0;   /* margen — título de tile */
+    --portfolio-tile-titulo-color:              var(--color-texto);   /* color del texto — título de tile */
+    --portfolio-tile-titulo-espaciado:          -0.012em;   /* separación entre letras — título de tile */
+    --portfolio-tile-titulo-color-oscuro:       var(--verde-100);   /* color del texto — título de tile (modo oscuro) */
+    --portfolio-tile-bajada-tamano:             0.8438rem;   /* tamaño de letra — bajada de tile */
+    --portfolio-tile-bajada-color:              var(--color-texto-secundario);   /* color del texto — bajada de tile */
+    --portfolio-tile-flecha-separacion:         6px;   /* separación entre elementos — flecha de tile */
+    --portfolio-tile-flecha-fuente:             var(--fuente-codigo);   /* tipografía — flecha de tile */
+    --portfolio-tile-flecha-tamano:             0.6875rem;   /* tamaño de letra — flecha de tile */
+    --portfolio-tile-flecha-espaciado:          0.14em;   /* separación entre letras — flecha de tile */
+    --portfolio-tile-flecha-color:              var(--verde-700);   /* color del texto — flecha de tile */
+    --portfolio-tile-flecha-transicion:         gap 0.22s ease, color 0.22s ease;   /* animación de los cambios — flecha de tile */
+    --portfolio-tile-flecha-color-oscuro:       var(--verde-300);   /* color del texto — flecha de tile (modo oscuro) */
+    --portfolio-tile-flecha-hover-separacion:   12px;   /* separación entre elementos — flecha de tile (estado: hover) */
+    --portfolio-tile-flecha-hover-color:        var(--verde-800);   /* color del texto — flecha de tile (estado: hover) */
+    --portfolio-tile-flecha-hover-color-oscuro: var(--color-citrico);   /* color del texto — flecha de tile (estado: hover; modo oscuro) */
 
     /* ---- 01 · Imagen corporativa (bento) --------------------------------- */
     --portfolio-bento-separacion:            clamp(12px, 1.6vw, 18px);   /* separación entre elementos — bento */
@@ -474,7 +474,7 @@
     --portfolio-bloque-relleno-arriba:             clamp(16px, 2vw, 20px);   /* espacio interno de arriba — bloque */
     --portfolio-bloque-no-primero-borde-arriba:    1px dashed var(--color-linea);   /* borde de arriba — bloque (estado: no-primero) */
     --portfolio-bloque-etiqueta-separacion:        4px;   /* separación entre elementos — etiqueta de bloque */
-    --portfolio-bloque-etiqueta-arriba:            calc(var(--ea-nav-h, 80px) + 12px);   /* distancia desde arriba — etiqueta de bloque */
+    --portfolio-bloque-etiqueta-arriba-respaldo:   80px;   /* distancia desde arriba — etiqueta de bloque — se usa si no hay --ea-nav-h */
     --portfolio-bloque-letter-fuente:              var(--fuente-codigo);   /* tipografía — letter de bloque */
     --portfolio-bloque-letter-tamano:              0.6875rem;   /* tamaño de letra — letter de bloque */
     --portfolio-bloque-letter-espaciado:           0.18em;   /* separación entre letras — letter de bloque */
@@ -727,14 +727,14 @@
     --portfolio-close-acciones-margen-arriba: 6px;   /* margen de arriba — acciones de close */
 
     /* ---- Cajón del celular ----------------------------------------------- */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-margen-arriba: 18px;   /* margen de arriba — sección de celular navegación celular navegación */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-relleno-arriba: 18px;   /* espacio interno de arriba — sección de celular navegación celular navegación */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-borde-arriba: 1px solid rgba(236, 242, 232, 0.1);   /* borde de arriba — sección de celular navegación celular navegación */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-titulo-fuente: var(--fuente-codigo);   /* tipografía — título de celular navegación celular navegación sección */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-titulo-tamano: 0.6875rem;   /* tamaño de letra — título de celular navegación celular navegación sección */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-titulo-espaciado: 0.16em;   /* separación entre letras — título de celular navegación celular navegación sección */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-titulo-color: rgba(236, 242, 232, 0.58);   /* color del texto — título de celular navegación celular navegación sección */
-    --portfolio-celular-navegacion-celular-navegacion-seccion-titulo-margen-abajo: 8px;   /* margen de abajo — título de celular navegación celular navegación sección */
+    --portfolio-celular-navegacion-seccion-margen-arriba: 18px;   /* margen de arriba — sección de celular navegación */
+    --portfolio-celular-navegacion-seccion-relleno-arriba: 18px;   /* espacio interno de arriba — sección de celular navegación */
+    --portfolio-celular-navegacion-seccion-borde-arriba: 1px solid rgba(236, 242, 232, 0.1);   /* borde de arriba — sección de celular navegación */
+    --portfolio-celular-navegacion-seccion-titulo-fuente: var(--fuente-codigo);   /* tipografía — título de celular navegación sección */
+    --portfolio-celular-navegacion-seccion-titulo-tamano: 0.6875rem;   /* tamaño de letra — título de celular navegación sección */
+    --portfolio-celular-navegacion-seccion-titulo-espaciado: 0.16em;   /* separación entre letras — título de celular navegación sección */
+    --portfolio-celular-navegacion-seccion-titulo-color: rgba(236, 242, 232, 0.58);   /* color del texto — título de celular navegación sección */
+    --portfolio-celular-navegacion-seccion-titulo-margen-abajo: 8px;   /* margen de abajo — título de celular navegación sección */
 
     /* ---- Aparición al hacer scroll --------------------------------------- */
     --portfolio-reveal-transformacion: translateY(28px);   /* desplazamiento/escala/giro — el componente (estado: reveal) */
@@ -859,7 +859,6 @@
     --portfolio-costo-open-columnas:               minmax(0, 0.95fr) minmax(0, 1.05fr);   /* columnas de la grilla — open de costo */
     --portfolio-costo-open-separacion:             clamp(22px, 4vw, 52px);   /* separación entre elementos — open de costo */
     --portfolio-costo-open-relleno:                clamp(24px, 4vw, 44px);   /* espacio interno — open de costo */
-    --portfolio-costo-open-redondeo:               var(--cost-r);   /* redondeo de las esquinas — open de costo */
     --portfolio-costo-open-fondo:                  radial-gradient(120% 130% at 0% 0%, var(--color-exito-suave), transparent 58%), var(--color-tarjeta);   /* fondo — open de costo */
     --portfolio-costo-open-borde:                  1px solid var(--color-linea);   /* borde — open de costo */
     --portfolio-costo-open-sombra:                 var(--sombra-chica);   /* sombra — open de costo */
@@ -885,12 +884,7 @@
     --portfolio-costo-barra-alto:                  46px;   /* alto — barra de costo */
     --portfolio-costo-barra-redondeo:              12px;   /* redondeo de las esquinas — barra de costo */
     --portfolio-costo-barra-fondo:                 var(--color-linea-suave);   /* fondo — barra de costo */
-    --portfolio-costo-barra-segmento-ancho:        var(--w);   /* ancho — segmento de costo barra */
     --portfolio-costo-barra-segmento-transicion:   width 0.5s cubic-bezier(0.23, 1, 0.32, 1);   /* animación de los cambios — segmento de costo barra */
-    --portfolio-costo-barra-segmento-mpd-fondo:    var(--cost-mpd);   /* fondo — segmento de costo barra (estado: mpd) */
-    --portfolio-costo-barra-segmento-mod-fondo:    var(--cost-mod);   /* fondo — segmento de costo barra (estado: mod) */
-    --portfolio-costo-barra-segmento-fijo-fondo:   var(--cost-fijo);   /* fondo — segmento de costo barra (estado: fijo) */
-    --portfolio-costo-barra-segmento-gan-fondo:    var(--cost-gan);   /* fondo — segmento de costo barra (estado: gan) */
     --portfolio-costo-clave-margen:                18px 0 0;   /* margen — clave de costo */
     --portfolio-costo-clave-separacion:            12px 20px;   /* separación entre elementos — clave de costo */
     --portfolio-costo-clave-item-columnas:         auto 1fr;   /* columnas de la grilla — item de costo clave */
@@ -898,10 +892,6 @@
     --portfolio-costo-clave-item-antes-ancho:      10px;   /* ancho — item de costo clave (estado: antes) */
     --portfolio-costo-clave-item-antes-alto:       10px;   /* alto — item de costo clave (estado: antes) */
     --portfolio-costo-clave-item-antes-redondeo:   3px;   /* redondeo de las esquinas — item de costo clave (estado: antes) */
-    --portfolio-costo-clave-item-mpd-antes-fondo:  var(--cost-mpd);   /* fondo — item de costo clave (estado: mpd, antes) */
-    --portfolio-costo-clave-item-mod-antes-fondo:  var(--cost-mod);   /* fondo — item de costo clave (estado: mod, antes) */
-    --portfolio-costo-clave-item-fijo-antes-fondo: var(--cost-fijo);   /* fondo — item de costo clave (estado: fijo, antes) */
-    --portfolio-costo-clave-item-gan-antes-fondo:  var(--cost-gan);   /* fondo — item de costo clave (estado: gan, antes) */
     --portfolio-costo-clave-nombre-tamano:         0.7813rem;   /* tamaño de letra — nombre de costo clave */
     --portfolio-costo-clave-nombre-color:          var(--color-texto-secundario);   /* color del texto — nombre de costo clave */
     --portfolio-costo-clave-valor-fuente:          var(--fuente-codigo);   /* tipografía — valor de costo clave */
@@ -915,7 +905,6 @@
     /* ---- 2 · Laboratorio: mover los números y ver qué pasa --------------- */
     --portfolio-costo-laboratorio-margen-arriba:   clamp(26px, 4vw, 44px);   /* margen de arriba — laboratorio de costo */
     --portfolio-costo-laboratorio-relleno:         clamp(22px, 3.5vw, 38px);   /* espacio interno — laboratorio de costo */
-    --portfolio-costo-laboratorio-redondeo:        var(--cost-r);   /* redondeo de las esquinas — laboratorio de costo */
     --portfolio-costo-laboratorio-fondo:           var(--color-fondo-suave);   /* fondo — laboratorio de costo */
     --portfolio-costo-laboratorio-borde:           1px solid var(--color-linea);   /* borde — laboratorio de costo */
     --portfolio-costo-laboratorio-cabeza-separacion: 4px;   /* separación entre elementos — cabeza de costo laboratorio */
@@ -1083,9 +1072,7 @@
     --portfolio-costo-fijo-riel-alto:             12px;   /* alto — riel de costo fijo */
     --portfolio-costo-fijo-riel-redondeo:         999px;   /* redondeo de las esquinas — riel de costo fijo */
     --portfolio-costo-fijo-riel-fondo:            var(--color-linea-suave);   /* fondo — riel de costo fijo */
-    --portfolio-costo-fijo-relleno-ancho:         var(--w);   /* ancho — relleno de costo fijo */
     --portfolio-costo-fijo-relleno-redondeo:      999px;   /* redondeo de las esquinas — relleno de costo fijo */
-    --portfolio-costo-fijo-relleno-fondo:         linear-gradient(90deg, var(--cost-mod), var(--cost-fijo));   /* fondo — relleno de costo fijo */
     --portfolio-costo-fijo-valor-fuente:          var(--fuente-codigo);   /* tipografía — valor de costo fijo */
     --portfolio-costo-fijo-valor-tamano:          0.8438rem;   /* tamaño de letra — valor de costo fijo */
     --portfolio-costo-fijo-valor-color:           var(--color-texto);   /* color del texto — valor de costo fijo */
@@ -1097,7 +1084,6 @@
     --portfolio-costo-methods-columnas:            repeat(auto-fit, minmax(280px, 1fr));   /* columnas de la grilla — methods de costo */
     --portfolio-costo-methods-separacion:          clamp(14px, 2vw, 20px);   /* separación entre elementos — methods de costo */
     --portfolio-costo-method-relleno:              clamp(20px, 3vw, 28px);   /* espacio interno — method de costo */
-    --portfolio-costo-method-redondeo:             var(--cost-r);   /* redondeo de las esquinas — method de costo */
     --portfolio-costo-method-fondo:                var(--color-tarjeta);   /* fondo — method de costo */
     --portfolio-costo-method-borde:                1px solid var(--color-linea);   /* borde — method de costo */
     --portfolio-costo-method-borde-arriba:         3px solid var(--verde-500);   /* borde de arriba — method de costo */
@@ -1142,7 +1128,6 @@
 
     /* ---- 7 · El TP completo, plegado ------------------------------------- */
     --portfolio-costo-completo-margen-arriba:      clamp(28px, 4.5vw, 52px);   /* margen de arriba — completo de costo */
-    --portfolio-costo-completo-redondeo:           var(--cost-r);   /* redondeo de las esquinas — completo de costo */
     --portfolio-costo-completo-borde:              1px solid var(--color-linea);   /* borde — completo de costo */
     --portfolio-costo-completo-fondo:              var(--color-tarjeta);   /* fondo — completo de costo */
     --portfolio-costo-completo-titulo-desplegable-relleno: clamp(18px, 2.6vw, 24px);   /* espacio interno — desplegable de costo completo título */
@@ -1161,7 +1146,7 @@
     --portfolio-costo-completo-titulo-desplegable-open-despues-margen-arriba: -2px;   /* margen de arriba — desplegable de costo completo título (estado: open, despues) */
     --portfolio-costo-completo-titulo-desplegable-foco-contorno: 2px solid var(--verde-500);   /* contorno — desplegable de costo completo título (estado: foco) */
     --portfolio-costo-completo-titulo-desplegable-foco-contorno-separacion: -3px;   /* separación del contorno — desplegable de costo completo título (estado: foco) */
-    --portfolio-costo-completo-costo-completo-titulo-hover-color: var(--verde-600);   /* color del texto — título de costo completo costo completo (estado: hover) */
+    --portfolio-costo-completo-titulo-hover-color: var(--verde-600);   /* color del texto — título de costo completo (estado: hover) */
     --portfolio-costo-completo-titulo-fuente:      var(--fuente-titulos);   /* tipografía — título de costo completo */
     --portfolio-costo-completo-titulo-tamano:      1.1875rem;   /* tamaño de letra — título de costo completo */
     --portfolio-costo-completo-titulo-color:       var(--color-texto);   /* color del texto — título de costo completo */
@@ -1196,12 +1181,15 @@
     /* ---- Cascada de entrada + barra de progreso (todo el portfolio) ------ */
     --portfolio-reveal-child-transformacion:       translate3d(0, 16px, 0);   /* desplazamiento/escala/giro — el componente (estado: reveal-child) */
     --portfolio-reveal-child-transicion:           opacity 0.55s cubic-bezier(0.23, 1, 0.32, 1), transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);   /* animación de los cambios — el componente (estado: reveal-child) */
-    --portfolio-reveal-child-demora:               calc(var(--reveal-i, 0) * 70ms);   /* demora antes del cambio — el componente (estado: reveal-child) */
     --portfolio-revealed-reveal-reveal-child-demora: 0s;   /* demora antes del cambio — revealed (estado: reveal, reveal-child) */
     --portfolio-progreso-alto:                     3px;   /* alto — progreso */
     --portfolio-progreso-barra-transformacion:     scaleX(0);   /* desplazamiento/escala/giro — barra de progreso */
     --portfolio-progreso-barra-origen-giro:        0 50%;   /* punto de giro — barra de progreso */
     --portfolio-progreso-barra-fondo:              linear-gradient(90deg, var(--verde-500), #c9d870);   /* fondo — barra de progreso */
+
+    /* ---- Ajustes que acompañan a variables locales ------------------ */
+    --portfolio-aparicion-escalonada:              70ms;   /* demora entre un elemento y el siguiente al aparecer en cascada */
+    --portfolio-bloque-etiqueta-separacion-barra:  12px;   /* espacio entre la barra fija y la etiqueta pegajosa de cada bloque */
 }
 
 
@@ -1240,7 +1228,7 @@
 }
 
 .ea-portfolio #smooth-content {
-    padding-top: var(--portfolio-portfolio-relleno-arriba);
+    padding-top: var(--ea-nav-h, var(--portfolio-portfolio-relleno-arriba-respaldo));
 }
 
 .ea-portfolio #smooth-wrapper {
@@ -1371,7 +1359,7 @@
 }
 
 .ea-pf-section + .ea-pf-section {
-    border-top: var(--portfolio-seccion-seccion-borde-arriba);
+    border-top: var(--portfolio-seccion-borde-arriba);
 }
 
 .ea-pf-section-head {
@@ -1565,7 +1553,7 @@
 
 .ea-pf-hero {
     position: relative;
-    min-height: var(--portfolio-portada-alto-min);
+    min-height: calc(100svh - var(--ea-nav-h, var(--portfolio-portada-alto-min-respaldo)));
     display: flex;
     align-items: center;
     padding: var(--portfolio-portada-relleno);
@@ -2009,12 +1997,12 @@
 }
 
 .ea-pf-tile:hover .ea-pf-tile__arrow {
-    gap: var(--portfolio-tile-tile-flecha-hover-separacion);
-    color: var(--portfolio-tile-tile-flecha-hover-color);
+    gap: var(--portfolio-tile-flecha-hover-separacion);
+    color: var(--portfolio-tile-flecha-hover-color);
 }
 
 :root[data-theme="dark"] .ea-pf-tile:hover .ea-pf-tile__arrow {
-    color: var(--portfolio-tile-tile-flecha-hover-color-oscuro);
+    color: var(--portfolio-tile-flecha-hover-color-oscuro);
 }
 
 /* ---------- 01 · Imagen corporativa (bento) ----------------------------------- */
@@ -2521,7 +2509,7 @@
     flex-direction: column;
     gap: var(--portfolio-bloque-etiqueta-separacion);
     position: sticky;
-    top: var(--portfolio-bloque-etiqueta-arriba);
+    top: calc(var(--ea-nav-h, var(--portfolio-bloque-etiqueta-arriba-respaldo)) + var(--portfolio-bloque-etiqueta-separacion-barra));
 }
 
 .ea-pf-block__letter {
@@ -3137,19 +3125,19 @@
 /* ---------- Cajón del celular ------------------------------------------------- */
 
 .ea-mobile-nav .ea-mobile-nav-section {
-    margin-top: var(--portfolio-celular-navegacion-celular-navegacion-seccion-margen-arriba);
-    padding-top: var(--portfolio-celular-navegacion-celular-navegacion-seccion-relleno-arriba);
-    border-top: var(--portfolio-celular-navegacion-celular-navegacion-seccion-borde-arriba);
+    margin-top: var(--portfolio-celular-navegacion-seccion-margen-arriba);
+    padding-top: var(--portfolio-celular-navegacion-seccion-relleno-arriba);
+    border-top: var(--portfolio-celular-navegacion-seccion-borde-arriba);
 }
 
 .ea-mobile-nav .ea-mobile-nav-section-title {
     display: block;
-    font-family: var(--portfolio-celular-navegacion-celular-navegacion-seccion-titulo-fuente);
-    font-size: var(--portfolio-celular-navegacion-celular-navegacion-seccion-titulo-tamano);
-    letter-spacing: var(--portfolio-celular-navegacion-celular-navegacion-seccion-titulo-espaciado);
+    font-family: var(--portfolio-celular-navegacion-seccion-titulo-fuente);
+    font-size: var(--portfolio-celular-navegacion-seccion-titulo-tamano);
+    letter-spacing: var(--portfolio-celular-navegacion-seccion-titulo-espaciado);
     text-transform: uppercase;
-    color: var(--portfolio-celular-navegacion-celular-navegacion-seccion-titulo-color);
-    margin-bottom: var(--portfolio-celular-navegacion-celular-navegacion-seccion-titulo-margen-abajo);
+    color: var(--portfolio-celular-navegacion-seccion-titulo-color);
+    margin-bottom: var(--portfolio-celular-navegacion-seccion-titulo-margen-abajo);
 }
 
 /* ---------- Aparición al hacer scroll ----------------------------------------- */
@@ -3489,7 +3477,7 @@
     gap: var(--portfolio-costo-open-separacion);
     align-items: center;
     padding: var(--portfolio-costo-open-relleno);
-    border-radius: var(--portfolio-costo-open-redondeo);
+    border-radius: var(--cost-r);
     background: var(--portfolio-costo-open-fondo);
     border: var(--portfolio-costo-open-borde);
     box-shadow: var(--portfolio-costo-open-sombra);
@@ -3549,24 +3537,24 @@
 }
 
 .ea-cost-bar__seg {
-    width: var(--portfolio-costo-barra-segmento-ancho);
+    width: var(--w);
     transition: var(--portfolio-costo-barra-segmento-transicion);
 }
 
 .ea-cost-bar__seg.is-mpd {
-    background: var(--portfolio-costo-barra-segmento-mpd-fondo);
+    background: var(--cost-mpd);
 }
 
 .ea-cost-bar__seg.is-mod {
-    background: var(--portfolio-costo-barra-segmento-mod-fondo);
+    background: var(--cost-mod);
 }
 
 .ea-cost-bar__seg.is-fijo {
-    background: var(--portfolio-costo-barra-segmento-fijo-fondo);
+    background: var(--cost-fijo);
 }
 
 .ea-cost-bar__seg.is-gan {
-    background: var(--portfolio-costo-barra-segmento-gan-fondo);
+    background: var(--cost-gan);
 }
 
 .ea-cost-key {
@@ -3596,19 +3584,19 @@
 }
 
 .ea-cost-key li.is-mpd::before {
-    background: var(--portfolio-costo-clave-item-mpd-antes-fondo);
+    background: var(--cost-mpd);
 }
 
 .ea-cost-key li.is-mod::before {
-    background: var(--portfolio-costo-clave-item-mod-antes-fondo);
+    background: var(--cost-mod);
 }
 
 .ea-cost-key li.is-fijo::before {
-    background: var(--portfolio-costo-clave-item-fijo-antes-fondo);
+    background: var(--cost-fijo);
 }
 
 .ea-cost-key li.is-gan::before {
-    background: var(--portfolio-costo-clave-item-gan-antes-fondo);
+    background: var(--cost-gan);
 }
 
 .ea-cost-key__name {
@@ -3642,7 +3630,7 @@
 .ea-cost-lab {
     margin-top: var(--portfolio-costo-laboratorio-margen-arriba);
     padding: var(--portfolio-costo-laboratorio-relleno);
-    border-radius: var(--portfolio-costo-laboratorio-redondeo);
+    border-radius: var(--cost-r);
     background: var(--portfolio-costo-laboratorio-fondo);
     border: var(--portfolio-costo-laboratorio-borde);
 }
@@ -4041,9 +4029,9 @@
 .ea-cost-fixed__fill {
     display: block;
     height: 100%;
-    width: var(--portfolio-costo-fijo-relleno-ancho);
+    width: var(--w);
     border-radius: var(--portfolio-costo-fijo-relleno-redondeo);
-    background: var(--portfolio-costo-fijo-relleno-fondo);
+    background: linear-gradient(90deg, var(--cost-mod), var(--cost-fijo));
 }
 
 .ea-cost-fixed__val {
@@ -4070,7 +4058,7 @@
 
 .ea-cost-method {
     padding: var(--portfolio-costo-method-relleno);
-    border-radius: var(--portfolio-costo-method-redondeo);
+    border-radius: var(--cost-r);
     background: var(--portfolio-costo-method-fondo);
     border: var(--portfolio-costo-method-borde);
     border-top: var(--portfolio-costo-method-borde-arriba);
@@ -4164,7 +4152,7 @@
 
 .ea-cost-full {
     margin-top: var(--portfolio-costo-completo-margen-arriba);
-    border-radius: var(--portfolio-costo-completo-redondeo);
+    border-radius: var(--cost-r);
     border: var(--portfolio-costo-completo-borde);
     background: var(--portfolio-costo-completo-fondo);
     overflow: hidden;
@@ -4210,7 +4198,7 @@
 }
 
 .ea-cost-full > summary:hover .ea-cost-full__title {
-    color: var(--portfolio-costo-completo-costo-completo-titulo-hover-color);
+    color: var(--portfolio-costo-completo-titulo-hover-color);
 }
 
 .ea-cost-full__title {
@@ -4364,7 +4352,7 @@
     opacity: 0;
     transform: var(--portfolio-reveal-child-transformacion);
     transition: var(--portfolio-reveal-child-transicion);
-    transition-delay: var(--portfolio-reveal-child-demora);
+    transition-delay: calc(var(--reveal-i, 0) * var(--portfolio-aparicion-escalonada));
 }
 
 [data-reveal].is-visible [data-reveal-child] {

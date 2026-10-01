@@ -63,10 +63,10 @@
     --inicio-caracteristica-icono-color-oscuro:    var(--verde-300);   /* color del texto — ícono de característica (modo oscuro) */
 
     /* ---- Scroll suave: barra fija fuera del envoltorio ------------------- */
-    --inicio-landing-relleno-arriba: var(--ea-nav-h, 72px);   /* espacio interno de arriba — landing */
+    --inicio-landing-relleno-arriba-respaldo: 72px;   /* espacio interno de arriba — landing — se usa si no hay --ea-nav-h */
 
     /* ---- Portada: alto de pantalla y adornos animados -------------------- */
-    --inicio-portada-alto-min:                     calc(100svh - var(--ea-nav-h, 72px));   /* alto mínimo — portada */
+    --inicio-portada-alto-min-respaldo:            72px;   /* alto mínimo — portada — se usa si no hay --ea-nav-h */
     --inicio-portada-relleno-arriba:               clamp(24px, 4vw, 56px);   /* espacio interno de arriba — portada */
     --inicio-portada-relleno-abajo:                clamp(40px, 6vw, 88px);   /* espacio interno de abajo — portada */
     --inicio-portada-relleno-arriba-hasta-920:     clamp(28px, 6vw, 56px);   /* espacio interno de arriba — portada (hasta 920px de ancho) */
@@ -304,13 +304,10 @@
 
     /* ---- Aparición al hacer scroll --------------------------------------- */
     --inicio-reveal-valor-reveal-y:                20px;   /* variable interna --reveal-y — el componente (estado: reveal) */
-    --inicio-reveal-transformacion:                translate3d(0, var(--reveal-y), 0);   /* desplazamiento/escala/giro — el componente (estado: reveal) */
     --inicio-reveal-transicion:                    opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);   /* animación de los cambios — el componente (estado: reveal) */
     --inicio-visible-reveal-valor-reveal-y:        0px;   /* variable interna --reveal-y — visible (estado: reveal) */
     --inicio-reveal-child-valor-reveal-y:          12px;   /* variable interna --reveal-y — el componente (estado: reveal-child) */
-    --inicio-reveal-child-transformacion:          translate3d(0, var(--reveal-y), 0);   /* desplazamiento/escala/giro — el componente (estado: reveal-child) */
     --inicio-reveal-child-transicion:              opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);   /* animación de los cambios — el componente (estado: reveal-child) */
-    --inicio-reveal-child-demora:                  calc(var(--reveal-i, 0) * 60ms);   /* demora antes del cambio — el componente (estado: reveal-child) */
     --inicio-visible-reveal-reveal-child-valor-reveal-y: 0px;   /* variable interna --reveal-y — visible (estado: reveal, reveal-child) */
     --inicio-revealed-reveal-reveal-child-demora:  0s;   /* demora antes del cambio — revealed (estado: reveal, reveal-child) */
 
@@ -382,8 +379,8 @@
     --inicio-portada-dato-etiqueta-margen:         0 0 6px;   /* margen — etiqueta de portada dato */
     --inicio-portada-punto-ancho:                  7px;   /* ancho — punto de portada */
     --inicio-portada-punto-alto:                   7px;   /* alto — punto de portada */
-    --inicio-portada-punto-fondo:                  var(--dot, var(--color-citrico));   /* fondo — punto de portada */
-    --inicio-portada-punto-sombra:                 0 0 8px var(--dot, var(--color-citrico));   /* sombra — punto de portada */
+    --inicio-portada-punto-fondo-respaldo:         var(--color-citrico);   /* fondo — punto de portada — se usa si no hay --dot */
+    --inicio-portada-punto-sombra-respaldo:        var(--color-citrico);   /* sombra — punto de portada — se usa si no hay --dot */
     --inicio-portada-dato-valor-fuente:            var(--fuente-titulos);   /* tipografía — valor de portada dato */
     --inicio-portada-dato-valor-peso:              400;   /* grosor de letra — valor de portada dato */
     --inicio-portada-dato-valor-tamano:            2.5rem;   /* tamaño de letra — valor de portada dato */
@@ -413,10 +410,10 @@
     --inicio-hardware-item-tono-alerta-valor-tone-soft: var(--color-alerta-suave);   /* variable interna --tone-soft — item de hardware (estado: tono-alerta) */
     --inicio-hardware-item-tono-citrus-valor-tone: #8a9933;   /* variable interna --tone — item de hardware (estado: tono-citrus) */
     --inicio-hardware-item-tono-citrus-valor-tone-soft: rgba(201, 216, 112, 0.22);   /* variable interna --tone-soft — item de hardware (estado: tono-citrus) */
-    --inicio-hardware-item-hardware-item-icono-class-tone-color: var(--tone, var(--verde-700));   /* color del texto — ícono de hardware item hardware item (estado: class-tone-) */
-    --inicio-hardware-item-hardware-item-icono-class-tone-fondo: var(--tone-soft, var(--verde-100));   /* fondo — ícono de hardware item hardware item (estado: class-tone-) */
-    --inicio-hardware-item-class-tone-hover-borde-color: var(--tone, var(--verde-300));   /* color del borde — item de hardware (estado: class-tone-, hover) */
-    --inicio-hardware-item-class-tone-hover-fondo: var(--tone-soft, var(--color-fondo-suave));   /* fondo — item de hardware (estado: class-tone-, hover) */
+    --inicio-hardware-item-icono-class-tone-color-respaldo: var(--verde-700);   /* color del texto — ícono de hardware item (estado: class-tone-) — se usa si no hay --tone */
+    --inicio-hardware-item-icono-class-tone-fondo-respaldo: var(--verde-100);   /* fondo — ícono de hardware item (estado: class-tone-) — se usa si no hay --tone-soft */
+    --inicio-hardware-item-class-tone-hover-borde-color-respaldo: var(--verde-300);   /* color del borde — item de hardware (estado: class-tone-, hover) — se usa si no hay --tone */
+    --inicio-hardware-item-class-tone-hover-fondo-respaldo: var(--color-fondo-suave);   /* fondo — item de hardware (estado: class-tone-, hover) — se usa si no hay --tone-soft */
     --inicio-hardware-item-tono-citrus-valor-tone-oscuro: var(--color-citrico);   /* variable interna --tone — item de hardware (estado: tono-citrus; modo oscuro) */
     --inicio-hardware-item-tono-alerta-valor-tone-oscuro: var(--color-arcilla);   /* variable interna --tone — item de hardware (estado: tono-alerta; modo oscuro) */
     --inicio-hardware-item-tono-info-valor-tone-oscuro: var(--color-menta);   /* variable interna --tone — item de hardware (estado: tono-info; modo oscuro) */
@@ -514,8 +511,8 @@
     --inicio-portada-nucleo-brillo-opacidad:       0.55;   /* opacidad (0 = invisible, 1 = opaco) — brillo de portada núcleo */
     --inicio-portada-nucleo-brillo-transicion:     opacity 0.45s ease, transform 0.45s ease;   /* animación de los cambios — brillo de portada núcleo */
     --inicio-portada-nucleo-brillo-fondo-oscuro:   radial-gradient(circle at 50% 50%, rgba(184, 213, 208, 0.13) 0%, rgba(184, 213, 208, 0.06) 22%, rgba(184, 213, 208, 0) 55%);   /* fondo — brillo de portada núcleo (modo oscuro) */
-    --inicio-portada-nucleo-portada-nucleo-brillo-active-opacidad: 0.72;   /* opacidad (0 = invisible, 1 = opaco) — brillo de portada núcleo portada núcleo (estado: active) */
-    --inicio-portada-nucleo-portada-nucleo-brillo-active-transformacion: translate(-50%, -50%) scale(1.025);   /* desplazamiento/escala/giro — brillo de portada núcleo portada núcleo (estado: active) */
+    --inicio-portada-nucleo-brillo-active-opacidad: 0.72;   /* opacidad (0 = invisible, 1 = opaco) — brillo de portada núcleo (estado: active) */
+    --inicio-portada-nucleo-brillo-active-transformacion: translate(-50%, -50%) scale(1.025);   /* desplazamiento/escala/giro — brillo de portada núcleo (estado: active) */
     --inicio-portada-nucleo-sombra-abajo:          10%;   /* distancia desde abajo — sombra de portada núcleo */
     --inicio-portada-nucleo-sombra-ancho:          32%;   /* ancho — sombra de portada núcleo */
     --inicio-portada-nucleo-sombra-alto:           8px;   /* alto — sombra de portada núcleo */
@@ -525,8 +522,8 @@
     --inicio-portada-nucleo-sombra-transicion:     opacity 0.45s ease, transform 0.45s ease;   /* animación de los cambios — sombra de portada núcleo */
     --inicio-portada-nucleo-sombra-fondo-oscuro:   radial-gradient(ellipse at center, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 70%);   /* fondo — sombra de portada núcleo (modo oscuro) */
     --inicio-portada-nucleo-sombra-opacidad-oscuro: 0.28;   /* opacidad (0 = invisible, 1 = opaco) — sombra de portada núcleo (modo oscuro) */
-    --inicio-portada-nucleo-portada-nucleo-sombra-active-opacidad: 0.32;   /* opacidad (0 = invisible, 1 = opaco) — sombra de portada núcleo portada núcleo (estado: active) */
-    --inicio-portada-nucleo-portada-nucleo-sombra-active-transformacion: translateX(-50%) scale(1.04);   /* desplazamiento/escala/giro — sombra de portada núcleo portada núcleo (estado: active) */
+    --inicio-portada-nucleo-sombra-active-opacidad: 0.32;   /* opacidad (0 = invisible, 1 = opaco) — sombra de portada núcleo (estado: active) */
+    --inicio-portada-nucleo-sombra-active-transformacion: translateX(-50%) scale(1.04);   /* desplazamiento/escala/giro — sombra de portada núcleo (estado: active) */
     --inicio-portada-nucleo-canvas-transicion:     opacity 0.7s ease;   /* animación de los cambios — canvas de portada núcleo */
     --inicio-portada-nucleo-fallback-separacion:   14px;   /* separación entre elementos — fallback de portada núcleo */
     --inicio-portada-nucleo-fallback-relleno:      24px;   /* espacio interno — fallback de portada núcleo */
@@ -544,8 +541,7 @@
     --inicio-anim-nucleo-breathe-p50-filtro:       brightness(1.08);   /* filtro (desenfoque, brillo, sombra) — animación "ea-core-breathe" al 50% */
 
     /* ---- HUD: micro-paneles ambientales emitidos por el núcleo ----------- */
-    --inicio-hud-panel-transformacion: translate(var(--pill-out-x, 0), var(--pill-out-y, 0));   /* desplazamiento/escala/giro — panel de hud */
-    --inicio-hud-panel-transicion:     opacity 0.5s ease, transform 0.55s cubic-bezier(.2,.7,.2,1);   /* animación de los cambios — panel de hud */
+    --inicio-hud-panel-transicion: opacity 0.5s ease, transform 0.55s cubic-bezier(.2,.7,.2,1);   /* animación de los cambios — panel de hud */
 
     /* ---- Bloque de datos ------------------------------------------------- */
     --inicio-hud-dato-separacion:                  4px;   /* separación entre elementos — dato de hud */
@@ -933,8 +929,7 @@
     --inicio-nucleo-center-subtitulo-tamano:       0.6875rem;   /* tamaño de letra — subtitulo de núcleo center */
     --inicio-nucleo-center-subtitulo-espaciado:    0.32em;   /* separación entre letras — subtitulo de núcleo center */
     --inicio-nucleo-center-subtitulo-color:        rgba(184, 213, 208, 0.85);   /* color del texto — subtitulo de núcleo center */
-    --inicio-nucleo-mod-valor-offset-y:            calc(var(--r, 38) * -1cqi);   /* variable interna --offset-y — mod de núcleo */
-    --inicio-nucleo-mod-transformacion:            translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1));   /* desplazamiento/escala/giro — mod de núcleo */
+    --inicio-nucleo-mod-valor-offset-y-respaldo:   38;   /* variable interna --offset-y — mod de núcleo — se usa si no hay --r */
     --inicio-nucleo-mod-separacion:                2px;   /* separación entre elementos — mod de núcleo */
     --inicio-nucleo-mod-relleno:                   10px 16px;   /* espacio interno — mod de núcleo */
     --inicio-nucleo-mod-redondeo:                  14px;   /* redondeo de las esquinas — mod de núcleo */
@@ -945,8 +940,7 @@
     --inicio-nucleo-mod-transicion:                transform 0.4s cubic-bezier(.2,.7,.2,1), border-color 0.3s ease, box-shadow 0.3s ease;   /* animación de los cambios — mod de núcleo */
     --inicio-nucleo-mod-hover-borde-color:         rgba(184, 213, 208, 0.45);   /* color del borde — mod de núcleo (estado: hover) */
     --inicio-nucleo-mod-hover-sombra:              0 16px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(184, 213, 208, 0.15), 0 0 30px rgba(184, 213, 208, 0.25);   /* sombra — mod de núcleo (estado: hover) */
-    --inicio-nucleo-mod-hover-transformacion:      translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1)) scale(1.06);   /* desplazamiento/escala/giro — mod de núcleo (estado: hover) */
-    --inicio-nucleo-mod-valor-offset-y-compat:     calc(var(--r, 38) * -0.9vw);   /* variable interna --offset-y — mod de núcleo (en navegadores sin soporte) */
+    --inicio-nucleo-mod-valor-offset-y-respaldo-compat: 38;   /* variable interna --offset-y — mod de núcleo (en navegadores sin soporte) — se usa si no hay --r */
     --inicio-nucleo-mod-clave-fuente:              var(--fuente-texto);   /* tipografía — clave de núcleo mod */
     --inicio-nucleo-mod-clave-tamano:              0.8125rem;   /* tamaño de letra — clave de núcleo mod */
     --inicio-nucleo-mod-clave-peso:                500;   /* grosor de letra — clave de núcleo mod */
@@ -1149,7 +1143,10 @@
     --inicio-compra-includes-pie-color:           var(--color-texto-suave);   /* color del texto — pie de compra includes */
 
     /* ---- ScrollSmoother (GSAP) — FASE 1 ---------------------------------- */
-    --inicio-has-smooth-relleno-arriba: var(--ea-nav-h, 72px);   /* espacio interno de arriba — smooth de has */
+    --inicio-has-smooth-relleno-arriba-respaldo: 72px;   /* espacio interno de arriba — smooth de has — se usa si no hay --ea-nav-h */
+
+    /* ---- Ajustes que acompañan a variables locales ------------------ */
+    --inicio-aparicion-escalonada:                 60ms;   /* demora entre un elemento y el siguiente al aparecer en cascada */
 }
 
 
@@ -1294,7 +1291,7 @@
 }
 
 .ea-landing #smooth-content {
-    padding-top: var(--inicio-landing-relleno-arriba);
+    padding-top: var(--ea-nav-h, var(--inicio-landing-relleno-arriba-respaldo));
 }
 
 /* GSAP fija #smooth-wrapper (inset:0) cuando ScrollSmoother está activo.
@@ -1307,7 +1304,7 @@
 
 .ea-hero {
     isolation: isolate;
-    min-height: var(--inicio-portada-alto-min);
+    min-height: calc(100svh - var(--ea-nav-h, var(--inicio-portada-alto-min-respaldo)));
     display: flex;
     align-items: center;
     padding-top: var(--inicio-portada-relleno-arriba);
@@ -1965,7 +1962,7 @@
 [data-reveal] {
     --reveal-y: var(--inicio-reveal-valor-reveal-y);
     opacity: 0;
-    transform: var(--inicio-reveal-transformacion);
+    transform: translate3d(0, var(--reveal-y), 0);
     transition: var(--inicio-reveal-transicion);
     will-change: opacity, transform;
 }
@@ -1978,9 +1975,9 @@
 [data-reveal-child] {
     --reveal-y: var(--inicio-reveal-child-valor-reveal-y);
     opacity: 0;
-    transform: var(--inicio-reveal-child-transformacion);
+    transform: translate3d(0, var(--reveal-y), 0);
     transition: var(--inicio-reveal-child-transicion);
-    transition-delay: var(--inicio-reveal-child-demora);
+    transition-delay: calc(var(--reveal-i, 0) * var(--inicio-aparicion-escalonada));
 }
 
 [data-reveal].is-visible [data-reveal-child] {
@@ -2212,8 +2209,8 @@ section[id] {
     width: var(--inicio-portada-punto-ancho);
     height: var(--inicio-portada-punto-alto);
     border-radius: 50%;
-    background: var(--inicio-portada-punto-fondo);
-    box-shadow: var(--inicio-portada-punto-sombra);
+    background: var(--dot, var(--inicio-portada-punto-fondo-respaldo));
+    box-shadow: 0 0 8px var(--dot, var(--inicio-portada-punto-sombra-respaldo));
 }
 
 .ea-hero-stat-value {
@@ -2275,13 +2272,13 @@ section[id] {
 }
 
 .ea-hardware-item[class*="tone-"] .ea-hardware-item-ico {
-    color: var(--inicio-hardware-item-hardware-item-icono-class-tone-color);
-    background: var(--inicio-hardware-item-hardware-item-icono-class-tone-fondo);
+    color: var(--tone, var(--inicio-hardware-item-icono-class-tone-color-respaldo));
+    background: var(--tone-soft, var(--inicio-hardware-item-icono-class-tone-fondo-respaldo));
 }
 
 .ea-hardware-item[class*="tone-"]:hover {
-    border-color: var(--inicio-hardware-item-class-tone-hover-borde-color);
-    background: var(--inicio-hardware-item-class-tone-hover-fondo);
+    border-color: var(--tone, var(--inicio-hardware-item-class-tone-hover-borde-color-respaldo));
+    background: var(--tone-soft, var(--inicio-hardware-item-class-tone-hover-fondo-respaldo));
 }
 
 :root[data-theme="dark"] .ea-hardware-item.tone-citrus {
@@ -2550,8 +2547,8 @@ section[id] {
 }
 
 .ea-hero-core.is-active .ea-hero-core-glow {
-    opacity: var(--inicio-portada-nucleo-portada-nucleo-brillo-active-opacidad);
-    transform: var(--inicio-portada-nucleo-portada-nucleo-brillo-active-transformacion);
+    opacity: var(--inicio-portada-nucleo-brillo-active-opacidad);
+    transform: var(--inicio-portada-nucleo-brillo-active-transformacion);
 }
 
 /* Sombra de "contacto" — muy reducida, sólo para que el modelo no parezca
@@ -2577,8 +2574,8 @@ section[id] {
 }
 
 .ea-hero-core.is-active .ea-hero-core-shadow {
-    opacity: var(--inicio-portada-nucleo-portada-nucleo-sombra-active-opacidad);
-    transform: var(--inicio-portada-nucleo-portada-nucleo-sombra-active-transformacion);
+    opacity: var(--inicio-portada-nucleo-sombra-active-opacidad);
+    transform: var(--inicio-portada-nucleo-sombra-active-transformacion);
 }
 
 /* Canvas Three.js — transparente, ocupa todo el stage, no captura
@@ -2663,7 +2660,7 @@ section[id] {
     gap: 0;
     pointer-events: none;
     opacity: 0;
-    transform: var(--inicio-hud-panel-transformacion);
+    transform: translate(var(--pill-out-x, 0), var(--pill-out-y, 0));
     transition: var(--inicio-hud-panel-transicion);
 }
 
@@ -3754,11 +3751,11 @@ section[id] {
 
 .ea-core-mod {
     /* --r es unitless; lo multiplicamos por 1cqi (1% del ancho del .ea-core) */
-    --offset-y: var(--inicio-nucleo-mod-valor-offset-y);
+    --offset-y: calc(var(--r, var(--inicio-nucleo-mod-valor-offset-y-respaldo)) * -1cqi);
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: var(--inicio-nucleo-mod-transformacion);
+    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1));
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -3778,12 +3775,12 @@ section[id] {
 .ea-core-mod:hover {
     border-color: var(--inicio-nucleo-mod-hover-borde-color);
     box-shadow: var(--inicio-nucleo-mod-hover-sombra);
-    transform: var(--inicio-nucleo-mod-hover-transformacion);
+    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1)) scale(1.06);
 }
 
 @supports not (width: 1cqi) {
     .ea-core-mod {
-        --offset-y: var(--inicio-nucleo-mod-valor-offset-y-compat);
+        --offset-y: calc(var(--r, var(--inicio-nucleo-mod-valor-offset-y-respaldo-compat)) * -0.9vw);
     }
 }
 
@@ -4338,7 +4335,7 @@ body.ea-has-smooth .ea-navbar {
 }
 
 body.ea-has-smooth #smooth-content {
-    padding-top: var(--inicio-has-smooth-relleno-arriba);
+    padding-top: var(--ea-nav-h, var(--inicio-has-smooth-relleno-arriba-respaldo));
 }
 
 /* Con ScrollSmoother activo, el stage del video deja de ser sticky

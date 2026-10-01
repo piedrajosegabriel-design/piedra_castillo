@@ -78,7 +78,7 @@
     --editar-ambiente-tipo-icono-redondeo:         10px;   /* redondeo de las esquinas — ícono de tipo */
     --editar-ambiente-tipo-icono-fondo:            var(--color-linea-suave);   /* fondo — ícono de tipo */
     --editar-ambiente-tipo-icono-color:            var(--verde-500);   /* color del texto — ícono de tipo */
-    --editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo: var(--color-tarjeta);   /* fondo — ícono de tipo tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-icono-con-campo-tildado-fondo: var(--color-tarjeta);   /* fondo — ícono de tipo (estado: con-campo-tildado) */
     --editar-ambiente-tipo-cuerpo-separacion:      4px;   /* separación entre elementos — cuerpo de tipo */
     --editar-ambiente-tipo-etiqueta-peso:          600;   /* grosor de letra — etiqueta de tipo */
     --editar-ambiente-tipo-etiqueta-color:         var(--color-texto);   /* color del texto — etiqueta de tipo */
@@ -101,9 +101,9 @@
     --editar-ambiente-tipo-check-alto:             20px;   /* alto — check de tipo */
     --editar-ambiente-tipo-check-borde:            1px solid var(--color-linea);   /* borde — check de tipo */
     --editar-ambiente-tipo-check-transicion:       background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;   /* animación de los cambios — check de tipo */
-    --editar-ambiente-tipo-tipo-check-con-campo-tildado-fondo: var(--verde-500);   /* fondo — check de tipo tipo (estado: con-campo-tildado) */
-    --editar-ambiente-tipo-tipo-check-con-campo-tildado-borde-color: var(--verde-500);   /* color del borde — check de tipo tipo (estado: con-campo-tildado) */
-    --editar-ambiente-tipo-tipo-check-con-campo-tildado-color: #fff;   /* color del texto — check de tipo tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-check-con-campo-tildado-fondo: var(--verde-500);   /* fondo — check de tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-check-con-campo-tildado-borde-color: var(--verde-500);   /* color del borde — check de tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-check-con-campo-tildado-color: #fff;   /* color del texto — check de tipo (estado: con-campo-tildado) */
 
     /* ---- Editar: bloque de rangos ---------------------------------------- */
     --editar-ambiente-valores-relleno:             16px;   /* espacio interno — valores */
@@ -153,7 +153,7 @@
 
     /* ---- Modo oscuro ----------------------------------------------------- */
     --editar-ambiente-tipo-con-campo-tildado-fondo-oscuro: rgba(74, 122, 85, 0.22);   /* fondo — tipo (estado: con-campo-tildado; modo oscuro) */
-    --editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo-oscuro: rgba(13, 22, 18, 0.5);   /* fondo — ícono de tipo tipo (estado: con-campo-tildado; modo oscuro) */
+    --editar-ambiente-tipo-icono-con-campo-tildado-fondo-oscuro: rgba(13, 22, 18, 0.5);   /* fondo — ícono de tipo (estado: con-campo-tildado; modo oscuro) */
     --editar-ambiente-valores-cabeza-separacion-hasta-560: 8px;   /* separación entre elementos — cabeza de valores (hasta 560px de ancho) */
 }
 
@@ -322,7 +322,7 @@
 }
 
 .ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon {
-    background: var(--editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo);
+    background: var(--editar-ambiente-tipo-icono-con-campo-tildado-fondo);
 }
 
 .ea-amb-tipo-body {
@@ -384,9 +384,9 @@
 }
 
 .ea-amb-tipo:has(input:checked) .ea-amb-tipo-check {
-    background: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-fondo);
-    border-color: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-borde-color);
-    color: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-color);
+    background: var(--editar-ambiente-tipo-check-con-campo-tildado-fondo);
+    border-color: var(--editar-ambiente-tipo-check-con-campo-tildado-borde-color);
+    color: var(--editar-ambiente-tipo-check-con-campo-tildado-color);
 }
 
 /* ---------- Editar: bloque de rangos ------------------------------------------ */
@@ -522,7 +522,7 @@
 }
 
 :root[data-theme="dark"] .ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon {
-    background: var(--editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo-oscuro);
+    background: var(--editar-ambiente-tipo-icono-con-campo-tildado-fondo-oscuro);
 }
 
 @media (prefers-reduced-motion: reduce) {

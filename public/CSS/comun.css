@@ -6,8 +6,12 @@
      · la paleta de la marca (verdes, neutros, acentos, estados)
      · las tipografías y el tamaño general de la letra
      · el reset (lo que se le saca al navegador)
-     · los componentes que aparecen en muchas pantallas:
-       logo, interruptor claro/oscuro, botones y carteles de aviso
+     · los componentes que aparecen en muchas pantallas: armazón de las
+       páginas públicas, barra de navegación (con el menú grande del
+       portfolio y el cajón del celular), logo, interruptor claro/oscuro,
+       botones, tarjetas, insignias, formularios, ojo de contraseña,
+       mensajes, tablas, portada, pie de página, barra de scroll y
+       carteles de aviso
 
    El resto de los estilos está en public/CSS/vistas/, un archivo por
    vista y con su mismo nombre (los carga app/Libraries/Vista.php).
@@ -292,8 +296,6 @@
     --cartel-lista-separacion: 4px;       /* espacio arriba de la lista de errores */
     --cartel-lista-sangria:    20px;      /* sangría de la lista de errores */
 
-    /* =========== Agregado en la migración del resto de las pantallas =========== */
-
     /* ---- Armazón de las páginas públicas --------------------------------- */
     --comun-pagina-ancho-max:            1280px;   /* ancho máximo — página */
     --comun-pagina-relleno:              0 clamp(20px, 4vw, 48px);   /* espacio interno — página */
@@ -316,28 +318,28 @@
     --comun-cabeza-texto-ancho-max:      56ch;   /* ancho máximo — texto de cabeza */
 
     /* ---- Barra de navegación --------------------------------------------- */
-    --comun-fondo:                            rgba(244, 241, 234, 0.92);   /* fondo — el componente */
-    --comun-filtro-fondo:                     saturate(160%) blur(14px);   /* desenfoque de lo que está detrás — el componente */
-    --comun-borde-abajo:                      1px solid var(--color-linea);   /* borde de abajo — el componente */
-    --comun-fondo-oscuro:                     rgba(13, 22, 18, 0.88);   /* fondo — el componente (modo oscuro) */
-    --comun-interior-separacion:              var(--espacio-medio);   /* separación entre elementos — interior */
-    --comun-interior-relleno-vertical:        var(--ea-nav-pad, 12px);   /* espacio interno arriba y abajo — interior */
-    --comun-marca-separacion:                 14px;   /* separación entre elementos — marca */
-    --comun-marca-color:                      var(--color-texto);   /* color del texto — marca */
-    --comun-marca-texto-interlineado:         1.05;   /* separación entre renglones — texto de marca */
-    --comun-marca-texto-negrita-fuente:       var(--fuente-titulos);   /* tipografía — negrita de marca texto */
-    --comun-marca-texto-negrita-peso:         400;   /* grosor de letra — negrita de marca texto */
-    --comun-marca-texto-negrita-tamano:       1.25rem;   /* tamaño de letra — negrita de marca texto */
-    --comun-marca-texto-negrita-espaciado:    -0.02em;   /* separación entre letras — negrita de marca texto */
-    --comun-marca-texto-negrita-color:        var(--color-texto);   /* color del texto — negrita de marca texto */
-    --comun-marca-texto-cursiva-color:        var(--verde-500);   /* color del texto — cursiva de marca texto */
-    --comun-marca-texto-cursiva-color-oscuro: var(--verde-300);   /* color del texto — cursiva de marca texto (modo oscuro) */
-    --comun-marca-texto-chico-fuente:         var(--fuente-codigo);   /* tipografía — chico de marca texto */
-    --comun-marca-texto-chico-tamano:         0.6875rem;   /* tamaño de letra — chico de marca texto */
-    --comun-marca-texto-chico-espaciado:      0.14em;   /* separación entre letras — chico de marca texto */
-    --comun-marca-texto-chico-color:          var(--color-texto-suave);   /* color del texto — chico de marca texto */
-    --comun-marca-texto-chico-margen-arriba:  4px;   /* margen de arriba — chico de marca texto */
-    --comun-acciones-separacion:              var(--espacio-chico);   /* separación entre elementos — acciones */
+    --comun-fondo:                              rgba(244, 241, 234, 0.92);   /* fondo — el componente */
+    --comun-filtro-fondo:                       saturate(160%) blur(14px);   /* desenfoque de lo que está detrás — el componente */
+    --comun-borde-abajo:                        1px solid var(--color-linea);   /* borde de abajo — el componente */
+    --comun-fondo-oscuro:                       rgba(13, 22, 18, 0.88);   /* fondo — el componente (modo oscuro) */
+    --comun-interior-separacion:                var(--espacio-medio);   /* separación entre elementos — interior */
+    --comun-interior-relleno-vertical-respaldo: 12px;   /* espacio interno arriba y abajo — interior — se usa si no hay --ea-nav-pad */
+    --comun-marca-separacion:                   14px;   /* separación entre elementos — marca */
+    --comun-marca-color:                        var(--color-texto);   /* color del texto — marca */
+    --comun-marca-texto-interlineado:           1.05;   /* separación entre renglones — texto de marca */
+    --comun-marca-texto-negrita-fuente:         var(--fuente-titulos);   /* tipografía — negrita de marca texto */
+    --comun-marca-texto-negrita-peso:           400;   /* grosor de letra — negrita de marca texto */
+    --comun-marca-texto-negrita-tamano:         1.25rem;   /* tamaño de letra — negrita de marca texto */
+    --comun-marca-texto-negrita-espaciado:      -0.02em;   /* separación entre letras — negrita de marca texto */
+    --comun-marca-texto-negrita-color:          var(--color-texto);   /* color del texto — negrita de marca texto */
+    --comun-marca-texto-cursiva-color:          var(--verde-500);   /* color del texto — cursiva de marca texto */
+    --comun-marca-texto-cursiva-color-oscuro:   var(--verde-300);   /* color del texto — cursiva de marca texto (modo oscuro) */
+    --comun-marca-texto-chico-fuente:           var(--fuente-codigo);   /* tipografía — chico de marca texto */
+    --comun-marca-texto-chico-tamano:           0.6875rem;   /* tamaño de letra — chico de marca texto */
+    --comun-marca-texto-chico-espaciado:        0.14em;   /* separación entre letras — chico de marca texto */
+    --comun-marca-texto-chico-color:            var(--color-texto-suave);   /* color del texto — chico de marca texto */
+    --comun-marca-texto-chico-margen-arriba:    4px;   /* margen de arriba — chico de marca texto */
+    --comun-acciones-separacion:                var(--espacio-chico);   /* separación entre elementos — acciones */
 
     /* ---- Menú grande del portfolio --------------------------------------- */
     --comun-disparador-separacion:                 6px;   /* separación entre elementos — disparador */
@@ -600,7 +602,7 @@
     --ojo-ojo-redondeo:                        var(--redondeo-chico, 8px);   /* redondeo de las esquinas — ojo */
     --ojo-ojo-color:                           var(--color-texto-suave, #7b8794);   /* color del texto — ojo */
     --ojo-ojo-transicion:                      color .18s ease, background-color .18s ease;   /* animación de los cambios — ojo */
-    --ojo-ojo-hover-color:                     var(--ea-brand, #2f9e77);   /* color del texto — ojo (estado: hover) */
+    --ojo-ojo-hover-color-respaldo:            #2f9e77;   /* color del texto — ojo (estado: hover) — se usa si no hay --ea-brand */
     --ojo-ojo-hover-fondo:                     rgba(127, 127, 127, .12);   /* fondo — ojo (estado: hover) */
     --ojo-ojo-icono-ancho:                     21px;   /* ancho — ícono de ojo */
     --ojo-ojo-icono-alto:                      21px;   /* alto — ícono de ojo */
@@ -1093,7 +1095,7 @@ body.ea-body {
     /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
        mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
        los botones quedaban pegados al borde de la ventana. */
-    padding-block: var(--comun-interior-relleno-vertical);
+    padding-block: var(--ea-nav-pad, var(--comun-interior-relleno-vertical-respaldo));
 }
 
 .ea-brand {
@@ -2211,7 +2213,7 @@ body.ea-nav-open {
 
 .ea-password-ojo:hover,
 .ea-password-ojo:focus-visible {
-    color: var(--ojo-ojo-hover-color);
+    color: var(--ea-brand, var(--ojo-ojo-hover-color-respaldo));
     background: var(--ojo-ojo-hover-fondo);
 }
 

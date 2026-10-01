@@ -135,33 +135,33 @@
     --compra-nota-icono-opacidad:                  0.7;   /* opacidad (0 = invisible, 1 = opaco) — ícono de nota */
 
     /* ---- Tus compras (historial debajo de la tarjeta) -------------------- */
-    --compra-historial-ancho-max:                  900px;   /* ancho máximo — historial */
-    --compra-historial-margen-arriba:              22px;   /* margen de arriba — historial */
-    --compra-historial-separacion:                 10px;   /* separación entre elementos — historial */
-    --compra-historial-titulo-fuente:              var(--fuente-codigo);   /* tipografía — título de historial */
-    --compra-historial-titulo-tamano:              0.6875rem;   /* tamaño de letra — título de historial */
-    --compra-historial-titulo-espaciado:           0.14em;   /* separación entre letras — título de historial */
-    --compra-historial-titulo-color:               var(--color-texto-suave);   /* color del texto — título de historial */
-    --compra-historial-titulo-peso:                600;   /* grosor de letra — título de historial */
-    --compra-historial-lista-borde:                1px solid var(--panel-linea);   /* borde — lista de historial */
-    --compra-historial-lista-redondeo:             var(--panel-redondeo);   /* redondeo de las esquinas — lista de historial */
-    --compra-historial-lista-fondo:                var(--panel-tarjeta);   /* fondo — lista de historial */
-    --compra-historial-item-separacion:            16px;   /* separación entre elementos — item de historial */
-    --compra-historial-item-relleno:               14px 18px;   /* espacio interno — item de historial */
-    --compra-historial-item-historial-item-borde-arriba: 1px dashed var(--panel-linea);   /* borde de arriba — item de historial item historial */
-    --compra-historial-main-separacion:            12px;   /* separación entre elementos — main de historial */
-    --compra-historial-main-separacion-2:          3px;   /* separación entre elementos — main de historial */
-    --compra-historial-nombre-peso:                700;   /* grosor de letra — nombre de historial */
-    --compra-historial-nombre-color:               var(--color-texto);   /* color del texto — nombre de historial */
-    --compra-historial-nombre-tamano:              0.9063rem;   /* tamaño de letra — nombre de historial */
-    --compra-historial-datos-color:                var(--color-texto-suave);   /* color del texto — datos de historial */
-    --compra-historial-datos-tamano:               0.7188rem;   /* tamaño de letra — datos de historial */
-    --compra-historial-monto-peso:                 700;   /* grosor de letra — monto de historial */
-    --compra-historial-monto-color:                var(--color-texto);   /* color del texto — monto de historial */
-    --compra-historial-monto-tamano:               0.9063rem;   /* tamaño de letra — monto de historial */
-    --compra-historial-monto-chico-color:          var(--color-texto-suave);   /* color del texto — chico de historial monto */
-    --compra-historial-monto-chico-peso:           600;   /* grosor de letra — chico de historial monto */
-    --compra-historial-monto-chico-tamano:         0.6875rem;   /* tamaño de letra — chico de historial monto */
+    --compra-historial-ancho-max:          900px;   /* ancho máximo — historial */
+    --compra-historial-margen-arriba:      22px;   /* margen de arriba — historial */
+    --compra-historial-separacion:         10px;   /* separación entre elementos — historial */
+    --compra-historial-titulo-fuente:      var(--fuente-codigo);   /* tipografía — título de historial */
+    --compra-historial-titulo-tamano:      0.6875rem;   /* tamaño de letra — título de historial */
+    --compra-historial-titulo-espaciado:   0.14em;   /* separación entre letras — título de historial */
+    --compra-historial-titulo-color:       var(--color-texto-suave);   /* color del texto — título de historial */
+    --compra-historial-titulo-peso:        600;   /* grosor de letra — título de historial */
+    --compra-historial-lista-borde:        1px solid var(--panel-linea);   /* borde — lista de historial */
+    --compra-historial-lista-redondeo:     var(--panel-redondeo);   /* redondeo de las esquinas — lista de historial */
+    --compra-historial-lista-fondo:        var(--panel-tarjeta);   /* fondo — lista de historial */
+    --compra-historial-item-separacion:    16px;   /* separación entre elementos — item de historial */
+    --compra-historial-item-relleno:       14px 18px;   /* espacio interno — item de historial */
+    --compra-historial-item-borde-arriba:  1px dashed var(--panel-linea);   /* borde de arriba — item de historial */
+    --compra-historial-main-separacion:    12px;   /* separación entre elementos — main de historial */
+    --compra-historial-main-separacion-2:  3px;   /* separación entre elementos — main de historial */
+    --compra-historial-nombre-peso:        700;   /* grosor de letra — nombre de historial */
+    --compra-historial-nombre-color:       var(--color-texto);   /* color del texto — nombre de historial */
+    --compra-historial-nombre-tamano:      0.9063rem;   /* tamaño de letra — nombre de historial */
+    --compra-historial-datos-color:        var(--color-texto-suave);   /* color del texto — datos de historial */
+    --compra-historial-datos-tamano:       0.7188rem;   /* tamaño de letra — datos de historial */
+    --compra-historial-monto-peso:         700;   /* grosor de letra — monto de historial */
+    --compra-historial-monto-color:        var(--color-texto);   /* color del texto — monto de historial */
+    --compra-historial-monto-tamano:       0.9063rem;   /* tamaño de letra — monto de historial */
+    --compra-historial-monto-chico-color:  var(--color-texto-suave);   /* color del texto — chico de historial monto */
+    --compra-historial-monto-chico-peso:   600;   /* grosor de letra — chico de historial monto */
+    --compra-historial-monto-chico-tamano: 0.6875rem;   /* tamaño de letra — chico de historial monto */
 
     /* ---- Celular y tablet ------------------------------------------------ */
     --compra-tarjeta-relleno-hasta-820:           28px;   /* espacio interno — tarjeta (hasta 820px de ancho) */
@@ -549,7 +549,7 @@
 }
 
 .ea-plan-history-item + .ea-plan-history-item {
-    border-top: var(--compra-historial-item-historial-item-borde-arriba);
+    border-top: var(--compra-historial-item-borde-arriba);
 }
 
 .ea-plan-history-main,

@@ -22,7 +22,6 @@
     --tablero-seccion-separacion:            12px;   /* separación entre elementos — sección */
     --tablero-seccion-margen-arriba:         18px;   /* margen de arriba — sección */
     --tablero-seccion-margen-abajo:          -6px;   /* margen de abajo — sección */
-    --tablero-seccion-margen-ancla:          calc(var(--ead-header-h) + 16px);   /* espacio al saltar con un link — sección */
     --tablero-seccion-titulo-separacion:     10px;   /* separación entre elementos — título de sección */
     --tablero-seccion-titulo-fuente:         var(--fuente-texto);   /* tipografía — título de sección */
     --tablero-seccion-titulo-tamano:         0.7813rem;   /* tamaño de letra — título de sección */
@@ -59,7 +58,7 @@
     --tablero-portada-brillo-alto:                 480px;   /* alto — brillo de portada */
     --tablero-portada-brillo-fondo:                radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, transparent 60%);   /* fondo — brillo de portada */
     --tablero-portada-brillo-opacidad:             0.9;   /* opacidad (0 = invisible, 1 = opaco) — brillo de portada */
-    --tablero-portada-portada-brillo-tono-alerta-fondo: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%);   /* fondo — brillo de portada portada (estado: tono-alerta) */
+    --tablero-portada-brillo-tono-alerta-fondo:    radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%);   /* fondo — brillo de portada (estado: tono-alerta) */
     --tablero-portada-top-separacion:              10px;   /* separación entre elementos — top de portada */
     --tablero-portada-estado-alto:                 26px;   /* alto — estado de portada */
     --tablero-portada-estado-relleno:              0 12px;   /* espacio interno — estado de portada */
@@ -213,9 +212,6 @@
     --tablero-sensor-icono-ancho:                  34px;   /* ancho — ícono de sensor */
     --tablero-sensor-icono-alto:                   34px;   /* alto — ícono de sensor */
     --tablero-sensor-icono-redondeo:               10px;   /* redondeo de las esquinas — ícono de sensor */
-    --tablero-sensor-icono-fondo:                  color-mix(in oklab, var(--accent) 22%, var(--panel-tarjeta));   /* fondo — ícono de sensor */
-    --tablero-sensor-icono-borde:                  1px solid color-mix(in oklab, var(--accent) 40%, var(--panel-linea-fuerte));   /* borde — ícono de sensor */
-    --tablero-sensor-icono-color:                  color-mix(in oklab, var(--accent) 80%, var(--color-texto));   /* color del texto — ícono de sensor */
     --tablero-sensor-icono-icono-ancho:            18px;   /* ancho — ícono de sensor ícono */
     --tablero-sensor-icono-icono-alto:             18px;   /* alto — ícono de sensor ícono */
     --tablero-sensor-titulo-tamano:                0.7813rem;   /* tamaño de letra — título de sensor */
@@ -328,51 +324,51 @@
     --tablero-anim-mensaje-latido-p50-sombra:      0 0 0 5px transparent;   /* sombra — animación "ea-msg-latido" al 50% */
 
     /* ---- Los tres LEDs del equipo ---------------------------------------- */
-    --tablero-leds-fondo:                          var(--panel-tarjeta);   /* fondo — leds */
-    --tablero-leds-borde:                          1px solid var(--panel-linea);   /* borde — leds */
-    --tablero-leds-redondeo:                       14px;   /* redondeo de las esquinas — leds */
-    --tablero-leds-relleno:                        var(--panel-relleno-chico);   /* espacio interno — leds */
-    --tablero-leds-separacion:                     12px;   /* separación entre elementos — leds */
-    --tablero-leds-titulo-tamano:                  0.6875rem;   /* tamaño de letra — título de leds */
-    --tablero-leds-titulo-espaciado:               0.1em;   /* separación entre letras — título de leds */
-    --tablero-leds-titulo-color:                   var(--color-texto-suave);   /* color del texto — título de leds */
-    --tablero-leds-lista-separacion:               var(--panel-separacion);   /* separación entre elementos — lista de leds */
-    --tablero-led-separacion:                      10px;   /* separación entre elementos — led */
-    --tablero-led-relleno:                         10px 12px;   /* espacio interno — led */
-    --tablero-led-redondeo:                        12px;   /* redondeo de las esquinas — led */
-    --tablero-led-borde:                           1px solid var(--panel-linea);   /* borde — led */
-    --tablero-led-fondo:                           var(--panel-fondo-suave);   /* fondo — led */
-    --tablero-led-opacidad:                        0.55;   /* opacidad (0 = invisible, 1 = opaco) — led */
-    --tablero-led-transicion:                      opacity 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — led */
-    --tablero-led-punto-ancho:                     12px;   /* ancho — punto de led */
-    --tablero-led-punto-alto:                      12px;   /* alto — punto de led */
-    --tablero-led-punto-margen-arriba:             3px;   /* margen de arriba — punto de led */
-    --tablero-led-punto-fondo:                     var(--color-texto-suave);   /* fondo — punto de led */
-    --tablero-led-on-tono-exito-borde-color:       var(--color-exito);   /* color del borde — led (estado: on, tono-exito) */
-    --tablero-led-on-tono-exito-fondo:             var(--color-exito-suave);   /* fondo — led (estado: on, tono-exito) */
-    --tablero-led-on-tono-info-borde-color:        var(--color-info);   /* color del borde — led (estado: on, tono-info) */
-    --tablero-led-on-tono-info-fondo:              var(--color-info-suave);   /* fondo — led (estado: on, tono-info) */
-    --tablero-led-on-tono-peligro-borde-color:     var(--color-peligro);   /* color del borde — led (estado: on, tono-peligro) */
-    --tablero-led-on-tono-peligro-fondo:           var(--color-peligro-suave);   /* fondo — led (estado: on, tono-peligro) */
-    --tablero-led-led-punto-on-tono-exito-fondo:   var(--color-exito);   /* fondo — punto de led led (estado: on, tono-exito) */
-    --tablero-led-led-punto-on-tono-exito-sombra:  0 0 0 4px var(--color-exito-suave);   /* sombra — punto de led led (estado: on, tono-exito) */
-    --tablero-led-led-punto-on-tono-info-fondo:    var(--color-info);   /* fondo — punto de led led (estado: on, tono-info) */
-    --tablero-led-led-punto-on-tono-info-sombra:   0 0 0 4px var(--color-info-suave);   /* sombra — punto de led led (estado: on, tono-info) */
-    --tablero-led-led-punto-on-tono-peligro-fondo: var(--color-peligro);   /* fondo — punto de led led (estado: on, tono-peligro) */
-    --tablero-led-led-punto-on-tono-peligro-sombra: 0 0 0 4px var(--color-peligro-suave);   /* sombra — punto de led led (estado: on, tono-peligro) */
-    --tablero-led-cuerpo-separacion:               2px;   /* separación entre elementos — cuerpo de led */
-    --tablero-led-nombre-tamano:                   0.8125rem;   /* tamaño de letra — nombre de led */
-    --tablero-led-nombre-peso:                     600;   /* grosor de letra — nombre de led */
-    --tablero-led-nombre-color:                    var(--color-texto);   /* color del texto — nombre de led */
-    --tablero-led-nombre-separacion:               6px;   /* separación entre elementos — nombre de led */
-    --tablero-led-estado-fuente:                   var(--fuente-codigo);   /* tipografía — estado de led */
-    --tablero-led-estado-tamano:                   0.625rem;   /* tamaño de letra — estado de led */
-    --tablero-led-estado-peso:                     500;   /* grosor de letra — estado de led */
-    --tablero-led-estado-espaciado:                0.04em;   /* separación entre letras — estado de led */
-    --tablero-led-estado-color:                    var(--color-texto-suave);   /* color del texto — estado de led */
-    --tablero-led-detail-tamano:                   0.7188rem;   /* tamaño de letra — detail de led */
-    --tablero-led-detail-interlineado:             1.4;   /* separación entre renglones — detail de led */
-    --tablero-led-detail-color:                    var(--color-texto-suave);   /* color del texto — detail de led */
+    --tablero-leds-fondo:                       var(--panel-tarjeta);   /* fondo — leds */
+    --tablero-leds-borde:                       1px solid var(--panel-linea);   /* borde — leds */
+    --tablero-leds-redondeo:                    14px;   /* redondeo de las esquinas — leds */
+    --tablero-leds-relleno:                     var(--panel-relleno-chico);   /* espacio interno — leds */
+    --tablero-leds-separacion:                  12px;   /* separación entre elementos — leds */
+    --tablero-leds-titulo-tamano:               0.6875rem;   /* tamaño de letra — título de leds */
+    --tablero-leds-titulo-espaciado:            0.1em;   /* separación entre letras — título de leds */
+    --tablero-leds-titulo-color:                var(--color-texto-suave);   /* color del texto — título de leds */
+    --tablero-leds-lista-separacion:            var(--panel-separacion);   /* separación entre elementos — lista de leds */
+    --tablero-led-separacion:                   10px;   /* separación entre elementos — led */
+    --tablero-led-relleno:                      10px 12px;   /* espacio interno — led */
+    --tablero-led-redondeo:                     12px;   /* redondeo de las esquinas — led */
+    --tablero-led-borde:                        1px solid var(--panel-linea);   /* borde — led */
+    --tablero-led-fondo:                        var(--panel-fondo-suave);   /* fondo — led */
+    --tablero-led-opacidad:                     0.55;   /* opacidad (0 = invisible, 1 = opaco) — led */
+    --tablero-led-transicion:                   opacity 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — led */
+    --tablero-led-punto-ancho:                  12px;   /* ancho — punto de led */
+    --tablero-led-punto-alto:                   12px;   /* alto — punto de led */
+    --tablero-led-punto-margen-arriba:          3px;   /* margen de arriba — punto de led */
+    --tablero-led-punto-fondo:                  var(--color-texto-suave);   /* fondo — punto de led */
+    --tablero-led-on-tono-exito-borde-color:    var(--color-exito);   /* color del borde — led (estado: on, tono-exito) */
+    --tablero-led-on-tono-exito-fondo:          var(--color-exito-suave);   /* fondo — led (estado: on, tono-exito) */
+    --tablero-led-on-tono-info-borde-color:     var(--color-info);   /* color del borde — led (estado: on, tono-info) */
+    --tablero-led-on-tono-info-fondo:           var(--color-info-suave);   /* fondo — led (estado: on, tono-info) */
+    --tablero-led-on-tono-peligro-borde-color:  var(--color-peligro);   /* color del borde — led (estado: on, tono-peligro) */
+    --tablero-led-on-tono-peligro-fondo:        var(--color-peligro-suave);   /* fondo — led (estado: on, tono-peligro) */
+    --tablero-led-punto-on-tono-exito-fondo:    var(--color-exito);   /* fondo — punto de led (estado: on, tono-exito) */
+    --tablero-led-punto-on-tono-exito-sombra:   0 0 0 4px var(--color-exito-suave);   /* sombra — punto de led (estado: on, tono-exito) */
+    --tablero-led-punto-on-tono-info-fondo:     var(--color-info);   /* fondo — punto de led (estado: on, tono-info) */
+    --tablero-led-punto-on-tono-info-sombra:    0 0 0 4px var(--color-info-suave);   /* sombra — punto de led (estado: on, tono-info) */
+    --tablero-led-punto-on-tono-peligro-fondo:  var(--color-peligro);   /* fondo — punto de led (estado: on, tono-peligro) */
+    --tablero-led-punto-on-tono-peligro-sombra: 0 0 0 4px var(--color-peligro-suave);   /* sombra — punto de led (estado: on, tono-peligro) */
+    --tablero-led-cuerpo-separacion:            2px;   /* separación entre elementos — cuerpo de led */
+    --tablero-led-nombre-tamano:                0.8125rem;   /* tamaño de letra — nombre de led */
+    --tablero-led-nombre-peso:                  600;   /* grosor de letra — nombre de led */
+    --tablero-led-nombre-color:                 var(--color-texto);   /* color del texto — nombre de led */
+    --tablero-led-nombre-separacion:            6px;   /* separación entre elementos — nombre de led */
+    --tablero-led-estado-fuente:                var(--fuente-codigo);   /* tipografía — estado de led */
+    --tablero-led-estado-tamano:                0.625rem;   /* tamaño de letra — estado de led */
+    --tablero-led-estado-peso:                  500;   /* grosor de letra — estado de led */
+    --tablero-led-estado-espaciado:             0.04em;   /* separación entre letras — estado de led */
+    --tablero-led-estado-color:                 var(--color-texto-suave);   /* color del texto — estado de led */
+    --tablero-led-detail-tamano:                0.7188rem;   /* tamaño de letra — detail de led */
+    --tablero-led-detail-interlineado:          1.4;   /* separación entre renglones — detail de led */
+    --tablero-led-detail-color:                 var(--color-texto-suave);   /* color del texto — detail de led */
 
     /* ---- Actuadores ------------------------------------------------------ */
     --tablero-actuador-fila-separacion:            13px;   /* separación entre elementos — fila de actuador */
@@ -417,11 +413,11 @@
     --tablero-actuador-boton-bolita-transicion:    transform 0.18s ease;   /* animación de los cambios — bolita de actuador botón */
     --tablero-actuador-boton-on-fondo:             var(--verde-600);   /* fondo — botón de actuador (estado: on) */
     --tablero-actuador-boton-on-borde-color:       var(--verde-700);   /* color del borde — botón de actuador (estado: on) */
-    --tablero-actuador-boton-actuador-boton-bolita-on-transformacion: translateX(22px);   /* desplazamiento/escala/giro — bolita de actuador botón actuador botón (estado: on) */
-    --tablero-actuador-boton-actuador-boton-bolita-on-fondo: var(--verde-100);   /* fondo — bolita de actuador botón actuador botón (estado: on) */
+    --tablero-actuador-boton-bolita-on-transformacion: translateX(22px);   /* desplazamiento/escala/giro — bolita de actuador botón (estado: on) */
+    --tablero-actuador-boton-bolita-on-fondo:      var(--verde-100);   /* fondo — bolita de actuador botón (estado: on) */
     --tablero-actuador-boton-on-fondo-oscuro:      var(--verde-500);   /* fondo — botón de actuador (estado: on; modo oscuro) */
     --tablero-actuador-boton-on-borde-color-oscuro: var(--verde-500);   /* color del borde — botón de actuador (estado: on; modo oscuro) */
-    --tablero-actuador-boton-actuador-boton-bolita-on-fondo-oscuro: var(--verde-900);   /* fondo — bolita de actuador botón actuador botón (estado: on; modo oscuro) */
+    --tablero-actuador-boton-bolita-on-fondo-oscuro: var(--verde-900);   /* fondo — bolita de actuador botón (estado: on; modo oscuro) */
     --tablero-actuador-insignia-tamano:            0.6875rem;   /* tamaño de letra — insignia de actuador */
     --tablero-actuadores-nota-relleno:             12px var(--panel-relleno-chico);   /* espacio interno — nota de actuadores */
     --tablero-actuadores-nota-tamano:              0.7188rem;   /* tamaño de letra — nota de actuadores */
@@ -519,6 +515,12 @@
     --tablero-vivo-sello-espaciado:        0.04em;   /* separación entre letras — sello de vivo */
     --tablero-vivo-sello-color:            var(--color-texto-suave);   /* color del texto — sello de vivo */
     --tablero-vivo-sello-viejo-color:      var(--color-alerta);   /* color del texto — sello de vivo (estado: viejo) */
+
+    /* ---- Ajustes que acompañan a variables locales ------------------ */
+    --tablero-seccion-margen-ancla-extra:          16px;   /* espacio extra debajo de la barra al saltar a una sección */
+    --tablero-sensor-icono-mezcla-fondo:           22%;   /* cuánto color del sensor lleva el fondo del ícono */
+    --tablero-sensor-icono-mezcla-borde:           40%;   /* cuánto color del sensor lleva el borde del ícono */
+    --tablero-sensor-icono-mezcla-dibujo:          80%;   /* cuánto color del sensor lleva el dibujo del ícono */
 }
 
 
@@ -548,7 +550,7 @@
     gap: var(--tablero-seccion-separacion);
     margin-top: var(--tablero-seccion-margen-arriba);
     margin-bottom: var(--tablero-seccion-margen-abajo);
-    scroll-margin-top: var(--tablero-seccion-margen-ancla);
+    scroll-margin-top: calc(var(--ead-header-h) + var(--tablero-seccion-margen-ancla-extra));
 }
 
 .ea-sec h2 {
@@ -647,7 +649,7 @@
 
 .ea-hero.tone-warning .ea-hero-glow,
 .ea-hero.tone-danger .ea-hero-glow {
-    background: var(--tablero-portada-portada-brillo-tono-alerta-fondo);
+    background: var(--tablero-portada-brillo-tono-alerta-fondo);
 }
 
 .ea-hero-main {
@@ -1047,9 +1049,9 @@
     border-radius: var(--tablero-sensor-icono-redondeo);
     display: grid;
     place-items: center;
-    background: var(--tablero-sensor-icono-fondo);
-    border: var(--tablero-sensor-icono-borde);
-    color: var(--tablero-sensor-icono-color);
+    background: color-mix(in oklab, var(--accent) var(--tablero-sensor-icono-mezcla-fondo), var(--panel-tarjeta));
+    border: var(--grosor-linea) solid color-mix(in oklab, var(--accent) var(--tablero-sensor-icono-mezcla-borde), var(--panel-linea-fuerte));
+    color: color-mix(in oklab, var(--accent) var(--tablero-sensor-icono-mezcla-dibujo), var(--color-texto));
     flex-shrink: 0;
 }
 
@@ -1417,18 +1419,18 @@
 }
 
 .ea-led.is-on.tone-success .ea-led-dot {
-    background: var(--tablero-led-led-punto-on-tono-exito-fondo);
-    box-shadow: var(--tablero-led-led-punto-on-tono-exito-sombra);
+    background: var(--tablero-led-punto-on-tono-exito-fondo);
+    box-shadow: var(--tablero-led-punto-on-tono-exito-sombra);
 }
 
 .ea-led.is-on.tone-info .ea-led-dot {
-    background: var(--tablero-led-led-punto-on-tono-info-fondo);
-    box-shadow: var(--tablero-led-led-punto-on-tono-info-sombra);
+    background: var(--tablero-led-punto-on-tono-info-fondo);
+    box-shadow: var(--tablero-led-punto-on-tono-info-sombra);
 }
 
 .ea-led.is-on.tone-danger .ea-led-dot {
-    background: var(--tablero-led-led-punto-on-tono-peligro-fondo);
-    box-shadow: var(--tablero-led-led-punto-on-tono-peligro-sombra);
+    background: var(--tablero-led-punto-on-tono-peligro-fondo);
+    box-shadow: var(--tablero-led-punto-on-tono-peligro-sombra);
 }
 
 .ea-led-body {
@@ -1586,8 +1588,8 @@
 }
 
 .ea-actuator-toggle.is-on .ea-actuator-toggle-thumb {
-    transform: var(--tablero-actuador-boton-actuador-boton-bolita-on-transformacion);
-    background: var(--tablero-actuador-boton-actuador-boton-bolita-on-fondo);
+    transform: var(--tablero-actuador-boton-bolita-on-transformacion);
+    background: var(--tablero-actuador-boton-bolita-on-fondo);
 }
 
 :root[data-theme="dark"] .ea-actuator-toggle.is-on {
@@ -1596,7 +1598,7 @@
 }
 
 :root[data-theme="dark"] .ea-actuator-toggle.is-on .ea-actuator-toggle-thumb {
-    background: var(--tablero-actuador-boton-actuador-boton-bolita-on-fondo-oscuro);
+    background: var(--tablero-actuador-boton-bolita-on-fondo-oscuro);
 }
 
 .ea-actuator-badge {
