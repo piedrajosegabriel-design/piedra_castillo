@@ -100,7 +100,7 @@ if (! function_exists('marca_e')) {
      * gradientes con el mismo id en la misma página se pisan.
      *
      * El SVG sale con la clase .ea-logo-mark--e y de ahí saca los colores
-     * (eden-brand.css). Sin esa clase el degradado queda sin resolver y el
+     * (comun.css). Sin esa clase el degradado queda sin resolver y el
      * trazo se dibuja negro: es lo que le pasaba al logo de la landing.
      *
      * @param string        $id      Identificador único del degradado en la página.

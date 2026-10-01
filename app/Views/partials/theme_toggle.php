@@ -3,7 +3,8 @@
  * Interruptor claro / oscuro.
  *
  * Estructura: el <label> con un checkbox escondido y la pastilla que se corre.
- * Estilos:    eden-brand.css, sección "Interruptor claro / oscuro".
+ * Estilos:    comun.css, sección "Interruptor claro / oscuro" (la barra del
+ *             panel lo achica en vistas/partials/panel_header.css).
  * Lógica:     public/JS/tema.js (guarda la elección en localStorage).
  *
  * Parámetros — todo adentro de la clave 'toggle', para que un uso no herede

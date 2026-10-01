@@ -98,7 +98,7 @@ ob_start(); ?>
              Columna izquierda: tagline + título + CTAs.
              Columna derecha: el núcleo 3D con sus tarjetas HUD. -->
         <!-- ===== ANIMACIÓN (CSS + GSAP + Three.js) =====
-             · glow/orbits/leaves: decorado animado por CSS (inicio.css)
+             · glow/orbits/leaves: decorado animado por CSS (vistas/inicio.css)
              · data-eden-core: eden-core-3d.js monta el modelo .glb en el
                canvas y actualiza las tarjetas HUD con /api/sensores
              · la entrada del hero la anima inicio-gsap.js -->

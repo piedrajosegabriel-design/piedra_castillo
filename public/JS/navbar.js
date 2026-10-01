@@ -2,7 +2,7 @@
  * EdenAir — mega menú "Portfolio" de la barra superior pública.
  *
  * ESTRUCTURA: app/Views/partials/navbar.php
- * ESTILOS:    eden-brand.css, sección "Portfolio mega menú"
+ * ESTILOS:    comun.css, sección "Menú grande del portfolio"
  *
  * Se engancha por atributos, no por ids:
  *   [data-ea-mega]          contenedor

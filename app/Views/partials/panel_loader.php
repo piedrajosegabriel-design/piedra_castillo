@@ -4,8 +4,8 @@
  * mientras el dashboard termina de armarse.
  *
  * Estructura: solo el HTML de abajo.
- * Animación:  los anillos y el halo giran por CSS (dashboard.css, sección
- *             LOADER). Quien la saca de pantalla es dashboard.js, que le quita
+ * Animación:  los anillos y el halo giran por CSS
+ *             (public/CSS/vistas/partials/panel_loader.css). Quien la saca de pantalla es dashboard.js, que le quita
  *             la clase 'dashboard-loading' al <body> cuando la página cargó.
  *
  * Se activa con 'conLoader' => true en la config de la vista.
@@ -13,7 +13,7 @@
 ?>
 <!-- Sin JavaScript no hay quien apague el loader: lo escondemos de entrada.
      Este <style> tiene que quedar acá adentro porque depende de <noscript>;
-     movido a dashboard.css perdería esa condición y aplicaría siempre. -->
+     movido a panel_loader.css perdería esa condición y aplicaría siempre. -->
 <noscript>
     <style>
         .dashboard-loading .dashboard-loader { display: none; }

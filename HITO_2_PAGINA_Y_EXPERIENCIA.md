@@ -83,44 +83,43 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 > **Regla de marca:** el verde es la identidad, pero el **aqua y el cítrico son
 > "el aire"** — se reservan para datos vivos.
 
-**Archivos:** `public/CSS/eden-brand.css` (tokens, logo, botones premium,
-modo oscuro), `public/CSS/inicio.css` (landing), `public/CSS/dashboard.css`
-(dashboard, welcome, wizard, switcher).
+**Archivos:** `public/CSS/comun.css` (tokens, logo, botones premium, modo
+oscuro) y un CSS por vista en `public/CSS/vistas/` (ver la sección siguiente).
 
 ---
 
 ## 1.bis Organización del CSS y el JS
 
-### CSS: un archivo global + un archivo por página (decisión de arquitectura)
-
-El proyecto usa el patrón **"global + por página"**, que es la mejor práctica
-para un sitio multipágina sin bundler como este:
+### CSS: un archivo común + un archivo por vista
 
 | Archivo | Alcance | Qué tiene |
 |---|---|---|
-| `eden-brand.css` | **Global** — lo carga `partials/head.php` en todas las páginas | Tokens (variables de color/easing), modo oscuro, navbar, botones, forms, footer: todo lo compartido. |
-| `inicio.css` | Solo la **landing** | Hero, núcleo 3D, video por scroll, secciones de la página pública. |
-| `portfolio.css` | Solo el **portfolio** | Las secciones numeradas 00–06 del recorrido. |
-| `dashboard.css` | Toda el **área privada** | Panel, sidebar, sensores, wizard de dispositivos, ambientes, perfil, compra. |
+| `public/CSS/comun.css` | **Todas las páginas** (lo carga `partials/head.php`) | Paleta, tipografías, reset y los componentes que se repiten: barra de navegación, logo, interruptor de tema, botones, tarjetas, formularios, mensajes, tablas, pie. |
+| `public/CSS/vistas/<vista>.css` | **Solo la vista con ese nombre** | Lo propio de esa pantalla, layout o partial. Ej: `app/Views/ambientes/index.php` → `public/CSS/vistas/ambientes/index.css`. |
 
-**Por qué así y no "un CSS por vista":** las vistas privadas (panel, perfil,
-dispositivos, ambientes…) comparten el mismo shell (sidebar + header + cards),
-así que partir `dashboard.css` en 7 archivos duplicaría estilos o exigiría más
-requests sin beneficio. Y lo común de verdad (botones, navbar) ya está aislado
-en `eden-brand.css`. Cada página termina cargando **exactamente 2 CSS**:
-el global + el suyo.
+**Cómo se cargan:** solos. `app/Libraries/Vista.php` anota cada vista que se
+dibuja y, al terminar la página, cambia una marca del `<head>` por un `<link>`
+por cada vista que tenga un CSS con su mismo nombre (primero el layout,
+después los partials y al final la pantalla). Si una vista no tiene CSS no se
+agrega nada. Para estilos nuevos alcanza con crear el archivo.
 
-**Para encontrar el CSS de cualquier cosa:** abrí el archivo de la página y
-mirá el **ÍNDICE comentado del inicio** — lista las secciones en orden con su
-línea aproximada. Los separadores internos (`/* ===== NOMBRE ===== */`) se
-buscan con Ctrl+F.
+**Cómo está armado cada CSS:**
+- **PARTE 1 — AJUSTES:** variables con nombre en castellano y un comentario
+  que dice qué afectan en pantalla. Es lo único que hay que tocar para cambiar
+  cómo se ve algo. El modo oscuro va como par `-oscuro` al lado del valor claro.
+- **PARTE 2 — ESTRUCTURA:** selectores, grid, flex y media queries, escritos
+  con las variables de arriba. Los cortes de los `@media` quedan como número
+  (CSS no acepta variables ahí) y se listan en el encabezado de la parte 2.
 
 **Excepciones documentadas (estilos embebidos en vistas):**
-- `panel.php` tiene un `<style>` dentro de `<noscript>`: es el fallback sin
-  JavaScript (oculta el loader). No puede moverse a un archivo porque perdería
-  la condición *noscript*.
-- `partials/theme_toggle.php` lleva sus estilos adentro a propósito: el toggle
-  es autocontenido y funciona en cualquier página sin depender de otro CSS.
+- `partials/panel_loader.php` tiene un `<style>` dentro de `<noscript>`: es el
+  fallback sin JavaScript (oculta el loader). No puede moverse a un archivo
+  porque perdería la condición *noscript*. Lo mismo `partials/head.php` con
+  `.ea-reveal`.
+- `emails/recuperar_password.php` lleva los estilos en línea: los programas de
+  correo no cargan CSS externos.
+- Algunos `style="..."` de las vistas llevan valores que calcula PHP (anchos
+  de barras, posición de marcadores).
 
 ### JS: misma lógica, por página
 
