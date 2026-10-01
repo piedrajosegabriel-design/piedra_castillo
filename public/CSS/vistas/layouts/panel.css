@@ -210,45 +210,45 @@
     --panel-tarjeta-redondeo:                      var(--panel-redondeo);   /* redondeo de las esquinas — tarjeta */
     --panel-tarjeta-sombra:                        var(--panel-sombra-tarjeta);   /* sombra — tarjeta */
     --panel-tarjeta-transicion:                    box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;   /* animación de los cambios — tarjeta */
-    --panel-insignia-separacion:                   6px;   /* separación entre elementos — insignia */
-    --panel-insignia-alto:                         22px;   /* alto — insignia */
-    --panel-insignia-relleno:                      0 9px;   /* espacio interno — insignia */
-    --panel-insignia-redondeo:                     999px;   /* redondeo de las esquinas — insignia */
-    --panel-insignia-fuente:                       var(--fuente-codigo);   /* tipografía — insignia */
-    --panel-insignia-tamano:                       0.6875rem;   /* tamaño de letra — insignia */
-    --panel-insignia-peso:                         500;   /* grosor de letra — insignia */
-    --panel-insignia-espaciado:                    0.05em;   /* separación entre letras — insignia */
-    --panel-insignia-borde:                        1px solid transparent;   /* borde — insignia */
-    --panel-insignia-interlineado:                 1;   /* separación entre renglones — insignia */
+    --panel-etiqueta-estado-separacion:            6px;   /* separación entre elementos — estado de etiqueta */
+    --panel-etiqueta-estado-alto:                  22px;   /* alto — estado de etiqueta */
+    --panel-etiqueta-estado-relleno:               0 9px;   /* espacio interno — estado de etiqueta */
+    --panel-etiqueta-estado-redondeo:              999px;   /* redondeo de las esquinas — estado de etiqueta */
+    --panel-etiqueta-estado-fuente:                var(--fuente-codigo);   /* tipografía — estado de etiqueta */
+    --panel-etiqueta-estado-tamano:                0.6875rem;   /* tamaño de letra — estado de etiqueta */
+    --panel-etiqueta-estado-peso:                  500;   /* grosor de letra — estado de etiqueta */
+    --panel-etiqueta-estado-espaciado:             0.05em;   /* separación entre letras — estado de etiqueta */
+    --panel-etiqueta-estado-borde:                 1px solid transparent;   /* borde — estado de etiqueta */
+    --panel-etiqueta-estado-interlineado:          1;   /* separación entre renglones — estado de etiqueta */
     --panel-punto-ancho:                           6px;   /* ancho — punto */
     --panel-punto-alto:                            6px;   /* alto — punto */
-    --panel-insignia-tono-exito-color:             #3f5a0e;   /* color del texto — insignia (estado: tono-exito) */
-    --panel-insignia-tono-exito-fondo:             color-mix(in oklab, var(--color-citrico) 28%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-exito) */
-    --panel-insignia-tono-exito-borde-color:       color-mix(in oklab, var(--color-citrico) 55%, transparent);   /* color del borde — insignia (estado: tono-exito) */
-    --panel-insignia-tono-alerta-color:            #7a4a2c;   /* color del texto — insignia (estado: tono-alerta) */
-    --panel-insignia-tono-alerta-fondo:            color-mix(in oklab, var(--color-arcilla) 22%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-alerta) */
-    --panel-insignia-tono-alerta-borde-color:      color-mix(in oklab, var(--color-arcilla) 55%, transparent);   /* color del borde — insignia (estado: tono-alerta) */
-    --panel-insignia-tono-peligro-color:           #7a2f19;   /* color del texto — insignia (estado: tono-peligro) */
-    --panel-insignia-tono-peligro-fondo:           color-mix(in oklab, var(--color-tierra) 22%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-peligro) */
-    --panel-insignia-tono-peligro-borde-color:     color-mix(in oklab, var(--color-tierra) 60%, transparent);   /* color del borde — insignia (estado: tono-peligro) */
-    --panel-insignia-tono-info-color:              #2f6a6f;   /* color del texto — insignia (estado: tono-info) */
-    --panel-insignia-tono-info-fondo:              color-mix(in oklab, var(--color-menta) 28%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-info) */
-    --panel-insignia-tono-info-borde-color:        color-mix(in oklab, var(--color-menta) 55%, transparent);   /* color del borde — insignia (estado: tono-info) */
-    --panel-insignia-tono-neutro-color:            var(--color-texto-secundario);   /* color del texto — insignia (estado: tono-neutro) */
-    --panel-insignia-tono-neutro-fondo:            var(--panel-fondo-suave);   /* fondo — insignia (estado: tono-neutro) */
-    --panel-insignia-tono-neutro-borde-color:      var(--panel-linea);   /* color del borde — insignia (estado: tono-neutro) */
-    --panel-insignia-tono-exito-color-oscuro:      #e2ee9c;   /* color del texto — insignia (estado: tono-exito; modo oscuro) */
-    --panel-insignia-tono-exito-fondo-oscuro:      color-mix(in oklab, var(--color-citrico) 18%, transparent);   /* fondo — insignia (estado: tono-exito; modo oscuro) */
-    --panel-insignia-tono-exito-borde-color-oscuro: color-mix(in oklab, var(--color-citrico) 32%, transparent);   /* color del borde — insignia (estado: tono-exito; modo oscuro) */
-    --panel-insignia-tono-alerta-color-oscuro:     #f1c9a8;   /* color del texto — insignia (estado: tono-alerta; modo oscuro) */
-    --panel-insignia-tono-alerta-fondo-oscuro:     color-mix(in oklab, var(--color-arcilla) 20%, transparent);   /* fondo — insignia (estado: tono-alerta; modo oscuro) */
-    --panel-insignia-tono-alerta-borde-color-oscuro: color-mix(in oklab, var(--color-arcilla) 42%, transparent);   /* color del borde — insignia (estado: tono-alerta; modo oscuro) */
-    --panel-insignia-tono-peligro-color-oscuro:    #f2b79e;   /* color del texto — insignia (estado: tono-peligro; modo oscuro) */
-    --panel-insignia-tono-peligro-fondo-oscuro:    color-mix(in oklab, var(--color-tierra) 22%, transparent);   /* fondo — insignia (estado: tono-peligro; modo oscuro) */
-    --panel-insignia-tono-peligro-borde-color-oscuro: color-mix(in oklab, var(--color-tierra) 48%, transparent);   /* color del borde — insignia (estado: tono-peligro; modo oscuro) */
-    --panel-insignia-tono-info-color-oscuro:       var(--color-menta);   /* color del texto — insignia (estado: tono-info; modo oscuro) */
-    --panel-insignia-tono-info-fondo-oscuro:       color-mix(in oklab, var(--color-menta) 18%, transparent);   /* fondo — insignia (estado: tono-info; modo oscuro) */
-    --panel-insignia-tono-info-borde-color-oscuro: color-mix(in oklab, var(--color-menta) 36%, transparent);   /* color del borde — insignia (estado: tono-info; modo oscuro) */
+    --panel-etiqueta-estado-tono-exito-color:      #3f5a0e;   /* color del texto — estado de etiqueta (estado: tono-exito) */
+    --panel-etiqueta-estado-tono-exito-fondo:      color-mix(in oklab, var(--color-citrico) 28%, var(--panel-tarjeta));   /* fondo — estado de etiqueta (estado: tono-exito) */
+    --panel-etiqueta-estado-tono-exito-borde-color: color-mix(in oklab, var(--color-citrico) 55%, transparent);   /* color del borde — estado de etiqueta (estado: tono-exito) */
+    --panel-etiqueta-estado-tono-alerta-color:     #7a4a2c;   /* color del texto — estado de etiqueta (estado: tono-alerta) */
+    --panel-etiqueta-estado-tono-alerta-fondo:     color-mix(in oklab, var(--color-arcilla) 22%, var(--panel-tarjeta));   /* fondo — estado de etiqueta (estado: tono-alerta) */
+    --panel-etiqueta-estado-tono-alerta-borde-color: color-mix(in oklab, var(--color-arcilla) 55%, transparent);   /* color del borde — estado de etiqueta (estado: tono-alerta) */
+    --panel-etiqueta-estado-tono-peligro-color:    #7a2f19;   /* color del texto — estado de etiqueta (estado: tono-peligro) */
+    --panel-etiqueta-estado-tono-peligro-fondo:    color-mix(in oklab, var(--color-tierra) 22%, var(--panel-tarjeta));   /* fondo — estado de etiqueta (estado: tono-peligro) */
+    --panel-etiqueta-estado-tono-peligro-borde-color: color-mix(in oklab, var(--color-tierra) 60%, transparent);   /* color del borde — estado de etiqueta (estado: tono-peligro) */
+    --panel-etiqueta-estado-tono-info-color:       #2f6a6f;   /* color del texto — estado de etiqueta (estado: tono-info) */
+    --panel-etiqueta-estado-tono-info-fondo:       color-mix(in oklab, var(--color-menta) 28%, var(--panel-tarjeta));   /* fondo — estado de etiqueta (estado: tono-info) */
+    --panel-etiqueta-estado-tono-info-borde-color: color-mix(in oklab, var(--color-menta) 55%, transparent);   /* color del borde — estado de etiqueta (estado: tono-info) */
+    --panel-etiqueta-estado-tono-neutro-color:     var(--color-texto-secundario);   /* color del texto — estado de etiqueta (estado: tono-neutro) */
+    --panel-etiqueta-estado-tono-neutro-fondo:     var(--panel-fondo-suave);   /* fondo — estado de etiqueta (estado: tono-neutro) */
+    --panel-etiqueta-estado-tono-neutro-borde-color: var(--panel-linea);   /* color del borde — estado de etiqueta (estado: tono-neutro) */
+    --panel-etiqueta-estado-tono-exito-color-oscuro: #e2ee9c;   /* color del texto — estado de etiqueta (estado: tono-exito; modo oscuro) */
+    --panel-etiqueta-estado-tono-exito-fondo-oscuro: color-mix(in oklab, var(--color-citrico) 18%, transparent);   /* fondo — estado de etiqueta (estado: tono-exito; modo oscuro) */
+    --panel-etiqueta-estado-tono-exito-borde-color-oscuro: color-mix(in oklab, var(--color-citrico) 32%, transparent);   /* color del borde — estado de etiqueta (estado: tono-exito; modo oscuro) */
+    --panel-etiqueta-estado-tono-alerta-color-oscuro: #f1c9a8;   /* color del texto — estado de etiqueta (estado: tono-alerta; modo oscuro) */
+    --panel-etiqueta-estado-tono-alerta-fondo-oscuro: color-mix(in oklab, var(--color-arcilla) 20%, transparent);   /* fondo — estado de etiqueta (estado: tono-alerta; modo oscuro) */
+    --panel-etiqueta-estado-tono-alerta-borde-color-oscuro: color-mix(in oklab, var(--color-arcilla) 42%, transparent);   /* color del borde — estado de etiqueta (estado: tono-alerta; modo oscuro) */
+    --panel-etiqueta-estado-tono-peligro-color-oscuro: #f2b79e;   /* color del texto — estado de etiqueta (estado: tono-peligro; modo oscuro) */
+    --panel-etiqueta-estado-tono-peligro-fondo-oscuro: color-mix(in oklab, var(--color-tierra) 22%, transparent);   /* fondo — estado de etiqueta (estado: tono-peligro; modo oscuro) */
+    --panel-etiqueta-estado-tono-peligro-borde-color-oscuro: color-mix(in oklab, var(--color-tierra) 48%, transparent);   /* color del borde — estado de etiqueta (estado: tono-peligro; modo oscuro) */
+    --panel-etiqueta-estado-tono-info-color-oscuro: var(--color-menta);   /* color del texto — estado de etiqueta (estado: tono-info; modo oscuro) */
+    --panel-etiqueta-estado-tono-info-fondo-oscuro: color-mix(in oklab, var(--color-menta) 18%, transparent);   /* fondo — estado de etiqueta (estado: tono-info; modo oscuro) */
+    --panel-etiqueta-estado-tono-info-borde-color-oscuro: color-mix(in oklab, var(--color-menta) 36%, transparent);   /* color del borde — estado de etiqueta (estado: tono-info; modo oscuro) */
     --panel-botoncito-separacion:                  6px;   /* separación entre elementos — botón chico */
     --panel-botoncito-alto:                        32px;   /* alto — botón chico */
     --panel-botoncito-relleno:                     0 14px;   /* espacio interno — botón chico */
@@ -476,18 +476,18 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--panel-insignia-separacion);
-    height: var(--panel-insignia-alto);
-    padding: var(--panel-insignia-relleno);
-    border-radius: var(--panel-insignia-redondeo);
-    font-family: var(--panel-insignia-fuente);
-    font-size: var(--panel-insignia-tamano);
-    font-weight: var(--panel-insignia-peso);
-    letter-spacing: var(--panel-insignia-espaciado);
+    gap: var(--panel-etiqueta-estado-separacion);
+    height: var(--panel-etiqueta-estado-alto);
+    padding: var(--panel-etiqueta-estado-relleno);
+    border-radius: var(--panel-etiqueta-estado-redondeo);
+    font-family: var(--panel-etiqueta-estado-fuente);
+    font-size: var(--panel-etiqueta-estado-tamano);
+    font-weight: var(--panel-etiqueta-estado-peso);
+    letter-spacing: var(--panel-etiqueta-estado-espaciado);
     text-transform: uppercase;
-    border: var(--panel-insignia-borde);
+    border: var(--panel-etiqueta-estado-borde);
     white-space: nowrap;
-    line-height: var(--panel-insignia-interlineado);
+    line-height: var(--panel-etiqueta-estado-interlineado);
 }
 
 .ea-dot {
@@ -499,57 +499,57 @@ body.dashboard-body { overflow-x: hidden; }
 }
 
 .ea-badge.tone-success {
-    color: var(--panel-insignia-tono-exito-color);
-    background: var(--panel-insignia-tono-exito-fondo);
-    border-color: var(--panel-insignia-tono-exito-borde-color);
+    color: var(--panel-etiqueta-estado-tono-exito-color);
+    background: var(--panel-etiqueta-estado-tono-exito-fondo);
+    border-color: var(--panel-etiqueta-estado-tono-exito-borde-color);
 }
 
 .ea-badge.tone-warning {
-    color: var(--panel-insignia-tono-alerta-color);
-    background: var(--panel-insignia-tono-alerta-fondo);
-    border-color: var(--panel-insignia-tono-alerta-borde-color);
+    color: var(--panel-etiqueta-estado-tono-alerta-color);
+    background: var(--panel-etiqueta-estado-tono-alerta-fondo);
+    border-color: var(--panel-etiqueta-estado-tono-alerta-borde-color);
 }
 
 .ea-badge.tone-danger {
-    color: var(--panel-insignia-tono-peligro-color);
-    background: var(--panel-insignia-tono-peligro-fondo);
-    border-color: var(--panel-insignia-tono-peligro-borde-color);
+    color: var(--panel-etiqueta-estado-tono-peligro-color);
+    background: var(--panel-etiqueta-estado-tono-peligro-fondo);
+    border-color: var(--panel-etiqueta-estado-tono-peligro-borde-color);
 }
 
 .ea-badge.tone-info {
-    color: var(--panel-insignia-tono-info-color);
-    background: var(--panel-insignia-tono-info-fondo);
-    border-color: var(--panel-insignia-tono-info-borde-color);
+    color: var(--panel-etiqueta-estado-tono-info-color);
+    background: var(--panel-etiqueta-estado-tono-info-fondo);
+    border-color: var(--panel-etiqueta-estado-tono-info-borde-color);
 }
 
 .ea-badge.tone-neutral {
-    color: var(--panel-insignia-tono-neutro-color);
-    background: var(--panel-insignia-tono-neutro-fondo);
-    border-color: var(--panel-insignia-tono-neutro-borde-color);
+    color: var(--panel-etiqueta-estado-tono-neutro-color);
+    background: var(--panel-etiqueta-estado-tono-neutro-fondo);
+    border-color: var(--panel-etiqueta-estado-tono-neutro-borde-color);
 }
 
 :root[data-theme="dark"] .ea-badge.tone-success {
-    color: var(--panel-insignia-tono-exito-color-oscuro);
-    background: var(--panel-insignia-tono-exito-fondo-oscuro);
-    border-color: var(--panel-insignia-tono-exito-borde-color-oscuro);
+    color: var(--panel-etiqueta-estado-tono-exito-color-oscuro);
+    background: var(--panel-etiqueta-estado-tono-exito-fondo-oscuro);
+    border-color: var(--panel-etiqueta-estado-tono-exito-borde-color-oscuro);
 }
 
 :root[data-theme="dark"] .ea-badge.tone-warning {
-    color: var(--panel-insignia-tono-alerta-color-oscuro);
-    background: var(--panel-insignia-tono-alerta-fondo-oscuro);
-    border-color: var(--panel-insignia-tono-alerta-borde-color-oscuro);
+    color: var(--panel-etiqueta-estado-tono-alerta-color-oscuro);
+    background: var(--panel-etiqueta-estado-tono-alerta-fondo-oscuro);
+    border-color: var(--panel-etiqueta-estado-tono-alerta-borde-color-oscuro);
 }
 
 :root[data-theme="dark"] .ea-badge.tone-danger {
-    color: var(--panel-insignia-tono-peligro-color-oscuro);
-    background: var(--panel-insignia-tono-peligro-fondo-oscuro);
-    border-color: var(--panel-insignia-tono-peligro-borde-color-oscuro);
+    color: var(--panel-etiqueta-estado-tono-peligro-color-oscuro);
+    background: var(--panel-etiqueta-estado-tono-peligro-fondo-oscuro);
+    border-color: var(--panel-etiqueta-estado-tono-peligro-borde-color-oscuro);
 }
 
 :root[data-theme="dark"] .ea-badge.tone-info {
-    color: var(--panel-insignia-tono-info-color-oscuro);
-    background: var(--panel-insignia-tono-info-fondo-oscuro);
-    border-color: var(--panel-insignia-tono-info-borde-color-oscuro);
+    color: var(--panel-etiqueta-estado-tono-info-color-oscuro);
+    background: var(--panel-etiqueta-estado-tono-info-fondo-oscuro);
+    border-color: var(--panel-etiqueta-estado-tono-info-borde-color-oscuro);
 }
 
 .ea-kbtn {
