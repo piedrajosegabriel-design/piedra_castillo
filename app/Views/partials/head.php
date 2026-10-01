@@ -36,10 +36,20 @@ $extraHead = $extraHead ?? '';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <?php /* asset() agrega ?v=<fecha del archivo> para que el navegador no siga
          mostrando el CSS viejo después de un cambio. Ver app/Helpers/eden_helper.php */ ?>
-<link rel="stylesheet" href="<?= asset('CSS/eden-brand.css') ?>">
-<?php foreach ($extraCss as $cssPath): ?>
-    <link rel="stylesheet" href="<?= asset($cssPath) ?>">
-<?php endforeach; ?>
+<?php if ($this->pantallaMigrada()): ?>
+    <?php /* comun.css: lo que comparten TODAS las pantallas (paleta, tipografía,
+             botones...). Después, la marca: app/Libraries/Vista.php la cambia
+             por el CSS de cada vista que usó la página (layout, partials y
+             pantalla), cada uno con el mismo nombre que su vista. */ ?>
+    <link rel="stylesheet" href="<?= asset('CSS/comun.css') ?>">
+    <?= \App\Libraries\Vista::MARCA_ESTILOS ?>
+<?php else: ?>
+    <?php /* TEMPORAL: pantallas que todavía no pasaron a los CSS nuevos. */ ?>
+    <link rel="stylesheet" href="<?= asset('CSS/eden-brand.css') ?>">
+    <?php foreach ($extraCss as $cssPath): ?>
+        <link rel="stylesheet" href="<?= asset($cssPath) ?>">
+    <?php endforeach; ?>
+<?php endif; ?>
 <?php /* Red de seguridad: .ea-reveal arranca en opacity:0 y lo destapa
          dashboard.js al entrar en pantalla. Si el JS no llega a correr
          (error de red, bloqueador, navegador viejo), sin esto la página se

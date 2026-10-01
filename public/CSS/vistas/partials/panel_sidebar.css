@@ -1,0 +1,444 @@
+/* =====================================================================
+   vistas/partials/panel_sidebar.css — el menú lateral del panel
+   ---------------------------------------------------------------------
+   Vista: app/Views/partials/panel_sidebar.php
+   Se carga sola en todas las pantallas que usan layouts/panel.php.
+
+   Qué hay acá: la marca de arriba, las opciones del menú (normal, al
+   pasar el mouse y la activa), el botón "Comprar EdenAir", el pie con
+   el estado y "Cerrar sesión", el menú colapsado (solo íconos) y el
+   cajón que se desliza en celular.
+
+   Abrir y cerrar el menú lo maneja JS/dashboard.js (clases
+   .sidebar-closed y .sidebar-open en .ea-dashboard).
+
+   Depende de: comun.css (paleta) y vistas/layouts/panel.css (anchos del
+   menú, líneas y fondos compartidos del panel).
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- El menú entero ---------------------------------------------- */
+    --menu-relleno:            18px 14px;                 /* espacio interno (arriba/abajo, costados) */
+    --menu-separacion:         2px;                       /* entre la marca, las opciones y el pie */
+    --menu-fondo:              var(--color-fondo-suave);
+    --menu-fondo-oscuro:       var(--panel-fondo-suave);
+    --menu-borde:              var(--panel-linea);        /* la línea del costado derecho */
+    --menu-scroll-color:       var(--panel-linea-fuerte); /* barrita de scroll si el menú no entra */
+    --menu-scroll-ancho:       6px;
+    --menu-cajon-ancho:        284px;                     /* ancho del menú en celular (se abre encima) */
+    --menu-cajon-ancho-max:    86vw;                      /* ...pero nunca más que esto: deja ver el velo */
+    --menu-cajon-sombra:       var(--panel-sombra-elevada);
+    --menu-alto-tactil:        44px;                      /* alto mínimo de las opciones en celular (para el dedo) */
+
+    /* ---- Marca de arriba (la "e" + EdenAir + "Panel · v0.5") --------- */
+    --menu-marca-separacion:   11px;                      /* entre la "e" y el texto */
+    --menu-marca-relleno:      4px 8px 18px;
+    --menu-marca-relleno-cerrado: 4px 0 18px;             /* con el menú colapsado */
+    --menu-logo-alto:          32px;                      /* alto de la "e" */
+    --menu-nombre-tamano:      1.125rem;                  /* "EdenAir" */
+    --menu-nombre-peso:        400;
+    --menu-nombre-espaciado:   -0.012em;
+    --menu-nombre-interlineado: 1.05;
+    --menu-nombre-color:       var(--color-texto);
+    --menu-nombre-color-oscuro: var(--verde-100);
+    --menu-nombre-air:         var(--verde-500);          /* el "Air" en cursiva */
+    --menu-nombre-air-oscuro:  var(--verde-300);
+    --menu-version-tamano:     0.6875rem;                 /* "Panel · v0.5" */
+    --menu-version-espaciado:  0.12em;
+    --menu-version-color:      var(--color-texto-suave);
+    --menu-version-margen:     4px;                       /* espacio arriba de la versión */
+
+    /* ---- Títulos de grupo ("CUENTA") --------------------------------- */
+    --menu-grupo-tamano:       0.6875rem;
+    --menu-grupo-peso:         500;
+    --menu-grupo-color:        var(--color-texto-suave);
+    --menu-grupo-espaciado:    0.14em;
+    --menu-grupo-relleno:      16px 12px 7px;
+
+    /* ---- Opciones del menú ------------------------------------------- */
+    --menu-opciones-separacion: 2px;                      /* entre una opción y otra */
+    --menu-opcion-separacion:  12px;                      /* entre el ícono y el texto */
+    --menu-opcion-relleno:     10px 12px;
+    --menu-opcion-relleno-cerrado: 10px 6px;              /* con el menú colapsado */
+    --menu-opcion-redondeo:    11px;
+    --menu-opcion-color:       var(--color-texto-secundario);
+    --menu-opcion-tamano:      0.8438rem;
+    --menu-opcion-peso:        500;
+    --menu-opcion-duracion-fondo: 0.18s;                  /* velocidad del cambio de fondo al pasar el mouse */
+    --menu-opcion-duracion-texto: 0.15s;
+    --menu-icono:              18px;
+
+    --menu-opcion-fondo-hover:        var(--verde-100);   /* al pasar el mouse */
+    --menu-opcion-color-hover:        var(--color-texto);
+    --menu-opcion-fondo-hover-oscuro: rgba(74, 122, 85, 0.18);
+    --menu-opcion-color-hover-oscuro: var(--verde-100);
+
+    --menu-activa-fondo:        var(--verde-200);         /* la opción de la pantalla actual */
+    --menu-activa-color:        var(--verde-800);
+    --menu-activa-peso:         600;
+    --menu-activa-fondo-oscuro: rgba(74, 122, 85, 0.32);
+    --menu-activa-color-oscuro: var(--verde-100);
+    --menu-activa-barra:        3px;                      /* la rayita de la izquierda: grosor */
+    --menu-activa-barra-margen: 9px;                      /* ...cuánto le falta arriba y abajo */
+    --menu-activa-barra-lugar:  -14px;                    /* ...dónde se para (pegada al borde del menú) */
+    --menu-activa-barra-color:  var(--verde-600);
+    --menu-activa-barra-color-oscuro: var(--verde-300);
+
+    --menu-anillo-foco:         0 0 0 3px rgba(74, 122, 85, 0.32);  /* contorno al llegar con el teclado */
+
+    /* ---- Globito con la cantidad de equipos -------------------------- */
+    --menu-globo-tamano:       0.6875rem;
+    --menu-globo-color:        var(--color-texto-suave);
+    --menu-globo-fondo:        var(--panel-tarjeta);
+    --menu-globo-borde:        var(--panel-linea);
+    --menu-globo-relleno:      2px 7px;
+    --menu-globo-redondeo:     6px;
+    --menu-globo-interlineado: 1.2;
+
+    /* ---- Pie: estado del sistema y "Cerrar sesión" -------------------- */
+    --menu-pie-separacion:     8px;
+    --menu-pie-margen:         14px;                      /* espacio arriba de la línea del pie */
+    --menu-pie-borde:          var(--panel-linea);
+    --menu-estado-separacion:  10px;
+    --menu-estado-relleno:     4px 12px;
+    --menu-estado-relleno-cerrado: 4px 0;
+    --menu-estado-color:       var(--color-texto-suave);
+    --menu-estado-tamano:      0.7188rem;
+    --menu-estado-punto:       8px;                       /* el puntito de "en línea" */
+    --menu-estado-punto-color: var(--color-citrico);
+    --menu-estado-punto-aro:   0 0 0 3px rgba(201, 216, 112, 0.3);
+
+    --menu-salir-separacion:   10px;
+    --menu-salir-relleno:      11px 12px;
+    --menu-salir-redondeo:     11px;
+    --menu-salir-borde:        color-mix(in oklab, var(--color-tierra) 32%, var(--panel-linea));
+    --menu-salir-fondo:        var(--color-peligro-suave);
+    --menu-salir-color:        var(--color-tierra);
+    --menu-salir-color-oscuro: #f2b79e;
+    --menu-salir-tamano:       0.8125rem;
+    --menu-salir-peso:         600;
+    --menu-salir-duracion:     0.15s;
+    --menu-salir-icono:        16px;
+    --menu-salir-fondo-hover:  color-mix(in oklab, var(--color-tierra) 16%, var(--panel-tarjeta));
+    --menu-salir-borde-hover:  color-mix(in oklab, var(--color-tierra) 55%, transparent);
+    --menu-salir-color-hover:  var(--color-tierra);
+    --menu-salir-color-hover-oscuro: #f6c6b2;
+
+    /* ---- Botón "Comprar EdenAir" -------------------------------------- */
+    --menu-compra-margen:      8px 12px 4px;
+    --menu-compra-relleno:     10px 12px;
+    --menu-compra-redondeo:    12px;
+    --menu-compra-fondo:       linear-gradient(120deg, var(--verde-700), var(--verde-600));
+    --menu-compra-color:       #ffffff;
+    --menu-compra-icono-color: var(--color-citrico);
+    --menu-compra-peso:        600;
+    --menu-compra-sombra:      0 6px 18px rgba(28, 64, 41, 0.25), inset 0 0 0 1px rgba(201, 216, 112, 0.22);
+    --menu-compra-sombra-hover: 0 10px 24px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.38);
+    --menu-compra-subida:      -1px;                      /* cuánto sube al pasar el mouse */
+    --menu-compra-duracion:    0.16s;
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     960px → celular/tablet: el menú pasa a ser un cajón que se    #
+   #             desliza desde la izquierda                            #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- El menú --------------------------------------------------
+   Acá se pinta y se ordena. La posición (fijo a la izquierda, ancho,
+   colapsado) está más abajo, en "Layout fijo". */
+.ea-sidebar {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: var(--menu-separacion);
+    padding: var(--menu-relleno);
+    background: var(--menu-fondo);
+    border-right: var(--grosor-linea) solid var(--menu-borde);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--menu-scroll-color) transparent;
+}
+
+:root[data-theme="dark"] .ea-sidebar { background: var(--menu-fondo-oscuro); }
+
+.ea-sidebar::-webkit-scrollbar { width: var(--menu-scroll-ancho); }
+.ea-sidebar::-webkit-scrollbar-thumb { background: var(--menu-scroll-color); border-radius: var(--redondeo-pildora); }
+
+/* ---------- Marca de arriba ------------------------------------------- */
+.ea-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--menu-marca-separacion);
+    padding: var(--menu-marca-relleno);
+}
+
+/* La "e" va sin caja: el ancho sale de su proporción y el alto se fija
+   acá. Los colores del trazo los pone .ea-logo-mark--e (comun.css). */
+.ea-sidebar-mark {
+    display: grid;
+    place-items: center;
+}
+.ea-sidebar-mark--e {
+    flex: 0 0 auto;
+    overflow: visible;
+}
+.ea-sidebar-mark--e svg { width: auto; height: var(--menu-logo-alto); display: block; }
+
+.ea-sidebar-word { display: flex; flex-direction: column; line-height: var(--menu-nombre-interlineado); min-width: 0; }
+
+.ea-sidebar-word b {
+    font-family: var(--fuente-titulos);
+    font-weight: var(--menu-nombre-peso);
+    font-size: var(--menu-nombre-tamano);
+    letter-spacing: var(--menu-nombre-espaciado);
+    color: var(--menu-nombre-color);
+}
+
+.ea-sidebar-word b em { font-style: italic; color: var(--menu-nombre-air); }
+:root[data-theme="dark"] .ea-sidebar-word b { color: var(--menu-nombre-color-oscuro); }
+:root[data-theme="dark"] .ea-sidebar-word b em { color: var(--menu-nombre-air-oscuro); }
+
+.ea-sidebar-word span {
+    font-family: var(--fuente-codigo);
+    font-size: var(--menu-version-tamano);
+    letter-spacing: var(--menu-version-espaciado);
+    text-transform: uppercase;
+    color: var(--menu-version-color);
+    margin-top: var(--menu-version-margen);
+}
+
+/* ---------- Opciones -------------------------------------------------- */
+.ea-sidebar-nav { display: flex; flex-direction: column; gap: var(--menu-opciones-separacion); }
+
+.ea-sidebar-section {
+    font-family: var(--fuente-codigo);
+    font-size: var(--menu-grupo-tamano);
+    font-weight: var(--menu-grupo-peso);
+    color: var(--menu-grupo-color);
+    letter-spacing: var(--menu-grupo-espaciado);
+    text-transform: uppercase;
+    padding: var(--menu-grupo-relleno);
+}
+
+.ea-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--menu-opcion-separacion);
+    padding: var(--menu-opcion-relleno);
+    border-radius: var(--menu-opcion-redondeo);
+    color: var(--menu-opcion-color);
+    font-size: var(--menu-opcion-tamano);
+    font-weight: var(--menu-opcion-peso);
+    text-decoration: none;
+    transition: background-color var(--menu-opcion-duracion-fondo) var(--curva-suave), color var(--menu-opcion-duracion-texto) ease;
+    position: relative;
+}
+
+.ea-sidebar-item:hover { background: var(--menu-opcion-fondo-hover); color: var(--menu-opcion-color-hover); }
+:root[data-theme="dark"] .ea-sidebar-item:hover { background: var(--menu-opcion-fondo-hover-oscuro); color: var(--menu-opcion-color-hover-oscuro); }
+
+.ea-sidebar-item.is-active {
+    background: var(--menu-activa-fondo);
+    color: var(--menu-activa-color);
+    font-weight: var(--menu-activa-peso);
+}
+
+:root[data-theme="dark"] .ea-sidebar-item.is-active { background: var(--menu-activa-fondo-oscuro); color: var(--menu-activa-color-oscuro); }
+
+/* La rayita vertical a la izquierda de la opción activa */
+.ea-sidebar-item.is-active::before {
+    content: "";
+    position: absolute;
+    left: var(--menu-activa-barra-lugar);
+    top: var(--menu-activa-barra-margen);
+    bottom: var(--menu-activa-barra-margen);
+    width: var(--menu-activa-barra);
+    background: var(--menu-activa-barra-color);
+    border-radius: 0 var(--menu-activa-barra) var(--menu-activa-barra) 0;
+}
+
+:root[data-theme="dark"] .ea-sidebar-item.is-active::before { background: var(--menu-activa-barra-color-oscuro); }
+
+.ea-sidebar-icon { flex: 0 0 var(--menu-icono); display: inline-flex; }
+.ea-sidebar-icon svg { width: var(--menu-icono); height: var(--menu-icono); }
+
+.ea-sidebar-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Globito con la cantidad de equipos ("Mis dispositivos  2") */
+.ea-sidebar-meta {
+    font-family: var(--fuente-codigo);
+    font-size: var(--menu-globo-tamano);
+    color: var(--menu-globo-color);
+    background: var(--menu-globo-fondo);
+    border: var(--grosor-linea) solid var(--menu-globo-borde);
+    padding: var(--menu-globo-relleno);
+    border-radius: var(--menu-globo-redondeo);
+    line-height: var(--menu-globo-interlineado);
+}
+
+/* ---------- Pie ------------------------------------------------------- */
+.ea-sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--menu-pie-separacion);
+    padding-top: var(--menu-pie-margen);
+    border-top: var(--grosor-linea) solid var(--menu-pie-borde);
+}
+
+.ea-sidebar-status {
+    display: flex;
+    align-items: center;
+    gap: var(--menu-estado-separacion);
+    padding: var(--menu-estado-relleno);
+    color: var(--menu-estado-color);
+    font-size: var(--menu-estado-tamano);
+}
+
+.ea-sidebar-dot {
+    width: var(--menu-estado-punto);
+    height: var(--menu-estado-punto);
+    border-radius: 50%;
+    background: var(--menu-estado-punto-color);
+    box-shadow: var(--menu-estado-punto-aro);
+    flex-shrink: 0;
+}
+
+.ea-sidebar-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--menu-salir-separacion);
+    padding: var(--menu-salir-relleno);
+    border-radius: var(--menu-salir-redondeo);
+    border: var(--grosor-linea) solid var(--menu-salir-borde);
+    background: var(--menu-salir-fondo);
+    color: var(--menu-salir-color);
+    font-size: var(--menu-salir-tamano);
+    font-weight: var(--menu-salir-peso);
+    text-decoration: none;
+    transition: background-color var(--menu-salir-duracion) ease, border-color var(--menu-salir-duracion) ease, color var(--menu-salir-duracion) ease;
+}
+
+.ea-sidebar-logout svg { flex: 0 0 var(--menu-salir-icono); }
+
+.ea-sidebar-logout:hover {
+    background: var(--menu-salir-fondo-hover);
+    border-color: var(--menu-salir-borde-hover);
+    color: var(--menu-salir-color-hover);
+}
+
+:root[data-theme="dark"] .ea-sidebar-logout { color: var(--menu-salir-color-oscuro); }
+:root[data-theme="dark"] .ea-sidebar-logout:hover { color: var(--menu-salir-color-hover-oscuro); }
+
+.ea-sidebar-logout:focus-visible,
+.ea-sidebar-item:focus-visible {
+    outline: none;
+    box-shadow: var(--menu-anillo-foco);
+}
+
+/* ---------- Menú colapsado: solo íconos ------------------------------- */
+.ea-dashboard.sidebar-closed .ea-sidebar-word,
+.ea-dashboard.sidebar-closed .ea-sidebar-label,
+.ea-dashboard.sidebar-closed .ea-sidebar-meta,
+.ea-dashboard.sidebar-closed .ea-sidebar-section,
+.ea-dashboard.sidebar-closed .ea-sidebar-foot-label {
+    display: none;
+}
+
+.ea-dashboard.sidebar-closed .ea-sidebar-item,
+.ea-dashboard.sidebar-closed .ea-sidebar-logout { justify-content: center; padding: var(--menu-opcion-relleno-cerrado); }
+.ea-dashboard.sidebar-closed .ea-sidebar-brand { justify-content: center; padding: var(--menu-marca-relleno-cerrado); }
+.ea-dashboard.sidebar-closed .ea-sidebar-status { justify-content: center; padding: var(--menu-estado-relleno-cerrado); }
+
+/* ---------- Celular y tablet: el menú es un cajón --------------------- */
+@media (max-width: 960px) {
+    .ea-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+        height: 100vh;
+        width: var(--menu-cajon-ancho);
+        transform: translateX(-100%);
+        transition: transform var(--panel-menu-duracion) ease;
+        box-shadow: var(--menu-cajon-sombra);
+    }
+
+    /* Abierto: entra y muestra los textos aunque en escritorio esté colapsado */
+    .ea-dashboard.sidebar-open .ea-sidebar { transform: translateX(0); }
+    .ea-dashboard.sidebar-open .ea-sidebar-word,
+    .ea-dashboard.sidebar-open .ea-sidebar-label,
+    .ea-dashboard.sidebar-open .ea-sidebar-meta,
+    .ea-dashboard.sidebar-open .ea-sidebar-section,
+    .ea-dashboard.sidebar-open .ea-sidebar-foot-label { display: revert; }
+
+    /* Zonas de toque cómodas para el dedo */
+    .ea-sidebar-item,
+    .ea-sidebar-logout { min-height: var(--menu-alto-tactil); }
+}
+
+/* ---------- Impresión: el menú no se imprime -------------------------- */
+@media print {
+    .ea-sidebar { display: none !important; }
+}
+
+/* ---------- Layout fijo -----------------------------------------------
+   El menú es fijo en TODAS las resoluciones (lo necesita el scroll suave
+   de GSAP). El contenido le deja lugar desde vistas/layouts/panel.css. */
+.ea-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--panel-ancho-menu);
+    z-index: 50;
+    /* Mismo tiempo que el contenido y la barra: se mueven en bloque */
+    transition: width var(--panel-menu-duracion) var(--curva-suave, ease), transform var(--panel-menu-duracion) var(--curva-suave, ease);
+}
+.ea-dashboard.sidebar-closed .ea-sidebar { width: var(--panel-ancho-menu-cerrado); }
+
+@media (max-width: 960px) {
+    /* Cajón: en pantallas muy angostas deja ver el velo de atrás */
+    .ea-sidebar { width: min(var(--menu-cajon-ancho), var(--menu-cajon-ancho-max)); transition: transform var(--panel-menu-duracion) var(--curva-suave, ease); }
+    .ea-dashboard.sidebar-closed .ea-sidebar { width: min(var(--menu-cajon-ancho), var(--menu-cajon-ancho-max)); }
+}
+
+/* ---------- Opción "Comprar EdenAir" destacada ------------------------ */
+.ea-sidebar-item--cta {
+    margin: var(--menu-compra-margen);
+    padding: var(--menu-compra-relleno) !important;
+    border-radius: var(--menu-compra-redondeo);
+    background: var(--menu-compra-fondo);
+    color: var(--menu-compra-color) !important;
+    box-shadow: var(--menu-compra-sombra);
+    transition: transform var(--menu-compra-duracion) ease, box-shadow var(--menu-compra-duracion) ease;
+}
+.ea-sidebar-item--cta:hover {
+    transform: translateY(var(--menu-compra-subida));
+    box-shadow: var(--menu-compra-sombra-hover);
+}
+.ea-sidebar-item--cta .ea-sidebar-icon { color: var(--menu-compra-icono-color); }
+.ea-sidebar-item--cta .ea-sidebar-label { color: var(--menu-compra-color) !important; font-weight: var(--menu-compra-peso); }

@@ -1,0 +1,183 @@
+/* =====================================================================
+   vistas/ambientes/index.css — pantalla "Ambientes"
+   ---------------------------------------------------------------------
+   Vista: app/Views/ambientes/index.php  ·  Ruta: /panel/ambientes
+   Se carga sola cuando se dibuja esa vista.
+
+   La pantalla tiene dos partes:
+     1. "Tus ambientes": una ficha por ambiente con sus rangos y los
+        equipos que tiene asignados.
+     2. "Rangos por tipo de espacio": la referencia de qué rangos usa
+        cada tipo (oficina, aula, hogar, dormitorio, personalizable).
+
+   Lo que NO está acá porque lo comparte con otras pantallas del panel
+   (está en vistas/layouts/panel.css): el título de sección con el botón,
+   la grilla de fichas, la ficha, la insignia de estado, la lista de datos
+   y el estado vacío (.ea-dev-*).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Ficha de ambiente: aviso de dónde salen los rangos ----------
+       ("Usa los rangos recomendados..." / "Rangos ajustados a medida...") */
+    --ambientes-origen-margen-arriba: -4px;   /* negativo: lo pega un poco al nombre */
+    --ambientes-origen-margen-abajo:  2px;
+    --ambientes-origen-tamano:        0.7813rem;
+    --ambientes-origen-interlineado:  1.45;
+    --ambientes-origen-color:         var(--color-texto-suave);
+
+    /* ---- Ficha de ambiente: equipos asignados ------------------------ */
+    --ambientes-equipos-margen:       4px 0 6px;   /* arriba / costados / abajo de la lista */
+    --ambientes-equipos-separacion:   6px;         /* entre un equipo y otro */
+    --ambientes-equipo-separacion:    8px;         /* entre el puntito y el nombre */
+    --ambientes-equipo-relleno:       8px 10px;
+    --ambientes-equipo-redondeo:      8px;
+    --ambientes-equipo-fondo:         var(--color-linea-suave);
+    --ambientes-equipo-tamano:        0.8125rem;
+    --ambientes-equipo-color:         var(--color-texto-secundario);
+    --ambientes-equipo-tipo-color:    var(--color-texto-suave);   /* el "· Eden Air Core" */
+    --ambientes-equipo-punto:         6px;
+    --ambientes-equipo-punto-color:   var(--verde-500);
+
+    /* ---- Referencia "Rangos por tipo de espacio" --------------------- */
+    --ambientes-ref-margen-arriba:    clamp(22px, 4vw, 34px);   /* separación de las fichas de arriba */
+    --ambientes-ref-titulo-margen:    14px;                     /* espacio debajo del título */
+    --ambientes-ref-ancho-minimo:     240px;                    /* debajo de esto una tarjeta baja de renglón */
+    --ambientes-ref-separacion:       14px;                     /* entre tarjetas */
+
+    /* Tarjeta de un tipo de espacio */
+    --ambientes-tipo-separacion:      10px;
+    --ambientes-tipo-relleno:         16px;
+    --ambientes-tipo-redondeo:        var(--redondeo-medio);
+    --ambientes-tipo-fondo:           var(--color-tarjeta);
+    --ambientes-tipo-borde:           var(--color-linea);
+    --ambientes-tipo-cabeza-separacion: 10px;                   /* entre ícono, nombre e insignia */
+    --ambientes-tipo-nombre-tamano:   1.0625rem;
+    --ambientes-tipo-nombre-color:    var(--color-texto);
+    --ambientes-tipo-texto-tamano:    0.8125rem;                /* descripción y aviso "sin rangos fijos" */
+    --ambientes-tipo-texto-interlineado: 1.5;
+    --ambientes-tipo-texto-color:     var(--color-texto-suave);
+    --ambientes-tipo-icono-color:     var(--verde-500);         /* ícono chico de temperatura, humedad, CO₂ */
+    --ambientes-tipo-icono-separacion: 6px;
+
+    /* El tipo que el usuario ya está usando se destaca con el verde de marca */
+    --ambientes-tipo-usado-borde:        var(--verde-300);
+    --ambientes-tipo-usado-borde-oscuro: var(--verde-500);
+    --ambientes-tipo-usado-sombra:       var(--sombra-chica);
+
+    /* Recuadro del tipo "Personalizable" ("Sin rangos fijos: ...") */
+    --ambientes-libre-relleno:        10px 12px;
+    --ambientes-libre-redondeo:       10px;
+    --ambientes-libre-fondo:          var(--color-linea-suave);
+    --ambientes-libre-color:          var(--color-texto-secundario);
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Esta pantalla no tiene cortes de pantalla propios: las grillas  #
+   #   se acomodan solas con el ancho mínimo de cada tarjeta.          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Ficha de ambiente: origen de los rangos ------------------- */
+.ea-amb-origen {
+    margin: var(--ambientes-origen-margen-arriba) 0 var(--ambientes-origen-margen-abajo);
+    font-size: var(--ambientes-origen-tamano);
+    line-height: var(--ambientes-origen-interlineado);
+    color: var(--ambientes-origen-color);
+}
+
+/* ---------- Referencia: rangos por tipo de espacio -------------------- */
+.ea-amb-ref { margin-top: var(--ambientes-ref-margen-arriba); }
+.ea-amb-ref-head { margin-bottom: var(--ambientes-ref-titulo-margen); }
+.ea-amb-ref-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--ambientes-ref-ancho-minimo), 1fr));
+    gap: var(--ambientes-ref-separacion);
+}
+.ea-amb-ref-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ambientes-tipo-separacion);
+    padding: var(--ambientes-tipo-relleno);
+    border-radius: var(--ambientes-tipo-redondeo);
+    background: var(--ambientes-tipo-fondo);
+    border: var(--grosor-linea) solid var(--ambientes-tipo-borde);
+}
+/* El tipo que el usuario ya está usando */
+.ea-amb-ref-card.is-usado {
+    border-color: var(--ambientes-tipo-usado-borde);
+    box-shadow: var(--ambientes-tipo-usado-sombra);
+}
+.ea-amb-ref-card-head { display: flex; align-items: center; gap: var(--ambientes-tipo-cabeza-separacion); }
+.ea-amb-ref-name {
+    font-family: var(--fuente-titulos);
+    font-size: var(--ambientes-tipo-nombre-tamano);
+    margin: 0;
+    color: var(--ambientes-tipo-nombre-color);
+    flex: 1;
+}
+.ea-amb-ref-desc, .ea-amb-ref-libre {
+    margin: 0;
+    font-size: var(--ambientes-tipo-texto-tamano);
+    line-height: var(--ambientes-tipo-texto-interlineado);
+    color: var(--ambientes-tipo-texto-color);
+}
+.ea-amb-ref-libre {
+    padding: var(--ambientes-libre-relleno);
+    border-radius: var(--ambientes-libre-redondeo);
+    background: var(--ambientes-libre-fondo);
+    color: var(--ambientes-libre-color);
+}
+/* Ícono chico al lado de "Temperatura", "Humedad" y "CO₂ máx" */
+.ea-amb-ref-card .ea-dev-meta dt {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ambientes-tipo-icono-separacion);
+}
+.ea-amb-ref-card .ea-dev-meta dt svg { color: var(--ambientes-tipo-icono-color); }
+
+/* ---------- Ficha de ambiente: equipos asignados ---------------------- */
+.ea-amb-devices {
+    list-style: none;
+    margin: var(--ambientes-equipos-margen);
+    padding: 0;
+    display: grid;
+    gap: var(--ambientes-equipos-separacion);
+}
+.ea-amb-devices li {
+    display: flex;
+    align-items: center;
+    gap: var(--ambientes-equipo-separacion);
+    padding: var(--ambientes-equipo-relleno);
+    border-radius: var(--ambientes-equipo-redondeo);
+    background: var(--ambientes-equipo-fondo);
+    font-size: var(--ambientes-equipo-tamano);
+    color: var(--ambientes-equipo-color);
+}
+.ea-amb-devices small { color: var(--ambientes-equipo-tipo-color); }
+.ea-amb-dot {
+    width: var(--ambientes-equipo-punto); height: var(--ambientes-equipo-punto);
+    border-radius: 50%;
+    background: var(--ambientes-equipo-punto-color);
+}
+
+/* ---------- Modo oscuro ----------------------------------------------- */
+:root[data-theme="dark"] .ea-amb-ref-card.is-usado { border-color: var(--ambientes-tipo-usado-borde-oscuro); }

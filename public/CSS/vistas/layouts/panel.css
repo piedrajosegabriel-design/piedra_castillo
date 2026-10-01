@@ -1,0 +1,542 @@
+/* =====================================================================
+   vistas/layouts/panel.css — el esqueleto de TODAS las pantallas internas
+   ---------------------------------------------------------------------
+   Vista: app/Views/layouts/panel.php
+   Se carga sola en: panel, bienvenida, dispositivos, conectar, ambientes,
+   editar ambiente, perfil y compra (todas usan este layout).
+
+   Qué hay acá:
+     · los valores compartidos del panel (anchos del menú, líneas, fondos
+       de tarjeta) que también usan el menú lateral y la barra superior
+     · el fondo de la página, el área de contenido y la entrada animada
+     · el velo oscuro detrás del menú en celular
+     · el cuadro de confirmación que arma JS/dashboard.js
+     · las piezas que comparten varias pantallas del panel: la barra de
+       título de sección y las tarjetas de equipo/ambiente (.ea-dev-*)
+
+   El menú lateral y la barra superior tienen su propio archivo:
+   vistas/partials/panel_sidebar.css y vistas/partials/panel_header.css.
+
+   Depende de: comun.css (paleta y botones).
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Medidas del armazón ------------------------------------------ */
+    --panel-ancho-menu:          248px;   /* ancho del menú lateral abierto */
+    --panel-ancho-menu-cerrado:  76px;    /* ancho del menú lateral colapsado (solo íconos) */
+    --panel-alto-cabecera:       64px;    /* alto de la barra superior (JS lo corrige con la altura real) */
+    --panel-menu-duracion:       0.25s;   /* lo que tarda en abrir/cerrar el menú; la barra y el contenido se mueven igual */
+
+    /* ---- Valores compartidos del panel --------------------------------
+       Los usan también el menú lateral y la barra superior. */
+    --panel-redondeo:         16px;
+    --panel-separacion:       clamp(14px, 2vw, 18px);     /* espacio entre los bloques del contenido */
+    --panel-linea:            rgba(14, 31, 23, 0.08);     /* bordes finos */
+    --panel-linea-fuerte:     rgba(14, 31, 23, 0.14);     /* bordes más marcados */
+    --panel-fondo-suave:      #f0ece2;
+    --panel-tarjeta:          #ffffff;                    /* fondo de tarjetas y botones de la barra */
+    --panel-sombra-elevada:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 14px 34px -16px rgba(14, 31, 23, 0.24);
+
+    /* ---- Fondo de la página ------------------------------------------- */
+    --panel-fondo-pagina:
+        radial-gradient(circle at 0% 0%, rgba(143, 214, 200, 0.12), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(188, 210, 189, 0.14), transparent 36%),
+        linear-gradient(180deg, var(--color-fondo) 0%, var(--color-fondo-aire) 100%);
+    --panel-fondo-pagina-oscuro:
+        radial-gradient(circle at 0% 0%, rgba(143, 214, 200, 0.10), transparent 34%),
+        radial-gradient(circle at 100% 100%, rgba(43, 86, 56, 0.40), transparent 40%),
+        linear-gradient(180deg, var(--color-fondo) 0%, #0a1611 100%);
+
+    /* ---- Letras del panel --------------------------------------------- */
+    --panel-titulos-peso:       400;       /* h1, h2 y h3 del panel (con la letra serif) */
+    --panel-titulos-espaciado:  -0.015em;
+    --panel-serif-espaciado:    -0.01em;   /* textos .ea-serif */
+
+    /* ---- Entrada de la pantalla y aparición al hacer scroll ----------- */
+    --panel-entrada-duracion:        0.4s;   /* fundido del panel al terminar de cargar */
+    --panel-entrada-desplazamiento:  12px;   /* cuánto sube el panel al aparecer */
+    --panel-aparicion-duracion:      0.5s;   /* bloques .ea-reveal al entrar en pantalla */
+    --panel-aparicion-desplazamiento: 14px;
+
+    /* ---- Área de contenido -------------------------------------------- */
+    --panel-contenido-relleno-arriba:  clamp(16px, 2.6vw, 26px);
+    --panel-contenido-relleno-lados:   clamp(14px, 2.6vw, 26px);
+    --panel-contenido-relleno-abajo:   clamp(44px, 6vw, 64px);
+    --panel-contenido-ancho-max:       1380px;   /* ancho máximo del contenido */
+    --panel-contenido-ancho-max-ancha: 1660px;   /* lo mismo, en ventanas desde 1700px */
+    --panel-impresion-relleno:         12px;     /* margen del contenido al imprimir */
+
+    /* ---- Velo oscuro detrás del menú abierto en celular --------------- */
+    --panel-velo-color:       rgba(14, 31, 23, 0.45);
+    --panel-velo-desenfoque:  2px;
+    --panel-velo-duracion:    0.2s;
+
+    /* ---- Cuadro de confirmación ("¿Seguro que...?") ------------------- */
+    --confirmar-velo-color:     rgba(14, 31, 23, 0.52);
+    --confirmar-velo-relleno:   18px;
+    --confirmar-duracion:       0.18s;
+    --confirmar-ancho:          440px;
+    --confirmar-separacion:     14px;
+    --confirmar-relleno:        18px;
+    --confirmar-sombra:         0 24px 70px -36px rgba(14, 31, 23, 0.72);
+    --confirmar-entrada-bajada: 8px;      /* el cuadro entra subiendo desde un poco más abajo... */
+    --confirmar-entrada-escala: 0.98;     /* ...y un poco más chico */
+    --confirmar-icono:          44px;     /* el cuadrado del ícono de advertencia */
+    --confirmar-icono-redondeo: 12px;
+    --confirmar-icono-fondo:    color-mix(in oklab, var(--color-arcilla) 18%, var(--panel-tarjeta));
+    --confirmar-icono-borde:    color-mix(in oklab, var(--color-arcilla) 42%, var(--panel-linea-fuerte));
+    --confirmar-icono-color:    #7a4a2c;
+    --confirmar-icono-dibujo:   22px;
+    --confirmar-titulo-color:   var(--color-texto);
+    --confirmar-titulo-tamano:  1.125rem;
+    --confirmar-titulo-peso:    700;
+    --confirmar-texto-separacion: 7px;
+    --confirmar-texto-color:    var(--color-texto-secundario);
+    --confirmar-texto-tamano:   0.8125rem;
+    --confirmar-texto-interlineado: 1.5;
+    --confirmar-botones-separacion: 10px;
+    --confirmar-botones-margen: 4px;
+
+    /* ---- Título de sección (.ea-dev-toolbar: "Tus ambientes" + botón) -- */
+    --panel-seccion-separacion:     18px;    /* entre el título y el botón */
+    --panel-seccion-margen-abajo:   22px;
+    --panel-seccion-titulo-tamano:  clamp(19px, 2vw, 22px);
+    --panel-seccion-titulo-margen:  4px;     /* espacio debajo del título */
+    --panel-seccion-titulo-color:   var(--color-texto);
+    --panel-seccion-bajada-ancho:   56ch;    /* ancho máximo del texto de abajo (en caracteres) */
+    --panel-seccion-bajada-color:   var(--color-texto-suave);
+    --panel-seccion-bajada-tamano:  0.875rem;
+    --panel-seccion-bajada-interlineado: 1.5;
+
+    /* ---- Grilla de fichas (tarjetas de equipos y de ambientes) -------- */
+    --panel-fichas-ancho-minimo:    280px;   /* debajo de esto una ficha baja de renglón */
+    --panel-fichas-separacion:      18px;
+    --panel-fichas-margen-abajo:    30px;
+
+    /* ---- Ficha (.ea-dev-card) ----------------------------------------- */
+    --panel-ficha-separacion:       12px;    /* espacio entre las partes de la ficha */
+    --panel-ficha-relleno:          20px;
+    --panel-ficha-redondeo:         var(--redondeo-grande);
+    --panel-ficha-fondo:            var(--color-tarjeta);
+    --panel-ficha-borde:            var(--color-linea);
+    --panel-ficha-sombra:           var(--sombra-chica);
+    --panel-ficha-duracion:         0.18s;
+    --panel-ficha-subida-hover:     -2px;    /* cuánto sube al pasar el mouse */
+    --panel-ficha-sombra-hover:     var(--sombra-media);
+    --panel-ficha-borde-hover:      var(--verde-300);
+    --panel-ficha-icono:            38px;    /* el cuadradito del ícono */
+    --panel-ficha-icono-redondeo:   12px;
+    --panel-ficha-icono-fondo:      var(--color-exito-suave);
+    --panel-ficha-icono-color:      var(--verde-500);
+    --panel-ficha-icono-dibujo:     20px;
+    --panel-ficha-nombre-tamano:    1.1875rem;
+    --panel-ficha-nombre-color:     var(--color-texto);
+    --panel-ficha-pie-separacion:   10px;    /* entre el botón y el texto de al lado */
+    --panel-ficha-pie-margen:       6px;     /* espacio arriba del pie */
+    --panel-ficha-codigo-tamano:    0.6875rem;
+    --panel-ficha-codigo-color:     var(--color-texto-suave);
+
+    /* ---- Datos de la ficha (lista "Rango temp ... 20° a 24°") --------- */
+    --panel-datos-separacion:       8px;     /* entre renglones */
+    --panel-datos-separacion-fila:  12px;    /* entre el nombre del dato y su valor */
+    --panel-datos-tamano:           0.8125rem;
+    --panel-datos-nombre-color:     var(--color-texto-suave);
+    --panel-datos-valor-color:      var(--color-texto-secundario);
+    --panel-datos-valor-peso:       500;
+
+    /* ---- Insignia de estado (.ea-dev-badge: "● Oficina", "● En uso") -- */
+    --panel-insignia-separacion:    6px;
+    --panel-insignia-relleno:       4px 10px;
+    --panel-insignia-redondeo:      var(--redondeo-pildora);
+    --panel-insignia-tamano:        0.7188rem;
+    --panel-insignia-peso:          600;
+    --panel-insignia-espaciado:     0.01em;
+    --panel-insignia-punto:         7px;
+    --panel-insignia-exito-color:   var(--color-exito);
+    --panel-insignia-exito-fondo:   var(--color-exito-suave);
+    --panel-insignia-info-color:    var(--color-info);
+    --panel-insignia-info-fondo:    var(--color-info-suave);
+    --panel-insignia-alerta-color:  var(--color-alerta);
+    --panel-insignia-alerta-fondo:  var(--color-alerta-suave);
+    --panel-insignia-peligro-color: var(--color-peligro);
+    --panel-insignia-peligro-fondo: var(--color-peligro-suave);
+
+    /* ---- Estado vacío ("Todavía no tenés ...") ------------------------ */
+    --panel-vacio-relleno:          48px 24px;
+    --panel-vacio-redondeo:         var(--redondeo-grande);
+    --panel-vacio-fondo:            var(--color-tarjeta);
+    --panel-vacio-borde:            var(--color-linea);
+    --panel-vacio-sombra:           var(--sombra-chica);
+    --panel-vacio-margen-abajo:     30px;
+    --panel-vacio-esfera:           64px;    /* la bolita verde de arriba */
+    --panel-vacio-esfera-margen:    18px;
+    --panel-vacio-esfera-color:     radial-gradient(circle at 35% 30%, var(--verde-400), var(--verde-700));
+    --panel-vacio-esfera-aro:       0 0 0 8px var(--color-exito-suave);
+    --panel-vacio-titulo-tamano:    1.375rem;
+    --panel-vacio-titulo-margen:    8px;
+    --panel-vacio-titulo-color:     var(--color-texto);
+    --panel-vacio-texto-margen:     18px;
+    --panel-vacio-texto-ancho:      48ch;
+    --panel-vacio-texto-color:      var(--color-texto-suave);
+    --panel-vacio-texto-interlineado: 1.55;
+
+    /* ---- Movimiento reducido ------------------------------------------
+       Si la compu pide "reducir movimiento", todas las animaciones del
+       panel duran esto (prácticamente nada). */
+    --panel-movimiento-reducido:    0.01ms;
+}
+
+/* ---- Valores compartidos en modo oscuro ------------------------------ */
+:root[data-theme="dark"] {
+    --panel-linea:          rgba(255, 255, 255, 0.07);
+    --panel-linea-fuerte:   rgba(255, 255, 255, 0.14);
+    --panel-fondo-suave:    #101e17;
+    --panel-tarjeta:        #14221c;
+    --panel-sombra-elevada:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 18px 42px -20px rgba(0, 0, 0, 0.72);
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     1700px → el contenido se ensancha en pantallas muy anchas     #
+   #     960px  → celular/tablet: el menú pasa a ser un cajón          #
+   #     520px  → celular angosto: el título de sección se apila       #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Variable que usa el JS -----------------------------------
+   JS/dashboard.js mide la barra superior y pisa --ead-header-h con la
+   altura real. Por eso conserva su nombre; el valor inicial se elige
+   arriba, en --panel-alto-cabecera. ------------------------------------ */
+:root {
+    --ead-header-h: var(--panel-alto-cabecera);
+}
+
+/* ---------- Títulos del panel ------------------------------------------ */
+.dashboard-body h1,
+.dashboard-body h2,
+.dashboard-body h3 {
+    font-family: var(--fuente-titulos);
+    font-weight: var(--panel-titulos-peso);
+    letter-spacing: var(--panel-titulos-espaciado);
+}
+
+/* ---------- Página ---------------------------------------------------- */
+body.dashboard-body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--color-texto);
+    font-family: var(--fuente-texto);
+    background: var(--panel-fondo-pagina);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "tnum" on;
+}
+
+:root[data-theme="dark"] body.dashboard-body {
+    background: var(--panel-fondo-pagina-oscuro);
+}
+
+/* Con el menú abierto en celular, la página de atrás no scrollea */
+body.dashboard-body.sidebar-lock { overflow: hidden; }
+body.dashboard-body { overflow-x: hidden; }
+
+.ea-mono { font-family: var(--fuente-codigo); font-feature-settings: "tnum", "zero"; }
+.ea-serif { font-family: var(--fuente-titulos); letter-spacing: var(--panel-serif-espaciado); }
+
+/* Aparición suave: JS/dashboard.js le pone .is-visible al entrar en pantalla */
+.ea-reveal {
+    opacity: 0;
+    transform: translateY(var(--panel-aparicion-desplazamiento));
+    transition: opacity var(--panel-aparicion-duracion) ease, transform var(--panel-aparicion-duracion) ease;
+}
+.ea-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .ea-reveal, .ea-reveal.is-visible { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- Armazón ---------------------------------------------------
+   Acá está solo la entrada (el fundido al terminar la carga). La POSICIÓN
+   del menú, la barra y el contenido está más abajo, en "Layout fijo". */
+.ea-dashboard {
+    min-height: 100vh;
+    transition: opacity var(--panel-entrada-duracion) ease, transform var(--panel-entrada-duracion) ease;
+}
+
+.dashboard-body.dashboard-loading .ea-dashboard {
+    opacity: 0;
+    transform: translateY(var(--panel-entrada-desplazamiento));
+    pointer-events: none;
+}
+
+.dashboard-body.dashboard-ready .ea-dashboard,
+.dashboard-body:not(.dashboard-loading) .ea-dashboard {
+    opacity: 1;
+    transform: none;
+}
+
+.ea-main { min-width: 0; }
+
+/* Velo oscuro detrás del menú abierto en celular */
+.ea-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: var(--panel-velo-color);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--panel-velo-duracion) ease;
+    -webkit-backdrop-filter: blur(var(--panel-velo-desenfoque));
+    backdrop-filter: blur(var(--panel-velo-desenfoque));
+}
+
+.ea-dashboard.sidebar-open .ea-sidebar-backdrop { opacity: 1; pointer-events: auto; }
+
+/* ---------- Contenido ------------------------------------------------- */
+.ea-content {
+    padding: var(--panel-contenido-relleno-arriba) var(--panel-contenido-relleno-lados) var(--panel-contenido-relleno-abajo);
+    display: flex;
+    flex-direction: column;
+    gap: var(--panel-separacion);
+    max-width: var(--panel-contenido-ancho-max);
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* En pantallas muy anchas el contenido se ensancha (igual que .ea-page) */
+@media (min-width: 1700px) { .ea-content { max-width: var(--panel-contenido-ancho-max-ancha); } }
+
+/* ---------- Cuadro de confirmación (lo arma JS/dashboard.js) ---------- */
+.confirm-lock {
+    overflow: hidden;
+}
+
+.ea-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: var(--confirmar-velo-relleno);
+    background: var(--confirmar-velo-color);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--confirmar-duracion) ease;
+}
+
+.ea-confirm.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ea-confirm-panel {
+    width: min(var(--confirmar-ancho), 100%);
+    display: grid;
+    grid-template-columns: var(--confirmar-icono) 1fr;
+    gap: var(--confirmar-separacion);
+    padding: var(--confirmar-relleno);
+    border-radius: var(--panel-redondeo);
+    border: var(--grosor-linea) solid var(--panel-linea-fuerte);
+    background: var(--panel-tarjeta);
+    box-shadow: var(--confirmar-sombra);
+    transform: translateY(var(--confirmar-entrada-bajada)) scale(var(--confirmar-entrada-escala));
+    transition: transform var(--confirmar-duracion) ease;
+}
+
+.ea-confirm.is-open .ea-confirm-panel {
+    transform: none;
+}
+
+.ea-confirm-icon {
+    width: var(--confirmar-icono);
+    height: var(--confirmar-icono);
+    display: grid;
+    place-items: center;
+    border-radius: var(--confirmar-icono-redondeo);
+    background: var(--confirmar-icono-fondo);
+    border: var(--grosor-linea) solid var(--confirmar-icono-borde);
+    color: var(--confirmar-icono-color);
+}
+
+.ea-confirm-icon svg {
+    width: var(--confirmar-icono-dibujo);
+    height: var(--confirmar-icono-dibujo);
+}
+
+.ea-confirm-copy h2 {
+    margin: 0;
+    color: var(--confirmar-titulo-color);
+    font-size: var(--confirmar-titulo-tamano);
+    font-weight: var(--confirmar-titulo-peso);
+}
+
+.ea-confirm-copy p {
+    margin: var(--confirmar-texto-separacion) 0 0;
+    color: var(--confirmar-texto-color);
+    font-size: var(--confirmar-texto-tamano);
+    line-height: var(--confirmar-texto-interlineado);
+    white-space: pre-line;
+}
+
+.ea-confirm-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--confirmar-botones-separacion);
+    padding-top: var(--confirmar-botones-margen);
+}
+
+/* ---------- Impresión ------------------------------------------------- */
+@media print {
+    .ea-main { margin-left: 0; padding-top: 0; }
+    .ea-content { padding: var(--panel-impresion-relleno); }
+}
+
+/* ---------- Layout fijo: el contenido deja lugar al menú y a la barra -
+   El menú y la barra superior son position:fixed (ver sus archivos).
+   Tiene que ser así para que funcione el scroll suave de GSAP: su
+   transform rompe cualquier sticky/fixed que quede adentro del contenido.
+   Como salen del flujo, .ea-main compensa el hueco: margin-left por el
+   menú y padding-top por la barra. La compensación va en .ea-main y no en
+   #smooth-wrapper porque GSAP le pisa inset/width con estilos en línea. */
+.ea-main {
+    display: block;
+    margin-left: var(--panel-ancho-menu);
+    padding-top: var(--ead-header-h);
+    min-height: 100vh;
+    transition: margin-left var(--panel-menu-duracion) var(--curva-suave, ease);
+}
+.ea-dashboard.sidebar-closed .ea-main { margin-left: var(--panel-ancho-menu-cerrado); }
+
+/* El envoltorio del scroll suave no lleva compensación propia */
+.ea-dashboard #smooth-wrapper { min-height: 100vh; }
+
+@media (max-width: 960px) {
+    /* En celular el menú se superpone (es un cajón): el contenido no se corre */
+    .ea-main { margin-left: 0; transition: none; }
+    .ea-dashboard.sidebar-closed .ea-main { margin-left: 0; }
+}
+
+/* ---------- Movimiento reducido --------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: var(--panel-movimiento-reducido) !important;
+        transition-duration: var(--panel-movimiento-reducido) !important;
+    }
+}
+
+/* ---------- Título de sección (ej: "Tus ambientes" + botón) ----------- */
+.ea-dev-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--panel-seccion-separacion);
+    flex-wrap: wrap;
+    margin-bottom: var(--panel-seccion-margen-abajo);
+}
+.ea-dev-toolbar-title { font-family: var(--fuente-titulos); font-size: var(--panel-seccion-titulo-tamano); margin: 0 0 var(--panel-seccion-titulo-margen); color: var(--panel-seccion-titulo-color); }
+.ea-dev-toolbar-sub { margin: 0; max-width: var(--panel-seccion-bajada-ancho); color: var(--panel-seccion-bajada-color); font-size: var(--panel-seccion-bajada-tamano); line-height: var(--panel-seccion-bajada-interlineado); }
+
+/* ---------- Grilla de fichas ------------------------------------------ */
+.ea-dev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--panel-fichas-ancho-minimo), 1fr));
+    gap: var(--panel-fichas-separacion);
+    margin-bottom: var(--panel-fichas-margen-abajo);
+}
+
+/* ---------- Ficha de equipo / ambiente -------------------------------- */
+.ea-dev-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--panel-ficha-separacion);
+    padding: var(--panel-ficha-relleno);
+    border-radius: var(--panel-ficha-redondeo);
+    background: var(--panel-ficha-fondo);
+    border: var(--grosor-linea) solid var(--panel-ficha-borde);
+    box-shadow: var(--panel-ficha-sombra);
+    transition: transform var(--panel-ficha-duracion) ease, box-shadow var(--panel-ficha-duracion) ease, border-color var(--panel-ficha-duracion) ease;
+}
+.ea-dev-card:hover { transform: translateY(var(--panel-ficha-subida-hover)); box-shadow: var(--panel-ficha-sombra-hover); border-color: var(--panel-ficha-borde-hover); }
+.ea-dev-card-head { display: flex; align-items: center; justify-content: space-between; }
+.ea-dev-icon {
+    display: inline-flex;
+    width: var(--panel-ficha-icono); height: var(--panel-ficha-icono);
+    align-items: center; justify-content: center;
+    border-radius: var(--panel-ficha-icono-redondeo);
+    background: var(--panel-ficha-icono-fondo);
+    color: var(--panel-ficha-icono-color);
+}
+.ea-dev-icon svg { width: var(--panel-ficha-icono-dibujo); height: var(--panel-ficha-icono-dibujo); }
+.ea-dev-name { font-family: var(--fuente-titulos); font-size: var(--panel-ficha-nombre-tamano); margin: 0; color: var(--panel-ficha-nombre-color); }
+
+/* Insignia de estado: el color sale de la clase tone-* */
+.ea-dev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--panel-insignia-separacion);
+    padding: var(--panel-insignia-relleno);
+    border-radius: var(--panel-insignia-redondeo);
+    font-size: var(--panel-insignia-tamano);
+    font-weight: var(--panel-insignia-peso);
+    letter-spacing: var(--panel-insignia-espaciado);
+}
+.ea-dev-badge-dot { width: var(--panel-insignia-punto); height: var(--panel-insignia-punto); border-radius: 50%; background: currentColor; }
+.ea-dev-badge.tone-success { color: var(--panel-insignia-exito-color);   background: var(--panel-insignia-exito-fondo); }
+.ea-dev-badge.tone-info    { color: var(--panel-insignia-info-color);    background: var(--panel-insignia-info-fondo); }
+.ea-dev-badge.tone-warning { color: var(--panel-insignia-alerta-color);  background: var(--panel-insignia-alerta-fondo); }
+.ea-dev-badge.tone-danger  { color: var(--panel-insignia-peligro-color); background: var(--panel-insignia-peligro-fondo); }
+
+/* Lista de datos: nombre a la izquierda, valor a la derecha */
+.ea-dev-meta { margin: 0; display: grid; gap: var(--panel-datos-separacion); }
+.ea-dev-meta > div { display: flex; justify-content: space-between; gap: var(--panel-datos-separacion-fila); font-size: var(--panel-datos-tamano); }
+.ea-dev-meta dt { color: var(--panel-datos-nombre-color); margin: 0; }
+.ea-dev-meta dd { margin: 0; color: var(--panel-datos-valor-color); text-align: right; font-weight: var(--panel-datos-valor-peso); }
+
+.ea-dev-card-foot { display: flex; align-items: center; gap: var(--panel-ficha-pie-separacion); margin-top: auto; padding-top: var(--panel-ficha-pie-margen); }
+.ea-dev-code { font-family: var(--fuente-codigo); font-size: var(--panel-ficha-codigo-tamano); color: var(--panel-ficha-codigo-color); }
+
+/* ---------- Estado vacío ---------------------------------------------- */
+.ea-dev-empty {
+    text-align: center;
+    padding: var(--panel-vacio-relleno);
+    border-radius: var(--panel-vacio-redondeo);
+    background: var(--panel-vacio-fondo);
+    border: var(--grosor-linea) solid var(--panel-vacio-borde);
+    box-shadow: var(--panel-vacio-sombra);
+    margin-bottom: var(--panel-vacio-margen-abajo);
+}
+.ea-dev-empty-orb {
+    display: block; width: var(--panel-vacio-esfera); height: var(--panel-vacio-esfera); margin: 0 auto var(--panel-vacio-esfera-margen);
+    border-radius: 50%;
+    background: var(--panel-vacio-esfera-color);
+    box-shadow: var(--panel-vacio-esfera-aro);
+}
+.ea-dev-empty h3 { font-family: var(--fuente-titulos); font-size: var(--panel-vacio-titulo-tamano); margin: 0 0 var(--panel-vacio-titulo-margen); color: var(--panel-vacio-titulo-color); }
+.ea-dev-empty p { margin: 0 auto var(--panel-vacio-texto-margen); max-width: var(--panel-vacio-texto-ancho); color: var(--panel-vacio-texto-color); line-height: var(--panel-vacio-texto-interlineado); }
+
+/* ---------- Celular angosto ------------------------------------------- */
+@media (max-width: 520px) {
+    .ea-dev-toolbar { flex-direction: column; align-items: stretch; }
+    .ea-dev-toolbar .ea-button { justify-content: center; }
+}

@@ -1,0 +1,367 @@
+/* =====================================================================
+   vistas/partials/panel_header.css — la barra superior del panel
+   ---------------------------------------------------------------------
+   Vista: app/Views/partials/panel_header.php
+   Se carga sola en todas las pantallas que usan layouts/panel.php.
+
+   Qué hay acá: la hamburguesa que abre/cierra el menú, el título y la
+   bajada de la pantalla, los botones que agrega cada vista, el
+   interruptor claro/oscuro (más chico que el de comun.css) y la
+   pastilla con el usuario. En celular la barra se acomoda en dos filas.
+
+   Depende de: comun.css (paleta, interruptor) y vistas/layouts/panel.css
+   (anchos del menú, líneas y fondos compartidos del panel).
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- La barra ---------------------------------------------------- */
+    --cabecera-separacion:       12px;        /* espacio entre las piezas de la barra */
+    --cabecera-relleno:          12px 26px;   /* espacio interno (arriba/abajo, costados) */
+    --cabecera-relleno-celular:  10px 16px;   /* lo mismo en celular/tablet */
+    --cabecera-borde:            var(--panel-linea);   /* la línea de abajo */
+    --cabecera-fondo:            color-mix(in oklab, var(--color-fondo) 90%, transparent);   /* casi opaco: deja adivinar lo de atrás */
+    --cabecera-fondo-oscuro:     rgba(11, 22, 18, 0.82);
+    --cabecera-saturacion:       160%;        /* lo que se ve detrás de la barra, más saturado... */
+    --cabecera-desenfoque:       12px;        /* ...y desenfocado */
+    --cabecera-fila2-margen:     2px;         /* en celular: espacio arriba de la segunda fila */
+
+    /* ---- Hamburguesa (abre y cierra el menú) ------------------------- */
+    --cabecera-hamburguesa:              38px;   /* tamaño del botón */
+    --cabecera-hamburguesa-tactil:       44px;   /* tamaño en celular/tablet (para el dedo) */
+    --cabecera-hamburguesa-separacion:   4px;    /* entre las tres rayitas */
+    --cabecera-hamburguesa-redondeo:     11px;
+    --cabecera-hamburguesa-borde:        var(--panel-linea);
+    --cabecera-hamburguesa-fondo:        var(--panel-tarjeta);
+    --cabecera-hamburguesa-duracion:     0.15s;
+    --cabecera-hamburguesa-fondo-hover:  var(--verde-100);
+    --cabecera-hamburguesa-borde-hover:  var(--panel-linea-fuerte);
+    --cabecera-hamburguesa-fondo-hover-oscuro: rgba(74, 122, 85, 0.18);
+    --cabecera-hamburguesa-borde-foco:   var(--verde-500);
+    --cabecera-hamburguesa-anillo-foco:  0 0 0 3px rgba(74, 122, 85, 0.22);
+    --cabecera-raya-larga:               17px;   /* ancho de las rayitas 1 y 3 */
+    --cabecera-raya-corta:               13px;   /* ancho de la rayita del medio (se alarga al pasar el mouse) */
+    --cabecera-raya-grosor:              2px;
+    --cabecera-raya-color:               var(--color-texto-secundario);
+    --cabecera-raya-color-hover:         var(--color-texto);
+    --cabecera-raya-duracion:            0.22s;
+    --cabecera-raya-duracion-opacidad:   0.18s;
+
+    /* ---- Título y bajada de la pantalla ------------------------------ */
+    --cabecera-titulos-interlineado: 1.15;
+    --cabecera-titulos-sangria:      4px;     /* espacio a la izquierda del título */
+    --cabecera-titulo-peso:          400;
+    --cabecera-titulo-tamano:        clamp(18px, 1.7vw, 22px);   /* crece con el ancho de la ventana */
+    --cabecera-titulo-espaciado:     -0.015em;
+    --cabecera-titulo-color:         var(--color-texto);
+    --cabecera-bajada-margen:        2px;     /* espacio entre título y bajada */
+    --cabecera-bajada-color:         var(--color-texto-suave);
+    --cabecera-bajada-tamano:        0.7813rem;
+
+    /* ---- Botones de la vista e interruptor de tema ------------------- */
+    --cabecera-herramientas-separacion: 8px;
+    --cabecera-botones-separacion:   8px;
+    --cabecera-boton-icono:          38px;    /* botones que son solo un ícono */
+    --cabecera-boton-redondeo:       11px;
+    --cabecera-boton-borde:          var(--panel-linea);
+    --cabecera-boton-fondo:          var(--panel-tarjeta);
+    --cabecera-boton-color:          var(--color-texto-secundario);
+    --cabecera-boton-duracion:       0.15s;
+    --cabecera-boton-fondo-hover:    var(--verde-100);
+    --cabecera-boton-borde-hover:    var(--panel-linea-fuerte);
+    --cabecera-boton-color-hover:    var(--color-texto);
+    --cabecera-boton-fondo-hover-oscuro: rgba(74, 122, 85, 0.18);
+    --cabecera-boton-color-hover-oscuro: var(--verde-100);
+    --cabecera-boton-borde-foco:     var(--verde-500);
+    --cabecera-boton-anillo-foco:    0 0 0 3px rgba(74, 122, 85, 0.3);
+
+    --cabecera-interruptor-ancho:    50px;    /* el interruptor de tema, en versión chica */
+    --cabecera-interruptor-alto:     28px;
+    --cabecera-interruptor-bolita:   22px;
+    --cabecera-interruptor-recorrido: 22px;
+    --cabecera-interruptor-tactil-alto:  8px;   /* en celular: zona de toque extra arriba y abajo... */
+    --cabecera-interruptor-tactil-lados: 4px;   /* ...y a los costados (no mueve nada de lugar) */
+
+    /* ---- Pastilla del usuario (inicial + nombre) --------------------- */
+    --cabecera-usuario-separacion:   10px;
+    --cabecera-usuario-relleno:      3px 12px 3px 4px;
+    --cabecera-usuario-borde:        var(--panel-linea);
+    --cabecera-usuario-fondo:        var(--panel-tarjeta);
+    --cabecera-usuario-redondeo:     var(--redondeo-pildora);
+    --cabecera-avatar:               28px;    /* el circulito con la inicial */
+    --cabecera-avatar-fondo:         linear-gradient(135deg, var(--verde-500), var(--verde-700));
+    --cabecera-avatar-color:         var(--verde-100);
+    --cabecera-avatar-tamano:        0.8125rem;
+    --cabecera-avatar-peso:          600;
+    --cabecera-nombre-interlineado:  1.1;
+    --cabecera-nombre-tamano:        0.7813rem;
+    --cabecera-nombre-color:         var(--color-texto);
+    --cabecera-nombre-peso:          500;
+    --cabecera-rol-color:            var(--color-texto-suave);   /* línea chica debajo del nombre */
+    --cabecera-rol-tamano:           0.6875rem;
+    --cabecera-rol-interlineado:     1;
+    --cabecera-rol-margen:           2px;
+    --cabecera-rol-espaciado:        0.08em;
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     960px → celular/tablet: la barra ocupa todo el ancho y los    #
+   #             botones se agrandan para el dedo                      #
+   #     680px → la barra se acomoda en dos filas y se oculta el nombre#
+   #     520px → se oculta la bajada del título                        #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- La barra --------------------------------------------------
+   Acá se pinta y se ordena. La posición (fija arriba, corrida por el
+   ancho del menú) está más abajo, en "Layout fijo". */
+.ea-header,
+.dashboard-header {
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: var(--cabecera-separacion);
+    padding: var(--cabecera-relleno);
+    border-bottom: var(--grosor-linea) solid var(--cabecera-borde);
+    background: var(--cabecera-fondo);
+    -webkit-backdrop-filter: saturate(var(--cabecera-saturacion)) blur(var(--cabecera-desenfoque));
+    backdrop-filter: saturate(var(--cabecera-saturacion)) blur(var(--cabecera-desenfoque));
+}
+
+:root[data-theme="dark"] .ea-header { background: var(--cabecera-fondo-oscuro); }
+
+/* ---------- Hamburguesa ----------------------------------------------- */
+.ea-burger {
+    width: var(--cabecera-hamburguesa);
+    height: var(--cabecera-hamburguesa);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cabecera-hamburguesa-separacion);
+    border-radius: var(--cabecera-hamburguesa-redondeo);
+    border: var(--grosor-linea) solid var(--cabecera-hamburguesa-borde);
+    background: var(--cabecera-hamburguesa-fondo);
+    cursor: pointer;
+    transition: background-color var(--cabecera-hamburguesa-duracion) ease, border-color var(--cabecera-hamburguesa-duracion) ease;
+}
+
+.ea-burger span {
+    display: block;
+    width: var(--cabecera-raya-larga);
+    height: var(--cabecera-raya-grosor);
+    border-radius: var(--cabecera-raya-grosor);
+    background: var(--cabecera-raya-color);
+    transition: transform var(--cabecera-raya-duracion) ease, opacity var(--cabecera-raya-duracion-opacidad) ease, width var(--cabecera-raya-duracion) ease;
+}
+
+.ea-burger:hover { background: var(--cabecera-hamburguesa-fondo-hover); border-color: var(--cabecera-hamburguesa-borde-hover); }
+:root[data-theme="dark"] .ea-burger:hover { background: var(--cabecera-hamburguesa-fondo-hover-oscuro); }
+.ea-burger:hover span { background: var(--cabecera-raya-color-hover); }
+.ea-burger:focus-visible {
+    outline: none;
+    border-color: var(--cabecera-hamburguesa-borde-foco);
+    box-shadow: var(--cabecera-hamburguesa-anillo-foco);
+}
+
+.ea-burger span:nth-child(1) { width: var(--cabecera-raya-larga); }
+.ea-burger span:nth-child(2) { width: var(--cabecera-raya-corta); }
+.ea-burger span:nth-child(3) { width: var(--cabecera-raya-larga); }
+.ea-burger:hover span:nth-child(2) { width: var(--cabecera-raya-larga); }
+
+/* ---------- Título de la pantalla ------------------------------------- */
+.ea-header-titles {
+    display: flex;
+    flex-direction: column;
+    line-height: var(--cabecera-titulos-interlineado);
+    margin-right: auto;
+    min-width: 0;
+    padding-left: var(--cabecera-titulos-sangria);
+}
+
+.ea-header-titles h1 {
+    margin: 0;
+    font-family: var(--fuente-titulos);
+    font-weight: var(--cabecera-titulo-peso);
+    font-size: var(--cabecera-titulo-tamano);
+    letter-spacing: var(--cabecera-titulo-espaciado);
+    color: var(--cabecera-titulo-color);
+    /* Se corta con "..." en vez de pisar lo que tiene al lado */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ea-header-titles p {
+    margin: var(--cabecera-bajada-margen) 0 0;
+    color: var(--cabecera-bajada-color);
+    font-size: var(--cabecera-bajada-tamano);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Interruptor de tema y botones de la vista ----------------- */
+.ea-header-tools { display: inline-flex; align-items: center; gap: var(--cabecera-herramientas-separacion); }
+
+/* Botones que agrega cada pantalla ('botones' en la config de la vista):
+   un botón nuevo ya sale bien alineado sin tocar este CSS. */
+.ea-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cabecera-botones-separacion);
+}
+
+/* ---------- Usuario --------------------------------------------------- */
+.ea-header-user {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cabecera-usuario-separacion);
+    padding: var(--cabecera-usuario-relleno);
+    border: var(--grosor-linea) solid var(--cabecera-usuario-borde);
+    background: var(--cabecera-usuario-fondo);
+    border-radius: var(--cabecera-usuario-redondeo);
+    cursor: default;
+}
+
+.ea-header-avatar {
+    width: var(--cabecera-avatar);
+    height: var(--cabecera-avatar);
+    border-radius: 50%;
+    background: var(--cabecera-avatar-fondo);
+    color: var(--cabecera-avatar-color);
+    display: grid;
+    place-items: center;
+    font-family: var(--fuente-titulos);
+    font-size: var(--cabecera-avatar-tamano);
+    font-weight: var(--cabecera-avatar-peso);
+}
+
+.ea-header-name {
+    display: flex;
+    flex-direction: column;
+    line-height: var(--cabecera-nombre-interlineado);
+    font-size: var(--cabecera-nombre-tamano);
+    color: var(--cabecera-nombre-color);
+    font-weight: var(--cabecera-nombre-peso);
+}
+
+.ea-header-name small {
+    color: var(--cabecera-rol-color);
+    font-size: var(--cabecera-rol-tamano);
+    line-height: var(--cabecera-rol-interlineado);
+    margin-top: var(--cabecera-rol-margen);
+    font-family: var(--fuente-codigo);
+    text-transform: uppercase;
+    letter-spacing: var(--cabecera-rol-espaciado);
+}
+
+/* ---------- Botones que son solo un ícono ----------------------------- */
+.ea-header-icon-btn {
+    width: var(--cabecera-boton-icono);
+    height: var(--cabecera-boton-icono);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--cabecera-boton-redondeo);
+    border: var(--grosor-linea) solid var(--cabecera-boton-borde);
+    background: var(--cabecera-boton-fondo);
+    color: var(--cabecera-boton-color);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--cabecera-boton-duracion) ease, border-color var(--cabecera-boton-duracion) ease, color var(--cabecera-boton-duracion) ease;
+}
+
+.ea-header-icon-btn:hover { background: var(--cabecera-boton-fondo-hover); border-color: var(--cabecera-boton-borde-hover); color: var(--cabecera-boton-color-hover); }
+:root[data-theme="dark"] .ea-header-icon-btn:hover { background: var(--cabecera-boton-fondo-hover-oscuro); color: var(--cabecera-boton-color-hover-oscuro); }
+
+.ea-header-icon-btn:focus-visible {
+    outline: none;
+    border-color: var(--cabecera-boton-borde-foco);
+    box-shadow: var(--cabecera-boton-anillo-foco);
+}
+
+/* ---------- Interruptor de tema, versión chica para la barra ----------- */
+.ea-header .ea-theme-switch .ea-theme-track { width: var(--cabecera-interruptor-ancho); height: var(--cabecera-interruptor-alto); }
+.ea-header .ea-theme-switch .ea-theme-thumb { width: var(--cabecera-interruptor-bolita); height: var(--cabecera-interruptor-bolita); }
+.ea-header .ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb { transform: translateX(var(--cabecera-interruptor-recorrido)); }
+
+/* ---------- Celular y tablet ------------------------------------------ */
+@media (max-width: 960px) {
+    .ea-header { padding: var(--cabecera-relleno-celular); }
+
+    /* Zonas de toque cómodas para el dedo */
+    .ea-burger { width: var(--cabecera-hamburguesa-tactil); height: var(--cabecera-hamburguesa-tactil); }
+    /* El interruptor agranda su zona de toque sin mover el resto */
+    .ea-header .ea-theme-switch {
+        padding: var(--cabecera-interruptor-tactil-alto) var(--cabecera-interruptor-tactil-lados);
+        margin: calc(-1 * var(--cabecera-interruptor-tactil-alto)) calc(-1 * var(--cabecera-interruptor-tactil-lados));
+    }
+}
+
+@media (max-width: 680px) {
+    /* Barra en dos filas: fila 1 = hamburguesa + título + tema + usuario;
+       fila 2 = chips, selector de dispositivo y botones de la pantalla. Así
+       nada se superpone ni se corta. La altura la sincroniza dashboard.js. */
+    .ea-header,
+    .dashboard-header { flex-wrap: wrap; }
+    /* Un "salto de renglón" invisible entre la fila 1 y la fila 2 */
+    .ea-header::after,
+    .dashboard-header::after { content: ""; order: 4; flex-basis: 100%; height: 0; }
+    .ea-burger { order: 0; }
+    .ea-header-titles { order: 1; }
+    .ea-header-tools { order: 2; margin-left: auto; }
+    .ea-header-user { order: 3; }
+    .ea-header .ea-chip,
+    .ea-header .ea-device-switcher,
+    .ea-header-actions { order: 5; margin-top: var(--cabecera-fila2-margen); }
+
+    .ea-header-user .ea-header-name { display: none; }
+}
+
+@media (max-width: 520px) {
+    .ea-header-titles p { display: none; }
+}
+
+/* ---------- Impresión: la barra no se imprime ------------------------- */
+@media print {
+    .ea-header { display: none !important; }
+}
+
+/* ---------- Layout fijo -----------------------------------------------
+   La barra es fija arriba en TODAS las resoluciones (lo necesita el
+   scroll suave de GSAP) y se corre a la derecha lo que ocupa el menú. */
+.ea-header,
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: var(--panel-ancho-menu);
+    right: 0;
+    transition: left var(--panel-menu-duracion) var(--curva-suave, ease);
+}
+.ea-dashboard.sidebar-closed .ea-header,
+.ea-dashboard.sidebar-closed .dashboard-header { left: var(--panel-ancho-menu-cerrado); }
+
+@media (max-width: 960px) {
+    /* En celular la barra ocupa todo el ancho: el menú se abre encima */
+    .ea-header,
+    .dashboard-header { left: 0; transition: none; }
+    .ea-dashboard.sidebar-closed .ea-header,
+    .ea-dashboard.sidebar-closed .dashboard-header { left: 0; }
+}

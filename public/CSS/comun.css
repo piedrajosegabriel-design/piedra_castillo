@@ -1,0 +1,894 @@
+/* =====================================================================
+   comun.css — lo que comparten TODAS las pantallas de EdenAir
+   ---------------------------------------------------------------------
+   Se carga en todas las páginas (lo pone partials/head.php), ANTES que
+   el CSS de cada vista. Acá vive:
+     · la paleta de la marca (verdes, neutros, acentos, estados)
+     · las tipografías y el tamaño general de la letra
+     · el reset (lo que se le saca al navegador)
+     · los componentes que aparecen en muchas pantallas:
+       logo, interruptor claro/oscuro, botones y carteles de aviso
+
+   El resto de los estilos está en public/CSS/vistas/, un archivo por
+   vista y con su mismo nombre (los carga app/Libraries/Vista.php).
+
+   CÓMO ESTÁ ARMADO (igual que todos los CSS del proyecto):
+     PARTE 1 — AJUSTES:    variables. Lo único que hay que tocar para
+                           cambiar cómo se ve algo.
+     PARTE 2 — ESTRUCTURA: selectores, layout y media queries. Usa las
+                           variables de la parte 1; no tiene valores sueltos.
+
+   MODO OSCURO: la paleta tiene un bloque propio más abajo (los colores
+   cambian solos). Los ajustes que se ven distintos en oscuro tienen su
+   par con "-oscuro" al final, al lado del valor claro.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---- Tipografías: se descargan de Google Fonts ----------------------
+   (Tiene que ir arriba de todo: CSS no acepta un @import más abajo.) */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");
+
+:root {
+    /* ---- Letras ------------------------------------------------------ */
+    --fuente-texto:   "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;  /* la letra de todo el texto */
+    --fuente-titulos: "DM Serif Display", "DM Serif Text", Georgia, serif;                         /* títulos con serifa */
+    --fuente-codigo:  "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;                 /* datos, números y etiquetas chicas */
+
+    /* Tamaño general: TODO lo que está en "rem" se mide contra esto, así que
+       cambiarlo agranda o achica la letra de todo el sitio de una vez.
+       (Los cortes de 1400px y 1700px están abajo, en "Escala de la interfaz".) */
+    --letra-raiz:            16px;   /* ventanas de menos de 1400px de ancho */
+    --letra-raiz-ancha:      18px;   /* ventanas desde 1400px */
+    --letra-raiz-muy-ancha:  20px;   /* ventanas desde 1700px */
+
+    --letra-cuerpo:          1rem;   /* tamaño del texto común */
+    --interlineado-cuerpo:   1.55;   /* separación entre renglones del texto común */
+
+    /* ---- Verdes de la marca (del más oscuro al más claro) ------------ */
+    --verde-900: #0e1f17;
+    --verde-800: #16301f;
+    --verde-700: #1c4029;
+    --verde-600: #2b5638;
+    --verde-500: #4a7a55;   /* el verde "de marca" de íconos y detalles */
+    --verde-400: #82a987;
+    --verde-300: #bcd2bd;
+    --verde-200: #dbe6d9;
+    --verde-100: #ecf2e8;
+
+    /* ---- Neutros ----------------------------------------------------- */
+    --color-fondo:             #f6f4ec;   /* fondo principal de las páginas */
+    --color-fondo-suave:       #eaf1ea;   /* fondo secundario (ej: el menú lateral) */
+    --color-fondo-aire:        #eef7f4;   /* fondo alternativo aqua muy suave */
+    --color-tarjeta:           #ffffff;   /* fondo de tarjetas */
+    --color-tarjeta-suave:     #fbfaf5;   /* fondo de tarjetas secundarias */
+    --color-texto:             #14231b;   /* texto principal */
+    --color-texto-secundario:  #45544a;   /* texto de apoyo */
+    --color-texto-suave:       #5f6e64;   /* texto apagado: aclaraciones, etiquetas (contraste mínimo 4.5 sobre blanco) */
+
+    /* ---- Acentos ----------------------------------------------------- */
+    --color-citrico:  #c9d870;   /* amarillo verdoso: puntos de "en línea", detalles */
+    --color-menta:    #b8d5d0;   /* menta suave */
+    --color-aire:     #8fd6c8;   /* aqua: aire limpio */
+    --color-arcilla:  #c89c7a;   /* tono cálido de advertencia */
+    --color-tierra:   #a65b3d;   /* tono de error / cerrar sesión */
+
+    /* ---- Estados: color fuerte + fondo suave ------------------------- */
+    --color-exito:          #4a7a55;
+    --color-exito-suave:    rgba(74, 122, 85, 0.14);
+    --color-info:           #2f8a7e;                   /* información, humedad, aire */
+    --color-info-suave:     rgba(143, 214, 200, 0.20);
+    --color-alerta:         #c89c7a;
+    --color-alerta-suave:   rgba(200, 156, 122, 0.18);
+    --color-peligro:        #a65b3d;
+    --color-peligro-suave:  rgba(166, 91, 61, 0.16);
+
+    /* ---- Verde primario (botones principales) ------------------------ */
+    --color-primario:         #2f6b4f;
+    --color-primario-oscuro:  #143326;   /* contraste fuerte: pie, texto destacado */
+    --color-primario-medio:   #4a7a55;
+
+    /* ---- Líneas divisorias y bordes ---------------------------------- */
+    --color-linea:        rgba(20, 35, 27, 0.11);    /* bordes de tarjetas, botones secundarios */
+    --color-linea-suave:  rgba(20, 35, 27, 0.055);   /* fondos grisados muy suaves */
+    --grosor-linea:       1px;                       /* grosor de todos los bordes finos */
+
+    /* ---- Bordes redondeados ------------------------------------------ */
+    --redondeo-chico:    10px;
+    --redondeo-medio:    14px;
+    --redondeo-grande:   22px;   /* tarjetas */
+    --redondeo-enorme:   30px;
+    --redondeo-pildora:  999px;  /* botones con forma de píldora */
+
+    /* ---- Sombras ----------------------------------------------------- */
+    --sombra-chica:   0 6px 16px rgba(20, 32, 26, 0.06);
+    --sombra-media:   0 14px 32px rgba(20, 32, 26, 0.08);
+    --sombra-grande:  0 28px 56px rgba(20, 32, 26, 0.12);
+
+    /* ---- Espacios entre elementos ------------------------------------ */
+    --espacio-chico:   10px;
+    --espacio-medio:   14px;
+    --espacio-grande:  22px;
+    --espacio-enorme:  36px;
+
+    /* ---- Curvas de animación (cómo acelera y frena un movimiento) ---- */
+    --curva-suave:      cubic-bezier(0.23, 1, 0.32, 1);    /* arranca rápido y frena suave: respuestas al toque */
+    --curva-ida-vuelta: cubic-bezier(0.77, 0, 0.175, 1);   /* movimientos en pantalla */
+
+    /* ---- Anclas (links a #seccion) ----------------------------------- */
+    --alto-libre-anclas: 96px;   /* cuánto espacio queda arriba al saltar a una sección (por la barra fija) */
+
+    /* ---- Texto seleccionado con el mouse ----------------------------- */
+    --seleccion-fondo: var(--verde-700);
+    --seleccion-texto: var(--verde-100);
+
+    /* ---- Fondo de la página en modo oscuro: brillos aqua y cítrico ---- */
+    --fondo-pagina-brillos-oscuro:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%);
+
+    /* ---- Textos con letra mono y etiquetas chicas (.ea-mono, .ea-eyebrow) */
+    --mono-tamano:              0.7813rem;   /* texto .ea-mono */
+    --mono-espaciado:           0.04em;      /* separación entre letras de .ea-mono */
+    --etiqueta-tamano:          0.7188rem;   /* "eyebrow": la etiqueta chica en mayúsculas arriba de un título */
+    --etiqueta-espaciado:       0.16em;      /* separación entre letras de la etiqueta */
+    --etiqueta-color:           var(--color-texto-suave);
+    --etiqueta-separacion:      10px;        /* espacio entre el puntito y el texto */
+    --etiqueta-punto:           6px;         /* tamaño del puntito verde */
+    --etiqueta-punto-color:     var(--verde-500);
+    --serif-peso:               400;         /* grosor de .ea-serif */
+
+    /* ---- Logo (la "e" + la palabra EdenAir) --------------------------- */
+    --logo-separacion:          12px;        /* espacio entre la "e" y la palabra */
+    --logo-separacion-apilado:  10px;        /* lo mismo, en la versión con la palabra abajo */
+    --logo-separacion-textos:   4px;         /* entre la palabra y el subtítulo */
+    /* El trazo de la "e" es un degradado de 3 colores (inicio → medio → final). */
+    --logo-e-inicio:            var(--color-primario-oscuro);   /* sobre fondo claro */
+    --logo-e-medio:             var(--color-primario);
+    --logo-e-final:             #3fae97;
+    --logo-e-inicio-oscuro:     #F6F4EC;     /* sobre fondo oscuro (modo oscuro y tono "crema") */
+    --logo-e-medio-oscuro:      #8FD6C8;
+    --logo-e-final-oscuro:      #5BE5B6;
+    --logo-e-halo-oscuro:       0 0 8px rgba(143, 214, 200, 0.35);   /* brillo alrededor de la "e" sobre oscuro */
+    --logo-e-inicio-musgo:      var(--verde-700);                    /* tono "musgo": todo verde */
+    --logo-e-medio-musgo:       var(--verde-600);
+    --logo-e-final-musgo:       var(--verde-500);
+    --logo-e-duracion:          0.35s;       /* cuánto tarda en aparecer el halo al cambiar de tema */
+    --logo-palabra-peso:        400;
+    --logo-palabra-espaciado:   -0.02em;     /* letras de "EdenAir" un poco más juntas */
+    --logo-palabra-interlineado: 1;
+    /* Colores de la palabra según el tono del logo ("Eden" y el "Air" en cursiva) */
+    --logo-tinta-color:         var(--color-texto);     /* tono "tinta" (el normal) */
+    --logo-tinta-air:           var(--verde-500);
+    --logo-tinta-color-oscuro:  var(--verde-100);
+    --logo-tinta-air-oscuro:    var(--verde-300);
+    --logo-crema-color:         var(--verde-100);       /* tono "crema" (sobre fondo oscuro, ej: el pie) */
+    --logo-crema-air:           var(--color-citrico);
+    --logo-crema-subtitulo:     rgba(236, 242, 232, 0.65);
+    --logo-musgo-color:         var(--verde-500);       /* tono "musgo" */
+    --logo-musgo-air:           var(--verde-300);
+    --logo-subtitulo-tamano:    0.6875rem;   /* la línea chica debajo de la palabra */
+    --logo-subtitulo-espaciado: 0.16em;
+    --logo-subtitulo-color:     var(--color-texto-suave);
+    --logo-subtitulo-interlineado: 1;
+    --logo-texto-interlineado:  1;
+    --eslogan-separacion:       12px;        /* espacio arriba del eslogan */
+    --eslogan-tamano:           1.0625rem;
+    --eslogan-interlineado:     1.3;
+    --eslogan-color:            var(--color-texto-secundario);
+
+    /* ---- Interruptor claro / oscuro (la pastilla con sol y luna) ------ */
+    --interruptor-ancho:          56px;
+    --interruptor-alto:           30px;
+    --interruptor-fondo:          var(--verde-100);   /* pastilla en modo claro */
+    --interruptor-borde:          var(--color-linea);
+    --interruptor-fondo-activo:   var(--verde-800);   /* pastilla en modo oscuro (tildado) */
+    --interruptor-borde-activo:   var(--verde-700);
+    --interruptor-bolita:         24px;               /* tamaño del círculo que se corre */
+    --interruptor-bolita-margen:  2px;                /* distancia del círculo al borde */
+    --interruptor-bolita-fondo:   var(--color-tarjeta);
+    --interruptor-bolita-sombra:  0 4px 10px rgba(20, 32, 26, 0.18);
+    --interruptor-bolita-icono:   var(--verde-700);   /* color del sol */
+    --interruptor-bolita-fondo-activo: var(--verde-700);
+    --interruptor-bolita-icono-activo: var(--verde-100); /* color de la luna */
+    --interruptor-recorrido:      26px;               /* cuánto se corre el círculo al tildar */
+    --interruptor-icono:          14px;               /* tamaño del sol y la luna */
+    --interruptor-duracion:       0.25s;
+    --interruptor-icono-chico:    0.4;                /* escala del ícono que se esconde */
+    --interruptor-icono-giro:     25deg;              /* cuánto gira el ícono al esconderse */
+
+    /* ---- Botones (.ea-button y variantes) ----------------------------- */
+    --boton-fondo-base:        var(--verde-700);   /* .ea-button sin variante */
+    --boton-texto-base:        var(--verde-100);
+    --boton-relleno:           10px 18px;          /* espacio interno (arriba/abajo, costados) */
+    --boton-separacion:        8px;                /* entre ícono y texto */
+    --boton-redondeo:          var(--redondeo-pildora);
+    --boton-peso:              500;
+    --boton-tamano:            0.8438rem;
+    --boton-espaciado:         0.01em;
+    --boton-interlineado:      1;
+    --boton-sombra:            var(--sombra-chica);
+    --boton-duracion:          0.16s;              /* velocidad de los cambios de color al pasar el mouse */
+    --boton-duracion-presion:  0.14s;              /* velocidad del "achique" al apretar */
+    --boton-duracion-presion-rapida: 0.08s;
+    --boton-presion:           0.97;               /* cuánto se achica al apretarlo */
+    --boton-anillo-foco:       0 0 0 3px rgba(74, 122, 85, 0.32);   /* contorno al llegar con el teclado */
+    /* En pantallas táctiles (hasta 960px) los botones tienen una zona de toque mínima. */
+    --boton-alto-tactil:       44px;
+    --boton-relleno-tactil:    13px;               /* relleno de arriba y abajo en táctil */
+    --boton-deshabilitado-opacidad: 0.55;
+
+    --boton-primario-fondo:        var(--color-primario);
+    --boton-primario-texto:        #ffffff;
+    --boton-primario-fondo-hover:  var(--verde-700);
+    --boton-primario-subida:       -1px;               /* cuánto sube al pasar el mouse */
+    --boton-primario-sombra-hover: var(--sombra-media);
+
+    --boton-secundario-texto:              var(--color-texto);
+    --boton-secundario-borde:              var(--color-linea);
+    --boton-secundario-fondo-hover:        var(--verde-100);
+    --boton-secundario-borde-hover:        var(--verde-300);
+    --boton-secundario-texto-hover:        var(--verde-700);
+    --boton-secundario-texto-oscuro:       var(--verde-100);
+    --boton-secundario-borde-oscuro:       rgba(236, 242, 232, 0.18);
+    --boton-secundario-fondo-hover-oscuro: rgba(74, 122, 85, 0.22);
+    --boton-secundario-borde-hover-oscuro: var(--verde-500);
+    --boton-secundario-texto-hover-oscuro: var(--verde-300);
+
+    --boton-fantasma-texto:            var(--verde-500);   /* .ea-button-ghost: sin fondo ni borde */
+    --boton-fantasma-relleno:          8px 14px;
+    --boton-fantasma-fondo-hover:      var(--verde-100);
+    --boton-fantasma-texto-oscuro:     var(--verde-300);
+    --boton-fantasma-fondo-hover-oscuro: rgba(74, 122, 85, 0.22);
+
+    --boton-chico-relleno:  7px 13px;     /* .ea-button-sm */
+    --boton-chico-tamano:   0.7813rem;
+
+    /* Botón de compra destacado (.ea-button-buy): degradado, brillo y reflejo */
+    --boton-compra-fondo:        linear-gradient(120deg, var(--color-primario) 0%, #3c7a57 52%, #4e9069 100%);
+    --boton-compra-texto:        #ffffff;
+    --boton-compra-peso:         600;
+    --boton-compra-espaciado:    0.015em;
+    --boton-compra-relleno-lados: 22px;
+    --boton-compra-sombra:       0 10px 26px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+    --boton-compra-fondo-hover:  linear-gradient(120deg, var(--verde-700) 0%, var(--color-primario) 55%, #3c7a57 100%);
+    --boton-compra-subida:       -2px;
+    --boton-compra-sombra-hover: 0 16px 34px rgba(47, 107, 79, 0.4), inset 0 0 0 1px rgba(201, 216, 112, 0.55);
+    --boton-compra-brillo:       radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    --boton-compra-brillo-desborde: -40%;   /* cuánto se sale el brillo de los bordes del botón */
+    --boton-compra-brillo-opacidad: 0.7;
+    --boton-compra-brillo-min:   0.45;      /* el brillo "respira" entre estos dos valores */
+    --boton-compra-brillo-max:   0.85;
+    --boton-compra-brillo-duracion: 3.6s;
+    --boton-compra-reflejo:      linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    --boton-compra-reflejo-ancho: 60%;
+    --boton-compra-reflejo-inclinacion: -18deg;
+    --boton-compra-reflejo-desde: -120%;    /* el reflejo cruza el botón de izquierda a derecha */
+    --boton-compra-reflejo-hasta: 140%;
+    --boton-compra-reflejo-duracion: 4.8s;
+
+    /* ---- Carteles de aviso del panel (partials/flashes.php) ----------- */
+    --cartel-redondeo:       11px;
+    --cartel-relleno:        12px 16px;
+    --cartel-tamano:         0.8438rem;
+    --cartel-exito-fondo:    rgba(74, 122, 85, 0.14);
+    --cartel-exito-borde:    rgba(74, 122, 85, 0.32);
+    --cartel-exito-texto:    var(--verde-700);
+    --cartel-exito-texto-oscuro: var(--verde-300);
+    --cartel-error-fondo:    rgba(166, 91, 61, 0.14);
+    --cartel-error-borde:    rgba(166, 91, 61, 0.32);
+    --cartel-error-texto:    var(--color-tierra);
+    --cartel-error-texto-oscuro: #f2b79e;
+    --cartel-info-fondo:     color-mix(in oklab, var(--color-menta) 18%, transparent);   /* ni éxito ni error */
+    --cartel-info-borde:     color-mix(in oklab, var(--color-menta) 45%, transparent);
+    --cartel-info-texto:     #2f6a6f;
+    --cartel-info-texto-oscuro: var(--color-menta);
+    --cartel-lista-separacion: 4px;       /* espacio arriba de la lista de errores */
+    --cartel-lista-sangria:    20px;      /* sangría de la lista de errores */
+}
+
+/* ---- Paleta en modo oscuro: solo los colores que cambian ------------ */
+:root[data-theme="dark"] {
+    --color-fondo:             #0e1f17;   /* verde profundo, no negro */
+    --color-fondo-suave:       #13261d;
+    --color-fondo-aire:        #13261d;
+    --color-tarjeta:           #1a2c23;   /* un poco más clara que el fondo para que se despegue */
+    --color-tarjeta-suave:     #21342a;
+    --color-texto:             #f4f1ea;
+    --color-texto-secundario:  #c8d4c6;
+    --color-texto-suave:       #93a194;
+
+    --color-info:              #8fd6c8;   /* aqua que resalta sobre oscuro */
+
+    /* Bordes con matiz aqua (no gris), así el oscuro no se ve embarrado */
+    --color-linea:             rgba(143, 214, 200, 0.15);
+    --color-linea-suave:       rgba(143, 214, 200, 0.07);
+
+    --color-primario:          #4f9a6f;   /* más luminoso para mantener la jerarquía */
+
+    --color-exito-suave:       rgba(74, 122, 85, 0.34);
+    --color-info-suave:        rgba(143, 214, 200, 0.18);
+    --color-alerta-suave:      rgba(200, 156, 122, 0.24);
+    --color-peligro-suave:     rgba(166, 91, 61, 0.28);
+
+    --sombra-chica:   0 6px 16px rgba(0, 0, 0, 0.45);
+    --sombra-media:   0 14px 32px rgba(0, 0, 0, 0.55);
+    --sombra-grande:  0 28px 56px rgba(0, 0, 0, 0.6);
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     1400px y 1700px → la letra general crece en pantallas anchas  #
+   #     960px           → botones con zona de toque más grande        #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Variables que usan el PHP y el JS ------------------------
+   Estos nombres los leen otros archivos, por eso no se pueden cambiar:
+     --ea-scroll-offset   lo pisa JS/dashboard.js con la altura real
+                          de la barra superior.
+     --ea-elogo-a/b/c     los colores del trazo de la "e"; los usa el
+                          SVG que arma marca_e() en app/Helpers/eden_helper.php.
+   El valor se elige arriba, en la parte 1. ------------------------------ */
+:root {
+    --ea-scroll-offset: var(--alto-libre-anclas);
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* ---------- Reset suave ---------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó con el zoom del navegador en 125%, así que al 100%
+   todo quedaba chico. Como las letras están en rem, subir el tamaño de
+   la raíz agranda toda la tipografía de una vez. Los saltos son por ancho
+   de ventana (CSS no puede leer el zoom): en una pantalla de 1920 al 100%
+   la ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no cambia. */
+html {
+    font-size: var(--letra-raiz);
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--ea-scroll-offset);
+}
+
+@media (min-width: 1400px) { html { font-size: var(--letra-raiz-ancha); } }
+@media (min-width: 1700px) { html { font-size: var(--letra-raiz-muy-ancha); } }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
+
+/* Cualquier sección con id como destino directo de un link #ancla */
+section[id],
+article[id],
+div[id] {
+    scroll-margin-top: var(--ea-scroll-offset);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+figure {
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: var(--seleccion-fondo);
+    color: var(--seleccion-texto);
+}
+
+/* ---------- Base ------------------------------------------------------ */
+body.ea-body {
+    min-height: 100vh;
+    font-family: var(--fuente-texto);
+    font-size: var(--letra-cuerpo);
+    line-height: var(--interlineado-cuerpo);
+    color: var(--color-texto);
+    background: var(--color-fondo);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "ss02" on;
+}
+
+:root[data-theme="dark"] body.ea-body {
+    background:
+        var(--fondo-pagina-brillos-oscuro),
+        var(--color-fondo);
+}
+
+.ea-serif {
+    font-family: var(--fuente-titulos);
+    font-weight: var(--serif-peso);
+}
+
+.ea-mono {
+    font-family: var(--fuente-codigo);
+    font-size: var(--mono-tamano);
+    letter-spacing: var(--mono-espaciado);
+}
+
+.ea-eyebrow {
+    font-family: var(--fuente-codigo);
+    font-size: var(--etiqueta-tamano);
+    letter-spacing: var(--etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--etiqueta-color);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--etiqueta-separacion);
+    margin: 0;
+}
+
+.ea-eyebrow::before {
+    content: "";
+    width: var(--etiqueta-punto);
+    height: var(--etiqueta-punto);
+    border-radius: 50%;
+    background: var(--etiqueta-punto-color);
+    flex-shrink: 0;
+}
+
+.ea-eyebrow.is-plain::before {
+    display: none;
+}
+
+/* ---------- Logo (partials/logo.php y marca_e() del helper) ---------- */
+.ea-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--logo-separacion);
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.ea-logo--stacked {
+    flex-direction: column;
+    gap: var(--logo-separacion-apilado);
+    text-align: center;
+    align-items: center;
+}
+
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* La "e": un solo trazo con un degradado de 3 colores que salen de
+   --ea-elogo-a/b/c. Así el mismo SVG sirve en toda la página: la landing,
+   el pie, el menú del panel y la pantalla de carga dibujan el mismo logo. */
+
+/* Sobre fondo claro */
+.ea-logo-mark--e {
+    --ea-elogo-a: var(--logo-e-inicio);
+    --ea-elogo-b: var(--logo-e-medio);
+    --ea-elogo-c: var(--logo-e-final);
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter var(--logo-e-duracion) var(--curva-suave);
+}
+
+/* Sobre fondo oscuro: el modo oscuro y el tono "cream" (el pie) */
+:root[data-theme="dark"] .ea-logo-mark--e,
+.ea-logo--tone-cream .ea-logo-mark--e {
+    --ea-elogo-a: var(--logo-e-inicio-oscuro);
+    --ea-elogo-b: var(--logo-e-medio-oscuro);
+    --ea-elogo-c: var(--logo-e-final-oscuro);
+    filter: drop-shadow(var(--logo-e-halo-oscuro));
+}
+
+/* Tono "moss": todo verde, igual en claro y en oscuro */
+.ea-logo--tone-moss .ea-logo-mark--e,
+:root[data-theme="dark"] .ea-logo--tone-moss .ea-logo-mark--e {
+    --ea-elogo-a: var(--logo-e-inicio-musgo);
+    --ea-elogo-b: var(--logo-e-medio-musgo);
+    --ea-elogo-c: var(--logo-e-final-musgo);
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.ea-logo-word {
+    font-family: var(--fuente-titulos);
+    font-weight: var(--logo-palabra-peso);
+    letter-spacing: var(--logo-palabra-espaciado);
+    white-space: nowrap;
+    line-height: var(--logo-palabra-interlineado);
+}
+
+.ea-logo--tone-ink   .ea-logo-word     { color: var(--logo-tinta-color); }
+.ea-logo--tone-ink   .ea-logo-word em  { color: var(--logo-tinta-air); font-style: italic; }
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word    { color: var(--logo-tinta-color-oscuro); }
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word em { color: var(--logo-tinta-air-oscuro); }
+
+.ea-logo--tone-cream .ea-logo-word     { color: var(--logo-crema-color); }
+.ea-logo--tone-cream .ea-logo-word em  { color: var(--logo-crema-air); font-style: italic; }
+
+.ea-logo--tone-moss  .ea-logo-word     { color: var(--logo-musgo-color); }
+.ea-logo--tone-moss  .ea-logo-word em  { color: var(--logo-musgo-air); font-style: italic; }
+
+.ea-logo-text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--logo-separacion-textos);
+    line-height: var(--logo-texto-interlineado);
+}
+
+.ea-logo-sub {
+    font-family: var(--fuente-codigo);
+    font-size: var(--logo-subtitulo-tamano);
+    letter-spacing: var(--logo-subtitulo-espaciado);
+    text-transform: uppercase;
+    color: var(--logo-subtitulo-color);
+    line-height: var(--logo-subtitulo-interlineado);
+}
+
+.ea-logo--tone-cream .ea-logo-sub { color: var(--logo-crema-subtitulo); }
+
+.ea-slogan {
+    font-family: var(--fuente-titulos);
+    font-style: italic;
+    color: var(--eslogan-color);
+    margin: var(--eslogan-separacion) 0 0;
+    font-size: var(--eslogan-tamano);
+    line-height: var(--eslogan-interlineado);
+}
+
+/* ---------- Interruptor claro / oscuro --------------------------------
+   HTML: partials/theme_toggle.php · lógica: JS/tema.js.
+   La barra del panel lo achica en vistas/partials/panel_header.css. ---- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* El checkbox real queda invisible: se ve la pastilla de abajo */
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: var(--interruptor-ancho);
+    height: var(--interruptor-alto);
+    background: var(--interruptor-fondo);
+    border: var(--grosor-linea) solid var(--interruptor-borde);
+    border-radius: var(--redondeo-pildora);
+    transition: background-color var(--interruptor-duracion) ease, border-color var(--interruptor-duracion) ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: var(--interruptor-bolita-margen);
+    left: var(--interruptor-bolita-margen);
+    width: var(--interruptor-bolita);
+    height: var(--interruptor-bolita);
+    background: var(--interruptor-bolita-fondo);
+    border-radius: 50%;
+    box-shadow: var(--interruptor-bolita-sombra);
+    transition: transform var(--interruptor-duracion) ease, background-color var(--interruptor-duracion) ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--interruptor-bolita-icono);
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: var(--interruptor-icono);
+    height: var(--interruptor-icono);
+    transition: opacity var(--interruptor-duracion) ease, transform var(--interruptor-duracion) ease;
+}
+
+.ea-theme-sun  { opacity: 1; transform: scale(1); }
+.ea-theme-moon { opacity: 0; transform: scale(var(--interruptor-icono-chico)) rotate(calc(-1 * var(--interruptor-icono-giro))); }
+
+/* Tildado = modo oscuro: la bolita se corre y cambia el sol por la luna */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: var(--interruptor-fondo-activo);
+    border-color: var(--interruptor-borde-activo);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(var(--interruptor-recorrido));
+    background: var(--interruptor-bolita-fondo-activo);
+    color: var(--interruptor-bolita-icono-activo);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun  { opacity: 0; transform: scale(var(--interruptor-icono-chico)) rotate(var(--interruptor-icono-giro)); }
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon { opacity: 1; transform: scale(1) rotate(0); }
+
+/* ---------- Botones ---------------------------------------------------
+   Cada variante solo cambia tres variables internas: --boton-fondo,
+   --boton-texto y --boton-borde. La regla de abajo las usa. ---------- */
+.ea-button,
+.ea-button-primary,
+.ea-button-secondary,
+.ea-button-ghost {
+    --boton-fondo: var(--boton-fondo-base);
+    --boton-texto: var(--boton-texto-base);
+    --boton-borde: transparent;
+
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--boton-separacion);
+    padding: var(--boton-relleno);
+    border-radius: var(--boton-redondeo);
+    border: var(--grosor-linea) solid var(--boton-borde);
+    background: var(--boton-fondo);
+    color: var(--boton-texto);
+    font-family: var(--fuente-texto);
+    font-weight: var(--boton-peso);
+    font-size: var(--boton-tamano);
+    letter-spacing: var(--boton-espaciado);
+    line-height: var(--boton-interlineado);
+    text-decoration: none;
+    transition:
+        background-color var(--boton-duracion) var(--curva-suave),
+        border-color var(--boton-duracion) var(--curva-suave),
+        color var(--boton-duracion) var(--curva-suave),
+        transform var(--boton-duracion-presion) var(--curva-suave),
+        box-shadow var(--boton-duracion) var(--curva-suave);
+    box-shadow: var(--boton-sombra);
+}
+
+/* Táctil: zona de toque mínima en pantallas chicas */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary,
+    .ea-button-ghost {
+        min-height: var(--boton-alto-tactil);
+        padding-top: var(--boton-relleno-tactil);
+        padding-bottom: var(--boton-relleno-tactil);
+    }
+}
+
+/* Al apretar, el botón se achica un poco: se siente que respondió */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(var(--boton-presion));
+        transition-duration: var(--boton-duracion-presion-rapida);
+    }
+    .ea-button-buy:active {
+        transform: scale(var(--boton-presion)) !important;
+        transition-duration: var(--boton-duracion-presion-rapida);
+    }
+}
+
+/* Pantallas táctiles: el mismo achique al tocar */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(var(--boton-presion));
+    }
+    .ea-button-buy:active {
+        transform: scale(var(--boton-presion)) !important;
+    }
+}
+
+.ea-button:focus-visible,
+.ea-button-primary:focus-visible,
+.ea-button-secondary:focus-visible,
+.ea-button-ghost:focus-visible {
+    outline: none;
+    box-shadow: var(--boton-anillo-foco);
+}
+
+.ea-button-primary {
+    --boton-fondo: var(--boton-primario-fondo);
+    --boton-texto: var(--boton-primario-texto);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --boton-fondo: var(--boton-primario-fondo-hover);
+        transform: translateY(var(--boton-primario-subida));
+        box-shadow: var(--boton-primario-sombra-hover);
+    }
+}
+
+.ea-button-secondary {
+    --boton-fondo: transparent;
+    --boton-texto: var(--boton-secundario-texto);
+    --boton-borde: var(--boton-secundario-borde);
+    box-shadow: none;
+    color: var(--boton-secundario-texto);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --boton-fondo: var(--boton-secundario-fondo-hover);
+        --boton-borde: var(--boton-secundario-borde-hover);
+        color: var(--boton-secundario-texto-hover);
+    }
+}
+
+:root[data-theme="dark"] .ea-button-secondary {
+    --boton-borde: var(--boton-secundario-borde-oscuro);
+    color: var(--boton-secundario-texto-oscuro);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --boton-fondo: var(--boton-secundario-fondo-hover-oscuro);
+        --boton-borde: var(--boton-secundario-borde-hover-oscuro);
+        color: var(--boton-secundario-texto-hover-oscuro);
+    }
+}
+
+.ea-button-ghost {
+    --boton-fondo: transparent;
+    --boton-texto: var(--boton-fantasma-texto);
+    --boton-borde: transparent;
+    box-shadow: none;
+    padding: var(--boton-fantasma-relleno);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover { --boton-fondo: var(--boton-fantasma-fondo-hover); }
+    :root[data-theme="dark"] .ea-button-ghost:hover { --boton-fondo: var(--boton-fantasma-fondo-hover-oscuro); }
+}
+
+:root[data-theme="dark"] .ea-button-ghost { --boton-texto: var(--boton-fantasma-texto-oscuro); }
+
+.ea-button-block {
+    width: 100%;
+}
+
+.ea-button-sm {
+    padding: var(--boton-chico-relleno);
+    font-size: var(--boton-chico-tamano);
+}
+
+/* Botón de compra destacado — en la landing y en el panel */
+.ea-button-buy {
+    --boton-fondo: var(--boton-compra-fondo);
+    --boton-texto: var(--boton-compra-texto);
+    position: relative;
+    font-weight: var(--boton-compra-peso);
+    letter-spacing: var(--boton-compra-espaciado);
+    padding-inline: var(--boton-compra-relleno-lados);
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: var(--boton-compra-sombra);
+}
+/* Brillo que "respira" detrás del texto */
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: var(--boton-compra-brillo-desborde);
+    z-index: -1;
+    background: var(--boton-compra-brillo);
+    opacity: var(--boton-compra-brillo-opacidad);
+    animation: ea-buy-glow var(--boton-compra-brillo-duracion) ease-in-out infinite;
+}
+/* Reflejo que cruza el botón cada tanto */
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: var(--boton-compra-reflejo-desde);
+    width: var(--boton-compra-reflejo-ancho);
+    height: 100%;
+    z-index: -1;
+    background: var(--boton-compra-reflejo);
+    transform: skewX(var(--boton-compra-reflejo-inclinacion));
+    animation: ea-buy-shine var(--boton-compra-reflejo-duracion) ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --boton-fondo: var(--boton-compra-fondo-hover);
+        transform: translateY(var(--boton-compra-subida));
+        box-shadow: var(--boton-compra-sombra-hover);
+    }
+}
+@keyframes ea-buy-glow { 0%, 100% { opacity: var(--boton-compra-brillo-min); } 50% { opacity: var(--boton-compra-brillo-max); } }
+@keyframes ea-buy-shine { 0%, 62% { left: var(--boton-compra-reflejo-desde); } 88%, 100% { left: var(--boton-compra-reflejo-hasta); } }
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before { animation: none !important; }
+    .ea-button-buy::after { display: none; }
+}
+
+.ea-button:disabled,
+.ea-button-primary:disabled,
+.ea-button-secondary:disabled {
+    opacity: var(--boton-deshabilitado-opacidad);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Carteles de aviso del panel (partials/flashes.php) -------- */
+.ea-flash {
+    border-radius: var(--cartel-redondeo);
+    padding: var(--cartel-relleno);
+    border: var(--grosor-linea) solid transparent;
+    font-size: var(--cartel-tamano);
+}
+
+.ea-flash-success {
+    background: var(--cartel-exito-fondo);
+    border-color: var(--cartel-exito-borde);
+    color: var(--cartel-exito-texto);
+}
+
+.ea-flash-danger {
+    background: var(--cartel-error-fondo);
+    border-color: var(--cartel-error-borde);
+    color: var(--cartel-error-texto);
+}
+
+/* Ni éxito ni error: ej. "tu pago quedó pendiente" */
+.ea-flash-info {
+    background: var(--cartel-info-fondo);
+    border-color: var(--cartel-info-borde);
+    color: var(--cartel-info-texto);
+}
+
+:root[data-theme="dark"] .ea-flash-success { color: var(--cartel-exito-texto-oscuro); }
+:root[data-theme="dark"] .ea-flash-danger  { color: var(--cartel-error-texto-oscuro); }
+:root[data-theme="dark"] .ea-flash-info    { color: var(--cartel-info-texto-oscuro); }
+
+.ea-flash ul { margin: var(--cartel-lista-separacion) 0 0; padding-left: var(--cartel-lista-sangria); list-style: disc; }
