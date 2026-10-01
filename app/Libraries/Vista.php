@@ -108,7 +108,7 @@ class Vista extends View
 
             // Sin archivo, sin <link>: así una vista sin CSS propio no tira 404.
             if (is_file(FCPATH . $css)) {
-                $links .= '<link rel="stylesheet" href="' . asset($css) . '">' . "\n";
+                $links .= '<link rel="stylesheet" href="' . esc($this->rutaSinHost(asset($css))) . '">' . "\n";
             }
         }
 
@@ -116,20 +116,19 @@ class Vista extends View
     }
 
     /**
-     * TEMPORAL — solo mientras dura la migración de los CSS.
+     * Saca el "http://localhost:8080" de una URL y deja solo la ruta.
      *
-     * Dice si la pantalla que se está dibujando ya tiene su CSS nuevo. La
-     * pantalla es la PRIMERA vista que se dibuja (la que pide el
-     * controlador con view()). partials/head.php lo usa para decidir si
-     * carga los CSS nuevos o los viejos (eden-brand.css, dashboard.css...).
-     *
-     * Cuando estén todas migradas se borra este método y el head carga
-     * siempre los nuevos.
+     * La pantalla vinculacion/seguir se abre desde el CELULAR, entrando por
+     * la IP de la PC: ahí "localhost" es el propio teléfono y la hoja de
+     * estilos no cargaría. Sin host, el navegador la pide al mismo lugar de
+     * donde sacó la página, sea cual sea (es lo mismo que hace esa vista con
+     * sus links y su JS).
      */
-    public function pantallaMigrada(): bool
+    private function rutaSinHost(string $url): string
     {
-        $pantalla = $this->vistasUsadas[0] ?? '';
+        $ruta     = '/' . ltrim((string) parse_url($url, PHP_URL_PATH), '/');
+        $consulta = (string) parse_url($url, PHP_URL_QUERY);
 
-        return $pantalla !== '' && is_file(FCPATH . self::CARPETA_CSS . $pantalla . '.css');
+        return $consulta !== '' ? $ruta . '?' . $consulta : $ruta;
     }
 }

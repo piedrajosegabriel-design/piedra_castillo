@@ -1,0 +1,182 @@
+/* =====================================================================
+   vistas/partials/selector_dispositivo.css — selector de dispositivo de la barra superior
+   ---------------------------------------------------------------------
+   Vista: app/Views/partials/selector_dispositivo.php
+   Se carga sola cuando una pantalla muestra el selector (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Chip de la barra superior --------------------------------------- */
+    --selector-chip-separacion:  8px;   /* separación entre elementos — chip */
+    --selector-chip-alto:        34px;   /* alto — chip */
+    --selector-chip-relleno:     0 13px;   /* espacio interno — chip */
+    --selector-chip-redondeo:    11px;   /* redondeo de las esquinas — chip */
+    --selector-chip-borde:       1px solid var(--panel-linea);   /* borde — chip */
+    --selector-chip-fondo:       var(--panel-tarjeta);   /* fondo — chip */
+    --selector-chip-color:       var(--color-texto-secundario);   /* color del texto — chip */
+    --selector-chip-tamano:      0.75rem;   /* tamaño de letra — chip */
+    --selector-chip-mono-tamano: 0.6875rem;   /* tamaño de letra — mono de chip */
+
+    /* ---- Celular y tablet ------------------------------------------------ */
+    --selector-desplegable-alto-min-hasta-960: 44px;   /* alto mínimo — desplegable (hasta 960px de ancho) */
+
+    /* ---- Selector de dispositivo ----------------------------------------- */
+    --selector-separacion:                    2px;   /* separación entre elementos — el selector de dispositivo */
+    --selector-etiqueta-fuente:               var(--fuente-codigo);   /* tipografía — etiqueta */
+    --selector-etiqueta-tamano:               0.6875rem;   /* tamaño de letra — etiqueta */
+    --selector-etiqueta-espaciado:            0.12em;   /* separación entre letras — etiqueta */
+    --selector-etiqueta-color:                var(--color-texto-suave);   /* color del texto — etiqueta */
+    --selector-desplegable-relleno:           7px 30px 7px 12px;   /* espacio interno — desplegable */
+    --selector-desplegable-redondeo:          var(--redondeo-pildora, 999px);   /* redondeo de las esquinas — desplegable */
+    --selector-desplegable-borde:             1px solid var(--color-linea);   /* borde — desplegable */
+    --selector-desplegable-fondo:             var(--color-tarjeta);   /* fondo — desplegable */
+    --selector-desplegable-color:             var(--color-texto);   /* color del texto — desplegable */
+    --selector-desplegable-fuente:            var(--fuente-texto);   /* tipografía — desplegable */
+    --selector-desplegable-tamano:            0.8125rem;   /* tamaño de letra — desplegable */
+    --selector-desplegable-peso:              500;   /* grosor de letra — desplegable */
+    --selector-desplegable-ancho-max:         240px;   /* ancho máximo — desplegable */
+    --selector-desplegable-transicion:        border-color 0.16s ease, background-color 0.16s ease;   /* animación de los cambios — desplegable */
+    --selector-desplegable-hover-borde-color: var(--verde-300);   /* color del borde — desplegable (estado: hover) */
+    --selector-desplegable-foco-borde-color:  var(--verde-500);   /* color del borde — desplegable (estado: foco) */
+    --selector-desplegable-foco-sombra:       0 0 0 3px var(--color-exito-suave);   /* sombra — desplegable (estado: foco) */
+    --selector-flechita-derecha:              11px;   /* distancia desde la derecha — flechita */
+    --selector-flechita-color:                var(--color-texto-suave);   /* color del texto — flechita */
+    --selector-chip-equipo-separacion:        6px;   /* separación entre elementos — equipo de chip */
+    --selector-chip-equipo-relleno:           5px 12px;   /* espacio interno — equipo de chip */
+    --selector-chip-equipo-redondeo:          var(--redondeo-pildora, 999px);   /* redondeo de las esquinas — equipo de chip */
+    --selector-chip-equipo-fondo:             var(--color-linea-suave);   /* fondo — equipo de chip */
+    --selector-chip-equipo-color:             var(--color-texto-secundario);   /* color del texto — equipo de chip */
+    --selector-chip-equipo-tamano:            0.7813rem;   /* tamaño de letra — equipo de chip */
+    --selector-chip-equipo-peso:              500;   /* grosor de letra — equipo de chip */
+    --selector-chip-equipo-ancho-max:         240px;   /* ancho máximo — equipo de chip */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 960px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Chip de la barra superior ----------------------------------------- */
+
+/* Chips */
+.ea-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--selector-chip-separacion);
+    height: var(--selector-chip-alto);
+    padding: var(--selector-chip-relleno);
+    border-radius: var(--selector-chip-redondeo);
+    border: var(--selector-chip-borde);
+    background: var(--selector-chip-fondo);
+    color: var(--selector-chip-color);
+    font-size: var(--selector-chip-tamano);
+    white-space: nowrap;
+}
+
+.ea-chip .ea-mono {
+    font-size: var(--selector-chip-mono-tamano);
+}
+
+/* ---------- Celular y tablet -------------------------------------------------- */
+
+@media (max-width: 960px) {
+    .ea-device-switcher select {
+        min-height: var(--selector-desplegable-alto-min-hasta-960);
+    }
+}
+
+/* ---------- Selector de dispositivo ------------------------------------------- */
+
+/* Switcher del header del panel (multi-dispositivo) */
+.ea-device-switcher {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--selector-separacion);
+    margin: 0;
+}
+
+.ea-device-switcher-label {
+    font-family: var(--selector-etiqueta-fuente);
+    font-size: var(--selector-etiqueta-tamano);
+    letter-spacing: var(--selector-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--selector-etiqueta-color);
+}
+
+.ea-device-switcher-control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-device-switcher select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: var(--selector-desplegable-relleno);
+    border-radius: var(--selector-desplegable-redondeo);
+    border: var(--selector-desplegable-borde);
+    background: var(--selector-desplegable-fondo);
+    color: var(--selector-desplegable-color);
+    font-family: var(--selector-desplegable-fuente);
+    font-size: var(--selector-desplegable-tamano);
+    font-weight: var(--selector-desplegable-peso);
+    cursor: pointer;
+    max-width: var(--selector-desplegable-ancho-max);
+    text-overflow: ellipsis;
+    transition: var(--selector-desplegable-transicion);
+}
+
+.ea-device-switcher select:hover {
+    border-color: var(--selector-desplegable-hover-borde-color);
+}
+
+.ea-device-switcher select:focus-visible {
+    outline: none;
+    border-color: var(--selector-desplegable-foco-borde-color);
+    box-shadow: var(--selector-desplegable-foco-sombra);
+}
+
+.ea-device-switcher-caret {
+    position: absolute;
+    right: var(--selector-flechita-derecha);
+    pointer-events: none;
+    color: var(--selector-flechita-color);
+}
+
+/* Chip "dispositivo activo" cuando hay uno solo */
+.ea-chip-device {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--selector-chip-equipo-separacion);
+    padding: var(--selector-chip-equipo-relleno);
+    border-radius: var(--selector-chip-equipo-redondeo);
+    background: var(--selector-chip-equipo-fondo);
+    color: var(--selector-chip-equipo-color);
+    font-size: var(--selector-chip-equipo-tamano);
+    font-weight: var(--selector-chip-equipo-peso);
+    max-width: var(--selector-chip-equipo-ancho-max);
+}
+
+.ea-chip-device span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

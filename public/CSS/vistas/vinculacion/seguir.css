@@ -1,0 +1,170 @@
+/* =====================================================================
+   vistas/vinculacion/seguir.css — pantalla "Conectando tu equipo"
+   ---------------------------------------------------------------------
+   Vista: app/Views/vinculacion/seguir.php  ·  Ruta: /vinculacion/seguir
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Es la pantalla que ve el CELULAR al volver del portal del equipo.
+   A propósito NO carga comun.css: tiene que ser liviana (el teléfono
+   recién recupera la conexión). Por eso tiene su propia paleta y su
+   propio reset, y el modo oscuro sigue al del teléfono
+   (prefers-color-scheme), no al interruptor del sitio.
+
+   Depende de: nada.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Colores (modo claro) ---------------------------------------- */
+    --seguir-fondo:      #f6f4ec;   /* fondo de la pantalla */
+    --seguir-tinta:      #14231b;   /* títulos y nombre del equipo */
+    --seguir-suave:      #6e7d73;   /* textos de apoyo */
+    --seguir-verde:      #2f6b4f;   /* marca, ruedita y botón principal */
+    --seguir-linea:      #e4e7dc;   /* bordes y aro de la ruedita */
+    --seguir-ok-fondo:   #dff0e4;   /* círculo del ícono "listo" */
+    --seguir-aviso:      #eef1e8;   /* círculo del ícono "problema" y fondo de la nota */
+    --seguir-boton-texto: #fff;     /* texto del botón principal */
+
+    /* ---- Letras ------------------------------------------------------ */
+    --seguir-fuente:          system-ui, -apple-system, sans-serif;   /* letra del sistema: no se descarga nada */
+    --seguir-marca-tamano:    12px;     /* "EDEN AIR" de arriba */
+    --seguir-marca-peso:      700;
+    --seguir-marca-espaciado: .12em;
+    --seguir-titulo-tamano:   22px;
+    --seguir-titulo-interlineado: 1.3;
+    --seguir-texto-tamano:    14.5px;
+    --seguir-texto-interlineado: 1.55;
+    --seguir-equipo-peso:     700;      /* nombre del equipo dentro del texto */
+    --seguir-boton-tamano:    15.5px;
+    --seguir-boton-peso:      700;
+    --seguir-nota-tamano:     13px;
+    --seguir-nota-interlineado: 1.5;
+    --seguir-icono-tamano:    30px;     /* tamaño del ✓ / ! adentro del círculo */
+
+    /* ---- Medidas y espacios ------------------------------------------ */
+    --seguir-relleno-pagina:  24px 20px;
+    --seguir-ancho-max:       400px;    /* ancho máximo del contenido */
+    --seguir-marca-margen:    18px;     /* espacio debajo de "EDEN AIR" */
+    --seguir-icono:           66px;     /* círculo del ícono */
+    --seguir-icono-margen:    16px;     /* espacio debajo del ícono */
+    --seguir-ruedita-grosor:  3px;      /* grosor del aro que gira mientras espera */
+    --seguir-ruedita-vuelta:  1s;       /* lo que tarda una vuelta */
+    --seguir-ruedita-vuelta-lenta: 3s;  /* ...si el teléfono pide reducir el movimiento */
+    --seguir-titulo-margen:   10px;     /* espacio debajo del título */
+    --seguir-texto-margen:    8px;      /* espacio debajo de cada párrafo */
+    --seguir-acciones-margen: 24px;     /* espacio arriba de los botones */
+    --seguir-acciones-separacion: 10px; /* entre un botón y otro */
+    --seguir-boton-relleno:   14px;
+    --seguir-redondeo:        12px;     /* botones y nota */
+    --seguir-nota-margen:     22px;     /* espacio arriba de la nota */
+    --seguir-nota-relleno:    13px 15px;
+    --seguir-grosor-linea:    1px;      /* borde del botón secundario */
+}
+
+/* ---- Colores en modo oscuro (si el teléfono está en oscuro) ---------- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --seguir-fondo:    #101613;
+        --seguir-tinta:    #e8efe9;
+        --seguir-suave:    #93a29a;
+        --seguir-verde:    #5aa47c;
+        --seguir-linea:    #26322c;
+        --seguir-ok-fondo: #1b3527;
+        --seguir-aviso:    #1a231e;
+    }
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Esta pantalla no tiene cortes de pantalla: es una sola columna  #
+   #   angosta, pensada para el celular.                               #
+   #                                                                   #
+   ##################################################################### */
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: var(--seguir-fuente);
+    background: var(--seguir-fondo);
+    color: var(--seguir-tinta);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--seguir-relleno-pagina);
+}
+
+.caja { width: 100%; max-width: var(--seguir-ancho-max); text-align: center; }
+
+.marca {
+    font-size: var(--seguir-marca-tamano);
+    font-weight: var(--seguir-marca-peso);
+    letter-spacing: var(--seguir-marca-espaciado);
+    text-transform: uppercase;
+    color: var(--seguir-verde);
+    margin-bottom: var(--seguir-marca-margen);
+}
+
+/* Círculo del ícono: ruedita mientras espera, ✓ si salió bien, ! si no */
+.icono {
+    width: var(--seguir-icono);
+    height: var(--seguir-icono);
+    margin: 0 auto var(--seguir-icono-margen);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--seguir-icono-tamano);
+}
+.icono.espera {
+    border: var(--seguir-ruedita-grosor) solid var(--seguir-linea);
+    border-top-color: var(--seguir-verde);
+    animation: girar var(--seguir-ruedita-vuelta) linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .icono.espera { animation-duration: var(--seguir-ruedita-vuelta-lenta); } }
+.icono.listo    { background: var(--seguir-ok-fondo); color: var(--seguir-verde); }
+.icono.problema { background: var(--seguir-aviso);    color: var(--seguir-suave); }
+
+h1 { font-size: var(--seguir-titulo-tamano); line-height: var(--seguir-titulo-interlineado); margin: 0 0 var(--seguir-titulo-margen); }
+p  { color: var(--seguir-suave); font-size: var(--seguir-texto-tamano); line-height: var(--seguir-texto-interlineado); margin: 0 0 var(--seguir-texto-margen); }
+.equipo { font-weight: var(--seguir-equipo-peso); color: var(--seguir-tinta); }
+
+.acciones { margin-top: var(--seguir-acciones-margen); display: grid; gap: var(--seguir-acciones-separacion); }
+.boton {
+    display: block;
+    padding: var(--seguir-boton-relleno);
+    border-radius: var(--seguir-redondeo);
+    font-size: var(--seguir-boton-tamano);
+    font-weight: var(--seguir-boton-peso);
+    text-decoration: none;
+    border: 0;
+}
+.boton.primario   { background: var(--seguir-verde); color: var(--seguir-boton-texto); }
+.boton.secundario { background: transparent; color: var(--seguir-suave); border: var(--seguir-grosor-linea) solid var(--seguir-linea); }
+
+.nota {
+    margin-top: var(--seguir-nota-margen);
+    padding: var(--seguir-nota-relleno);
+    border-radius: var(--seguir-redondeo);
+    background: var(--seguir-aviso);
+    font-size: var(--seguir-nota-tamano);
+    line-height: var(--seguir-nota-interlineado);
+    color: var(--seguir-suave);
+    text-align: left;
+}
+
+[hidden] { display: none !important; }

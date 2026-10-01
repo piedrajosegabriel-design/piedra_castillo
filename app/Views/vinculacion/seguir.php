@@ -46,44 +46,10 @@ $rutaJs = '/' . ltrim((string) parse_url(base_url('JS/vinculacion.js'), PHP_URL_
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
 <title>Eden Air · Conectando tu equipo</title>
-<style>
- *{box-sizing:border-box}
- :root{
-   --fondo:#f6f4ec; --tinta:#14231b; --suave:#6e7d73; --verde:#2f6b4f;
-   --caja:#fff; --linea:#e4e7dc; --ok-fondo:#dff0e4; --aviso:#eef1e8;
- }
- @media (prefers-color-scheme: dark){
-   :root{
-     --fondo:#101613; --tinta:#e8efe9; --suave:#93a29a; --verde:#5aa47c;
-     --caja:#18211d; --linea:#26322c; --ok-fondo:#1b3527; --aviso:#1a231e;
-   }
- }
- body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--fondo);
-      color:var(--tinta);display:flex;align-items:center;justify-content:center;
-      min-height:100vh;padding:24px 20px}
- .caja{width:100%;max-width:400px;text-align:center}
- .marca{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-        color:var(--verde);margin-bottom:18px}
- .icono{width:66px;height:66px;margin:0 auto 16px;border-radius:50%;
-        display:flex;align-items:center;justify-content:center;font-size:30px}
- .icono.espera{border:3px solid var(--linea);border-top-color:var(--verde);
-        animation:girar 1s linear infinite}
- @keyframes girar{to{transform:rotate(360deg)}}
- @media (prefers-reduced-motion: reduce){ .icono.espera{animation-duration:3s} }
- .icono.listo{background:var(--ok-fondo);color:var(--verde)}
- .icono.problema{background:var(--aviso);color:var(--suave)}
- h1{font-size:22px;line-height:1.3;margin:0 0 10px}
- p{color:var(--suave);font-size:14.5px;line-height:1.55;margin:0 0 8px}
- .equipo{font-weight:700;color:var(--tinta)}
- .acciones{margin-top:24px;display:grid;gap:10px}
- .boton{display:block;padding:14px;border-radius:12px;font-size:15.5px;
-        font-weight:700;text-decoration:none;border:0}
- .boton.primario{background:var(--verde);color:#fff}
- .boton.secundario{background:transparent;color:var(--suave);border:1px solid var(--linea)}
- .nota{margin-top:22px;padding:13px 15px;border-radius:12px;background:var(--aviso);
-       font-size:13px;line-height:1.5;color:var(--suave);text-align:left}
- [hidden]{display:none !important}
-</style>
+<?php /* Estilos: public/CSS/vistas/vinculacion/seguir.css. La marca la
+         cambia app/Libraries/Vista.php por el <link>, con la ruta sin host
+         (igual que los links y el JS de esta vista). */ ?>
+<?= \App\Libraries\Vista::MARCA_ESTILOS ?>
 </head>
 <body>
 <div class="caja"

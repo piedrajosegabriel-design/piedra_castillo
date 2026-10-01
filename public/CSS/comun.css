@@ -291,6 +291,412 @@
     --cartel-info-texto-oscuro: var(--color-menta);
     --cartel-lista-separacion: 4px;       /* espacio arriba de la lista de errores */
     --cartel-lista-sangria:    20px;      /* sangría de la lista de errores */
+
+    /* =========== Agregado en la migración del resto de las pantallas =========== */
+
+    /* ---- Armazón de las páginas públicas --------------------------------- */
+    --comun-pagina-ancho-max:            1280px;   /* ancho máximo — página */
+    --comun-pagina-relleno:              0 clamp(20px, 4vw, 48px);   /* espacio interno — página */
+    --comun-pagina-ancho-max-desde-1400: 1400px;   /* ancho máximo — página (desde 1400px de ancho) */
+    --comun-pagina-ancho-max-desde-1700: 1600px;   /* ancho máximo — página (desde 1700px de ancho) */
+    --comun-relleno:                     clamp(36px, 6vw, 72px) 0;   /* espacio interno — el componente */
+    --comun-borde-arriba:                1px solid var(--color-linea);   /* borde de arriba — el componente */
+    --comun-cabeza-columnas:             1fr 2fr;   /* columnas de la grilla — cabeza */
+    --comun-cabeza-separacion:           var(--espacio-grande);   /* separación entre elementos — cabeza */
+    --comun-cabeza-margen-abajo:         clamp(24px, 4vw, 40px);   /* margen de abajo — cabeza */
+    --comun-cabeza-titulo-fuente:        var(--fuente-titulos);   /* tipografía — título de cabeza */
+    --comun-cabeza-titulo-peso:          400;   /* grosor de letra — título de cabeza */
+    --comun-cabeza-titulo-tamano:        clamp(28px, 3.6vw, 44px);   /* tamaño de letra — título de cabeza */
+    --comun-cabeza-titulo-interlineado:  1.05;   /* separación entre renglones — título de cabeza */
+    --comun-cabeza-titulo-espaciado:     -0.015em;   /* separación entre letras — título de cabeza */
+    --comun-cabeza-titulo-margen:        10px 0 0;   /* margen — título de cabeza */
+    --comun-cabeza-cursiva-color:        var(--verde-500);   /* color del texto — cursiva de cabeza */
+    --comun-cabeza-texto-tamano:         1.0625rem;   /* tamaño de letra — texto de cabeza */
+    --comun-cabeza-texto-color:          var(--color-texto-secundario);   /* color del texto — texto de cabeza */
+    --comun-cabeza-texto-ancho-max:      56ch;   /* ancho máximo — texto de cabeza */
+
+    /* ---- Barra de navegación --------------------------------------------- */
+    --comun-fondo:                            rgba(244, 241, 234, 0.92);   /* fondo — el componente */
+    --comun-filtro-fondo:                     saturate(160%) blur(14px);   /* desenfoque de lo que está detrás — el componente */
+    --comun-borde-abajo:                      1px solid var(--color-linea);   /* borde de abajo — el componente */
+    --comun-fondo-oscuro:                     rgba(13, 22, 18, 0.88);   /* fondo — el componente (modo oscuro) */
+    --comun-interior-separacion:              var(--espacio-medio);   /* separación entre elementos — interior */
+    --comun-interior-relleno-vertical:        var(--ea-nav-pad, 12px);   /* espacio interno arriba y abajo — interior */
+    --comun-marca-separacion:                 14px;   /* separación entre elementos — marca */
+    --comun-marca-color:                      var(--color-texto);   /* color del texto — marca */
+    --comun-marca-texto-interlineado:         1.05;   /* separación entre renglones — texto de marca */
+    --comun-marca-texto-negrita-fuente:       var(--fuente-titulos);   /* tipografía — negrita de marca texto */
+    --comun-marca-texto-negrita-peso:         400;   /* grosor de letra — negrita de marca texto */
+    --comun-marca-texto-negrita-tamano:       1.25rem;   /* tamaño de letra — negrita de marca texto */
+    --comun-marca-texto-negrita-espaciado:    -0.02em;   /* separación entre letras — negrita de marca texto */
+    --comun-marca-texto-negrita-color:        var(--color-texto);   /* color del texto — negrita de marca texto */
+    --comun-marca-texto-cursiva-color:        var(--verde-500);   /* color del texto — cursiva de marca texto */
+    --comun-marca-texto-cursiva-color-oscuro: var(--verde-300);   /* color del texto — cursiva de marca texto (modo oscuro) */
+    --comun-marca-texto-chico-fuente:         var(--fuente-codigo);   /* tipografía — chico de marca texto */
+    --comun-marca-texto-chico-tamano:         0.6875rem;   /* tamaño de letra — chico de marca texto */
+    --comun-marca-texto-chico-espaciado:      0.14em;   /* separación entre letras — chico de marca texto */
+    --comun-marca-texto-chico-color:          var(--color-texto-suave);   /* color del texto — chico de marca texto */
+    --comun-marca-texto-chico-margen-arriba:  4px;   /* margen de arriba — chico de marca texto */
+    --comun-acciones-separacion:              var(--espacio-chico);   /* separación entre elementos — acciones */
+
+    /* ---- Menú grande del portfolio --------------------------------------- */
+    --comun-disparador-separacion:                 6px;   /* separación entre elementos — disparador */
+    --comun-disparador-relleno:                    8px 12px;   /* espacio interno — disparador */
+    --comun-disparador-redondeo:                   var(--redondeo-pildora);   /* redondeo de las esquinas — disparador */
+    --comun-disparador-tamano:                     0.8438rem;   /* tamaño de letra — disparador */
+    --comun-disparador-peso:                       500;   /* grosor de letra — disparador */
+    --comun-disparador-color:                      var(--color-texto-secundario);   /* color del texto — disparador */
+    --comun-disparador-transicion:                 color 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — disparador */
+    --comun-disparador-despues-izquierda:          14px;   /* distancia desde la izquierda — disparador (estado: despues) */
+    --comun-disparador-despues-derecha:            14px;   /* distancia desde la derecha — disparador (estado: despues) */
+    --comun-disparador-despues-abajo:              4px;   /* distancia desde abajo — disparador (estado: despues) */
+    --comun-disparador-despues-alto:               2px;   /* alto — disparador (estado: despues) */
+    --comun-disparador-despues-fondo:              var(--verde-500);   /* fondo — disparador (estado: despues) */
+    --comun-disparador-despues-redondeo:           2px;   /* redondeo de las esquinas — disparador (estado: despues) */
+    --comun-disparador-despues-transformacion:     scaleX(0.4);   /* desplazamiento/escala/giro — disparador (estado: despues) */
+    --comun-disparador-despues-transicion:         opacity 0.2s ease, transform 0.25s ease;   /* animación de los cambios — disparador (estado: despues) */
+    --comun-disparador-hover-color:                var(--verde-700);   /* color del texto — disparador (estado: hover) */
+    --comun-disparador-foco-contorno:              2px solid var(--verde-500);   /* contorno — disparador (estado: foco) */
+    --comun-disparador-foco-contorno-separacion:   3px;   /* separación del contorno — disparador (estado: foco) */
+    --comun-disparador-foco-color:                 var(--verde-700);   /* color del texto — disparador (estado: foco) */
+    --comun-disparador-hover-despues-transformacion: scaleX(1);   /* desplazamiento/escala/giro — disparador (estado: hover, despues) */
+    --comun-disparador-color-oscuro:               var(--color-texto-secundario);   /* color del texto — disparador (modo oscuro) */
+    --comun-disparador-hover-color-oscuro:         var(--verde-300);   /* color del texto — disparador (estado: hover; modo oscuro) */
+    --comun-disparador-despues-fondo-oscuro:       var(--verde-300);   /* fondo — disparador (estado: despues; modo oscuro) */
+    --comun-flechita-transicion:                   transform 0.28s cubic-bezier(.2,.7,.2,1);   /* animación de los cambios — flechita */
+    --comun-flechita-hover-transformacion:         rotate(180deg);   /* desplazamiento/escala/giro — flechita (estado: hover) */
+    --comun-panel-ancho:                           min(540px, calc(100vw - 32px));   /* ancho — panel */
+    --comun-panel-relleno-arriba:                  14px;   /* espacio interno de arriba — panel */
+    --comun-panel-transformacion:                  translateY(-10px);   /* desplazamiento/escala/giro — panel */
+    --comun-panel-transicion:                      opacity 0.28s cubic-bezier(.2,.7,.2,1), transform 0.28s cubic-bezier(.2,.7,.2,1), visibility 0s linear 0.28s;   /* animación de los cambios — panel */
+    --comun-panel-antes-alto:                      14px;   /* alto — panel (estado: antes) */
+    --comun-panel-hover-demora:                    0s;   /* demora antes del cambio — panel (estado: hover) */
+    --comun-interior-fondo:                        rgba(248, 248, 242, 0.97);   /* fondo — interior */
+    --comun-interior-filtro-fondo:                 saturate(160%) blur(18px);   /* desenfoque de lo que está detrás — interior */
+    --comun-interior-borde:                        1px solid rgba(20, 32, 26, 0.1);   /* borde — interior */
+    --comun-interior-redondeo:                     var(--redondeo-grande);   /* redondeo de las esquinas — interior */
+    --comun-interior-sombra:                       var(--sombra-grande);   /* sombra — interior */
+    --comun-interior-relleno:                      22px;   /* espacio interno — interior */
+    --comun-interior-antes-fondo:                  radial-gradient(120% 80% at 0% 0%, rgba(201, 216, 112, 0.18), transparent 55%), radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.18), transparent 60%);   /* fondo — interior (estado: antes) */
+    --comun-interior-antes-opacidad:               0.9;   /* opacidad (0 = invisible, 1 = opaco) — interior (estado: antes) */
+    --comun-interior-fondo-oscuro:                 rgba(13, 22, 18, 0.97);   /* fondo — interior (modo oscuro) */
+    --comun-interior-borde-color-oscuro:           rgba(236, 242, 232, 0.14);   /* color del borde — interior (modo oscuro) */
+    --comun-interior-antes-fondo-oscuro:           radial-gradient(120% 80% at 0% 0%, rgba(74, 122, 85, 0.32), transparent 55%), radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.16), transparent 60%);   /* fondo — interior (estado: antes; modo oscuro) */
+    --comun-cabeza-margen-abajo-2:                 16px;   /* margen de abajo — cabeza */
+    --comun-etiqueta-superior-separacion:          8px;   /* separación entre elementos — superior de etiqueta */
+    --comun-etiqueta-superior-fuente:              var(--fuente-codigo);   /* tipografía — superior de etiqueta */
+    --comun-etiqueta-superior-tamano:              0.6875rem;   /* tamaño de letra — superior de etiqueta */
+    --comun-etiqueta-superior-espaciado:           0.14em;   /* separación entre letras — superior de etiqueta */
+    --comun-etiqueta-superior-color:               var(--color-texto-suave);   /* color del texto — superior de etiqueta */
+    --comun-titulo-fuente:                         var(--fuente-titulos);   /* tipografía — título */
+    --comun-titulo-peso:                           400;   /* grosor de letra — título */
+    --comun-titulo-tamano:                         1.375rem;   /* tamaño de letra — título */
+    --comun-titulo-espaciado:                      -0.012em;   /* separación entre letras — título */
+    --comun-titulo-margen:                         6px 0 4px;   /* margen — título */
+    --comun-titulo-color:                          var(--color-texto);   /* color del texto — título */
+    --comun-titulo-cursiva-color:                  var(--verde-500);   /* color del texto — cursiva de título */
+    --comun-titulo-color-oscuro:                   var(--verde-100);   /* color del texto — título (modo oscuro) */
+    --comun-titulo-cursiva-color-oscuro:           var(--verde-300);   /* color del texto — cursiva de título (modo oscuro) */
+    --comun-bajada-tamano:                         0.8125rem;   /* tamaño de letra — bajada */
+    --comun-bajada-color:                          var(--color-texto-secundario);   /* color del texto — bajada */
+    --comun-lista-separacion:                      4px 10px;   /* separación entre elementos — lista */
+    --comun-lista-link-relleno:                    10px 12px;   /* espacio interno — link de lista */
+    --comun-lista-link-redondeo:                   var(--redondeo-medio);   /* redondeo de las esquinas — link de lista */
+    --comun-lista-link-borde:                      1px solid transparent;   /* borde — link de lista */
+    --comun-lista-link-color:                      var(--color-texto);   /* color del texto — link de lista */
+    --comun-lista-link-transicion:                 background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;   /* animación de los cambios — link de lista */
+    --comun-lista-link-hover-fondo:                rgba(74, 122, 85, 0.08);   /* fondo — link de lista (estado: hover) */
+    --comun-lista-link-hover-borde-color:          rgba(74, 122, 85, 0.18);   /* color del borde — link de lista (estado: hover) */
+    --comun-lista-link-hover-transformacion:       translateX(2px);   /* desplazamiento/escala/giro — link de lista (estado: hover) */
+    --comun-lista-link-color-oscuro:               var(--verde-100);   /* color del texto — link de lista (modo oscuro) */
+    --comun-lista-link-hover-fondo-oscuro:         rgba(74, 122, 85, 0.28);   /* fondo — link de lista (estado: hover; modo oscuro) */
+    --comun-lista-link-hover-borde-color-oscuro:   rgba(188, 210, 189, 0.22);   /* color del borde — link de lista (estado: hover; modo oscuro) */
+    --comun-link-etiqueta-tamano:                  0.875rem;   /* tamaño de letra — etiqueta de link */
+    --comun-link-etiqueta-peso:                    500;   /* grosor de letra — etiqueta de link */
+    --comun-link-etiqueta-interlineado:            1.2;   /* separación entre renglones — etiqueta de link */
+    --comun-link-ayuda-fuente:                     var(--fuente-codigo);   /* tipografía — ayuda de link */
+    --comun-link-ayuda-tamano:                     0.6875rem;   /* tamaño de letra — ayuda de link */
+    --comun-link-ayuda-espaciado:                  0.06em;   /* separación entre letras — ayuda de link */
+    --comun-link-ayuda-color:                      var(--color-texto-suave);   /* color del texto — ayuda de link */
+    --comun-link-ayuda-margen-arriba:              4px;   /* margen de arriba — ayuda de link */
+    --comun-pie-separacion:                        12px;   /* separación entre elementos — pie */
+    --comun-pie-margen-arriba:                     16px;   /* margen de arriba — pie */
+    --comun-pie-relleno-arriba:                    14px;   /* espacio interno de arriba — pie */
+    --comun-pie-borde-arriba:                      1px solid var(--color-linea-suave);   /* borde de arriba — pie */
+    --comun-pie-etiqueta-separacion:               8px;   /* separación entre elementos — etiqueta de pie */
+    --comun-pie-etiqueta-fuente:                   var(--fuente-codigo);   /* tipografía — etiqueta de pie */
+    --comun-pie-etiqueta-tamano:                   0.6875rem;   /* tamaño de letra — etiqueta de pie */
+    --comun-pie-etiqueta-espaciado:                0.12em;   /* separación entre letras — etiqueta de pie */
+    --comun-pie-etiqueta-color:                    var(--color-texto-suave);   /* color del texto — etiqueta de pie */
+    --comun-pie-etiqueta-negrita-color:            var(--verde-700);   /* color del texto — negrita de pie etiqueta */
+    --comun-pie-etiqueta-negrita-peso:             600;   /* grosor de letra — negrita de pie etiqueta */
+    --comun-pie-etiqueta-negrita-espaciado:        0.08em;   /* separación entre letras — negrita de pie etiqueta */
+    --comun-pie-etiqueta-negrita-color-oscuro:     var(--verde-300);   /* color del texto — negrita de pie etiqueta (modo oscuro) */
+    --comun-pie-punto-ancho:                       7px;   /* ancho — punto de pie */
+    --comun-pie-punto-alto:                        7px;   /* alto — punto de pie */
+    --comun-pie-punto-fondo:                       var(--color-citrico);   /* fondo — punto de pie */
+    --comun-pie-punto-sombra:                      0 0 0 0 rgba(201, 216, 112, 0.55);   /* sombra — punto de pie */
+    --comun-pie-punto-animacion:                   ea-mega-foot-pulse 2.4s ease-in-out infinite;   /* animación — punto de pie */
+    --comun-anim-pie-pulse-p0-sombra:              0 0 0 0 rgba(201, 216, 112, 0.55);   /* sombra — animación "ea-mega-foot-pulse" al 0% */
+    --comun-anim-pie-pulse-p70-sombra:             0 0 0 8px rgba(201, 216, 112, 0);   /* sombra — animación "ea-mega-foot-pulse" al 70% */
+    --comun-anim-pie-pulse-p100-sombra:            0 0 0 0 rgba(201, 216, 112, 0);   /* sombra — animación "ea-mega-foot-pulse" al 100% */
+    --comun-pie-link-fuente:                       var(--fuente-texto);   /* tipografía — link de pie */
+    --comun-pie-link-tamano:                       0.8125rem;   /* tamaño de letra — link de pie */
+    --comun-pie-link-peso:                         500;   /* grosor de letra — link de pie */
+    --comun-pie-link-color:                        var(--verde-700);   /* color del texto — link de pie */
+    --comun-pie-link-transicion:                   color 0.18s ease;   /* animación de los cambios — link de pie */
+    --comun-pie-link-hover-color:                  var(--verde-800);   /* color del texto — link de pie (estado: hover) */
+    --comun-pie-link-color-oscuro:                 var(--verde-300);   /* color del texto — link de pie (modo oscuro) */
+    --comun-pie-link-hover-color-oscuro:           var(--color-citrico);   /* color del texto — link de pie (estado: hover; modo oscuro) */
+
+    /* ---- Links de la barra y cajón del celular --------------------------- */
+    --comun-valor-ea-nav-pad:                      12px;   /* variable interna --ea-nav-pad — el componente */
+    --comun-transicion:                            box-shadow 0.25s ease, background-color 0.25s ease;   /* animación de los cambios — el componente */
+    --comun-interior-transicion:                   padding-block 0.25s ease;   /* animación de los cambios — interior */
+    --comun-scrolled-valor-ea-nav-pad:             6px;   /* variable interna --ea-nav-pad — el componente (estado: scrolled) */
+    --comun-scrolled-sombra:                       var(--sombra-chica);   /* sombra — el componente (estado: scrolled) */
+    --comun-scrolled-fondo:                        rgba(244, 241, 234, 0.96);   /* fondo — el componente (estado: scrolled) */
+    --comun-scrolled-fondo-oscuro:                 rgba(13, 22, 18, 0.94);   /* fondo — el componente (estado: scrolled; modo oscuro) */
+    --comun-links-separacion:                      4px;   /* separación entre elementos — links */
+    --comun-links-margen:                          0 8px;   /* margen — links */
+    --comun-links-link-relleno:                    8px 12px;   /* espacio interno — link de links */
+    --comun-links-link-redondeo:                   var(--redondeo-pildora);   /* redondeo de las esquinas — link de links */
+    --comun-links-link-tamano:                     0.8438rem;   /* tamaño de letra — link de links */
+    --comun-links-link-color:                      var(--color-texto-secundario);   /* color del texto — link de links */
+    --comun-links-link-peso:                       500;   /* grosor de letra — link de links */
+    --comun-links-link-transicion:                 color 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — link de links */
+    --comun-links-link-despues-izquierda:          14px;   /* distancia desde la izquierda — link de links (estado: despues) */
+    --comun-links-link-despues-derecha:            14px;   /* distancia desde la derecha — link de links (estado: despues) */
+    --comun-links-link-despues-abajo:              4px;   /* distancia desde abajo — link de links (estado: despues) */
+    --comun-links-link-despues-alto:               2px;   /* alto — link de links (estado: despues) */
+    --comun-links-link-despues-fondo:              var(--verde-500);   /* fondo — link de links (estado: despues) */
+    --comun-links-link-despues-redondeo:           2px;   /* redondeo de las esquinas — link de links (estado: despues) */
+    --comun-links-link-despues-transformacion:     scaleX(0.4);   /* desplazamiento/escala/giro — link de links (estado: despues) */
+    --comun-links-link-despues-transicion:         opacity 0.2s ease, transform 0.25s ease;   /* animación de los cambios — link de links (estado: despues) */
+    --comun-links-link-hover-color:                var(--verde-700);   /* color del texto — link de links (estado: hover) */
+    --comun-links-link-hover-despues-transformacion: scaleX(1);   /* desplazamiento/escala/giro — link de links (estado: hover, despues) */
+    --comun-links-link-color-oscuro:               var(--color-texto-secundario);   /* color del texto — link de links (modo oscuro) */
+    --comun-links-link-hover-color-oscuro:         var(--verde-300);   /* color del texto — link de links (estado: hover; modo oscuro) */
+    --comun-links-link-despues-fondo-oscuro:       var(--verde-300);   /* fondo — link de links (estado: despues; modo oscuro) */
+    --comun-boton-arriba:                          14px;   /* distancia desde arriba — botón */
+    --comun-boton-derecha:                         16px;   /* distancia desde la derecha — botón */
+    --comun-boton-ancho:                           42px;   /* ancho — botón */
+    --comun-boton-alto:                            42px;   /* alto — botón */
+    --comun-boton-borde:                           1px solid var(--color-linea);   /* borde — botón */
+    --comun-boton-fondo:                           var(--color-tarjeta);   /* fondo — botón */
+    --comun-boton-color:                           var(--color-texto);   /* color del texto — botón */
+    --comun-boton-sombra:                          var(--sombra-chica);   /* sombra — botón */
+    --comun-boton-foco-sombra:                     0 0 0 3px rgba(74, 122, 85, 0.3);   /* sombra — botón (estado: foco) */
+    --comun-boton-rayitas-ancho:                   18px;   /* ancho — rayitas de botón */
+    --comun-boton-rayitas-alto:                    14px;   /* alto — rayitas de botón */
+    --comun-boton-rayitas-span-alto:               2px;   /* alto — span de botón rayitas */
+    --comun-boton-rayitas-span-redondeo:           2px;   /* redondeo de las esquinas — span de botón rayitas */
+    --comun-boton-rayitas-span-transicion:         transform 0.25s ease, opacity 0.2s ease;   /* animación de los cambios — span de botón rayitas */
+    --comun-boton-span-expanded-true-n1-transformacion: translateY(6px) rotate(45deg);   /* desplazamiento/escala/giro — span de botón (estado: expanded-true, n1) */
+    --comun-boton-span-expanded-true-n3-transformacion: translateY(-6px) rotate(-45deg);   /* desplazamiento/escala/giro — span de botón (estado: expanded-true, n3) */
+    --comun-celular-navegacion-fondo:              rgba(13, 22, 18, 0.96);   /* fondo — navegación de celular */
+    --comun-celular-navegacion-filtro-fondo:       blur(14px);   /* desenfoque de lo que está detrás — navegación de celular */
+    --comun-celular-navegacion-color:              var(--verde-100);   /* color del texto — navegación de celular */
+    --comun-celular-navegacion-relleno:            80px 28px 32px;   /* espacio interno — navegación de celular */
+    --comun-celular-navegacion-separacion:         24px;   /* separación entre elementos — navegación de celular */
+    --comun-celular-navegacion-transformacion:     translateY(-12px);   /* desplazamiento/escala/giro — navegación de celular */
+    --comun-celular-navegacion-transicion:         opacity 0.28s ease, transform 0.28s ease;   /* animación de los cambios — navegación de celular */
+    --comun-celular-navegacion-lista-separacion:   4px;   /* separación entre elementos — lista de celular navegación */
+    --comun-celular-navegacion-link-relleno:       14px 16px;   /* espacio interno — link de celular navegación */
+    --comun-celular-navegacion-link-redondeo:      var(--redondeo-medio);   /* redondeo de las esquinas — link de celular navegación */
+    --comun-celular-navegacion-link-fuente:        var(--fuente-titulos);   /* tipografía — link de celular navegación */
+    --comun-celular-navegacion-link-tamano:        1.5rem;   /* tamaño de letra — link de celular navegación */
+    --comun-celular-navegacion-link-espaciado:     -0.012em;   /* separación entre letras — link de celular navegación */
+    --comun-celular-navegacion-link-color:         var(--verde-100);   /* color del texto — link de celular navegación */
+    --comun-celular-navegacion-link-borde:         1px solid transparent;   /* borde — link de celular navegación */
+    --comun-celular-navegacion-link-transicion:    background-color 0.2s ease, border-color 0.2s ease;   /* animación de los cambios — link de celular navegación */
+    --comun-celular-navegacion-link-hover-fondo:   rgba(74, 122, 85, 0.28);   /* fondo — link de celular navegación (estado: hover) */
+    --comun-celular-navegacion-link-hover-borde-color: rgba(188, 210, 189, 0.18);   /* color del borde — link de celular navegación (estado: hover) */
+    --comun-celular-navegacion-acciones-separacion: 10px;   /* separación entre elementos — acciones de celular navegación */
+    --comun-celular-navegacion-acciones-relleno-arriba: 24px;   /* espacio interno de arriba — acciones de celular navegación */
+    --comun-celular-navegacion-acciones-borde-arriba: 1px solid rgba(236, 242, 232, 0.1);   /* borde de arriba — acciones de celular navegación */
+    --comun-celular-navegacion-acciones-boton-secundario-fondo: rgba(236, 242, 232, 0.08);   /* fondo — secundario de celular navegación acciones botón */
+    --comun-celular-navegacion-acciones-boton-secundario-color: var(--verde-100);   /* color del texto — secundario de celular navegación acciones botón */
+    --comun-celular-navegacion-acciones-boton-secundario-borde-color: rgba(236, 242, 232, 0.22);   /* color del borde — secundario de celular navegación acciones botón */
+    --comun-celular-navegacion-tema-separacion:    14px;   /* separación entre elementos — tema de celular navegación */
+    --comun-celular-navegacion-tema-relleno:       6px 4px 14px;   /* espacio interno — tema de celular navegación */
+    --comun-celular-navegacion-tema-borde-abajo:   1px solid rgba(236, 242, 232, 0.08);   /* borde de abajo — tema de celular navegación */
+    --comun-celular-navegacion-tema-margen-abajo:  6px;   /* margen de abajo — tema de celular navegación */
+    --comun-celular-navegacion-tema-etiqueta-fuente: var(--fuente-codigo);   /* tipografía — etiqueta de celular navegación tema */
+    --comun-celular-navegacion-tema-etiqueta-tamano: 0.7188rem;   /* tamaño de letra — etiqueta de celular navegación tema */
+    --comun-celular-navegacion-tema-etiqueta-espaciado: 0.16em;   /* separación entre letras — etiqueta de celular navegación tema */
+    --comun-celular-navegacion-tema-etiqueta-color: rgba(236, 242, 232, 0.58);   /* color del texto — etiqueta de celular navegación tema */
+
+    /* ---- Tarjetas -------------------------------------------------------- */
+    --comun-tarjeta-fondo:    var(--color-tarjeta);   /* fondo — tarjeta */
+    --comun-tarjeta-borde:    1px solid var(--color-linea-suave);   /* borde — tarjeta */
+    --comun-tarjeta-redondeo: var(--redondeo-grande);   /* redondeo de las esquinas — tarjeta */
+    --comun-tarjeta-relleno:  clamp(16px, 2.4vw, 24px);   /* espacio interno — tarjeta */
+    --comun-tarjeta-sombra:   var(--sombra-chica);   /* sombra — tarjeta */
+
+    /* ---- Insignias de estado --------------------------------------------- */
+    --comun-separacion:           8px;   /* separación entre elementos — el componente */
+    --comun-relleno-2:            6px 12px;   /* espacio interno — el componente */
+    --comun-redondeo:             var(--redondeo-pildora);   /* redondeo de las esquinas — el componente */
+    --comun-fuente:               var(--fuente-codigo);   /* tipografía — el componente */
+    --comun-tamano:               0.7188rem;   /* tamaño de letra — el componente */
+    --comun-espaciado:            0.1em;   /* separación entre letras — el componente */
+    --comun-fondo-2:              var(--verde-100);   /* fondo — el componente */
+    --comun-color:                var(--verde-700);   /* color del texto — el componente */
+    --comun-borde:                1px solid transparent;   /* borde — el componente */
+    --comun-interlineado:         1;   /* separación entre renglones — el componente */
+    --comun-antes-ancho:          6px;   /* ancho — el componente (estado: antes) */
+    --comun-antes-alto:           6px;   /* alto — el componente (estado: antes) */
+    --comun-antes-opacidad:       0.8;   /* opacidad (0 = invisible, 1 = opaco) — el componente (estado: antes) */
+    --comun-neutro-fondo:         var(--color-linea-suave);   /* fondo — neutro */
+    --comun-neutro-color:         var(--color-texto-secundario);   /* color del texto — neutro */
+    --comun-exito-fondo:          var(--color-exito-suave);   /* fondo — exito */
+    --comun-exito-color:          var(--verde-700);   /* color del texto — exito */
+    --comun-info-fondo:           var(--color-info-suave);   /* fondo — info */
+    --comun-info-color:           #2f6a6f;   /* color del texto — info */
+    --comun-alerta-fondo:         var(--color-alerta-suave);   /* fondo — alerta */
+    --comun-alerta-color:         #7a4a23;   /* color del texto — alerta */
+    --comun-peligro-fondo:        var(--color-peligro-suave);   /* fondo — peligro */
+    --comun-peligro-color:        var(--color-tierra);   /* color del texto — peligro */
+    --comun-exito-color-oscuro:   var(--verde-300);   /* color del texto — exito (modo oscuro) */
+    --comun-info-color-oscuro:    var(--color-menta);   /* color del texto — info (modo oscuro) */
+    --comun-alerta-color-oscuro:  var(--color-arcilla);   /* color del texto — alerta (modo oscuro) */
+    --comun-peligro-color-oscuro: #e08465;   /* color del texto — peligro (modo oscuro) */
+
+    /* ---- Formularios ----------------------------------------------------- */
+    --comun-formulario-separacion:         var(--espacio-medio);   /* separación entre elementos — formulario */
+    --comun-etiqueta-fuente:               var(--fuente-codigo);   /* tipografía — etiqueta */
+    --comun-etiqueta-tamano:               0.7188rem;   /* tamaño de letra — etiqueta */
+    --comun-etiqueta-espaciado:            0.12em;   /* separación entre letras — etiqueta */
+    --comun-etiqueta-color:                var(--color-texto-secundario);   /* color del texto — etiqueta */
+    --comun-campo-fondo:                   var(--color-tarjeta);   /* fondo — campo */
+    --comun-campo-color:                   var(--color-texto);   /* color del texto — campo */
+    --comun-campo-borde:                   1px solid var(--color-linea);   /* borde — campo */
+    --comun-campo-redondeo:                var(--redondeo-chico);   /* redondeo de las esquinas — campo */
+    --comun-campo-relleno:                 11px 14px;   /* espacio interno — campo */
+    --comun-campo-fuente:                  var(--fuente-texto);   /* tipografía — campo */
+    --comun-campo-tamano:                  0.9063rem;   /* tamaño de letra — campo */
+    --comun-campo-interlineado:            1.4;   /* separación entre renglones — campo */
+    --comun-campo-transicion:              border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — campo */
+    --comun-campo-ayuda-campo-color:       var(--color-texto-suave);   /* color del texto — campo (estado: ayuda-campo) */
+    --comun-campo-ayuda-campo-opacidad:    0.85;   /* opacidad (0 = invisible, 1 = opaco) — campo (estado: ayuda-campo) */
+    --comun-campo-foco-borde-color:        var(--verde-500);   /* color del borde — campo (estado: foco) */
+    --comun-campo-foco-sombra:             0 0 0 3px rgba(74, 122, 85, 0.22);   /* sombra — campo (estado: foco) */
+    --comun-campo-fondo-oscuro:            var(--color-tarjeta-suave);   /* fondo — campo (modo oscuro) */
+    --comun-campo-borde-color-oscuro:      var(--color-linea);   /* color del borde — campo (modo oscuro) */
+    --comun-campo-foco-borde-color-oscuro: var(--verde-300);   /* color del borde — campo (estado: foco; modo oscuro) */
+    --comun-campo-foco-sombra-oscuro:      0 0 0 3px rgba(188, 210, 189, 0.18);   /* sombra — campo (estado: foco; modo oscuro) */
+    --comun-ayuda-fuente:                  var(--fuente-texto);   /* tipografía — ayuda */
+    --comun-ayuda-tamano:                  0.7813rem;   /* tamaño de letra — ayuda */
+    --comun-ayuda-color:                   var(--color-texto-suave);   /* color del texto — ayuda */
+    --comun-fila-separacion:               var(--espacio-medio);   /* separación entre elementos — fila */
+    --comun-fila-columnas:                 repeat(auto-fit, minmax(220px, 1fr));   /* columnas de la grilla — fila */
+
+    /* ---- Contraseña con ojo ---------------------------------------------- */
+    --ojo-campo-type-password-relleno-derecha: 48px;   /* espacio interno derecho — campo (estado: type-password) */
+    --ojo-ojo-derecha:                         6px;   /* distancia desde la derecha — ojo */
+    --ojo-ojo-ancho:                           44px;   /* ancho — ojo */
+    --ojo-ojo-alto:                            44px;   /* alto — ojo */
+    --ojo-ojo-redondeo:                        var(--redondeo-chico, 8px);   /* redondeo de las esquinas — ojo */
+    --ojo-ojo-color:                           var(--color-texto-suave, #7b8794);   /* color del texto — ojo */
+    --ojo-ojo-transicion:                      color .18s ease, background-color .18s ease;   /* animación de los cambios — ojo */
+    --ojo-ojo-hover-color:                     var(--ea-brand, #2f9e77);   /* color del texto — ojo (estado: hover) */
+    --ojo-ojo-hover-fondo:                     rgba(127, 127, 127, .12);   /* fondo — ojo (estado: hover) */
+    --ojo-ojo-icono-ancho:                     21px;   /* ancho — ícono de ojo */
+    --ojo-ojo-icono-alto:                      21px;   /* alto — ícono de ojo */
+
+    /* ---- Mensajes -------------------------------------------------------- */
+    --comun-redondeo-2:               var(--redondeo-medio);   /* redondeo de las esquinas — el componente */
+    --comun-relleno-3:                14px 18px;   /* espacio interno — el componente */
+    --comun-tamano-2:                 0.875rem;   /* tamaño de letra — el componente */
+    --comun-separacion-2:             12px;   /* separación entre elementos — el componente */
+    --comun-antes-ancho-2:            8px;   /* ancho — el componente (estado: antes) */
+    --comun-antes-alto-2:             8px;   /* alto — el componente (estado: antes) */
+    --comun-antes-margen-arriba:      7px;   /* margen de arriba — el componente (estado: antes) */
+    --comun-error-fondo:              var(--color-peligro-suave);   /* fondo — error */
+    --comun-error-color:              var(--color-tierra);   /* color del texto — error */
+    --comun-error-borde-color:        rgba(166, 91, 61, 0.32);   /* color del borde — error */
+    --comun-exito-borde-color:        rgba(74, 122, 85, 0.32);   /* color del borde — exito */
+    --comun-info-borde-color:         rgba(106, 155, 159, 0.32);   /* color del borde — info */
+    --comun-exito-borde-color-oscuro: rgba(74, 122, 85, 0.4);   /* color del borde — exito (modo oscuro) */
+    --comun-error-color-oscuro:       #e08465;   /* color del texto — error (modo oscuro) */
+    --comun-error-borde-color-oscuro: rgba(166, 91, 61, 0.45);   /* color del borde — error (modo oscuro) */
+    --comun-info-borde-color-oscuro:  rgba(106, 155, 159, 0.4);   /* color del borde — info (modo oscuro) */
+    --comun-lista-margen:             4px 0 0;   /* margen — lista */
+    --comun-lista-relleno:            0 0 0 18px;   /* espacio interno — lista */
+
+    /* ---- Tablas ---------------------------------------------------------- */
+    --comun-encabezado-relleno:             10px 14px;   /* espacio interno — encabezado */
+    --comun-encabezado-borde-abajo:         1px solid var(--color-linea-suave);   /* borde de abajo — encabezado */
+    --comun-encabezado-fuente:              var(--fuente-codigo);   /* tipografía — encabezado */
+    --comun-encabezado-peso:                500;   /* grosor de letra — encabezado */
+    --comun-encabezado-espaciado:           0.12em;   /* separación entre letras — encabezado */
+    --comun-encabezado-tamano:              0.7188rem;   /* tamaño de letra — encabezado */
+    --comun-encabezado-color:               var(--color-texto-suave);   /* color del texto — encabezado */
+    --comun-encabezado-fondo:               rgba(236, 242, 232, 0.42);   /* fondo — encabezado */
+    --comun-encabezado-fondo-oscuro:        rgba(236, 242, 232, 0.04);   /* fondo — encabezado (modo oscuro) */
+    --comun-cuerpo-fila-hover-fondo:        rgba(236, 242, 232, 0.4);   /* fondo — fila de cuerpo (estado: hover) */
+    --comun-cuerpo-fila-hover-fondo-oscuro: rgba(236, 242, 232, 0.04);   /* fondo — fila de cuerpo (estado: hover; modo oscuro) */
+
+    /* ---- Portada (páginas públicas) -------------------------------------- */
+    --comun-portada-relleno:              clamp(40px, 7vw, 88px) 0;   /* espacio interno — portada */
+    --comun-portada-fondo:                radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.18), transparent 55%), radial-gradient(ellipse at bottom left, rgba(188, 210, 189, 0.22), transparent 55%), var(--color-fondo);   /* fondo — portada */
+    --comun-portada-fondo-oscuro:         radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.22), transparent 55%), radial-gradient(ellipse at bottom left, rgba(28, 64, 41, 0.5), transparent 60%), var(--color-fondo);   /* fondo — portada (modo oscuro) */
+    --comun-portada-titulo-fuente:        var(--fuente-titulos);   /* tipografía — título de portada */
+    --comun-portada-titulo-peso:          400;   /* grosor de letra — título de portada */
+    --comun-portada-titulo-tamano:        clamp(40px, 6vw, 76px);   /* tamaño de letra — título de portada */
+    --comun-portada-titulo-interlineado:  0.98;   /* separación entre renglones — título de portada */
+    --comun-portada-titulo-espaciado:     -0.03em;   /* separación entre letras — título de portada */
+    --comun-portada-titulo-margen:        14px 0 18px;   /* margen — título de portada */
+    --comun-portada-titulo-cursiva-color: var(--verde-500);   /* color del texto — cursiva de portada título */
+
+    /* ---- Pie de página --------------------------------------------------- */
+    --comun-fondo-3:               var(--verde-900);   /* fondo — el componente */
+    --comun-color-2:               rgba(236, 242, 232, 0.78);   /* color del texto — el componente */
+    --comun-relleno-4:             clamp(36px, 5.5vw, 60px) 0 24px;   /* espacio interno — el componente */
+    --comun-interior-columnas:     1.4fr 1fr 1fr;   /* columnas de la grilla — interior */
+    --comun-interior-separacion-2: var(--espacio-grande);   /* separación entre elementos — interior */
+    --comun-texto-color:           rgba(236, 242, 232, 0.7);   /* color del texto — texto */
+    --comun-texto-tamano:          0.9063rem;   /* tamaño de letra — texto */
+    --comun-texto-ancho-max:       40ch;   /* ancho máximo — texto */
+    --comun-texto-margen-arriba:   18px;   /* margen de arriba — texto */
+    --comun-texto-interlineado:    1.55;   /* separación entre renglones — texto */
+    --comun-titulo-fuente-2:       var(--fuente-codigo);   /* tipografía — título */
+    --comun-titulo-tamano-2:       0.7188rem;   /* tamaño de letra — título */
+    --comun-titulo-espaciado-2:    0.16em;   /* separación entre letras — título */
+    --comun-titulo-color-2:        rgba(236, 242, 232, 0.5);   /* color del texto — título */
+    --comun-titulo-margen-abajo:   12px;   /* margen de abajo — título */
+    --comun-lista-item-color:      rgba(236, 242, 232, 0.78);   /* color del texto — item de lista */
+    --comun-lista-item-tamano:     0.875rem;   /* tamaño de letra — item de lista */
+    --comun-abajo-borde-arriba:    1px solid rgba(236, 242, 232, 0.1);   /* borde de arriba — abajo */
+    --comun-abajo-margen-arriba:   40px;   /* margen de arriba — abajo */
+    --comun-abajo-relleno-arriba:  22px;   /* espacio interno de arriba — abajo */
+    --comun-abajo-separacion:      12px;   /* separación entre elementos — abajo */
+    --comun-abajo-fuente:          var(--fuente-codigo);   /* tipografía — abajo */
+    --comun-abajo-tamano:          0.7188rem;   /* tamaño de letra — abajo */
+    --comun-abajo-espaciado:       0.14em;   /* separación entre letras — abajo */
+    --comun-abajo-color:           rgba(236, 242, 232, 0.5);   /* color del texto — abajo */
+
+    /* ---- Utilidades ------------------------------------------------------ */
+    --comun-pila-separacion: var(--espacio-chico);   /* separación entre elementos — pila */
+
+    /* ---- Barra de scroll moderna flotante (EdenAir) ---------------------- */
+    --barrascroll-arriba:                         8px;   /* distancia desde arriba — el componente */
+    --barrascroll-derecha:                        4px;   /* distancia desde la derecha — el componente */
+    --barrascroll-abajo:                          8px;   /* distancia desde abajo — el componente */
+    --barrascroll-ancho:                          12px;   /* ancho — el componente */
+    --barrascroll-transicion:                     opacity 0.35s ease;   /* animación de los cambios — el componente */
+    --barrascroll-bolita-derecha:                 2px;   /* distancia desde la derecha — bolita */
+    --barrascroll-bolita-ancho:                   4px;   /* ancho — bolita */
+    --barrascroll-bolita-alto-min:                40px;   /* alto mínimo — bolita */
+    --barrascroll-bolita-redondeo:                999px;   /* redondeo de las esquinas — bolita */
+    --barrascroll-bolita-fondo:                   linear-gradient( to bottom, color-mix(in srgb, var(--color-aire, #8fd6c8) 92%, transparent), color-mix(in srgb, var(--color-primario, #2f6b4f) 92%, transparent) );   /* fondo — bolita */
+    --barrascroll-bolita-sombra:                  0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 10px -3px color-mix(in srgb, var(--color-primario, #2f6b4f) 55%, transparent);   /* sombra — bolita */
+    --barrascroll-bolita-transicion:              width 0.18s ease, right 0.18s ease, background 0.2s ease;   /* animación de los cambios — bolita */
+    --barrascroll-bolita-hover-ancho:             7px;   /* ancho — bolita (estado: hover) */
+    --barrascroll-bolita-fondo-oscuro:            linear-gradient( to bottom, color-mix(in srgb, var(--color-aire, #8fd6c8) 96%, transparent), color-mix(in srgb, var(--verde-500, #4a7a55) 94%, transparent) );   /* fondo — bolita (modo oscuro) */
+    --barrascroll-bolita-sombra-oscuro:           0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 12px -3px color-mix(in srgb, var(--color-aire, #8fd6c8) 45%, transparent);   /* sombra — bolita (modo oscuro) */
+    --barrascroll-active-opacidad-sin-movimiento: 0.85;   /* opacidad (0 = invisible, 1 = opaco) — el componente (estado: active; si se pidió reducir el movimiento) */
 }
 
 /* ---- Paleta en modo oscuro: solo los colores que cambian ------------ */
@@ -342,9 +748,22 @@
                           de la barra superior.
      --ea-elogo-a/b/c     los colores del trazo de la "e"; los usa el
                           SVG que arma marca_e() en app/Helpers/eden_helper.php.
+     --ea-mute, --ea-ink-2, --ea-citrus, --ea-breath, --ea-font-mono,
+     --eden-300, --eden-500, --eden-700
+                          los usan algunos style="..." de las vistas
+                          (panel.php, portfolio.php, partials/footer.php):
+                          son los nombres viejos de la paleta.
    El valor se elige arriba, en la parte 1. ------------------------------ */
 :root {
     --ea-scroll-offset: var(--alto-libre-anclas);
+    --ea-mute:      var(--color-texto-suave);
+    --ea-ink-2:     var(--color-texto-secundario);
+    --ea-citrus:    var(--color-citrico);
+    --ea-breath:    var(--color-menta);
+    --ea-font-mono: var(--fuente-codigo);
+    --eden-300:     var(--verde-300);
+    --eden-500:     var(--verde-500);
+    --eden-700:     var(--verde-700);
     color-scheme: light;
 }
 
@@ -481,6 +900,77 @@ body.ea-body {
     display: none;
 }
 
+/* ---------- Armazón de las páginas públicas ----------------------------------- */
+
+.ea-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-page {
+    width: 100%;
+    max-width: var(--comun-pagina-ancho-max);
+    margin: 0 auto;
+    padding: var(--comun-pagina-relleno);
+}
+
+@media (min-width: 1400px) {
+    .ea-page {
+        max-width: var(--comun-pagina-ancho-max-desde-1400);
+    }
+}
+
+@media (min-width: 1700px) {
+    .ea-page {
+        max-width: var(--comun-pagina-ancho-max-desde-1700);
+    }
+}
+
+.ea-section {
+    padding: var(--comun-relleno);
+    position: relative;
+}
+
+.ea-section + .ea-section {
+    border-top: var(--comun-borde-arriba);
+}
+
+.ea-section-head {
+    display: grid;
+    grid-template-columns: var(--comun-cabeza-columnas);
+    gap: var(--comun-cabeza-separacion);
+    align-items: end;
+    margin-bottom: var(--comun-cabeza-margen-abajo);
+}
+
+.ea-section-head h2 {
+    font-family: var(--comun-cabeza-titulo-fuente);
+    font-weight: var(--comun-cabeza-titulo-peso);
+    font-size: var(--comun-cabeza-titulo-tamano);
+    line-height: var(--comun-cabeza-titulo-interlineado);
+    letter-spacing: var(--comun-cabeza-titulo-espaciado);
+    margin: var(--comun-cabeza-titulo-margen);
+}
+
+.ea-section-head h2 em {
+    font-style: italic;
+    color: var(--comun-cabeza-cursiva-color);
+}
+
+.ea-section-head p {
+    font-size: var(--comun-cabeza-texto-tamano);
+    color: var(--comun-cabeza-texto-color);
+    max-width: var(--comun-cabeza-texto-ancho-max);
+    margin: 0;
+}
+
+@media (max-width: 820px) {
+    .ea-section-head {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ---------- Logo (partials/logo.php y marca_e() del helper) ---------- */
 .ea-logo {
     display: inline-flex;
@@ -578,6 +1068,654 @@ body.ea-body {
     margin: var(--eslogan-separacion) 0 0;
     font-size: var(--eslogan-tamano);
     line-height: var(--eslogan-interlineado);
+}
+
+/* ---------- Barra de navegación ----------------------------------------------- */
+
+.ea-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--comun-fondo);
+    backdrop-filter: var(--comun-filtro-fondo);
+    border-bottom: var(--comun-borde-abajo);
+}
+
+:root[data-theme="dark"] .ea-navbar {
+    background: var(--comun-fondo-oscuro);
+}
+
+.ea-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--comun-interior-separacion);
+    /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
+       mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
+       los botones quedaban pegados al borde de la ventana. */
+    padding-block: var(--comun-interior-relleno-vertical);
+}
+
+.ea-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-marca-separacion);
+    color: var(--comun-marca-color);
+}
+
+.ea-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: var(--comun-marca-texto-interlineado);
+}
+
+.ea-brand-text strong {
+    font-family: var(--comun-marca-texto-negrita-fuente);
+    font-weight: var(--comun-marca-texto-negrita-peso);
+    font-size: var(--comun-marca-texto-negrita-tamano);
+    letter-spacing: var(--comun-marca-texto-negrita-espaciado);
+    color: var(--comun-marca-texto-negrita-color);
+}
+
+.ea-brand-text strong em {
+    font-style: italic;
+    color: var(--comun-marca-texto-cursiva-color);
+}
+
+:root[data-theme="dark"] .ea-brand-text strong em {
+    color: var(--comun-marca-texto-cursiva-color-oscuro);
+}
+
+.ea-brand-text small {
+    font-family: var(--comun-marca-texto-chico-fuente);
+    font-size: var(--comun-marca-texto-chico-tamano);
+    letter-spacing: var(--comun-marca-texto-chico-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-marca-texto-chico-color);
+    margin-top: var(--comun-marca-texto-chico-margen-arriba);
+}
+
+.ea-nav-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-acciones-separacion);
+}
+
+/* ---------- Menú grande del portfolio ----------------------------------------- */
+
+.ea-mega {
+    position: relative;
+    list-style: none;
+}
+
+.ea-mega-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-disparador-separacion);
+    padding: var(--comun-disparador-relleno);
+    border-radius: var(--comun-disparador-redondeo);
+    font-size: var(--comun-disparador-tamano);
+    font-weight: var(--comun-disparador-peso);
+    color: var(--comun-disparador-color);
+    cursor: pointer;
+    transition: var(--comun-disparador-transicion);
+}
+
+.ea-mega-trigger::after {
+    content: "";
+    position: absolute;
+    left: var(--comun-disparador-despues-izquierda);
+    right: var(--comun-disparador-despues-derecha);
+    bottom: var(--comun-disparador-despues-abajo);
+    height: var(--comun-disparador-despues-alto);
+    background: var(--comun-disparador-despues-fondo);
+    border-radius: var(--comun-disparador-despues-redondeo);
+    opacity: 0;
+    transform: var(--comun-disparador-despues-transformacion);
+    transform-origin: left;
+    transition: var(--comun-disparador-despues-transicion);
+}
+
+.ea-mega:hover .ea-mega-trigger,
+.ea-mega.is-open .ea-mega-trigger,
+.ea-mega-trigger.is-active {
+    color: var(--comun-disparador-hover-color);
+}
+
+.ea-mega-trigger:focus-visible {
+    outline: var(--comun-disparador-foco-contorno);
+    outline-offset: var(--comun-disparador-foco-contorno-separacion);
+    color: var(--comun-disparador-foco-color);
+}
+
+.ea-mega:hover .ea-mega-trigger::after,
+.ea-mega.is-open .ea-mega-trigger::after,
+.ea-mega-trigger.is-active::after {
+    opacity: 1;
+    transform: var(--comun-disparador-hover-despues-transformacion);
+}
+
+:root[data-theme="dark"] .ea-mega-trigger {
+    color: var(--comun-disparador-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega:hover .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega.is-open .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega-trigger.is-active {
+    color: var(--comun-disparador-hover-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega-trigger::after {
+    background: var(--comun-disparador-despues-fondo-oscuro);
+}
+
+.ea-mega-caret {
+    transition: var(--comun-flechita-transicion);
+}
+
+.ea-mega:hover .ea-mega-caret,
+.ea-mega.is-open .ea-mega-caret {
+    transform: var(--comun-flechita-hover-transformacion);
+}
+
+.ea-mega-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: var(--comun-panel-ancho);
+    padding-top: var(--comun-panel-relleno-arriba);
+    opacity: 0;
+    visibility: hidden;
+    transform: var(--comun-panel-transformacion);
+    pointer-events: none;
+    transition: var(--comun-panel-transicion);
+    z-index: 60;
+}
+
+/* Bridge invisible: evita perder el hover entre trigger y panel */
+.ea-mega-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--comun-panel-antes-alto);
+    background: transparent;
+}
+
+.ea-mega:hover .ea-mega-panel,
+.ea-mega.is-open .ea-mega-panel,
+.ea-mega:focus-within .ea-mega-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: var(--comun-panel-hover-demora);
+}
+
+.ea-mega-inner {
+    background: var(--comun-interior-fondo);
+    -webkit-backdrop-filter: var(--comun-interior-filtro-fondo);
+    backdrop-filter: var(--comun-interior-filtro-fondo);
+    border: var(--comun-interior-borde);
+    border-radius: var(--comun-interior-redondeo);
+    box-shadow: var(--comun-interior-sombra);
+    padding: var(--comun-interior-relleno);
+    position: relative;
+    overflow: hidden;
+}
+
+.ea-mega-inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--comun-interior-antes-fondo);
+    pointer-events: none;
+    opacity: var(--comun-interior-antes-opacidad);
+}
+
+:root[data-theme="dark"] .ea-mega-inner {
+    background: var(--comun-interior-fondo-oscuro);
+    border-color: var(--comun-interior-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega-inner::before {
+    background: var(--comun-interior-antes-fondo-oscuro);
+}
+
+.ea-mega-head {
+    position: relative;
+    margin-bottom: var(--comun-cabeza-margen-abajo-2);
+}
+
+.ea-mega-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-etiqueta-superior-separacion);
+    font-family: var(--comun-etiqueta-superior-fuente);
+    font-size: var(--comun-etiqueta-superior-tamano);
+    letter-spacing: var(--comun-etiqueta-superior-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-etiqueta-superior-color);
+}
+
+.ea-mega-title {
+    font-family: var(--comun-titulo-fuente);
+    font-weight: var(--comun-titulo-peso);
+    font-size: var(--comun-titulo-tamano);
+    letter-spacing: var(--comun-titulo-espaciado);
+    margin: var(--comun-titulo-margen);
+    color: var(--comun-titulo-color);
+}
+
+.ea-mega-title em {
+    font-style: italic;
+    color: var(--comun-titulo-cursiva-color);
+}
+
+:root[data-theme="dark"] .ea-mega-title {
+    color: var(--comun-titulo-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega-title em {
+    color: var(--comun-titulo-cursiva-color-oscuro);
+}
+
+.ea-mega-lede {
+    font-size: var(--comun-bajada-tamano);
+    color: var(--comun-bajada-color);
+    margin: 0;
+}
+
+.ea-mega-list {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--comun-lista-separacion);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ea-mega-list a {
+    display: block;
+    padding: var(--comun-lista-link-relleno);
+    border-radius: var(--comun-lista-link-redondeo);
+    border: var(--comun-lista-link-borde);
+    color: var(--comun-lista-link-color);
+    transition: var(--comun-lista-link-transicion);
+}
+
+.ea-mega-list a:hover,
+.ea-mega-list a:focus-visible {
+    background: var(--comun-lista-link-hover-fondo);
+    border-color: var(--comun-lista-link-hover-borde-color);
+    outline: none;
+    transform: var(--comun-lista-link-hover-transformacion);
+}
+
+:root[data-theme="dark"] .ea-mega-list a {
+    color: var(--comun-lista-link-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega-list a:hover,
+:root[data-theme="dark"] .ea-mega-list a:focus-visible {
+    background: var(--comun-lista-link-hover-fondo-oscuro);
+    border-color: var(--comun-lista-link-hover-borde-color-oscuro);
+}
+
+.ea-mega-link-label {
+    display: block;
+    font-size: var(--comun-link-etiqueta-tamano);
+    font-weight: var(--comun-link-etiqueta-peso);
+    line-height: var(--comun-link-etiqueta-interlineado);
+}
+
+.ea-mega-link-hint {
+    display: block;
+    font-family: var(--comun-link-ayuda-fuente);
+    font-size: var(--comun-link-ayuda-tamano);
+    letter-spacing: var(--comun-link-ayuda-espaciado);
+    color: var(--comun-link-ayuda-color);
+    margin-top: var(--comun-link-ayuda-margen-arriba);
+}
+
+.ea-mega-foot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--comun-pie-separacion);
+    margin-top: var(--comun-pie-margen-arriba);
+    padding-top: var(--comun-pie-relleno-arriba);
+    border-top: var(--comun-pie-borde-arriba);
+    flex-wrap: wrap;
+}
+
+.ea-mega-foot-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-pie-etiqueta-separacion);
+    font-family: var(--comun-pie-etiqueta-fuente);
+    font-size: var(--comun-pie-etiqueta-tamano);
+    letter-spacing: var(--comun-pie-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-pie-etiqueta-color);
+}
+
+.ea-mega-foot-tag strong {
+    color: var(--comun-pie-etiqueta-negrita-color);
+    font-weight: var(--comun-pie-etiqueta-negrita-peso);
+    letter-spacing: var(--comun-pie-etiqueta-negrita-espaciado);
+}
+
+:root[data-theme="dark"] .ea-mega-foot-tag strong {
+    color: var(--comun-pie-etiqueta-negrita-color-oscuro);
+}
+
+.ea-mega-foot-dot {
+    width: var(--comun-pie-punto-ancho);
+    height: var(--comun-pie-punto-alto);
+    border-radius: 50%;
+    background: var(--comun-pie-punto-fondo);
+    box-shadow: var(--comun-pie-punto-sombra);
+    animation: var(--comun-pie-punto-animacion);
+}
+
+@keyframes ea-mega-foot-pulse {
+    0% {
+        box-shadow: var(--comun-anim-pie-pulse-p0-sombra);
+    }
+    70% {
+        box-shadow: var(--comun-anim-pie-pulse-p70-sombra);
+    }
+    100% {
+        box-shadow: var(--comun-anim-pie-pulse-p100-sombra);
+    }
+}
+
+.ea-mega-foot-link {
+    font-family: var(--comun-pie-link-fuente);
+    font-size: var(--comun-pie-link-tamano);
+    font-weight: var(--comun-pie-link-peso);
+    color: var(--comun-pie-link-color);
+    transition: var(--comun-pie-link-transicion);
+}
+
+.ea-mega-foot-link:hover {
+    color: var(--comun-pie-link-hover-color);
+}
+
+:root[data-theme="dark"] .ea-mega-foot-link {
+    color: var(--comun-pie-link-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mega-foot-link:hover {
+    color: var(--comun-pie-link-hover-color-oscuro);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-mega-panel,
+    .ea-mega-caret,
+    .ea-mega-list a {
+        transition: none;
+    }
+    .ea-mega-foot-dot {
+        animation: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .ea-mega-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    /* En mobile el navbar oculta los nav-links; el portfolio entra al drawer */
+    .ea-mega {
+        display: none;
+    }
+}
+
+/* ---------- Links de la barra y cajón del celular ----------------------------- */
+
+/* Al scrollear la barra se achica: el alto lo pone el padding vertical del
+   .ea-navbar-inner, asi que el que cambia es --ea-nav-pad (12px en reposo,
+   6px al scrollear). Ponerle padding al <header> lo agrandaba en vez de
+   achicarlo, porque se sumaba al del inner. */
+.ea-navbar {
+    --ea-nav-pad: var(--comun-valor-ea-nav-pad);
+    transition: var(--comun-transicion);
+}
+
+.ea-navbar-inner {
+    transition: var(--comun-interior-transicion);
+}
+
+.ea-navbar.is-scrolled {
+    --ea-nav-pad: var(--comun-scrolled-valor-ea-nav-pad);
+    box-shadow: var(--comun-scrolled-sombra);
+    background: var(--comun-scrolled-fondo);
+}
+
+:root[data-theme="dark"] .ea-navbar.is-scrolled {
+    background: var(--comun-scrolled-fondo-oscuro);
+}
+
+.ea-nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-links-separacion);
+    margin: var(--comun-links-margen);
+    list-style: none;
+    padding: 0;
+}
+
+.ea-nav-links a {
+    position: relative;
+    padding: var(--comun-links-link-relleno);
+    border-radius: var(--comun-links-link-redondeo);
+    font-size: var(--comun-links-link-tamano);
+    color: var(--comun-links-link-color);
+    font-weight: var(--comun-links-link-peso);
+    transition: var(--comun-links-link-transicion);
+}
+
+.ea-nav-links a::after {
+    content: "";
+    position: absolute;
+    left: var(--comun-links-link-despues-izquierda);
+    right: var(--comun-links-link-despues-derecha);
+    bottom: var(--comun-links-link-despues-abajo);
+    height: var(--comun-links-link-despues-alto);
+    background: var(--comun-links-link-despues-fondo);
+    border-radius: var(--comun-links-link-despues-redondeo);
+    opacity: 0;
+    transform: var(--comun-links-link-despues-transformacion);
+    transform-origin: left;
+    transition: var(--comun-links-link-despues-transicion);
+}
+
+.ea-nav-links a:hover,
+.ea-nav-links a.is-active {
+    color: var(--comun-links-link-hover-color);
+}
+
+.ea-nav-links a:hover::after,
+.ea-nav-links a.is-active::after {
+    opacity: 1;
+    transform: var(--comun-links-link-hover-despues-transformacion);
+}
+
+:root[data-theme="dark"] .ea-nav-links a {
+    color: var(--comun-links-link-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-nav-links a:hover,
+:root[data-theme="dark"] .ea-nav-links a.is-active {
+    color: var(--comun-links-link-hover-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-nav-links a::after {
+    background: var(--comun-links-link-despues-fondo-oscuro);
+}
+
+@media (max-width: 900px) {
+    .ea-nav-links {
+        display: none;
+    }
+}
+
+.ea-nav-toggle {
+    display: none;
+    position: fixed;
+    top: var(--comun-boton-arriba);
+    right: var(--comun-boton-derecha);
+    z-index: 50;
+    width: var(--comun-boton-ancho);
+    height: var(--comun-boton-alto);
+    border-radius: 50%;
+    border: var(--comun-boton-borde);
+    background: var(--comun-boton-fondo);
+    color: var(--comun-boton-color);
+    box-shadow: var(--comun-boton-sombra);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-nav-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--comun-boton-foco-sombra);
+}
+
+.ea-nav-toggle-bars {
+    position: relative;
+    width: var(--comun-boton-rayitas-ancho);
+    height: var(--comun-boton-rayitas-alto);
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ea-nav-toggle-bars span {
+    display: block;
+    height: var(--comun-boton-rayitas-span-alto);
+    width: 100%;
+    background: currentColor;
+    border-radius: var(--comun-boton-rayitas-span-redondeo);
+    transition: var(--comun-boton-rayitas-span-transicion);
+    transform-origin: center;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(1) {
+    transform: var(--comun-boton-span-expanded-true-n1-transformacion);
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(2) {
+    opacity: 0;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(3) {
+    transform: var(--comun-boton-span-expanded-true-n3-transformacion);
+}
+
+.ea-mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: var(--comun-celular-navegacion-fondo);
+    backdrop-filter: var(--comun-celular-navegacion-filtro-fondo);
+    color: var(--comun-celular-navegacion-color);
+    padding: var(--comun-celular-navegacion-relleno);
+    display: none;
+    flex-direction: column;
+    gap: var(--comun-celular-navegacion-separacion);
+    opacity: 0;
+    transform: var(--comun-celular-navegacion-transformacion);
+    transition: var(--comun-celular-navegacion-transicion);
+}
+
+.ea-mobile-nav.is-open {
+    display: flex;
+    opacity: 1;
+    transform: none;
+}
+
+.ea-mobile-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--comun-celular-navegacion-lista-separacion);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-mobile-nav a {
+    display: block;
+    padding: var(--comun-celular-navegacion-link-relleno);
+    border-radius: var(--comun-celular-navegacion-link-redondeo);
+    font-family: var(--comun-celular-navegacion-link-fuente);
+    font-size: var(--comun-celular-navegacion-link-tamano);
+    letter-spacing: var(--comun-celular-navegacion-link-espaciado);
+    color: var(--comun-celular-navegacion-link-color);
+    border: var(--comun-celular-navegacion-link-borde);
+    transition: var(--comun-celular-navegacion-link-transicion);
+}
+
+.ea-mobile-nav a:hover,
+.ea-mobile-nav a:focus-visible {
+    background: var(--comun-celular-navegacion-link-hover-fondo);
+    border-color: var(--comun-celular-navegacion-link-hover-borde-color);
+    outline: none;
+}
+
+.ea-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--comun-celular-navegacion-acciones-separacion);
+    margin-top: auto;
+    padding-top: var(--comun-celular-navegacion-acciones-relleno-arriba);
+    border-top: var(--comun-celular-navegacion-acciones-borde-arriba);
+}
+
+.ea-mobile-nav-actions .ea-button-secondary {
+    background: var(--comun-celular-navegacion-acciones-boton-secundario-fondo);
+    color: var(--comun-celular-navegacion-acciones-boton-secundario-color);
+    border-color: var(--comun-celular-navegacion-acciones-boton-secundario-borde-color);
+}
+
+.ea-mobile-nav-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--comun-celular-navegacion-tema-separacion);
+    padding: var(--comun-celular-navegacion-tema-relleno);
+    border-bottom: var(--comun-celular-navegacion-tema-borde-abajo);
+    margin-bottom: var(--comun-celular-navegacion-tema-margen-abajo);
+}
+
+.ea-mobile-nav-theme-label {
+    font-family: var(--comun-celular-navegacion-tema-etiqueta-fuente);
+    font-size: var(--comun-celular-navegacion-tema-etiqueta-tamano);
+    letter-spacing: var(--comun-celular-navegacion-tema-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-celular-navegacion-tema-etiqueta-color);
+}
+
+@media (max-width: 900px) {
+    .ea-nav-toggle {
+        display: inline-flex;
+    }
+    .ea-landing .ea-navbar .ea-nav-actions {
+        display: none;
+    }
+}
+
+body.ea-nav-open {
+    overflow: hidden;
 }
 
 /* ---------- Interruptor claro / oscuro --------------------------------
@@ -858,6 +1996,531 @@ body.ea-body {
     opacity: var(--boton-deshabilitado-opacidad);
     cursor: not-allowed;
     transform: none;
+}
+
+/* ---------- Tarjetas ---------------------------------------------------------- */
+
+.ea-card {
+    background: var(--comun-tarjeta-fondo);
+    border: var(--comun-tarjeta-borde);
+    border-radius: var(--comun-tarjeta-redondeo);
+    padding: var(--comun-tarjeta-relleno);
+    box-shadow: var(--comun-tarjeta-sombra);
+    position: relative;
+}
+
+/* ---------- Insignias de estado ----------------------------------------------- */
+
+.ea-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--comun-separacion);
+    padding: var(--comun-relleno-2);
+    border-radius: var(--comun-redondeo);
+    font-family: var(--comun-fuente);
+    font-size: var(--comun-tamano);
+    letter-spacing: var(--comun-espaciado);
+    text-transform: uppercase;
+    background: var(--comun-fondo-2);
+    color: var(--comun-color);
+    border: var(--comun-borde);
+    line-height: var(--comun-interlineado);
+}
+
+.ea-badge::before {
+    content: "";
+    width: var(--comun-antes-ancho);
+    height: var(--comun-antes-alto);
+    border-radius: 50%;
+    background: currentColor;
+    opacity: var(--comun-antes-opacidad);
+}
+
+.ea-badge--neutral {
+    background: var(--comun-neutro-fondo);
+    color: var(--comun-neutro-color);
+}
+
+.ea-badge--success,
+.ea-badge-success {
+    background: var(--comun-exito-fondo);
+    color: var(--comun-exito-color);
+}
+
+.ea-badge--info {
+    background: var(--comun-info-fondo);
+    color: var(--comun-info-color);
+}
+
+.ea-badge--warning,
+.ea-badge-warning {
+    background: var(--comun-alerta-fondo);
+    color: var(--comun-alerta-color);
+}
+
+.ea-badge--danger,
+.ea-badge-danger {
+    background: var(--comun-peligro-fondo);
+    color: var(--comun-peligro-color);
+}
+
+:root[data-theme="dark"] .ea-badge--success {
+    color: var(--comun-exito-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge--info {
+    color: var(--comun-info-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge--warning {
+    color: var(--comun-alerta-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge--danger {
+    color: var(--comun-peligro-color-oscuro);
+}
+
+/* ---------- Formularios ------------------------------------------------------- */
+
+.ea-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--comun-formulario-separacion);
+    width: 100%;
+}
+
+.ea-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--comun-separacion);
+}
+
+.ea-field label,
+.ea-label {
+    font-family: var(--comun-etiqueta-fuente);
+    font-size: var(--comun-etiqueta-tamano);
+    letter-spacing: var(--comun-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-etiqueta-color);
+}
+
+.ea-input,
+.ea-field input[type="text"],
+.ea-field input[type="email"],
+.ea-field input[type="password"],
+.ea-field input[type="number"],
+.ea-field input[type="search"],
+.ea-field input[type="tel"],
+.ea-field input[type="url"],
+.ea-field select,
+.ea-field textarea {
+    appearance: none;
+    width: 100%;
+    background: var(--comun-campo-fondo);
+    color: var(--comun-campo-color);
+    border: var(--comun-campo-borde);
+    border-radius: var(--comun-campo-redondeo);
+    padding: var(--comun-campo-relleno);
+    font-family: var(--comun-campo-fuente);
+    font-size: var(--comun-campo-tamano);
+    line-height: var(--comun-campo-interlineado);
+    transition: var(--comun-campo-transicion);
+}
+
+.ea-input::placeholder,
+.ea-field input::placeholder,
+.ea-field textarea::placeholder {
+    color: var(--comun-campo-ayuda-campo-color);
+    opacity: var(--comun-campo-ayuda-campo-opacidad);
+}
+
+.ea-input:focus,
+.ea-field input:focus,
+.ea-field select:focus,
+.ea-field textarea:focus {
+    outline: none;
+    border-color: var(--comun-campo-foco-borde-color);
+    box-shadow: var(--comun-campo-foco-sombra);
+}
+
+:root[data-theme="dark"] .ea-input,
+:root[data-theme="dark"] .ea-field input,
+:root[data-theme="dark"] .ea-field select,
+:root[data-theme="dark"] .ea-field textarea {
+    background: var(--comun-campo-fondo-oscuro);
+    border-color: var(--comun-campo-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-input:focus,
+:root[data-theme="dark"] .ea-field input:focus,
+:root[data-theme="dark"] .ea-field select:focus,
+:root[data-theme="dark"] .ea-field textarea:focus {
+    border-color: var(--comun-campo-foco-borde-color-oscuro);
+    box-shadow: var(--comun-campo-foco-sombra-oscuro);
+}
+
+.ea-field .ea-hint,
+.ea-hint {
+    font-family: var(--comun-ayuda-fuente);
+    font-size: var(--comun-ayuda-tamano);
+    color: var(--comun-ayuda-color);
+}
+
+.ea-field-row {
+    display: grid;
+    gap: var(--comun-fila-separacion);
+    grid-template-columns: var(--comun-fila-columnas);
+}
+
+/* ---------- Contraseña con ojo ------------------------------------------------ */
+
+.ea-password {
+    position: relative;
+    display: block;
+}
+
+/* Los dos tipos, porque el campo pasa a type="text" al mostrar la clave.
+   Van con [type] a propósito: así empatan en especificidad con la regla
+   general de .ea-field input[type="password"] (línea ~1491) y ganan por
+   venir después. Con `.ea-password input` a secas, perdían y el texto
+   quedaba pasando por abajo del ojo.                                      */
+.ea-password input[type="password"],
+.ea-password input[type="text"] {
+    width: 100%;
+    padding-right: var(--ojo-campo-type-password-relleno-derecha);
+}
+
+.ea-password-ojo {
+    position: absolute;
+    top: 50%;
+    right: var(--ojo-ojo-derecha);
+    transform: translateY(-50%);
+    width: var(--ojo-ojo-ancho);
+    height: var(--ojo-ojo-alto);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ojo-ojo-redondeo);
+    background: transparent;
+    color: var(--ojo-ojo-color);
+    cursor: pointer;
+    transition: var(--ojo-ojo-transicion);
+}
+
+.ea-password-ojo:hover,
+.ea-password-ojo:focus-visible {
+    color: var(--ojo-ojo-hover-color);
+    background: var(--ojo-ojo-hover-fondo);
+}
+
+.ea-password-ojo svg {
+    width: var(--ojo-ojo-icono-ancho);
+    height: var(--ojo-ojo-icono-alto);
+    display: block;
+}
+
+/* Con la contraseña oculta se ofrece "ver"; con la contraseña a la vista,
+   "ocultar". Solo uno de los dos íconos está presente a la vez.            */
+.ea-password-ojo .ea-ojo-ocultar,
+.ea-password-ojo[data-visible="true"] .ea-ojo-ver {
+    display: none;
+}
+
+.ea-password-ojo[data-visible="true"] .ea-ojo-ocultar {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-password-ojo {
+        transition: none;
+    }
+}
+
+/* ---------- Mensajes ---------------------------------------------------------- */
+
+.ea-message {
+    border-radius: var(--comun-redondeo-2);
+    padding: var(--comun-relleno-3);
+    font-size: var(--comun-tamano-2);
+    border: var(--comun-borde);
+    display: flex;
+    gap: var(--comun-separacion-2);
+    align-items: flex-start;
+}
+
+.ea-message::before {
+    content: "";
+    width: var(--comun-antes-ancho-2);
+    height: var(--comun-antes-alto-2);
+    border-radius: 50%;
+    margin-top: var(--comun-antes-margen-arriba);
+    flex-shrink: 0;
+    background: currentColor;
+}
+
+.ea-message--error {
+    background: var(--comun-error-fondo);
+    color: var(--comun-error-color);
+    border-color: var(--comun-error-borde-color);
+}
+
+.ea-message--success {
+    background: var(--comun-exito-fondo);
+    color: var(--comun-exito-color);
+    border-color: var(--comun-exito-borde-color);
+}
+
+.ea-message--info {
+    background: var(--comun-info-fondo);
+    color: var(--comun-info-color);
+    border-color: var(--comun-info-borde-color);
+}
+
+:root[data-theme="dark"] .ea-message--success {
+    color: var(--comun-exito-color-oscuro);
+    border-color: var(--comun-exito-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-message--error {
+    color: var(--comun-error-color-oscuro);
+    border-color: var(--comun-error-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-message--info {
+    color: var(--comun-info-color-oscuro);
+    border-color: var(--comun-info-borde-color-oscuro);
+}
+
+.ea-message ul {
+    margin: var(--comun-lista-margen);
+    padding: var(--comun-lista-relleno);
+    list-style: disc;
+}
+
+/* ---------- Tablas ------------------------------------------------------------ */
+
+.ea-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--comun-tamano-2);
+}
+
+.ea-table th,
+.ea-table td {
+    text-align: left;
+    padding: var(--comun-encabezado-relleno);
+    border-bottom: var(--comun-encabezado-borde-abajo);
+    vertical-align: middle;
+}
+
+.ea-table th {
+    font-family: var(--comun-encabezado-fuente);
+    font-weight: var(--comun-encabezado-peso);
+    letter-spacing: var(--comun-encabezado-espaciado);
+    text-transform: uppercase;
+    font-size: var(--comun-encabezado-tamano);
+    color: var(--comun-encabezado-color);
+    background: var(--comun-encabezado-fondo);
+}
+
+:root[data-theme="dark"] .ea-table th {
+    background: var(--comun-encabezado-fondo-oscuro);
+}
+
+.ea-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.ea-table tbody tr:hover {
+    background: var(--comun-cuerpo-fila-hover-fondo);
+}
+
+:root[data-theme="dark"] .ea-table tbody tr:hover {
+    background: var(--comun-cuerpo-fila-hover-fondo-oscuro);
+}
+
+/* ---------- Portada (páginas públicas) ---------------------------------------- */
+
+.ea-hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--comun-portada-relleno);
+    background: var(--comun-portada-fondo);
+}
+
+:root[data-theme="dark"] .ea-hero {
+    background: var(--comun-portada-fondo-oscuro);
+}
+
+.ea-hero-title {
+    font-family: var(--comun-portada-titulo-fuente);
+    font-weight: var(--comun-portada-titulo-peso);
+    font-size: var(--comun-portada-titulo-tamano);
+    line-height: var(--comun-portada-titulo-interlineado);
+    letter-spacing: var(--comun-portada-titulo-espaciado);
+    margin: var(--comun-portada-titulo-margen);
+}
+
+.ea-hero-title em {
+    font-style: italic;
+    color: var(--comun-portada-titulo-cursiva-color);
+}
+
+/* ---------- Pie de página ----------------------------------------------------- */
+
+.ea-footer {
+    background: var(--comun-fondo-3);
+    color: var(--comun-color-2);
+    padding: var(--comun-relleno-4);
+    margin-top: auto;
+}
+
+.ea-footer-inner {
+    display: grid;
+    grid-template-columns: var(--comun-interior-columnas);
+    gap: var(--comun-interior-separacion-2);
+    align-items: start;
+}
+
+.ea-footer p {
+    color: var(--comun-texto-color);
+    font-size: var(--comun-texto-tamano);
+    max-width: var(--comun-texto-ancho-max);
+    margin-top: var(--comun-texto-margen-arriba);
+    line-height: var(--comun-texto-interlineado);
+}
+
+.ea-footer h4 {
+    font-family: var(--comun-titulo-fuente-2);
+    font-size: var(--comun-titulo-tamano-2);
+    letter-spacing: var(--comun-titulo-espaciado-2);
+    text-transform: uppercase;
+    color: var(--comun-titulo-color-2);
+    margin-bottom: var(--comun-titulo-margen-abajo);
+}
+
+.ea-footer ul li,
+.ea-footer span {
+    color: var(--comun-lista-item-color);
+    font-size: var(--comun-lista-item-tamano);
+}
+
+.ea-footer-bottom {
+    border-top: var(--comun-abajo-borde-arriba);
+    margin-top: var(--comun-abajo-margen-arriba);
+    padding-top: var(--comun-abajo-relleno-arriba);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--comun-abajo-separacion);
+    font-family: var(--comun-abajo-fuente);
+    font-size: var(--comun-abajo-tamano);
+    letter-spacing: var(--comun-abajo-espaciado);
+    text-transform: uppercase;
+    color: var(--comun-abajo-color);
+}
+
+@media (max-width: 820px) {
+    .ea-footer-inner {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Utilidades -------------------------------------------------------- */
+
+.ea-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--comun-pila-separacion);
+}
+
+/* ---------- Barra de scroll moderna flotante (EdenAir) ------------------------ */
+
+html.ea-floatbar-on {
+    scrollbar-width: none;
+}
+
+/* Firefox */
+html.ea-floatbar-on::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* WebKit  */
+.ea-floatbar {
+    position: fixed;
+    top: var(--barrascroll-arriba);
+    right: var(--barrascroll-derecha);
+    bottom: var(--barrascroll-abajo);
+    width: var(--barrascroll-ancho);
+    /* zona de agarre; el thumb visible es más fino */
+    z-index: 90;
+    /* sobre navbar/menús (≤60), bajo el loader (100) */
+    pointer-events: none;
+    /* el track nunca bloquea clicks */
+    opacity: 0;
+    transition: var(--barrascroll-transicion);
+}
+
+.ea-floatbar.is-active {
+    opacity: 1;
+}
+
+.ea-floatbar-thumb {
+    position: absolute;
+    top: 0;
+    right: var(--barrascroll-bolita-derecha);
+    width: var(--barrascroll-bolita-ancho);
+    min-height: var(--barrascroll-bolita-alto-min);
+    border-radius: var(--barrascroll-bolita-redondeo);
+    background: var(--barrascroll-bolita-fondo);
+    box-shadow: var(--barrascroll-bolita-sombra);
+    pointer-events: auto;
+    /* sólo el thumb captura el arrastre */
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+    transition: var(--barrascroll-bolita-transicion);
+}
+
+.ea-floatbar-thumb:hover,
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    width: var(--barrascroll-bolita-hover-ancho);
+    right: 0;
+}
+
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    cursor: grabbing;
+}
+
+:root[data-theme="dark"] .ea-floatbar-thumb {
+    background: var(--barrascroll-bolita-fondo-oscuro);
+    box-shadow: var(--barrascroll-bolita-sombra-oscuro);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-floatbar,
+    .ea-floatbar-thumb {
+        transition: none;
+    }
+    .ea-floatbar.is-active {
+        opacity: var(--barrascroll-active-opacidad-sin-movimiento);
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .ea-floatbar {
+        display: none;
+    }
+    html.ea-floatbar-on {
+        scrollbar-width: auto;
+    }
+    html.ea-floatbar-on::-webkit-scrollbar {
+        width: auto;
+        height: auto;
+    }
 }
 
 /* ---------- Carteles de aviso del panel (partials/flashes.php) -------- */

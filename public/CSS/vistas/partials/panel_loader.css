@@ -1,0 +1,602 @@
+/* =====================================================================
+   vistas/partials/panel_loader.css — pantalla de carga "Preparando tu ambiente inteligente"
+   ---------------------------------------------------------------------
+   Vista: app/Views/partials/panel_loader.php
+   Se carga sola cuando el layout del panel muestra la pantalla de carga (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Pantalla de carga ----------------------------------------------- */
+    --carga-color:                     var(--color-texto);   /* color del texto — la pantalla de carga */
+    --carga-fondo:                     radial-gradient(60% 50% at 50% 38%, rgba(143, 214, 200, 0.32), transparent 70%), radial-gradient(120% 90% at 12% 8%, rgba(143, 214, 200, 0.22), transparent 55%), radial-gradient(120% 90% at 88% 92%, rgba(201, 216, 112, 0.18), transparent 58%), linear-gradient(180deg, #fbfaf3 0%, var(--color-fondo-aire) 100%);   /* fondo — la pantalla de carga */
+    --carga-transicion:                opacity 0.6s var(--curva-suave, cubic-bezier(0.23, 1, 0.32, 1));   /* animación de los cambios — la pantalla de carga */
+    --carga-color-oscuro:              var(--verde-100);   /* color del texto — la pantalla de carga (modo oscuro) */
+    --carga-fondo-oscuro:              radial-gradient(60% 50% at 50% 38%, rgba(91, 229, 182, 0.18), transparent 72%), radial-gradient(120% 90% at 12% 8%, rgba(143, 214, 200, 0.14), transparent 58%), radial-gradient(120% 90% at 88% 92%, rgba(43, 86, 56, 0.55), transparent 60%), linear-gradient(180deg, #06140e 0%, #0a1a13 100%);   /* fondo — la pantalla de carga (modo oscuro) */
+    --carga-trama-fondo-imagen:        repeating-linear-gradient(115deg, rgba(47, 107, 79, 0.055) 0 1px, transparent 1px 30px);   /* imagen/degradado de fondo — trama */
+    --carga-trama-mascara:             radial-gradient(circle at center, black 20%, transparent 82%);   /* máscara — trama */
+    --carga-trama-fondo-imagen-oscuro: repeating-linear-gradient(115deg, rgba(143, 214, 200, 0.065) 0 1px, transparent 1px 30px);   /* imagen/degradado de fondo — trama (modo oscuro) */
+    --carga-grano-opacidad:            0.55;   /* opacidad (0 = invisible, 1 = opaco) — grano */
+    --carga-grano-fondo-imagen:        radial-gradient(rgba(20, 35, 27, 0.06) 1px, transparent 1px), radial-gradient(rgba(20, 35, 27, 0.04) 1px, transparent 1px);   /* imagen/degradado de fondo — grano */
+    --carga-grano-fondo-tamano:        3px 3px, 7px 7px;   /* tamaño del fondo — grano */
+    --carga-grano-fondo-posicion:      0 0, 1px 2px;   /* posición del fondo — grano */
+    --carga-grano-mascara:             radial-gradient(circle at center, black 35%, transparent 90%);   /* máscara — grano */
+    --carga-grano-opacidad-oscuro:     0.4;   /* opacidad (0 = invisible, 1 = opaco) — grano (modo oscuro) */
+    --carga-grano-fondo-imagen-oscuro: radial-gradient(rgba(236, 242, 232, 0.05) 1px, transparent 1px), radial-gradient(rgba(143, 214, 200, 0.04) 1px, transparent 1px);   /* imagen/degradado de fondo — grano (modo oscuro) */
+    --carga-interior-separacion:       32px;   /* separación entre elementos — interior */
+    --carga-interior-relleno:          48px 56px;   /* espacio interno — interior */
+    --carga-interior-ancho-max:        min(640px, 92vw);   /* ancho máximo — interior */
+
+    /* ---- Etiqueta de arriba ---------------------------------------------- */
+    --carga-etiqueta-superior-separacion:         10px;   /* separación entre elementos — superior de etiqueta */
+    --carga-etiqueta-superior-fuente:             var(--fuente-codigo);   /* tipografía — superior de etiqueta */
+    --carga-etiqueta-superior-tamano:             0.6875rem;   /* tamaño de letra — superior de etiqueta */
+    --carga-etiqueta-superior-peso:               500;   /* grosor de letra — superior de etiqueta */
+    --carga-etiqueta-superior-espaciado:          0.22em;   /* separación entre letras — superior de etiqueta */
+    --carga-etiqueta-superior-color:              var(--color-primario);   /* color del texto — superior de etiqueta */
+    --carga-etiqueta-superior-relleno:            8px 16px;   /* espacio interno — superior de etiqueta */
+    --carga-etiqueta-superior-redondeo:           999px;   /* redondeo de las esquinas — superior de etiqueta */
+    --carga-etiqueta-superior-borde:              1px solid rgba(47, 107, 79, 0.22);   /* borde — superior de etiqueta */
+    --carga-etiqueta-superior-fondo:              rgba(255, 255, 255, 0.55);   /* fondo — superior de etiqueta */
+    --carga-etiqueta-superior-filtro-fondo:       blur(8px);   /* desenfoque de lo que está detrás — superior de etiqueta */
+    --carga-etiqueta-superior-punto-ancho:        7px;   /* ancho — punto de etiqueta superior */
+    --carga-etiqueta-superior-punto-alto:         7px;   /* alto — punto de etiqueta superior */
+    --carga-etiqueta-superior-punto-fondo:        var(--color-aire);   /* fondo — punto de etiqueta superior */
+    --carga-etiqueta-superior-punto-sombra:       0 0 0 0 rgba(143, 214, 200, 0.7);   /* sombra — punto de etiqueta superior */
+    --carga-etiqueta-superior-punto-animacion:    ea-loader-pulse 1.8s ease-out infinite;   /* animación — punto de etiqueta superior */
+    --carga-etiqueta-superior-color-oscuro:       var(--color-aire);   /* color del texto — superior de etiqueta (modo oscuro) */
+    --carga-etiqueta-superior-borde-color-oscuro: rgba(143, 214, 200, 0.28);   /* color del borde — superior de etiqueta (modo oscuro) */
+    --carga-etiqueta-superior-fondo-oscuro:       rgba(143, 214, 200, 0.06);   /* fondo — superior de etiqueta (modo oscuro) */
+    --carga-etiqueta-superior-punto-fondo-oscuro: #5BE5B6;   /* fondo — punto de etiqueta superior (modo oscuro) */
+    --carga-anim-pulse-p0-sombra:                 0 0 0 0 rgba(143, 214, 200, 0.55);   /* sombra — animación "ea-loader-pulse" al 0% */
+    --carga-anim-pulse-p70-sombra:                0 0 0 10px rgba(143, 214, 200, 0);   /* sombra — animación "ea-loader-pulse" al 70% */
+    --carga-anim-pulse-p100-sombra:               0 0 0 0 rgba(143, 214, 200, 0);   /* sombra — animación "ea-loader-pulse" al 100% */
+
+    /* ---- Órbita central: halo + tres anillos + isotipo ------------------- */
+    --carga-orbita-ancho:                          280px;   /* ancho — órbita */
+    --carga-orbita-alto:                           280px;   /* alto — órbita */
+    --carga-halo-posicion:                         -40px;   /* distancia a los bordes — halo */
+    --carga-halo-fondo:                            radial-gradient(circle at 50% 50%, rgba(143, 214, 200, 0.45), rgba(143, 214, 200, 0.08) 45%, transparent 70%);   /* fondo — halo */
+    --carga-halo-filtro:                           blur(14px);   /* filtro (desenfoque, brillo, sombra) — halo */
+    --carga-halo-animacion:                        ea-loader-halo 4.6s ease-in-out infinite;   /* animación — halo */
+    --carga-halo-fondo-oscuro:                     radial-gradient(circle at 50% 50%, rgba(91, 229, 182, 0.35), rgba(143, 214, 200, 0.08) 50%, transparent 75%);   /* fondo — halo (modo oscuro) */
+    --carga-anim-halo-p0100-transformacion:        scale(0.96);   /* desplazamiento/escala/giro — animación "ea-loader-halo" al 0%, 100% */
+    --carga-anim-halo-p0100-opacidad:              0.85;   /* opacidad (0 = invisible, 1 = opaco) — animación "ea-loader-halo" al 0%, 100% */
+    --carga-anim-halo-p50-transformacion:          scale(1.06);   /* desplazamiento/escala/giro — animación "ea-loader-halo" al 50% */
+    --carga-anillo-borde:                          1px solid rgba(47, 107, 79, 0.16);   /* borde — anillo */
+    --carga-anillo-borde-color-oscuro:             rgba(143, 214, 200, 0.18);   /* color del borde — anillo (modo oscuro) */
+    --carga-anillo-a-borde-arriba-color:           var(--color-primario);   /* color del borde de arriba — a de anillo */
+    --carga-anillo-a-borde-derecha-color:          rgba(47, 107, 79, 0.06);   /* color del borde derecho — a de anillo */
+    --carga-anillo-a-animacion:                    ea-loader-spin 9s linear infinite;   /* animación — a de anillo */
+    --carga-anillo-b-posicion:                     30px;   /* distancia a los bordes — b de anillo */
+    --carga-anillo-b-borde-grosor:                 1px;   /* grosor del borde — b de anillo */
+    --carga-anillo-b-borde-color:                  rgba(47, 107, 79, 0.18);   /* color del borde — b de anillo */
+    --carga-anillo-b-animacion:                    ea-loader-spin 14s linear infinite reverse;   /* animación — b de anillo */
+    --carga-anillo-c-posicion:                     64px;   /* distancia a los bordes — c de anillo */
+    --carga-anillo-c-borde-izquierda-color:        var(--color-aire);   /* color del borde izquierdo — c de anillo */
+    --carga-anillo-c-borde-abajo-color:            rgba(143, 214, 200, 0.25);   /* color del borde de abajo — c de anillo */
+    --carga-anillo-c-animacion:                    ea-loader-spin 11s linear infinite;   /* animación — c de anillo */
+    --carga-anillo-a-borde-arriba-color-oscuro:    var(--color-aire);   /* color del borde de arriba — a de anillo (modo oscuro) */
+    --carga-anillo-b-borde-color-oscuro:           rgba(143, 214, 200, 0.22);   /* color del borde — b de anillo (modo oscuro) */
+    --carga-anillo-c-borde-izquierda-color-oscuro: #5BE5B6;   /* color del borde izquierdo — c de anillo (modo oscuro) */
+    --carga-anillo-c-borde-abajo-color-oscuro:     rgba(91, 229, 182, 0.3);   /* color del borde de abajo — c de anillo (modo oscuro) */
+    --carga-anim-spin-pto-transformacion:          rotate(360deg);   /* desplazamiento/escala/giro — animación "ea-loader-spin" al to */
+    --carga-logo-e-animacion:                      ea-loader-breathe 4.6s ease-in-out infinite;   /* animación — e de logo */
+    --carga-logo-e-filtro:                         drop-shadow(0 12px 28px rgba(47, 107, 79, 0.28));   /* filtro (desenfoque, brillo, sombra) — e de logo */
+    --carga-logo-e-filtro-oscuro:                  drop-shadow(0 12px 32px rgba(91, 229, 182, 0.35));   /* filtro (desenfoque, brillo, sombra) — e de logo (modo oscuro) */
+    --carga-logo-e-icono-alto:                     140px;   /* alto — ícono de logo e */
+    --carga-anim-breathe-p50-transformacion:       scale(1.04);   /* desplazamiento/escala/giro — animación "ea-loader-breathe" al 50% */
+
+    /* ---- Texto ----------------------------------------------------------- */
+    --carga-texto-separacion:            12px;   /* separación entre elementos — texto */
+    --carga-nombre-fuente:               var(--fuente-titulos);   /* tipografía — nombre */
+    --carga-nombre-peso:                 400;   /* grosor de letra — nombre */
+    --carga-nombre-tamano:               2.75rem;   /* tamaño de letra — nombre */
+    --carga-nombre-espaciado:            -0.025em;   /* separación entre letras — nombre */
+    --carga-nombre-interlineado:         1;   /* separación entre renglones — nombre */
+    --carga-nombre-color:                var(--verde-800);   /* color del texto — nombre */
+    --carga-nombre-cursiva-color:        var(--color-primario);   /* color del texto — cursiva de nombre */
+    --carga-nombre-color-oscuro:         var(--verde-100);   /* color del texto — nombre (modo oscuro) */
+    --carga-nombre-cursiva-color-oscuro: #5BE5B6;   /* color del texto — cursiva de nombre (modo oscuro) */
+    --carga-mensaje-fuente:              var(--fuente-codigo);   /* tipografía — mensaje */
+    --carga-mensaje-tamano:              0.7188rem;   /* tamaño de letra — mensaje */
+    --carga-mensaje-espaciado:           0.22em;   /* separación entre letras — mensaje */
+    --carga-mensaje-color:               var(--color-texto-suave);   /* color del texto — mensaje */
+    --carga-mensaje-despues-ancho:       1.2em;   /* ancho — mensaje (estado: despues) */
+    --carga-mensaje-despues-animacion:   ea-loader-dots 1.6s steps(4, end) infinite;   /* animación — mensaje (estado: despues) */
+    --carga-mensaje-color-oscuro:        rgba(236, 242, 232, 0.58);   /* color del texto — mensaje (modo oscuro) */
+
+    /* ---- Barra de progreso ----------------------------------------------- */
+    --carga-progreso-ancho:                 320px;   /* ancho — progreso */
+    --carga-progreso-ancho-max:             72vw;   /* ancho máximo — progreso */
+    --carga-progreso-alto:                  3px;   /* alto — progreso */
+    --carga-progreso-fondo:                 color-mix(in oklab, var(--color-primario) 12%, transparent);   /* fondo — progreso */
+    --carga-progreso-redondeo:              999px;   /* redondeo de las esquinas — progreso */
+    --carga-progreso-antes-ancho:           4px;   /* ancho — progreso (estado: antes) */
+    --carga-progreso-antes-alto:            4px;   /* alto — progreso (estado: antes) */
+    --carga-progreso-antes-margen-arriba:   -2px;   /* margen de arriba — progreso (estado: antes) */
+    --carga-progreso-antes-fondo:           var(--color-primario);   /* fondo — progreso (estado: antes) */
+    --carga-progreso-antes-opacidad:        0.4;   /* opacidad (0 = invisible, 1 = opaco) — progreso (estado: antes) */
+    --carga-progreso-antes-izquierda:       -10px;   /* distancia desde la izquierda — progreso (estado: antes) */
+    --carga-progreso-despues-derecha:       -10px;   /* distancia desde la derecha — progreso (estado: despues) */
+    --carga-progreso-fondo-oscuro:          rgba(236, 242, 232, 0.10);   /* fondo — progreso (modo oscuro) */
+    --carga-progreso-antes-fondo-oscuro:    var(--color-aire);   /* fondo — progreso (estado: antes; modo oscuro) */
+    --carga-progreso-antes-opacidad-oscuro: 0.55;   /* opacidad (0 = invisible, 1 = opaco) — progreso (estado: antes; modo oscuro) */
+    --carga-progreso-span-ancho:            40%;   /* ancho — span de progreso */
+    --carga-progreso-span-redondeo:         999px;   /* redondeo de las esquinas — span de progreso */
+    --carga-progreso-span-fondo:            linear-gradient(90deg, var(--color-aire), var(--color-primario), var(--color-citrico));   /* fondo — span de progreso */
+    --carga-progreso-span-sombra:           0 0 12px rgba(143, 214, 200, 0.6);   /* sombra — span de progreso */
+    --carga-progreso-span-animacion:        ea-loader-bar 1.9s var(--curva-ida-vuelta, cubic-bezier(0.77, 0, 0.175, 1)) infinite;   /* animación — span de progreso */
+    --carga-progreso-span-fondo-oscuro:     linear-gradient(90deg, #5BE5B6, var(--color-aire), #BCE9DC);   /* fondo — span de progreso (modo oscuro) */
+    --carga-progreso-span-sombra-oscuro:    0 0 14px rgba(91, 229, 182, 0.6);   /* sombra — span de progreso (modo oscuro) */
+    --carga-anim-barra-p0-transformacion:   translateX(-120%);   /* desplazamiento/escala/giro — animación "ea-loader-bar" al 0% */
+    --carga-anim-barra-p0-ancho:            35%;   /* ancho — animación "ea-loader-bar" al 0% */
+    --carga-anim-barra-p50-transformacion:  translateX(60%);   /* desplazamiento/escala/giro — animación "ea-loader-bar" al 50% */
+    --carga-anim-barra-p50-ancho:           65%;   /* ancho — animación "ea-loader-bar" al 50% */
+    --carga-anim-barra-p100-transformacion: translateX(280%);   /* desplazamiento/escala/giro — animación "ea-loader-bar" al 100% */
+    --carga-anim-barra-p100-ancho:          35%;   /* ancho — animación "ea-loader-bar" al 100% */
+    --carga-interior-separacion-hasta-560:  24px;   /* separación entre elementos — interior (hasta 560px de ancho) */
+    --carga-interior-relleno-hasta-560:     32px 24px;   /* espacio interno — interior (hasta 560px de ancho) */
+    --carga-orbita-ancho-hasta-560:         220px;   /* ancho — órbita (hasta 560px de ancho) */
+    --carga-orbita-alto-hasta-560:          220px;   /* alto — órbita (hasta 560px de ancho) */
+    --carga-logo-e-icono-alto-hasta-560:    108px;   /* alto — ícono de logo e (hasta 560px de ancho) */
+    --carga-nombre-tamano-hasta-560:        2.25rem;   /* tamaño de letra — nombre (hasta 560px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 560px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Pantalla de carga ------------------------------------------------- */
+
+.ea-loader,
+.dashboard-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: var(--carga-color);
+    background: var(--carga-fondo);
+    transition: var(--carga-transicion);
+}
+
+:root[data-theme="dark"] .ea-loader,
+:root[data-theme="dark"] .dashboard-loader {
+    color: var(--carga-color-oscuro);
+    background: var(--carga-fondo-oscuro);
+}
+
+.dashboard-body.dashboard-ready .ea-loader,
+.dashboard-body.dashboard-ready .dashboard-loader {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.dashboard-body:not(.dashboard-loading) .ea-loader,
+.dashboard-body:not(.dashboard-loading) .dashboard-loader {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Trama de aire diagonal del branding */
+.ea-loader-pattern {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--carga-trama-fondo-imagen);
+    mask-image: var(--carga-trama-mascara);
+    -webkit-mask-image: var(--carga-trama-mascara);
+}
+
+:root[data-theme="dark"] .ea-loader-pattern {
+    background-image: var(--carga-trama-fondo-imagen-oscuro);
+}
+
+/* Capa fina de grano para textura editorial */
+.ea-loader-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--carga-grano-opacidad);
+    mix-blend-mode: overlay;
+    background-image: var(--carga-grano-fondo-imagen);
+    background-size: var(--carga-grano-fondo-tamano);
+    background-position: var(--carga-grano-fondo-posicion);
+    mask-image: var(--carga-grano-mascara);
+    -webkit-mask-image: var(--carga-grano-mascara);
+}
+
+:root[data-theme="dark"] .ea-loader-grain {
+    opacity: var(--carga-grano-opacidad-oscuro);
+    background-image: var(--carga-grano-fondo-imagen-oscuro);
+}
+
+.ea-loader-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--carga-interior-separacion);
+    padding: var(--carga-interior-relleno);
+    text-align: center;
+    max-width: var(--carga-interior-ancho-max);
+}
+
+/* ---------- Etiqueta de arriba ------------------------------------------------ */
+
+.ea-loader-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--carga-etiqueta-superior-separacion);
+    font-family: var(--carga-etiqueta-superior-fuente);
+    font-size: var(--carga-etiqueta-superior-tamano);
+    font-weight: var(--carga-etiqueta-superior-peso);
+    letter-spacing: var(--carga-etiqueta-superior-espaciado);
+    text-transform: uppercase;
+    color: var(--carga-etiqueta-superior-color);
+    padding: var(--carga-etiqueta-superior-relleno);
+    border-radius: var(--carga-etiqueta-superior-redondeo);
+    border: var(--carga-etiqueta-superior-borde);
+    background: var(--carga-etiqueta-superior-fondo);
+    backdrop-filter: var(--carga-etiqueta-superior-filtro-fondo);
+    -webkit-backdrop-filter: var(--carga-etiqueta-superior-filtro-fondo);
+}
+
+.ea-loader-eyebrow .ea-loader-dot {
+    width: var(--carga-etiqueta-superior-punto-ancho);
+    height: var(--carga-etiqueta-superior-punto-alto);
+    border-radius: 50%;
+    background: var(--carga-etiqueta-superior-punto-fondo);
+    box-shadow: var(--carga-etiqueta-superior-punto-sombra);
+    animation: var(--carga-etiqueta-superior-punto-animacion);
+}
+
+:root[data-theme="dark"] .ea-loader-eyebrow {
+    color: var(--carga-etiqueta-superior-color-oscuro);
+    border-color: var(--carga-etiqueta-superior-borde-color-oscuro);
+    background: var(--carga-etiqueta-superior-fondo-oscuro);
+}
+
+:root[data-theme="dark"] .ea-loader-eyebrow .ea-loader-dot {
+    background: var(--carga-etiqueta-superior-punto-fondo-oscuro);
+}
+
+@keyframes ea-loader-pulse {
+    0% {
+        box-shadow: var(--carga-anim-pulse-p0-sombra);
+    }
+    70% {
+        box-shadow: var(--carga-anim-pulse-p70-sombra);
+    }
+    100% {
+        box-shadow: var(--carga-anim-pulse-p100-sombra);
+    }
+}
+
+/* ---------- Órbita central: halo + tres anillos + isotipo --------------------- */
+
+.ea-loader-orbit {
+    position: relative;
+    width: var(--carga-orbita-ancho);
+    height: var(--carga-orbita-alto);
+    display: grid;
+    place-items: center;
+}
+
+.ea-loader-halo {
+    position: absolute;
+    inset: var(--carga-halo-posicion);
+    border-radius: 50%;
+    background: var(--carga-halo-fondo);
+    filter: var(--carga-halo-filtro);
+    animation: var(--carga-halo-animacion);
+}
+
+:root[data-theme="dark"] .ea-loader-halo {
+    background: var(--carga-halo-fondo-oscuro);
+}
+
+@keyframes ea-loader-halo {
+    0%, 100% {
+        transform: var(--carga-anim-halo-p0100-transformacion);
+        opacity: var(--carga-anim-halo-p0100-opacidad);
+    }
+    50% {
+        transform: var(--carga-anim-halo-p50-transformacion);
+        opacity: 1;
+    }
+}
+
+.ea-loader-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: var(--carga-anillo-borde);
+}
+
+:root[data-theme="dark"] .ea-loader-ring {
+    border-color: var(--carga-anillo-borde-color-oscuro);
+}
+
+.ea-loader-ring--a {
+    inset: 0;
+    border-top-color: var(--carga-anillo-a-borde-arriba-color);
+    border-right-color: var(--carga-anillo-a-borde-derecha-color);
+    animation: var(--carga-anillo-a-animacion);
+}
+
+.ea-loader-ring--b {
+    inset: var(--carga-anillo-b-posicion);
+    border-style: dashed;
+    border-width: var(--carga-anillo-b-borde-grosor);
+    border-color: var(--carga-anillo-b-borde-color);
+    animation: var(--carga-anillo-b-animacion);
+}
+
+.ea-loader-ring--c {
+    inset: var(--carga-anillo-c-posicion);
+    border-left-color: var(--carga-anillo-c-borde-izquierda-color);
+    border-bottom-color: var(--carga-anillo-c-borde-abajo-color);
+    animation: var(--carga-anillo-c-animacion);
+}
+
+:root[data-theme="dark"] .ea-loader-ring--a {
+    border-top-color: var(--carga-anillo-a-borde-arriba-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-loader-ring--b {
+    border-color: var(--carga-anillo-b-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-loader-ring--c {
+    border-left-color: var(--carga-anillo-c-borde-izquierda-color-oscuro);
+    border-bottom-color: var(--carga-anillo-c-borde-abajo-color-oscuro);
+}
+
+@keyframes ea-loader-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: var(--carga-anim-spin-pto-transformacion);
+    }
+}
+
+.ea-loader-logo {
+    position: relative;
+    z-index: 1;
+}
+
+/* Marca "e" en el loader: trazo-corriente, ancho proporcional + respiración */
+.ea-loader-logo--e,
+:root[data-theme="dark"] .ea-loader-logo--e {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+    animation: var(--carga-logo-e-animacion);
+    filter: var(--carga-logo-e-filtro);
+}
+
+:root[data-theme="dark"] .ea-loader-logo--e {
+    filter: var(--carga-logo-e-filtro-oscuro);
+}
+
+.ea-loader-logo--e svg {
+    width: auto;
+    height: var(--carga-logo-e-icono-alto);
+    display: block;
+}
+
+@keyframes ea-loader-breathe {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: var(--carga-anim-breathe-p50-transformacion);
+    }
+}
+
+/* ---------- Texto ------------------------------------------------------------- */
+
+.ea-loader-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--carga-texto-separacion);
+}
+
+.ea-loader-name {
+    font-family: var(--carga-nombre-fuente);
+    font-weight: var(--carga-nombre-peso);
+    font-size: var(--carga-nombre-tamano);
+    letter-spacing: var(--carga-nombre-espaciado);
+    line-height: var(--carga-nombre-interlineado);
+    color: var(--carga-nombre-color);
+}
+
+.ea-loader-name em {
+    font-style: italic;
+    color: var(--carga-nombre-cursiva-color);
+}
+
+:root[data-theme="dark"] .ea-loader-name {
+    color: var(--carga-nombre-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-loader-name em {
+    color: var(--carga-nombre-cursiva-color-oscuro);
+}
+
+.ea-loader-msg {
+    margin: 0;
+    position: relative;
+    font-family: var(--carga-mensaje-fuente);
+    font-size: var(--carga-mensaje-tamano);
+    letter-spacing: var(--carga-mensaje-espaciado);
+    text-transform: uppercase;
+    color: var(--carga-mensaje-color);
+}
+
+.ea-loader-msg::after {
+    content: "";
+    display: inline-block;
+    width: var(--carga-mensaje-despues-ancho);
+    text-align: left;
+    animation: var(--carga-mensaje-despues-animacion);
+}
+
+@keyframes ea-loader-dots {
+    0% {
+        content: "";
+    }
+    25% {
+        content: ".";
+    }
+    50% {
+        content: "..";
+    }
+    75% {
+        content: "...";
+    }
+    100% {
+        content: "";
+    }
+}
+
+:root[data-theme="dark"] .ea-loader-msg {
+    color: var(--carga-mensaje-color-oscuro);
+}
+
+/* ---------- Barra de progreso ------------------------------------------------- */
+
+.ea-loader-progress {
+    width: var(--carga-progreso-ancho);
+    max-width: var(--carga-progreso-ancho-max);
+    height: var(--carga-progreso-alto);
+    background: var(--carga-progreso-fondo);
+    border-radius: var(--carga-progreso-redondeo);
+    overflow: hidden;
+    position: relative;
+}
+
+.ea-loader-progress::before,
+.ea-loader-progress::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: var(--carga-progreso-antes-ancho);
+    height: var(--carga-progreso-antes-alto);
+    margin-top: var(--carga-progreso-antes-margen-arriba);
+    border-radius: 50%;
+    background: var(--carga-progreso-antes-fondo);
+    opacity: var(--carga-progreso-antes-opacidad);
+}
+
+.ea-loader-progress::before {
+    left: var(--carga-progreso-antes-izquierda);
+}
+
+.ea-loader-progress::after {
+    right: var(--carga-progreso-despues-derecha);
+}
+
+:root[data-theme="dark"] .ea-loader-progress {
+    background: var(--carga-progreso-fondo-oscuro);
+}
+
+:root[data-theme="dark"] .ea-loader-progress::before,
+:root[data-theme="dark"] .ea-loader-progress::after {
+    background: var(--carga-progreso-antes-fondo-oscuro);
+    opacity: var(--carga-progreso-antes-opacidad-oscuro);
+}
+
+.ea-loader-progress span {
+    display: block;
+    height: 100%;
+    width: var(--carga-progreso-span-ancho);
+    border-radius: var(--carga-progreso-span-redondeo);
+    background: var(--carga-progreso-span-fondo);
+    box-shadow: var(--carga-progreso-span-sombra);
+    animation: var(--carga-progreso-span-animacion);
+}
+
+:root[data-theme="dark"] .ea-loader-progress span {
+    background: var(--carga-progreso-span-fondo-oscuro);
+    box-shadow: var(--carga-progreso-span-sombra-oscuro);
+}
+
+@keyframes ea-loader-bar {
+    0% {
+        transform: var(--carga-anim-barra-p0-transformacion);
+        width: var(--carga-anim-barra-p0-ancho);
+    }
+    50% {
+        transform: var(--carga-anim-barra-p50-transformacion);
+        width: var(--carga-anim-barra-p50-ancho);
+    }
+    100% {
+        transform: var(--carga-anim-barra-p100-transformacion);
+        width: var(--carga-anim-barra-p100-ancho);
+    }
+}
+
+@media (max-width: 560px) {
+    .ea-loader-inner {
+        gap: var(--carga-interior-separacion-hasta-560);
+        padding: var(--carga-interior-relleno-hasta-560);
+    }
+    .ea-loader-orbit {
+        width: var(--carga-orbita-ancho-hasta-560);
+        height: var(--carga-orbita-alto-hasta-560);
+    }
+    .ea-loader-logo--e svg {
+        height: var(--carga-logo-e-icono-alto-hasta-560);
+    }
+    .ea-loader-name {
+        font-size: var(--carga-nombre-tamano-hasta-560);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-loader-ring,
+    .ea-loader-halo,
+    .ea-loader-logo--e,
+    .ea-loader-progress span,
+    .ea-loader-eyebrow .ea-loader-dot,
+    .ea-loader-msg::after {
+        animation: none !important;
+    }
+    .ea-loader-progress span {
+        width: 100%;
+        transform: none;
+    }
+}
+
+/* ---------- Impresión --------------------------------------------------------- */
+
+@media print {
+    .dashboard-loader {
+        display: none !important;
+    }
+}

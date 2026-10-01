@@ -1,7 +1,7 @@
 <?php
 /* =============================================================================
    VISTA: portfolio.php — PORTFOLIO PÚBLICO del proyecto (ruta "/portfolio")
-   CSS:  public/CSS/portfolio.css (+ eden-brand.css global)
+   CSS:  public/CSS/vistas/portfolio.css (+ comun.css). Se cargan solos (app/Libraries/Vista.php)
    JS:   portfolio.js (menú, scrollspy, gráficos Chart.js) ·
          portfolio-gsap.js (animaciones de scroll) · ea-scrollbar.js
    CÓMO LEER ESTA VISTA:
@@ -57,7 +57,6 @@ $sitemap = [
 <head>
     <?= view('partials/head', [
         'title'    => 'EdenAir | Portfolio',
-        'extraCss' => ['CSS/portfolio.css'],
     ]) ?>
 </head>
 <body class="ea-body ea-landing ea-portfolio" data-ea-portfolio>

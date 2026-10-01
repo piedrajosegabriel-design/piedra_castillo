@@ -1,0 +1,549 @@
+/* =====================================================================
+   vistas/ambientes/editar.css — pantalla "Editar ambiente" (tipo de espacio, nombre y rangos)
+   ---------------------------------------------------------------------
+   Vista: app/Views/ambientes/editar.php  ·  Ruta: /panel/ambientes/{id}/editar
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Campos de formulario -------------------------------------------- */
+    --editar-ambiente-campo-margen-abajo:          16px;   /* margen de abajo — campo */
+    --editar-ambiente-campo-etiqueta-margen-abajo: 6px;   /* margen de abajo — etiqueta de campo */
+    --editar-ambiente-campo-etiqueta-tamano:       0.8438rem;   /* tamaño de letra — etiqueta de campo */
+    --editar-ambiente-campo-etiqueta-peso:         600;   /* grosor de letra — etiqueta de campo */
+    --editar-ambiente-campo-etiqueta-color:        var(--color-texto-secundario);   /* color del texto — etiqueta de campo */
+    --editar-ambiente-campo-opcion-peso:           400;   /* grosor de letra — opción de campo */
+    --editar-ambiente-campo-opcion-color:          var(--color-texto-suave);   /* color del texto — opción de campo */
+    --editar-ambiente-campo-relleno:               11px 14px;   /* espacio interno — campo */
+    --editar-ambiente-campo-redondeo:              12px;   /* redondeo de las esquinas — campo */
+    --editar-ambiente-campo-borde:                 1px solid var(--color-linea);   /* borde — campo */
+    --editar-ambiente-campo-fondo:                 var(--color-tarjeta-suave, var(--color-tarjeta));   /* fondo — campo */
+    --editar-ambiente-campo-color:                 var(--color-texto);   /* color del texto — campo */
+    --editar-ambiente-campo-fuente:                var(--fuente-texto);   /* tipografía — campo */
+    --editar-ambiente-campo-tamano:                0.9063rem;   /* tamaño de letra — campo */
+    --editar-ambiente-campo-transicion:            border-color 0.18s ease, box-shadow 0.18s ease;   /* animación de los cambios — campo */
+    --editar-ambiente-campo-foco-borde-color:      var(--verde-500);   /* color del borde — campo (estado: foco) */
+    --editar-ambiente-campo-foco-sombra:           0 0 0 3px var(--color-exito-suave);   /* sombra — campo (estado: foco) */
+    --editar-ambiente-campo-ayuda-campo-color:     var(--color-texto-suave);   /* color del texto — campo (estado: ayuda-campo) */
+
+    /* ---- Tarjeta de formulario ------------------------------------------- */
+    --editar-ambiente-asistente-formulario-relleno: clamp(16px, 4vw, 26px);   /* espacio interno — formulario de asistente */
+    --editar-ambiente-asistente-formulario-redondeo: var(--redondeo-grande, 22px);   /* redondeo de las esquinas — formulario de asistente */
+    --editar-ambiente-asistente-formulario-fondo:  var(--color-tarjeta);   /* fondo — formulario de asistente */
+    --editar-ambiente-asistente-formulario-borde:  1px solid var(--color-linea);   /* borde — formulario de asistente */
+    --editar-ambiente-asistente-formulario-sombra: var(--sombra-chica);   /* sombra — formulario de asistente */
+
+    /* ---- Resultado ------------------------------------------------------- */
+    --editar-ambiente-asistente-formulario-relleno-hasta-520: 18px;   /* espacio interno — formulario de asistente (hasta 520px de ancho) */
+
+    /* ---- Piezas compartidas ---------------------------------------------- */
+    --editar-ambiente-campo-ayuda-margen-arriba: 6px;   /* margen de arriba — ayuda de campo */
+    --editar-ambiente-campo-ayuda-tamano:        0.7813rem;   /* tamaño de letra — ayuda de campo */
+    --editar-ambiente-campo-ayuda-interlineado:  1.5;   /* separación entre renglones — ayuda de campo */
+    --editar-ambiente-campo-ayuda-color:         var(--color-texto-suave);   /* color del texto — ayuda de campo */
+    --editar-ambiente-campo-ayuda-negrita-color: var(--color-texto-secundario);   /* color del texto — negrita de campo ayuda */
+    --editar-ambiente-campo-ayuda-negrita-peso:  600;   /* grosor de letra — negrita de campo ayuda */
+
+    /* ---- Editar ambiente: la tarjeta del formulario ---------------------- */
+    --editar-ambiente-formulario-ancho-max: 860px;   /* ancho máximo — formulario */
+
+    /* ---- Editar: selector de tipo de espacio ----------------------------- */
+    --editar-ambiente-tipos-margen:                0 0 22px;   /* margen — tipos */
+    --editar-ambiente-tipos-grilla-margen-arriba:  10px;   /* margen de arriba — grilla de tipos */
+    --editar-ambiente-tipos-grilla-columnas:       repeat(auto-fit, minmax(240px, 1fr));   /* columnas de la grilla — grilla de tipos */
+    --editar-ambiente-tipos-grilla-separacion:     10px;   /* separación entre elementos — grilla de tipos */
+    --editar-ambiente-tipo-separacion:             12px;   /* separación entre elementos — tipo */
+    --editar-ambiente-tipo-relleno:                14px;   /* espacio interno — tipo */
+    --editar-ambiente-tipo-redondeo:               var(--redondeo-medio, 14px);   /* redondeo de las esquinas — tipo */
+    --editar-ambiente-tipo-borde:                  1px solid var(--color-linea);   /* borde — tipo */
+    --editar-ambiente-tipo-fondo:                  var(--color-tarjeta);   /* fondo — tipo */
+    --editar-ambiente-tipo-transicion:             border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — tipo */
+    --editar-ambiente-tipo-hover-borde-color:      var(--verde-300);   /* color del borde — tipo (estado: hover) */
+    --editar-ambiente-tipo-con-campo-tildado-borde-color: var(--verde-500);   /* color del borde — tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-con-campo-tildado-fondo: var(--color-exito-suave);   /* fondo — tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-con-campo-tildado-sombra: var(--sombra-chica);   /* sombra — tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-con-campo-foco-sombra:  0 0 0 3px rgba(74, 122, 85, 0.32);   /* sombra — tipo (estado: con-campo-foco) */
+    --editar-ambiente-tipo-icono-ancho:            34px;   /* ancho — ícono de tipo */
+    --editar-ambiente-tipo-icono-alto:             34px;   /* alto — ícono de tipo */
+    --editar-ambiente-tipo-icono-redondeo:         10px;   /* redondeo de las esquinas — ícono de tipo */
+    --editar-ambiente-tipo-icono-fondo:            var(--color-linea-suave);   /* fondo — ícono de tipo */
+    --editar-ambiente-tipo-icono-color:            var(--verde-500);   /* color del texto — ícono de tipo */
+    --editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo: var(--color-tarjeta);   /* fondo — ícono de tipo tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-cuerpo-separacion:      4px;   /* separación entre elementos — cuerpo de tipo */
+    --editar-ambiente-tipo-etiqueta-peso:          600;   /* grosor de letra — etiqueta de tipo */
+    --editar-ambiente-tipo-etiqueta-color:         var(--color-texto);   /* color del texto — etiqueta de tipo */
+    --editar-ambiente-tipo-etiqueta-tamano:        0.9063rem;   /* tamaño de letra — etiqueta de tipo */
+    --editar-ambiente-tipo-descripcion-tamano:     0.7813rem;   /* tamaño de letra — descripción de tipo */
+    --editar-ambiente-tipo-descripcion-interlineado: 1.45;   /* separación entre renglones — descripción de tipo */
+    --editar-ambiente-tipo-descripcion-color:      var(--color-texto-suave);   /* color del texto — descripción de tipo */
+    --editar-ambiente-tipo-rangos-separacion:      4px 12px;   /* separación entre elementos — rangos de tipo */
+    --editar-ambiente-tipo-rangos-margen-arriba:   4px;   /* margen de arriba — rangos de tipo */
+    --editar-ambiente-tipo-rangos-fuente:          var(--fuente-codigo);   /* tipografía — rangos de tipo */
+    --editar-ambiente-tipo-rangos-tamano:          0.6875rem;   /* tamaño de letra — rangos de tipo */
+    --editar-ambiente-tipo-rangos-color:           var(--color-texto-secundario);   /* color del texto — rangos de tipo */
+    --editar-ambiente-tipo-rangos-span-separacion: 5px;   /* separación entre elementos — span de tipo rangos */
+    --editar-ambiente-tipo-rangos-icono-color:     var(--verde-500);   /* color del texto — ícono de tipo rangos */
+    --editar-ambiente-tipo-libre-margen-arriba:    4px;   /* margen de arriba — libre de tipo */
+    --editar-ambiente-tipo-libre-fuente:           var(--fuente-codigo);   /* tipografía — libre de tipo */
+    --editar-ambiente-tipo-libre-tamano:           0.6875rem;   /* tamaño de letra — libre de tipo */
+    --editar-ambiente-tipo-libre-color:            var(--verde-500);   /* color del texto — libre de tipo */
+    --editar-ambiente-tipo-check-ancho:            20px;   /* ancho — check de tipo */
+    --editar-ambiente-tipo-check-alto:             20px;   /* alto — check de tipo */
+    --editar-ambiente-tipo-check-borde:            1px solid var(--color-linea);   /* borde — check de tipo */
+    --editar-ambiente-tipo-check-transicion:       background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;   /* animación de los cambios — check de tipo */
+    --editar-ambiente-tipo-tipo-check-con-campo-tildado-fondo: var(--verde-500);   /* fondo — check de tipo tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-tipo-check-con-campo-tildado-borde-color: var(--verde-500);   /* color del borde — check de tipo tipo (estado: con-campo-tildado) */
+    --editar-ambiente-tipo-tipo-check-con-campo-tildado-color: #fff;   /* color del texto — check de tipo tipo (estado: con-campo-tildado) */
+
+    /* ---- Editar: bloque de rangos ---------------------------------------- */
+    --editar-ambiente-valores-relleno:             16px;   /* espacio interno — valores */
+    --editar-ambiente-valores-redondeo:            var(--redondeo-medio, 14px);   /* redondeo de las esquinas — valores */
+    --editar-ambiente-valores-borde:               1px solid var(--color-linea);   /* borde — valores */
+    --editar-ambiente-valores-fondo:               var(--color-linea-suave);   /* fondo — valores */
+    --editar-ambiente-valores-margen-abajo:        20px;   /* margen de abajo — valores */
+    --editar-ambiente-valores-cabeza-separacion:   12px;   /* separación entre elementos — cabeza de valores */
+    --editar-ambiente-valores-cabeza-margen-abajo: 14px;   /* margen de abajo — cabeza de valores */
+    --editar-ambiente-valores-titulo-fuente:       var(--fuente-titulos);   /* tipografía — título de valores */
+    --editar-ambiente-valores-titulo-tamano:       1.0625rem;   /* tamaño de letra — título de valores */
+    --editar-ambiente-valores-titulo-margen:       0 0 2px;   /* margen — título de valores */
+    --editar-ambiente-valores-titulo-color:        var(--color-texto);   /* color del texto — título de valores */
+    --editar-ambiente-valores-subtitulo-tamano:    0.7813rem;   /* tamaño de letra — subtitulo de valores */
+    --editar-ambiente-valores-subtitulo-color:     var(--color-texto-suave);   /* color del texto — subtitulo de valores */
+    --editar-ambiente-valores-campo-fondo:         var(--color-tarjeta);   /* fondo — campo de valores */
+
+    /* ---- Editar: ajustes avanzados (plegados) ---------------------------- */
+    --editar-ambiente-avanzado-borde:              1px solid var(--color-linea);   /* borde — avanzado */
+    --editar-ambiente-avanzado-redondeo:           var(--redondeo-medio, 14px);   /* redondeo de las esquinas — avanzado */
+    --editar-ambiente-avanzado-fondo:              var(--color-linea-suave);   /* fondo — avanzado */
+    --editar-ambiente-avanzado-margen-abajo:       20px;   /* margen de abajo — avanzado */
+    --editar-ambiente-avanzado-cabeza-separacion:  2px;   /* separación entre elementos — cabeza de avanzado */
+    --editar-ambiente-avanzado-cabeza-relleno:     14px 16px;   /* espacio interno — cabeza de avanzado */
+    --editar-ambiente-avanzado-cabeza-despues-derecha: 18px;   /* distancia desde la derecha — cabeza de avanzado (estado: despues) */
+    --editar-ambiente-avanzado-cabeza-despues-fuente: var(--fuente-codigo);   /* tipografía — cabeza de avanzado (estado: despues) */
+    --editar-ambiente-avanzado-cabeza-despues-tamano: 1.125rem;   /* tamaño de letra — cabeza de avanzado (estado: despues) */
+    --editar-ambiente-avanzado-cabeza-despues-interlineado: 1;   /* separación entre renglones — cabeza de avanzado (estado: despues) */
+    --editar-ambiente-avanzado-cabeza-despues-color: var(--color-texto-suave);   /* color del texto — cabeza de avanzado (estado: despues) */
+    --editar-ambiente-avanzado-cabeza-foco-sombra: inset 0 0 0 2px var(--verde-500);   /* sombra — cabeza de avanzado (estado: foco) */
+    --editar-ambiente-avanzado-titulo-fuente:      var(--fuente-titulos);   /* tipografía — título de avanzado */
+    --editar-ambiente-avanzado-titulo-tamano:      1.0625rem;   /* tamaño de letra — título de avanzado */
+    --editar-ambiente-avanzado-titulo-color:       var(--color-texto);   /* color del texto — título de avanzado */
+    --editar-ambiente-avanzado-subtitulo-tamano:   0.7813rem;   /* tamaño de letra — subtitulo de avanzado */
+    --editar-ambiente-avanzado-subtitulo-color:    var(--color-texto-suave);   /* color del texto — subtitulo de avanzado */
+    --editar-ambiente-avanzado-subtitulo-relleno-derecha: 24px;   /* espacio interno derecho — subtitulo de avanzado */
+    --editar-ambiente-avanzado-cuerpo-relleno:     0 16px 16px;   /* espacio interno — cuerpo de avanzado */
+    --editar-ambiente-avanzado-cuerpo-borde-arriba: 1px solid var(--color-linea);   /* borde de arriba — cuerpo de avanzado */
+    --editar-ambiente-avanzado-cuerpo-relleno-arriba: 14px;   /* espacio interno de arriba — cuerpo de avanzado */
+    --editar-ambiente-avanzado-cuerpo-valores-subtitulo-margen-abajo: 14px;   /* margen de abajo — subtitulo de avanzado cuerpo valores */
+    --editar-ambiente-avanzado-cuerpo-valores-subtitulo-interlineado: 1.5;   /* separación entre renglones — subtitulo de avanzado cuerpo valores */
+    --editar-ambiente-avanzado-campo-fondo:        var(--color-tarjeta);   /* fondo — campo de avanzado */
+
+    /* ---- Editar ambiente: filas de dos campos ---------------------------- */
+    --editar-ambiente-fila-separacion:         14px;   /* separación entre elementos — fila */
+    --editar-ambiente-fila-campo-margen-abajo: 6px;   /* margen de abajo — campo de fila */
+
+    /* ---- Modo oscuro ----------------------------------------------------- */
+    --editar-ambiente-tipo-con-campo-tildado-fondo-oscuro: rgba(74, 122, 85, 0.22);   /* fondo — tipo (estado: con-campo-tildado; modo oscuro) */
+    --editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo-oscuro: rgba(13, 22, 18, 0.5);   /* fondo — ícono de tipo tipo (estado: con-campo-tildado; modo oscuro) */
+    --editar-ambiente-valores-cabeza-separacion-hasta-560: 8px;   /* separación entre elementos — cabeza de valores (hasta 560px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 560px de ancho                                          #
+   #     hasta 520px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Campos de formulario ---------------------------------------------- */
+
+.ea-field {
+    display: block;
+    margin-bottom: var(--editar-ambiente-campo-margen-abajo);
+}
+
+.ea-field-label {
+    display: block;
+    margin-bottom: var(--editar-ambiente-campo-etiqueta-margen-abajo);
+    font-size: var(--editar-ambiente-campo-etiqueta-tamano);
+    font-weight: var(--editar-ambiente-campo-etiqueta-peso);
+    color: var(--editar-ambiente-campo-etiqueta-color);
+}
+
+.ea-field-opt {
+    font-weight: var(--editar-ambiente-campo-opcion-peso);
+    color: var(--editar-ambiente-campo-opcion-color);
+}
+
+.ea-input {
+    width: 100%;
+    padding: var(--editar-ambiente-campo-relleno);
+    border-radius: var(--editar-ambiente-campo-redondeo);
+    border: var(--editar-ambiente-campo-borde);
+    background: var(--editar-ambiente-campo-fondo);
+    color: var(--editar-ambiente-campo-color);
+    font-family: var(--editar-ambiente-campo-fuente);
+    font-size: var(--editar-ambiente-campo-tamano);
+    transition: var(--editar-ambiente-campo-transicion);
+}
+
+.ea-input:focus {
+    outline: none;
+    border-color: var(--editar-ambiente-campo-foco-borde-color);
+    box-shadow: var(--editar-ambiente-campo-foco-sombra);
+}
+
+.ea-input::placeholder {
+    color: var(--editar-ambiente-campo-ayuda-campo-color);
+}
+
+/* ---------- Tarjeta de formulario --------------------------------------------- */
+
+.ea-wizard-form {
+    padding: var(--editar-ambiente-asistente-formulario-relleno);
+    border-radius: var(--editar-ambiente-asistente-formulario-redondeo);
+    background: var(--editar-ambiente-asistente-formulario-fondo);
+    border: var(--editar-ambiente-asistente-formulario-borde);
+    box-shadow: var(--editar-ambiente-asistente-formulario-sombra);
+}
+
+/* ---------- Resultado --------------------------------------------------------- */
+
+@media (max-width: 520px) {
+    .ea-wizard-form {
+        padding: var(--editar-ambiente-asistente-formulario-relleno-hasta-520);
+    }
+}
+
+/* ---------- Piezas compartidas ------------------------------------------------ */
+
+/* Texto chico de ayuda debajo de un campo. */
+.ea-field-hint {
+    display: block;
+    margin-top: var(--editar-ambiente-campo-ayuda-margen-arriba);
+    font-size: var(--editar-ambiente-campo-ayuda-tamano);
+    line-height: var(--editar-ambiente-campo-ayuda-interlineado);
+    color: var(--editar-ambiente-campo-ayuda-color);
+}
+
+.ea-field-hint strong {
+    color: var(--editar-ambiente-campo-ayuda-negrita-color);
+    font-weight: var(--editar-ambiente-campo-ayuda-negrita-peso);
+}
+
+/* ---------- Editar ambiente: la tarjeta del formulario ------------------------ */
+
+/* Más ancha que el resto de los formularios del panel: el selector de
+   tipos es una grilla de tarjetas. */
+.ea-amb-form {
+    max-width: var(--editar-ambiente-formulario-ancho-max);
+}
+
+/* ---------- Editar: selector de tipo de espacio ------------------------------- */
+
+.ea-amb-tipos {
+    border: 0;
+    margin: var(--editar-ambiente-tipos-margen);
+    padding: 0;
+}
+
+.ea-amb-tipos-grid {
+    margin-top: var(--editar-ambiente-tipos-grilla-margen-arriba);
+    display: grid;
+    grid-template-columns: var(--editar-ambiente-tipos-grilla-columnas);
+    gap: var(--editar-ambiente-tipos-grilla-separacion);
+}
+
+/* Cada opción es un <label> con el radio adentro: se puede tocar en toda
+   la tarjeta y el teclado sigue funcionando como con un radio normal. */
+.ea-amb-tipo {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--editar-ambiente-tipo-separacion);
+    padding: var(--editar-ambiente-tipo-relleno);
+    border-radius: var(--editar-ambiente-tipo-redondeo);
+    border: var(--editar-ambiente-tipo-borde);
+    background: var(--editar-ambiente-tipo-fondo);
+    cursor: pointer;
+    transition: var(--editar-ambiente-tipo-transicion);
+}
+
+.ea-amb-tipo:hover {
+    border-color: var(--editar-ambiente-tipo-hover-borde-color);
+}
+
+/* El radio real: invisible pero presente (lector de pantalla y teclado). */
+.ea-amb-tipo input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+
+.ea-amb-tipo:has(input:checked) {
+    border-color: var(--editar-ambiente-tipo-con-campo-tildado-borde-color);
+    background: var(--editar-ambiente-tipo-con-campo-tildado-fondo);
+    box-shadow: var(--editar-ambiente-tipo-con-campo-tildado-sombra);
+}
+
+.ea-amb-tipo:has(input:focus-visible) {
+    outline: none;
+    box-shadow: var(--editar-ambiente-tipo-con-campo-foco-sombra);
+}
+
+.ea-amb-tipo-icon {
+    flex: none;
+    width: var(--editar-ambiente-tipo-icono-ancho);
+    height: var(--editar-ambiente-tipo-icono-alto);
+    border-radius: var(--editar-ambiente-tipo-icono-redondeo);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--editar-ambiente-tipo-icono-fondo);
+    color: var(--editar-ambiente-tipo-icono-color);
+}
+
+.ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon {
+    background: var(--editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo);
+}
+
+.ea-amb-tipo-body {
+    display: grid;
+    gap: var(--editar-ambiente-tipo-cuerpo-separacion);
+}
+
+.ea-amb-tipo-label {
+    font-weight: var(--editar-ambiente-tipo-etiqueta-peso);
+    color: var(--editar-ambiente-tipo-etiqueta-color);
+    font-size: var(--editar-ambiente-tipo-etiqueta-tamano);
+}
+
+.ea-amb-tipo-desc {
+    font-size: var(--editar-ambiente-tipo-descripcion-tamano);
+    line-height: var(--editar-ambiente-tipo-descripcion-interlineado);
+    color: var(--editar-ambiente-tipo-descripcion-color);
+}
+
+.ea-amb-tipo-rangos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--editar-ambiente-tipo-rangos-separacion);
+    margin-top: var(--editar-ambiente-tipo-rangos-margen-arriba);
+    font-family: var(--editar-ambiente-tipo-rangos-fuente);
+    font-size: var(--editar-ambiente-tipo-rangos-tamano);
+    color: var(--editar-ambiente-tipo-rangos-color);
+}
+
+.ea-amb-tipo-rangos span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--editar-ambiente-tipo-rangos-span-separacion);
+}
+
+.ea-amb-tipo-rangos svg {
+    color: var(--editar-ambiente-tipo-rangos-icono-color);
+}
+
+.ea-amb-tipo-libre {
+    margin-top: var(--editar-ambiente-tipo-libre-margen-arriba);
+    font-family: var(--editar-ambiente-tipo-libre-fuente);
+    font-size: var(--editar-ambiente-tipo-libre-tamano);
+    color: var(--editar-ambiente-tipo-libre-color);
+}
+
+/* Tilde de "elegido": sólo aparece en la opción marcada. */
+.ea-amb-tipo-check {
+    flex: none;
+    width: var(--editar-ambiente-tipo-check-ancho);
+    height: var(--editar-ambiente-tipo-check-alto);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--editar-ambiente-tipo-check-borde);
+    color: transparent;
+    transition: var(--editar-ambiente-tipo-check-transicion);
+}
+
+.ea-amb-tipo:has(input:checked) .ea-amb-tipo-check {
+    background: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-fondo);
+    border-color: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-borde-color);
+    color: var(--editar-ambiente-tipo-tipo-check-con-campo-tildado-color);
+}
+
+/* ---------- Editar: bloque de rangos ------------------------------------------ */
+
+.ea-amb-valores {
+    padding: var(--editar-ambiente-valores-relleno);
+    border-radius: var(--editar-ambiente-valores-redondeo);
+    border: var(--editar-ambiente-valores-borde);
+    background: var(--editar-ambiente-valores-fondo);
+    margin-bottom: var(--editar-ambiente-valores-margen-abajo);
+}
+
+.ea-amb-valores-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--editar-ambiente-valores-cabeza-separacion);
+    margin-bottom: var(--editar-ambiente-valores-cabeza-margen-abajo);
+}
+
+.ea-amb-valores-title {
+    font-family: var(--editar-ambiente-valores-titulo-fuente);
+    font-size: var(--editar-ambiente-valores-titulo-tamano);
+    margin: var(--editar-ambiente-valores-titulo-margen);
+    color: var(--editar-ambiente-valores-titulo-color);
+}
+
+.ea-amb-valores-sub {
+    margin: 0;
+    font-size: var(--editar-ambiente-valores-subtitulo-tamano);
+    color: var(--editar-ambiente-valores-subtitulo-color);
+}
+
+.ea-amb-valores .ea-input {
+    background: var(--editar-ambiente-valores-campo-fondo);
+}
+
+.ea-amb-restaurar[hidden] {
+    display: none;
+}
+
+/* ---------- Editar: ajustes avanzados (plegados) ------------------------------ */
+
+.ea-amb-avanzado {
+    border: var(--editar-ambiente-avanzado-borde);
+    border-radius: var(--editar-ambiente-avanzado-redondeo);
+    background: var(--editar-ambiente-avanzado-fondo);
+    margin-bottom: var(--editar-ambiente-avanzado-margen-abajo);
+    overflow: hidden;
+}
+
+.ea-amb-avanzado-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--editar-ambiente-avanzado-cabeza-separacion);
+    padding: var(--editar-ambiente-avanzado-cabeza-relleno);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+/* El triangulito por defecto de Safari/Chrome: se saca para poner el propio. */
+.ea-amb-avanzado-head::-webkit-details-marker {
+    display: none;
+}
+
+.ea-amb-avanzado-head::after {
+    content: "+";
+    position: absolute;
+    right: var(--editar-ambiente-avanzado-cabeza-despues-derecha);
+    font-family: var(--editar-ambiente-avanzado-cabeza-despues-fuente);
+    font-size: var(--editar-ambiente-avanzado-cabeza-despues-tamano);
+    line-height: var(--editar-ambiente-avanzado-cabeza-despues-interlineado);
+    color: var(--editar-ambiente-avanzado-cabeza-despues-color);
+}
+
+.ea-amb-avanzado[open] > .ea-amb-avanzado-head::after {
+    content: "–";
+}
+
+.ea-amb-avanzado {
+    position: relative;
+}
+
+.ea-amb-avanzado-head:focus-visible {
+    outline: none;
+    box-shadow: var(--editar-ambiente-avanzado-cabeza-foco-sombra);
+}
+
+.ea-amb-avanzado-title {
+    font-family: var(--editar-ambiente-avanzado-titulo-fuente);
+    font-size: var(--editar-ambiente-avanzado-titulo-tamano);
+    color: var(--editar-ambiente-avanzado-titulo-color);
+}
+
+.ea-amb-avanzado-sub {
+    font-size: var(--editar-ambiente-avanzado-subtitulo-tamano);
+    color: var(--editar-ambiente-avanzado-subtitulo-color);
+    padding-right: var(--editar-ambiente-avanzado-subtitulo-relleno-derecha);
+}
+
+.ea-amb-avanzado-body {
+    padding: var(--editar-ambiente-avanzado-cuerpo-relleno);
+    border-top: var(--editar-ambiente-avanzado-cuerpo-borde-arriba);
+    padding-top: var(--editar-ambiente-avanzado-cuerpo-relleno-arriba);
+}
+
+.ea-amb-avanzado-body > .ea-amb-valores-sub {
+    margin-bottom: var(--editar-ambiente-avanzado-cuerpo-valores-subtitulo-margen-abajo);
+    line-height: var(--editar-ambiente-avanzado-cuerpo-valores-subtitulo-interlineado);
+}
+
+.ea-amb-avanzado .ea-input {
+    background: var(--editar-ambiente-avanzado-campo-fondo);
+}
+
+/* ---------- Editar ambiente: filas de dos campos ------------------------------ */
+
+.ea-amb-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--editar-ambiente-fila-separacion);
+}
+
+.ea-amb-row .ea-field {
+    margin-bottom: var(--editar-ambiente-fila-campo-margen-abajo);
+}
+
+/* ---------- Modo oscuro ------------------------------------------------------- */
+
+:root[data-theme="dark"] .ea-amb-tipo:has(input:checked) {
+    background: var(--editar-ambiente-tipo-con-campo-tildado-fondo-oscuro);
+}
+
+:root[data-theme="dark"] .ea-amb-tipo:has(input:checked) .ea-amb-tipo-icon {
+    background: var(--editar-ambiente-tipo-tipo-icono-con-campo-tildado-fondo-oscuro);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-amb-tipo,
+    .ea-amb-tipo-check {
+        transition: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .ea-amb-row {
+        grid-template-columns: 1fr;
+    }
+    /* El cartelito de estado baja debajo del título en vez de apretarlo. */
+    .ea-amb-valores-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--editar-ambiente-valores-cabeza-separacion-hasta-560);
+    }
+    .ea-amb-restaurar {
+        width: 100%;
+        justify-content: center;
+    }
+}

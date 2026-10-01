@@ -1,0 +1,1974 @@
+/* =====================================================================
+   vistas/panel.css — el tablero principal (estado del ambiente, sensores, LEDs, actuadores, automatizaciones y lecturas)
+   ---------------------------------------------------------------------
+   Vista: app/Views/panel.php  ·  Ruta: /panel
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+/* Las variables de este archivo empiezan con --tablero- (y no --panel-) para no
+   confundirse con las del layout del panel. */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Títulos de sección ---------------------------------------------- */
+    --tablero-seccion-separacion:            12px;   /* separación entre elementos — sección */
+    --tablero-seccion-margen-arriba:         18px;   /* margen de arriba — sección */
+    --tablero-seccion-margen-abajo:          -6px;   /* margen de abajo — sección */
+    --tablero-seccion-margen-ancla:          calc(var(--ead-header-h) + 16px);   /* espacio al saltar con un link — sección */
+    --tablero-seccion-titulo-separacion:     10px;   /* separación entre elementos — título de sección */
+    --tablero-seccion-titulo-fuente:         var(--fuente-texto);   /* tipografía — título de sección */
+    --tablero-seccion-titulo-tamano:         0.7813rem;   /* tamaño de letra — título de sección */
+    --tablero-seccion-titulo-peso:           600;   /* grosor de letra — título de sección */
+    --tablero-seccion-titulo-espaciado:      0.1em;   /* separación entre letras — título de sección */
+    --tablero-seccion-titulo-color:          var(--color-texto-suave);   /* color del texto — título de sección */
+    --tablero-seccion-titulo-antes-ancho:    18px;   /* ancho — título de sección (estado: antes) */
+    --tablero-seccion-titulo-antes-alto:     2px;   /* alto — título de sección (estado: antes) */
+    --tablero-seccion-titulo-antes-redondeo: 2px;   /* redondeo de las esquinas — título de sección (estado: antes) */
+    --tablero-seccion-titulo-antes-fondo:    var(--verde-500);   /* fondo — título de sección (estado: antes) */
+    --tablero-seccion-titulo-antes-opacidad: 0.7;   /* opacidad (0 = invisible, 1 = opaco) — título de sección (estado: antes) */
+
+    /* ---- Tarjetas, insignias y botones del panel ------------------------- */
+    --tablero-lecturas-mas-flechita-transicion:    transform 0.2s ease;   /* animación de los cambios — flechita de lecturas más */
+    --tablero-lecturas-tarjeta-lecturas-mas-flechita-expanded-transformacion: rotate(180deg);   /* desplazamiento/escala/giro — flechita de lecturas tarjeta lecturas más (estado: expanded) */
+
+    /* ---- Resumen del ambiente -------------------------------------------- */
+    --tablero-portada-columnas:                    1.35fr 1fr;   /* columnas de la grilla — portada */
+    --tablero-portada-separacion:                  30px;   /* separación entre elementos — portada */
+    --tablero-portada-relleno:                     28px 30px;   /* espacio interno — portada */
+    --tablero-portada-redondeo:                    var(--panel-redondeo-grande);   /* redondeo de las esquinas — portada */
+    --tablero-portada-borde:                       1px solid transparent;   /* borde — portada */
+    --tablero-portada-color:                       #fff;   /* color del texto — portada */
+    --tablero-portada-fondo:                       linear-gradient(125deg, var(--color-primario) 0%, var(--color-primario-medio) 60%, color-mix(in oklab, var(--color-primario-medio) 96%, var(--color-aire)) 100%);   /* fondo — portada */
+    --tablero-portada-sombra:                      0 18px 42px color-mix(in oklab, var(--color-primario-oscuro) 34%, transparent);   /* sombra — portada */
+    --tablero-portada-tono-alerta-fondo:           linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.38)), linear-gradient(125deg, #a6764e 0%, var(--color-arcilla) 58%, color-mix(in oklab, var(--color-arcilla) 74%, #e6c19a) 100%);   /* fondo — portada (estado: tono-alerta) */
+    --tablero-portada-tono-alerta-sombra:          0 18px 42px color-mix(in oklab, #7a4a23 32%, transparent);   /* sombra — portada (estado: tono-alerta) */
+    --tablero-portada-tono-peligro-fondo:          linear-gradient(rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.16)), linear-gradient(125deg, #863c26 0%, var(--color-tierra) 58%, color-mix(in oklab, var(--color-tierra) 76%, #cf7e5c) 100%);   /* fondo — portada (estado: tono-peligro) */
+    --tablero-portada-tono-peligro-sombra:         0 18px 42px color-mix(in oklab, #5f2a18 34%, transparent);   /* sombra — portada (estado: tono-peligro) */
+    --tablero-portada-sombra-oscuro:               0 18px 42px rgba(0, 0, 0, 0.5);   /* sombra — portada (modo oscuro) */
+    --tablero-portada-brillo-arriba:               -46%;   /* distancia desde arriba — brillo de portada */
+    --tablero-portada-brillo-derecha:              -12%;   /* distancia desde la derecha — brillo de portada */
+    --tablero-portada-brillo-ancho:                480px;   /* ancho — brillo de portada */
+    --tablero-portada-brillo-alto:                 480px;   /* alto — brillo de portada */
+    --tablero-portada-brillo-fondo:                radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, transparent 60%);   /* fondo — brillo de portada */
+    --tablero-portada-brillo-opacidad:             0.9;   /* opacidad (0 = invisible, 1 = opaco) — brillo de portada */
+    --tablero-portada-portada-brillo-tono-alerta-fondo: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%);   /* fondo — brillo de portada portada (estado: tono-alerta) */
+    --tablero-portada-top-separacion:              10px;   /* separación entre elementos — top de portada */
+    --tablero-portada-estado-alto:                 26px;   /* alto — estado de portada */
+    --tablero-portada-estado-relleno:              0 12px;   /* espacio interno — estado de portada */
+    --tablero-portada-estado-tamano:               0.6875rem;   /* tamaño de letra — estado de portada */
+    --tablero-portada-insignia-fondo:              rgba(255, 255, 255, 0.16);   /* fondo — insignia de portada */
+    --tablero-portada-insignia-color:              #fff;   /* color del texto — insignia de portada */
+    --tablero-portada-insignia-borde-color:        rgba(255, 255, 255, 0.22);   /* color del borde — insignia de portada */
+    --tablero-portada-modo-etiqueta-color:         #fff;   /* color del texto — etiqueta de portada modo */
+    --tablero-portada-modo-etiqueta-fondo:         rgba(255, 255, 255, 0.14);   /* fondo — etiqueta de portada modo */
+    --tablero-portada-modo-etiqueta-borde-color:   rgba(255, 255, 255, 0.26);   /* color del borde — etiqueta de portada modo */
+    --tablero-portada-conexion-punto-fondo:        var(--color-citrico);   /* fondo — punto de portada conexión */
+    --tablero-portada-conexion-punto-sombra:       0 0 0 3px rgba(201, 216, 112, 0.3);   /* sombra — punto de portada conexión */
+    --tablero-modo-etiqueta-separacion:            7px;   /* separación entre elementos — etiqueta de modo */
+    --tablero-modo-etiqueta-alto:                  26px;   /* alto — etiqueta de modo */
+    --tablero-modo-etiqueta-relleno:               0 12px;   /* espacio interno — etiqueta de modo */
+    --tablero-modo-etiqueta-redondeo:              999px;   /* redondeo de las esquinas — etiqueta de modo */
+    --tablero-modo-etiqueta-fuente:                var(--fuente-texto);   /* tipografía — etiqueta de modo */
+    --tablero-modo-etiqueta-tamano:                0.7188rem;   /* tamaño de letra — etiqueta de modo */
+    --tablero-modo-etiqueta-peso:                  600;   /* grosor de letra — etiqueta de modo */
+    --tablero-modo-etiqueta-espaciado:             0.01em;   /* separación entre letras — etiqueta de modo */
+    --tablero-modo-etiqueta-borde:                 1px solid var(--panel-linea-fuerte);   /* borde — etiqueta de modo */
+    --tablero-modo-etiqueta-fondo:                 var(--panel-fondo-suave);   /* fondo — etiqueta de modo */
+    --tablero-modo-etiqueta-color:                 var(--color-texto-secundario);   /* color del texto — etiqueta de modo */
+    --tablero-modo-etiqueta-punto-ancho:           7px;   /* ancho — punto de modo etiqueta */
+    --tablero-modo-etiqueta-punto-alto:            7px;   /* alto — punto de modo etiqueta */
+    --tablero-modo-etiqueta-punto-sombra:          0 0 0 3px color-mix(in oklab, currentColor 25%, transparent);   /* sombra — punto de modo etiqueta */
+    --tablero-modo-etiqueta-auto-color:            var(--verde-700);   /* color del texto — etiqueta de modo (estado: auto) */
+    --tablero-modo-etiqueta-auto-fondo:            color-mix(in oklab, var(--verde-300) 35%, var(--panel-tarjeta));   /* fondo — etiqueta de modo (estado: auto) */
+    --tablero-modo-etiqueta-auto-borde-color:      color-mix(in oklab, var(--verde-500) 35%, transparent);   /* color del borde — etiqueta de modo (estado: auto) */
+    --tablero-modo-etiqueta-manual-color:          #7a4a2c;   /* color del texto — etiqueta de modo (estado: manual) */
+    --tablero-modo-etiqueta-manual-fondo:          color-mix(in oklab, var(--color-arcilla) 22%, var(--panel-tarjeta));   /* fondo — etiqueta de modo (estado: manual) */
+    --tablero-modo-etiqueta-manual-borde-color:    color-mix(in oklab, var(--color-arcilla) 50%, transparent);   /* color del borde — etiqueta de modo (estado: manual) */
+    --tablero-modo-etiqueta-auto-color-oscuro:     var(--verde-300);   /* color del texto — etiqueta de modo (estado: auto; modo oscuro) */
+    --tablero-modo-etiqueta-auto-fondo-oscuro:     rgba(74, 122, 85, 0.22);   /* fondo — etiqueta de modo (estado: auto; modo oscuro) */
+    --tablero-modo-etiqueta-auto-borde-color-oscuro: rgba(74, 122, 85, 0.4);   /* color del borde — etiqueta de modo (estado: auto; modo oscuro) */
+    --tablero-modo-etiqueta-manual-color-oscuro:   #f1c9a8;   /* color del texto — etiqueta de modo (estado: manual; modo oscuro) */
+    --tablero-modo-etiqueta-manual-fondo-oscuro:   color-mix(in oklab, var(--color-arcilla) 18%, transparent);   /* fondo — etiqueta de modo (estado: manual; modo oscuro) */
+    --tablero-modo-etiqueta-manual-borde-color-oscuro: color-mix(in oklab, var(--color-arcilla) 35%, transparent);   /* color del borde — etiqueta de modo (estado: manual; modo oscuro) */
+    --tablero-conexion-punto-ancho:                8px;   /* ancho — punto de conexión */
+    --tablero-conexion-punto-alto:                 8px;   /* alto — punto de conexión */
+    --tablero-conexion-punto-fondo:                var(--color-aire);   /* fondo — punto de conexión */
+    --tablero-conexion-punto-sombra:               0 0 0 3px color-mix(in oklab, var(--color-aire) 28%, transparent);   /* sombra — punto de conexión */
+    --tablero-conexion-punto-animacion:            ead-breathe 3.4s ease-in-out infinite;   /* animación — punto de conexión */
+    --tablero-anim-ead-breathe-p50-transformacion: scale(1.08);   /* desplazamiento/escala/giro — animación "ead-breathe" al 50% */
+    --tablero-anim-ead-breathe-p50-opacidad:       0.85;   /* opacidad (0 = invisible, 1 = opaco) — animación "ead-breathe" al 50% */
+    --tablero-portada-etiqueta-superior-margen:    26px 0 0;   /* margen — superior de portada etiqueta */
+    --tablero-portada-etiqueta-superior-fuente:    var(--fuente-codigo);   /* tipografía — superior de portada etiqueta */
+    --tablero-portada-etiqueta-superior-tamano:    0.6875rem;   /* tamaño de letra — superior de portada etiqueta */
+    --tablero-portada-etiqueta-superior-espaciado: 0.14em;   /* separación entre letras — superior de portada etiqueta */
+    --tablero-portada-etiqueta-superior-color:     #fff;   /* color del texto — superior de portada etiqueta */
+    --tablero-portada-titulo-margen:               8px 0 0;   /* margen — título de portada */
+    --tablero-portada-titulo-fuente:               var(--fuente-titulos);   /* tipografía — título de portada */
+    --tablero-portada-titulo-peso:                 400;   /* grosor de letra — título de portada */
+    --tablero-portada-titulo-tamano:               clamp(28px, 5vw, 46px);   /* tamaño de letra — título de portada */
+    --tablero-portada-titulo-interlineado:         1.04;   /* separación entre renglones — título de portada */
+    --tablero-portada-titulo-espaciado:            -0.02em;   /* separación entre letras — título de portada */
+    --tablero-portada-titulo-color:                #fff;   /* color del texto — título de portada */
+    --tablero-portada-diagnostico-margen:          14px 0 0;   /* margen — diagnóstico de portada */
+    --tablero-portada-diagnostico-color:           rgba(255, 255, 255, 0.98);   /* color del texto — diagnóstico de portada */
+    --tablero-portada-diagnostico-tamano:          0.9375rem;   /* tamaño de letra — diagnóstico de portada */
+    --tablero-portada-diagnostico-interlineado:    1.6;   /* separación entre renglones — diagnóstico de portada */
+    --tablero-portada-diagnostico-ancho-max:       50ch;   /* ancho máximo — diagnóstico de portada */
+    --tablero-portada-pie-margen-arriba:           24px;   /* margen de arriba — pie de portada */
+    --tablero-portada-pie-relleno-arriba:          18px;   /* espacio interno de arriba — pie de portada */
+    --tablero-portada-pie-borde-arriba:            1px solid rgba(255, 255, 255, 0.2);   /* borde de arriba — pie de portada */
+    --tablero-portada-pie-separacion:              14px 24px;   /* separación entre elementos — pie de portada */
+    --tablero-portada-pie-item-separacion:         2px;   /* separación entre elementos — item de portada pie */
+    --tablero-portada-pie-etiqueta-fuente:         var(--fuente-codigo);   /* tipografía — etiqueta de portada pie */
+    --tablero-portada-pie-etiqueta-tamano:         0.6875rem;   /* tamaño de letra — etiqueta de portada pie */
+    --tablero-portada-pie-etiqueta-espaciado:      0.12em;   /* separación entre letras — etiqueta de portada pie */
+    --tablero-portada-pie-etiqueta-color:          #fff;   /* color del texto — etiqueta de portada pie */
+    --tablero-portada-pie-valor-tamano:            0.875rem;   /* tamaño de letra — valor de portada pie */
+    --tablero-portada-pie-valor-peso:              600;   /* grosor de letra — valor de portada pie */
+    --tablero-portada-pie-valor-color:             #fff;   /* color del texto — valor de portada pie */
+    --tablero-portada-pie-valor-interlineado:      1.2;   /* separación entre renglones — valor de portada pie */
+    --tablero-portada-pie-valor-chico-peso:        500;   /* grosor de letra — chico de portada pie valor */
+    --tablero-portada-pie-valor-chico-color:       rgba(255, 255, 255, 0.7);   /* color del texto — chico de portada pie valor */
+    --tablero-portada-pie-valor-chico-tamano:      0.75rem;   /* tamaño de letra — chico de portada pie valor */
+    --tablero-portada-pie-conexion-separacion:     8px;   /* separación entre elementos — conexión de portada pie */
+    --tablero-portada-pie-conexion-portada-pie-etiqueta-margen-izquierda: 2px;   /* margen izquierdo — etiqueta de portada pie conexión portada pie */
+    --tablero-portada-pie-conexion-portada-pie-valor-fuente: var(--fuente-codigo);   /* tipografía — valor de portada pie conexión portada pie */
+    --tablero-portada-pie-conexion-portada-pie-valor-tamano: 0.7188rem;   /* tamaño de letra — valor de portada pie conexión portada pie */
+    --tablero-portada-pie-conexion-portada-pie-valor-color: rgba(255, 255, 255, 0.82);   /* color del texto — valor de portada pie conexión portada pie */
+    --tablero-portada-costado-separacion:          14px;   /* separación entre elementos — costado de portada */
+    --tablero-portada-tendencia-separacion:        6px;   /* separación entre elementos — tendencia de portada */
+    --tablero-portada-tendencia-relleno:           14px 16px 6px;   /* espacio interno — tendencia de portada */
+    --tablero-portada-tendencia-redondeo:          14px;   /* redondeo de las esquinas — tendencia de portada */
+    --tablero-portada-tendencia-fondo:             rgba(0, 0, 0, 0.22);   /* fondo — tendencia de portada */
+    --tablero-portada-tendencia-borde:             1px solid rgba(255, 255, 255, 0.18);   /* borde — tendencia de portada */
+    --tablero-portada-tendencia-etiqueta-tamano:   0.6875rem;   /* tamaño de letra — etiqueta de portada tendencia */
+    --tablero-portada-tendencia-etiqueta-espaciado: 0.1em;   /* separación entre letras — etiqueta de portada tendencia */
+    --tablero-portada-tendencia-etiqueta-color:    rgba(255, 255, 255, 0.94);   /* color del texto — etiqueta de portada tendencia */
+    --tablero-portada-minigrafico-alto:            52px;   /* alto — minigráfico de portada */
+    --tablero-portada-minigrafico-trazo-stroke-trazo: var(--color-citrico);   /* color del trazo — trazo de portada minigráfico (estado: stroke) */
+    --tablero-portada-tendencia-escala-tamano:     0.6875rem;   /* tamaño de letra — escala de portada tendencia */
+    --tablero-portada-tendencia-escala-color:      rgba(255, 255, 255, 0.94);   /* color del texto — escala de portada tendencia */
+    --tablero-portada-tendencia-escala-relleno-abajo: 8px;   /* espacio interno de abajo — escala de portada tendencia */
+
+    /* ---- Índice de calidad de aire (el titular numérico) ----------------- */
+    --tablero-portada-indice-separacion:           8px;   /* separación entre elementos — índice de portada */
+    --tablero-portada-indice-relleno:              16px 18px;   /* espacio interno — índice de portada */
+    --tablero-portada-indice-redondeo:             14px;   /* redondeo de las esquinas — índice de portada */
+    --tablero-portada-indice-fondo:                rgba(0, 0, 0, 0.22);   /* fondo — índice de portada */
+    --tablero-portada-indice-borde:                1px solid rgba(255, 255, 255, 0.18);   /* borde — índice de portada */
+    --tablero-portada-indice-etiqueta-tamano:      0.6875rem;   /* tamaño de letra — etiqueta de portada índice */
+    --tablero-portada-indice-etiqueta-espaciado:   0.1em;   /* separación entre letras — etiqueta de portada índice */
+    --tablero-portada-indice-etiqueta-color:       rgba(255, 255, 255, 0.94);   /* color del texto — etiqueta de portada índice */
+    --tablero-portada-indice-dato-separacion:      6px;   /* separación entre elementos — dato de portada índice */
+    --tablero-portada-indice-numero-fuente:        var(--fuente-titulos);   /* tipografía — número de portada índice */
+    --tablero-portada-indice-numero-tamano:        clamp(38px, 6vw, 52px);   /* tamaño de letra — número de portada índice */
+    --tablero-portada-indice-numero-interlineado:  1;   /* separación entre renglones — número de portada índice */
+    --tablero-portada-indice-numero-color:         #fff;   /* color del texto — número de portada índice */
+    --tablero-portada-indice-unidad-tamano:        0.875rem;   /* tamaño de letra — unidad de portada índice */
+    --tablero-portada-indice-unidad-color:         rgba(255, 255, 255, 0.92);   /* color del texto — unidad de portada índice */
+    --tablero-portada-indice-unidad-margen-derecha: 4px;   /* margen derecho — unidad de portada índice */
+    --tablero-portada-indice-medidor-margen-arriba: 2px;   /* margen de arriba — medidor de portada índice */
+    --tablero-portada-indice-ayuda-tamano:         0.7188rem;   /* tamaño de letra — ayuda de portada índice */
+    --tablero-portada-indice-ayuda-interlineado:   1.4;   /* separación entre renglones — ayuda de portada índice */
+    --tablero-portada-indice-ayuda-color:          rgba(255, 255, 255, 0.94);   /* color del texto — ayuda de portada índice */
+    --tablero-portada-indice-fuente-tamano:        0.6875rem;   /* tamaño de letra — fuente de portada índice */
+    --tablero-portada-indice-fuente-interlineado:  1.4;   /* separación entre renglones — fuente de portada índice */
+    --tablero-portada-indice-fuente-color:         rgba(255, 255, 255, 0.78);   /* color del texto — fuente de portada índice */
+
+    /* ---- Sensores (medidores) -------------------------------------------- */
+    --tablero-sensor-grilla-separacion:            var(--panel-separacion);   /* separación entre elementos — grilla de sensor */
+    --tablero-sensor-tarjeta-relleno:              var(--panel-relleno-chico);   /* espacio interno — tarjeta de sensor */
+    --tablero-sensor-tarjeta-separacion:           12px;   /* separación entre elementos — tarjeta de sensor */
+    --tablero-sensor-tarjeta-alto-min:             176px;   /* alto mínimo — tarjeta de sensor */
+    --tablero-sensor-tarjeta-fondo:                var(--panel-tarjeta);   /* fondo — tarjeta de sensor */
+    --tablero-sensor-tarjeta-borde:                1px solid var(--panel-linea);   /* borde — tarjeta de sensor */
+    --tablero-sensor-tarjeta-redondeo:             var(--panel-redondeo);   /* redondeo de las esquinas — tarjeta de sensor */
+    --tablero-sensor-tarjeta-sombra:               var(--panel-sombra-tarjeta);   /* sombra — tarjeta de sensor */
+    --tablero-sensor-tarjeta-transicion:           box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;   /* animación de los cambios — tarjeta de sensor */
+    --tablero-sensor-tarjeta-valor-accent:         var(--verde-500);   /* variable interna --accent — tarjeta de sensor */
+    --tablero-sensor-tarjeta-hover-transformacion: translateY(-2px);   /* desplazamiento/escala/giro — tarjeta de sensor (estado: hover) */
+    --tablero-sensor-tarjeta-hover-sombra:         var(--panel-sombra-elevada);   /* sombra — tarjeta de sensor (estado: hover) */
+    --tablero-sensor-tarjeta-hover-borde-color:    var(--panel-linea-fuerte);   /* color del borde — tarjeta de sensor (estado: hover) */
+    --tablero-sensor-tarjeta-despues-posicion:     auto 0 0 0;   /* distancia a los bordes — tarjeta de sensor (estado: despues) */
+    --tablero-sensor-tarjeta-despues-alto:         3px;   /* alto — tarjeta de sensor (estado: despues) */
+    --tablero-sensor-tarjeta-despues-fondo:        var(--color-exito);   /* fondo — tarjeta de sensor (estado: despues) */
+    --tablero-sensor-tarjeta-despues-transicion:   opacity 0.18s ease;   /* animación de los cambios — tarjeta de sensor (estado: despues) */
+    --tablero-sensor-tarjeta-con-sensor-insignia-tono-alerta-despues-fondo: var(--color-alerta);   /* fondo — tarjeta de sensor (estado: con-sensor-insignia-tono-alerta, despues) */
+    --tablero-sensor-tarjeta-con-sensor-insignia-tono-alerta-despues-opacidad: 0.9;   /* opacidad (0 = invisible, 1 = opaco) — tarjeta de sensor (estado: con-sensor-insignia-tono-alerta, despues) */
+    --tablero-sensor-tarjeta-con-sensor-insignia-tono-peligro-despues-fondo: var(--color-peligro);   /* fondo — tarjeta de sensor (estado: con-sensor-insignia-tono-peligro, despues) */
+    --tablero-sensor-tarjeta-con-sensor-insignia-tono-peligro-despues-opacidad: 0.95;   /* opacidad (0 = invisible, 1 = opaco) — tarjeta de sensor (estado: con-sensor-insignia-tono-peligro, despues) */
+    --tablero-sensor-tarjeta-accent-eden-valor-accent: var(--verde-500);   /* variable interna --accent — tarjeta de sensor (estado: accent-eden) */
+    --tablero-sensor-tarjeta-accent-breath-valor-accent: var(--color-menta);   /* variable interna --accent — tarjeta de sensor (estado: accent-breath) */
+    --tablero-sensor-tarjeta-accent-citrus-valor-accent: var(--color-citrico);   /* variable interna --accent — tarjeta de sensor (estado: accent-citrus) */
+    --tablero-sensor-tarjeta-accent-clay-valor-accent: var(--color-arcilla);   /* variable interna --accent — tarjeta de sensor (estado: accent-clay) */
+    --tablero-sensor-cabeza-separacion:            10px;   /* separación entre elementos — cabeza de sensor */
+    --tablero-sensor-icono-ancho:                  34px;   /* ancho — ícono de sensor */
+    --tablero-sensor-icono-alto:                   34px;   /* alto — ícono de sensor */
+    --tablero-sensor-icono-redondeo:               10px;   /* redondeo de las esquinas — ícono de sensor */
+    --tablero-sensor-icono-fondo:                  color-mix(in oklab, var(--accent) 22%, var(--panel-tarjeta));   /* fondo — ícono de sensor */
+    --tablero-sensor-icono-borde:                  1px solid color-mix(in oklab, var(--accent) 40%, var(--panel-linea-fuerte));   /* borde — ícono de sensor */
+    --tablero-sensor-icono-color:                  color-mix(in oklab, var(--accent) 80%, var(--color-texto));   /* color del texto — ícono de sensor */
+    --tablero-sensor-icono-icono-ancho:            18px;   /* ancho — ícono de sensor ícono */
+    --tablero-sensor-icono-icono-alto:             18px;   /* alto — ícono de sensor ícono */
+    --tablero-sensor-titulo-tamano:                0.7813rem;   /* tamaño de letra — título de sensor */
+    --tablero-sensor-titulo-peso:                  500;   /* grosor de letra — título de sensor */
+    --tablero-sensor-titulo-color:                 var(--color-texto-secundario);   /* color del texto — título de sensor */
+    --tablero-sensor-valor-separacion:             5px;   /* separación entre elementos — valor de sensor */
+    --tablero-sensor-valor-margen-arriba:          2px;   /* margen de arriba — valor de sensor */
+    --tablero-sensor-numero-fuente:                var(--fuente-titulos);   /* tipografía — número de sensor */
+    --tablero-sensor-numero-tamano:                clamp(30px, 3.4vw, 38px);   /* tamaño de letra — número de sensor */
+    --tablero-sensor-numero-peso:                  400;   /* grosor de letra — número de sensor */
+    --tablero-sensor-numero-espaciado:             -0.025em;   /* separación entre letras — número de sensor */
+    --tablero-sensor-numero-interlineado:          1;   /* separación entre renglones — número de sensor */
+    --tablero-sensor-numero-color:                 var(--color-texto);   /* color del texto — número de sensor */
+    --tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-alerta-color: #8a4e22;   /* color del texto — número de sensor tarjeta sensor (estado: con-sensor-insignia-tono-alerta) */
+    --tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-peligro-color: #7a2f19;   /* color del texto — número de sensor tarjeta sensor (estado: con-sensor-insignia-tono-peligro) */
+    --tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-alerta-color-oscuro: #f1c9a8;   /* color del texto — número de sensor tarjeta sensor (estado: con-sensor-insignia-tono-alerta; modo oscuro) */
+    --tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-peligro-color-oscuro: #f2b79e;   /* color del texto — número de sensor tarjeta sensor (estado: con-sensor-insignia-tono-peligro; modo oscuro) */
+    --tablero-sensor-unidad-tamano:                0.8125rem;   /* tamaño de letra — unidad de sensor */
+    --tablero-sensor-unidad-color:                 var(--color-texto-suave);   /* color del texto — unidad de sensor */
+    --tablero-sensor-unidad-peso:                  500;   /* grosor de letra — unidad de sensor */
+    --tablero-sensor-pie-separacion:               8px;   /* separación entre elementos — pie de sensor */
+    --tablero-medidor-alto:                        8px;   /* alto — medidor */
+    --tablero-medidor-redondeo:                    999px;   /* redondeo de las esquinas — medidor */
+    --tablero-medidor-fondo:                       var(--panel-fondo-suave);   /* fondo — medidor */
+    --tablero-medidor-borde:                       1px solid var(--panel-linea);   /* borde — medidor */
+    --tablero-medidor-franja-arriba:               -1px;   /* distancia desde arriba — franja de medidor */
+    --tablero-medidor-franja-abajo:                -1px;   /* distancia desde abajo — franja de medidor */
+    --tablero-medidor-franja-redondeo:             999px;   /* redondeo de las esquinas — franja de medidor */
+    --tablero-medidor-franja-fondo:                color-mix(in oklab, var(--color-exito) 32%, transparent);   /* fondo — franja de medidor */
+    --tablero-medidor-franja-borde:                1px solid color-mix(in oklab, var(--color-exito) 50%, transparent);   /* borde — franja de medidor */
+    --tablero-medidor-marcador-ancho:              16px;   /* ancho — marcador de medidor */
+    --tablero-medidor-marcador-alto:               16px;   /* alto — marcador de medidor */
+    --tablero-medidor-marcador-fondo:              var(--color-exito);   /* fondo — marcador de medidor */
+    --tablero-medidor-marcador-borde:              3px solid var(--panel-tarjeta);   /* borde — marcador de medidor */
+    --tablero-medidor-marcador-sombra:             0 2px 6px rgba(14, 31, 23, 0.3), 0 0 0 1px color-mix(in oklab, var(--color-exito) 50%, transparent);   /* sombra — marcador de medidor */
+    --tablero-medidor-marcador-tono-exito-fondo:   var(--color-exito);   /* fondo — marcador de medidor (estado: tono-exito) */
+    --tablero-medidor-marcador-tono-exito-sombra:  0 2px 6px rgba(14, 31, 23, 0.3), 0 0 0 1px color-mix(in oklab, var(--color-exito) 50%, transparent);   /* sombra — marcador de medidor (estado: tono-exito) */
+    --tablero-medidor-marcador-tono-alerta-fondo:  var(--color-alerta);   /* fondo — marcador de medidor (estado: tono-alerta) */
+    --tablero-medidor-marcador-tono-alerta-sombra: 0 2px 6px rgba(14, 31, 23, 0.3), 0 0 0 1px color-mix(in oklab, var(--color-alerta) 50%, transparent);   /* sombra — marcador de medidor (estado: tono-alerta) */
+    --tablero-medidor-marcador-tono-peligro-fondo: var(--color-peligro);   /* fondo — marcador de medidor (estado: tono-peligro) */
+    --tablero-medidor-marcador-tono-peligro-sombra: 0 2px 6px rgba(14, 31, 23, 0.3), 0 0 0 1px color-mix(in oklab, var(--color-peligro) 50%, transparent);   /* sombra — marcador de medidor (estado: tono-peligro) */
+    --tablero-sensor-ayuda-tamano:                 0.7188rem;   /* tamaño de letra — ayuda de sensor */
+    --tablero-sensor-ayuda-color:                  var(--color-texto-suave);   /* color del texto — ayuda de sensor */
+    --tablero-sensor-ayuda-separacion:             8px;   /* separación entre elementos — ayuda de sensor */
+    --tablero-medidor-leyenda-separacion:          5px;   /* separación entre elementos — leyenda de medidor */
+    --tablero-medidor-leyenda-tamano:              0.6875rem;   /* tamaño de letra — leyenda de medidor */
+    --tablero-medidor-leyenda-icono-ancho:         10px;   /* ancho — ícono de medidor leyenda */
+    --tablero-medidor-leyenda-icono-alto:          8px;   /* alto — ícono de medidor leyenda */
+    --tablero-medidor-leyenda-icono-redondeo:      3px;   /* redondeo de las esquinas — ícono de medidor leyenda */
+    --tablero-medidor-leyenda-icono-fondo:         color-mix(in oklab, var(--color-exito) 26%, transparent);   /* fondo — ícono de medidor leyenda */
+    --tablero-medidor-leyenda-icono-borde:         1px solid color-mix(in oklab, var(--color-exito) 40%, transparent);   /* borde — ícono de medidor leyenda */
+    --tablero-modo-selector-relleno:               5px;   /* espacio interno — selector de modo */
+    --tablero-modo-selector-separacion:            4px;   /* separación entre elementos — selector de modo */
+    --tablero-modo-selector-redondeo:              12px;   /* redondeo de las esquinas — selector de modo */
+    --tablero-modo-selector-fondo:                 var(--panel-fondo-suave);   /* fondo — selector de modo */
+    --tablero-modo-selector-borde:                 1px solid var(--panel-linea);   /* borde — selector de modo */
+    --tablero-modo-opcion-color:                   var(--color-texto-secundario);   /* color del texto — opción de modo */
+    --tablero-modo-opcion-fuente:                  var(--fuente-texto);   /* tipografía — opción de modo */
+    --tablero-modo-opcion-tamano:                  0.8125rem;   /* tamaño de letra — opción de modo */
+    --tablero-modo-opcion-peso:                    600;   /* grosor de letra — opción de modo */
+    --tablero-modo-opcion-relleno:                 9px 16px;   /* espacio interno — opción de modo */
+    --tablero-modo-opcion-redondeo:                9px;   /* redondeo de las esquinas — opción de modo */
+    --tablero-modo-opcion-separacion:              7px;   /* separación entre elementos — opción de modo */
+    --tablero-modo-opcion-transicion:              background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;   /* animación de los cambios — opción de modo */
+    --tablero-modo-opcion-icono-opacidad:          0.85;   /* opacidad (0 = invisible, 1 = opaco) — ícono de modo opción */
+    --tablero-modo-opcion-hover-color:             var(--color-texto);   /* color del texto — opción de modo (estado: hover) */
+    --tablero-modo-opcion-presionado-transformacion: scale(0.97);   /* desplazamiento/escala/giro — opción de modo (estado: presionado) */
+    --tablero-modo-opcion-presionado-duracion:     0.08s;   /* duración de los cambios — opción de modo (estado: presionado) */
+    --tablero-modo-opcion-foco-sombra:             0 0 0 3px rgba(74, 122, 85, 0.32);   /* sombra — opción de modo (estado: foco) */
+    --tablero-modo-opcion-active-fondo:            var(--verde-700);   /* fondo — opción de modo (estado: active) */
+    --tablero-modo-opcion-active-color:            var(--verde-100);   /* color del texto — opción de modo (estado: active) */
+    --tablero-modo-opcion-active-sombra:           0 4px 12px -6px rgba(14, 31, 23, 0.5);   /* sombra — opción de modo (estado: active) */
+    --tablero-modo-selector-modo-opcion-manual-active-fondo: #8a4e22;   /* fondo — opción de modo selector modo (estado: manual, active) */
+    --tablero-modo-selector-modo-opcion-manual-active-color: #fff;   /* color del texto — opción de modo selector modo (estado: manual, active) */
+    --tablero-modo-selector-modo-opcion-manual-active-sombra: 0 4px 12px -6px rgba(122, 74, 44, 0.6);   /* sombra — opción de modo selector modo (estado: manual, active) */
+    --tablero-modo-opcion-active-fondo-oscuro:     var(--verde-500);   /* fondo — opción de modo (estado: active; modo oscuro) */
+    --tablero-modo-opcion-active-color-oscuro:     var(--verde-900);   /* color del texto — opción de modo (estado: active; modo oscuro) */
+    --tablero-modo-selector-modo-opcion-manual-active-fondo-oscuro: var(--color-arcilla);   /* fondo — opción de modo selector modo (estado: manual, active; modo oscuro) */
+    --tablero-modo-selector-modo-opcion-manual-active-color-oscuro: #2a1610;   /* color del texto — opción de modo selector modo (estado: manual, active; modo oscuro) */
+    --tablero-operacion-grilla-separacion:         var(--panel-separacion);   /* separación entre elementos — grilla de operación */
+
+    /* ---- Mensajes del equipo --------------------------------------------- */
+    --tablero-mensajes-separacion:                 8px;   /* separación entre elementos — mensajes */
+    --tablero-mensaje-separacion:                  10px;   /* separación entre elementos — mensaje */
+    --tablero-mensaje-relleno:                     11px 14px;   /* espacio interno — mensaje */
+    --tablero-mensaje-redondeo:                    12px;   /* redondeo de las esquinas — mensaje */
+    --tablero-mensaje-tamano:                      0.8125rem;   /* tamaño de letra — mensaje */
+    --tablero-mensaje-interlineado:                1.45;   /* separación entre renglones — mensaje */
+    --tablero-mensaje-peso:                        500;   /* grosor de letra — mensaje */
+    --tablero-mensaje-borde:                       1px solid var(--panel-linea-fuerte);   /* borde — mensaje */
+    --tablero-mensaje-fondo:                       var(--panel-tarjeta);   /* fondo — mensaje */
+    --tablero-mensaje-color:                       var(--color-texto-secundario);   /* color del texto — mensaje */
+    --tablero-mensaje-punto-ancho:                 8px;   /* ancho — punto de mensaje */
+    --tablero-mensaje-punto-alto:                  8px;   /* alto — punto de mensaje */
+    --tablero-mensaje-punto-fondo:                 var(--color-texto-suave);   /* fondo — punto de mensaje */
+    --tablero-mensaje-tono-peligro-borde-color:    var(--color-peligro);   /* color del borde — mensaje (estado: tono-peligro) */
+    --tablero-mensaje-tono-peligro-fondo:          var(--color-peligro-suave);   /* fondo — mensaje (estado: tono-peligro) */
+    --tablero-mensaje-tono-peligro-color:          var(--color-texto);   /* color del texto — mensaje (estado: tono-peligro) */
+    --tablero-mensaje-tono-alerta-borde-color:     var(--color-alerta);   /* color del borde — mensaje (estado: tono-alerta) */
+    --tablero-mensaje-tono-alerta-fondo:           var(--color-alerta-suave);   /* fondo — mensaje (estado: tono-alerta) */
+    --tablero-mensaje-tono-alerta-color:           var(--color-texto);   /* color del texto — mensaje (estado: tono-alerta) */
+    --tablero-mensaje-tono-info-borde-color:       var(--color-info);   /* color del borde — mensaje (estado: tono-info) */
+    --tablero-mensaje-tono-info-fondo:             var(--color-info-suave);   /* fondo — mensaje (estado: tono-info) */
+    --tablero-mensaje-tono-info-color:             var(--color-texto);   /* color del texto — mensaje (estado: tono-info) */
+    --tablero-mensaje-punto-tono-peligro-fondo:    var(--color-peligro);   /* fondo — punto de mensaje (estado: tono-peligro) */
+    --tablero-mensaje-punto-tono-alerta-fondo:     var(--color-alerta);   /* fondo — punto de mensaje (estado: tono-alerta) */
+    --tablero-mensaje-punto-tono-info-fondo:       var(--color-info);   /* fondo — punto de mensaje (estado: tono-info) */
+    --tablero-mensaje-punto-tono-peligro-animacion-sin-movimiento: ea-msg-latido 1.6s ease-in-out infinite;   /* animación — punto de mensaje (estado: tono-peligro; si se pidió reducir el movimiento) */
+    --tablero-anim-mensaje-latido-p0100-sombra:    0 0 0 0 var(--color-peligro-suave);   /* sombra — animación "ea-msg-latido" al 0%, 100% */
+    --tablero-anim-mensaje-latido-p50-sombra:      0 0 0 5px transparent;   /* sombra — animación "ea-msg-latido" al 50% */
+
+    /* ---- Los tres LEDs del equipo ---------------------------------------- */
+    --tablero-leds-fondo:                          var(--panel-tarjeta);   /* fondo — leds */
+    --tablero-leds-borde:                          1px solid var(--panel-linea);   /* borde — leds */
+    --tablero-leds-redondeo:                       14px;   /* redondeo de las esquinas — leds */
+    --tablero-leds-relleno:                        var(--panel-relleno-chico);   /* espacio interno — leds */
+    --tablero-leds-separacion:                     12px;   /* separación entre elementos — leds */
+    --tablero-leds-titulo-tamano:                  0.6875rem;   /* tamaño de letra — título de leds */
+    --tablero-leds-titulo-espaciado:               0.1em;   /* separación entre letras — título de leds */
+    --tablero-leds-titulo-color:                   var(--color-texto-suave);   /* color del texto — título de leds */
+    --tablero-leds-lista-separacion:               var(--panel-separacion);   /* separación entre elementos — lista de leds */
+    --tablero-led-separacion:                      10px;   /* separación entre elementos — led */
+    --tablero-led-relleno:                         10px 12px;   /* espacio interno — led */
+    --tablero-led-redondeo:                        12px;   /* redondeo de las esquinas — led */
+    --tablero-led-borde:                           1px solid var(--panel-linea);   /* borde — led */
+    --tablero-led-fondo:                           var(--panel-fondo-suave);   /* fondo — led */
+    --tablero-led-opacidad:                        0.55;   /* opacidad (0 = invisible, 1 = opaco) — led */
+    --tablero-led-transicion:                      opacity 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — led */
+    --tablero-led-punto-ancho:                     12px;   /* ancho — punto de led */
+    --tablero-led-punto-alto:                      12px;   /* alto — punto de led */
+    --tablero-led-punto-margen-arriba:             3px;   /* margen de arriba — punto de led */
+    --tablero-led-punto-fondo:                     var(--color-texto-suave);   /* fondo — punto de led */
+    --tablero-led-on-tono-exito-borde-color:       var(--color-exito);   /* color del borde — led (estado: on, tono-exito) */
+    --tablero-led-on-tono-exito-fondo:             var(--color-exito-suave);   /* fondo — led (estado: on, tono-exito) */
+    --tablero-led-on-tono-info-borde-color:        var(--color-info);   /* color del borde — led (estado: on, tono-info) */
+    --tablero-led-on-tono-info-fondo:              var(--color-info-suave);   /* fondo — led (estado: on, tono-info) */
+    --tablero-led-on-tono-peligro-borde-color:     var(--color-peligro);   /* color del borde — led (estado: on, tono-peligro) */
+    --tablero-led-on-tono-peligro-fondo:           var(--color-peligro-suave);   /* fondo — led (estado: on, tono-peligro) */
+    --tablero-led-led-punto-on-tono-exito-fondo:   var(--color-exito);   /* fondo — punto de led led (estado: on, tono-exito) */
+    --tablero-led-led-punto-on-tono-exito-sombra:  0 0 0 4px var(--color-exito-suave);   /* sombra — punto de led led (estado: on, tono-exito) */
+    --tablero-led-led-punto-on-tono-info-fondo:    var(--color-info);   /* fondo — punto de led led (estado: on, tono-info) */
+    --tablero-led-led-punto-on-tono-info-sombra:   0 0 0 4px var(--color-info-suave);   /* sombra — punto de led led (estado: on, tono-info) */
+    --tablero-led-led-punto-on-tono-peligro-fondo: var(--color-peligro);   /* fondo — punto de led led (estado: on, tono-peligro) */
+    --tablero-led-led-punto-on-tono-peligro-sombra: 0 0 0 4px var(--color-peligro-suave);   /* sombra — punto de led led (estado: on, tono-peligro) */
+    --tablero-led-cuerpo-separacion:               2px;   /* separación entre elementos — cuerpo de led */
+    --tablero-led-nombre-tamano:                   0.8125rem;   /* tamaño de letra — nombre de led */
+    --tablero-led-nombre-peso:                     600;   /* grosor de letra — nombre de led */
+    --tablero-led-nombre-color:                    var(--color-texto);   /* color del texto — nombre de led */
+    --tablero-led-nombre-separacion:               6px;   /* separación entre elementos — nombre de led */
+    --tablero-led-estado-fuente:                   var(--fuente-codigo);   /* tipografía — estado de led */
+    --tablero-led-estado-tamano:                   0.625rem;   /* tamaño de letra — estado de led */
+    --tablero-led-estado-peso:                     500;   /* grosor de letra — estado de led */
+    --tablero-led-estado-espaciado:                0.04em;   /* separación entre letras — estado de led */
+    --tablero-led-estado-color:                    var(--color-texto-suave);   /* color del texto — estado de led */
+    --tablero-led-detail-tamano:                   0.7188rem;   /* tamaño de letra — detail de led */
+    --tablero-led-detail-interlineado:             1.4;   /* separación entre renglones — detail de led */
+    --tablero-led-detail-color:                    var(--color-texto-suave);   /* color del texto — detail de led */
+
+    /* ---- Actuadores ------------------------------------------------------ */
+    --tablero-actuador-fila-separacion:            13px;   /* separación entre elementos — fila de actuador */
+    --tablero-actuador-fila-relleno:               14px var(--panel-relleno-chico);   /* espacio interno — fila de actuador */
+    --tablero-actuador-fila-borde-arriba:          1px solid var(--panel-linea);   /* borde de arriba — fila de actuador */
+    --tablero-actuador-icono-ancho:                36px;   /* ancho — ícono de actuador */
+    --tablero-actuador-icono-alto:                 36px;   /* alto — ícono de actuador */
+    --tablero-actuador-icono-redondeo:             10px;   /* redondeo de las esquinas — ícono de actuador */
+    --tablero-actuador-icono-fondo:                var(--panel-fondo-suave);   /* fondo — ícono de actuador */
+    --tablero-actuador-icono-borde:                1px solid var(--panel-linea);   /* borde — ícono de actuador */
+    --tablero-actuador-icono-color:                var(--color-texto-suave);   /* color del texto — ícono de actuador */
+    --tablero-actuador-icono-transicion:           background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;   /* animación de los cambios — ícono de actuador */
+    --tablero-actuador-icono-on-fondo:             color-mix(in oklab, var(--verde-500) 22%, var(--panel-tarjeta));   /* fondo — ícono de actuador (estado: on) */
+    --tablero-actuador-icono-on-borde-color:       color-mix(in oklab, var(--verde-500) 45%, var(--panel-linea-fuerte));   /* color del borde — ícono de actuador (estado: on) */
+    --tablero-actuador-icono-on-color:             var(--verde-600);   /* color del texto — ícono de actuador (estado: on) */
+    --tablero-actuador-icono-on-color-oscuro:      var(--verde-300);   /* color del texto — ícono de actuador (estado: on; modo oscuro) */
+    --tablero-actuador-icono-icono-ancho:          18px;   /* ancho — ícono de actuador ícono */
+    --tablero-actuador-icono-icono-alto:           18px;   /* alto — ícono de actuador ícono */
+    --tablero-actuador-cuerpo-separacion:          2px;   /* separación entre elementos — cuerpo de actuador */
+    --tablero-actuador-nombre-tamano:              0.8438rem;   /* tamaño de letra — nombre de actuador */
+    --tablero-actuador-nombre-peso:                600;   /* grosor de letra — nombre de actuador */
+    --tablero-actuador-nombre-color:               var(--color-texto);   /* color del texto — nombre de actuador */
+    --tablero-actuador-motivo-tamano:              0.7188rem;   /* tamaño de letra — motivo de actuador */
+    --tablero-actuador-motivo-color:               var(--color-texto-suave);   /* color del texto — motivo de actuador */
+    --tablero-actuador-motivo-interlineado:        1.35;   /* separación entre renglones — motivo de actuador */
+    --tablero-actuador-estado-separacion:          8px;   /* separación entre elementos — estado de actuador */
+    --tablero-actuador-boton-ancho:                50px;   /* ancho — botón de actuador */
+    --tablero-actuador-boton-alto:                 28px;   /* alto — botón de actuador */
+    --tablero-actuador-boton-redondeo:             999px;   /* redondeo de las esquinas — botón de actuador */
+    --tablero-actuador-boton-borde:                1px solid var(--panel-linea-fuerte);   /* borde — botón de actuador */
+    --tablero-actuador-boton-fondo:                var(--panel-fondo-suave);   /* fondo — botón de actuador */
+    --tablero-actuador-boton-transicion:           background-color 0.18s ease, border-color 0.18s ease;   /* animación de los cambios — botón de actuador */
+    --tablero-actuador-boton-foco-sombra:          0 0 0 3px rgba(74, 122, 85, 0.32);   /* sombra — botón de actuador (estado: foco) */
+    --tablero-actuador-boton-presionado-transformacion: scale(0.95);   /* desplazamiento/escala/giro — botón de actuador (estado: presionado) */
+    --tablero-actuador-boton-presionado-duracion:  0.08s;   /* duración de los cambios — botón de actuador (estado: presionado) */
+    --tablero-actuador-boton-bolita-arriba:        2px;   /* distancia desde arriba — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-izquierda:     2px;   /* distancia desde la izquierda — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-ancho:         22px;   /* ancho — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-alto:          22px;   /* alto — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-fondo:         var(--panel-tarjeta);   /* fondo — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-sombra:        0 1px 3px rgba(14, 31, 23, 0.3);   /* sombra — bolita de actuador botón */
+    --tablero-actuador-boton-bolita-transicion:    transform 0.18s ease;   /* animación de los cambios — bolita de actuador botón */
+    --tablero-actuador-boton-on-fondo:             var(--verde-600);   /* fondo — botón de actuador (estado: on) */
+    --tablero-actuador-boton-on-borde-color:       var(--verde-700);   /* color del borde — botón de actuador (estado: on) */
+    --tablero-actuador-boton-actuador-boton-bolita-on-transformacion: translateX(22px);   /* desplazamiento/escala/giro — bolita de actuador botón actuador botón (estado: on) */
+    --tablero-actuador-boton-actuador-boton-bolita-on-fondo: var(--verde-100);   /* fondo — bolita de actuador botón actuador botón (estado: on) */
+    --tablero-actuador-boton-on-fondo-oscuro:      var(--verde-500);   /* fondo — botón de actuador (estado: on; modo oscuro) */
+    --tablero-actuador-boton-on-borde-color-oscuro: var(--verde-500);   /* color del borde — botón de actuador (estado: on; modo oscuro) */
+    --tablero-actuador-boton-actuador-boton-bolita-on-fondo-oscuro: var(--verde-900);   /* fondo — bolita de actuador botón actuador botón (estado: on; modo oscuro) */
+    --tablero-actuador-insignia-tamano:            0.6875rem;   /* tamaño de letra — insignia de actuador */
+    --tablero-actuadores-nota-relleno:             12px var(--panel-relleno-chico);   /* espacio interno — nota de actuadores */
+    --tablero-actuadores-nota-tamano:              0.7188rem;   /* tamaño de letra — nota de actuadores */
+    --tablero-actuadores-nota-color:               var(--color-texto-suave);   /* color del texto — nota de actuadores */
+    --tablero-actuadores-nota-interlineado:        1.45;   /* separación entre renglones — nota de actuadores */
+    --tablero-actuadores-nota-borde-arriba:        1px solid var(--panel-linea);   /* borde de arriba — nota de actuadores */
+    --tablero-actuadores-nota-fondo:               var(--panel-fondo-suave);   /* fondo — nota de actuadores */
+
+    /* ---- Automatizaciones ------------------------------------------------ */
+    --tablero-regla-separacion:                  13px;   /* separación entre elementos — regla */
+    --tablero-regla-relleno:                     14px var(--panel-relleno-chico);   /* espacio interno — regla */
+    --tablero-regla-borde-arriba:                1px solid var(--panel-linea);   /* borde de arriba — regla */
+    --tablero-regla-estado-ancho:                10px;   /* ancho — estado de regla */
+    --tablero-regla-estado-alto:                 10px;   /* alto — estado de regla */
+    --tablero-regla-estado-fondo:                var(--color-texto-suave);   /* fondo — estado de regla */
+    --tablero-regla-estado-tono-exito-fondo:     var(--color-exito);   /* fondo — estado de regla (estado: tono-exito) */
+    --tablero-regla-estado-tono-exito-sombra:    0 0 0 3px var(--color-exito-suave);   /* sombra — estado de regla (estado: tono-exito) */
+    --tablero-regla-estado-tono-info-fondo:      var(--color-info);   /* fondo — estado de regla (estado: tono-info) */
+    --tablero-regla-estado-tono-info-sombra:     0 0 0 3px var(--color-info-suave);   /* sombra — estado de regla (estado: tono-info) */
+    --tablero-regla-estado-tono-alerta-fondo:    var(--color-alerta);   /* fondo — estado de regla (estado: tono-alerta) */
+    --tablero-regla-estado-tono-alerta-sombra:   0 0 0 3px var(--color-alerta-suave);   /* sombra — estado de regla (estado: tono-alerta) */
+    --tablero-regla-estado-tono-peligro-fondo:   var(--color-peligro);   /* fondo — estado de regla (estado: tono-peligro) */
+    --tablero-regla-estado-tono-peligro-sombra:  0 0 0 3px var(--color-peligro-suave);   /* sombra — estado de regla (estado: tono-peligro) */
+    --tablero-regla-estado-tono-neutro-fondo:    var(--color-texto-suave);   /* fondo — estado de regla (estado: tono-neutro) */
+    --tablero-regla-estado-tono-neutro-opacidad: 0.5;   /* opacidad (0 = invisible, 1 = opaco) — estado de regla (estado: tono-neutro) */
+    --tablero-regla-texto-tamano:                0.8125rem;   /* tamaño de letra — texto de regla */
+    --tablero-regla-texto-interlineado:          1.45;   /* separación entre renglones — texto de regla */
+    --tablero-regla-texto-color:                 var(--color-texto-secundario);   /* color del texto — texto de regla */
+    --tablero-regla-texto-negrita-color:         var(--color-texto);   /* color del texto — negrita de regla texto */
+    --tablero-regla-texto-negrita-peso:          600;   /* grosor de letra — negrita de regla texto */
+    --tablero-regla-tipo-margen-derecha:         6px;   /* margen derecho — tipo de regla */
+    --tablero-regla-tipo-relleno:                1px 7px;   /* espacio interno — tipo de regla */
+    --tablero-regla-tipo-redondeo:               999px;   /* redondeo de las esquinas — tipo de regla */
+    --tablero-regla-tipo-fuente:                 var(--fuente-codigo);   /* tipografía — tipo de regla */
+    --tablero-regla-tipo-tamano:                 0.625rem;   /* tamaño de letra — tipo de regla */
+    --tablero-regla-tipo-peso:                   600;   /* grosor de letra — tipo de regla */
+    --tablero-regla-tipo-espaciado:              0.04em;   /* separación entre letras — tipo de regla */
+    --tablero-regla-tipo-actua-color:            var(--color-info);   /* color del texto — tipo de regla (estado: actua) */
+    --tablero-regla-tipo-actua-fondo:            var(--color-info-suave);   /* fondo — tipo de regla (estado: actua) */
+    --tablero-regla-tipo-avisa-color:            var(--color-alerta);   /* color del texto — tipo de regla (estado: avisa) */
+    --tablero-regla-tipo-avisa-fondo:            var(--color-alerta-suave);   /* fondo — tipo de regla (estado: avisa) */
+    --tablero-regla-ayuda-margen:                4px 0 0;   /* margen — ayuda de regla */
+    --tablero-regla-ayuda-tamano:                0.6875rem;   /* tamaño de letra — ayuda de regla */
+    --tablero-regla-ayuda-interlineado:          1.45;   /* separación entre renglones — ayuda de regla */
+    --tablero-regla-ayuda-color:                 var(--color-texto-suave);   /* color del texto — ayuda de regla */
+
+    /* ---- Lecturas -------------------------------------------------------- */
+    --tablero-tabla-tamano:                 0.7813rem;   /* tamaño de letra — tabla */
+    --tablero-tabla-fila-fondo:             var(--panel-fondo-suave);   /* fondo — fila de tabla */
+    --tablero-tabla-encabezado-relleno:     11px 16px;   /* espacio interno — encabezado de tabla */
+    --tablero-tabla-encabezado-color:       var(--color-texto-suave);   /* color del texto — encabezado de tabla */
+    --tablero-tabla-encabezado-fuente:      var(--fuente-codigo);   /* tipografía — encabezado de tabla */
+    --tablero-tabla-encabezado-peso:        500;   /* grosor de letra — encabezado de tabla */
+    --tablero-tabla-encabezado-tamano:      0.6875rem;   /* tamaño de letra — encabezado de tabla */
+    --tablero-tabla-encabezado-espaciado:   0.08em;   /* separación entre letras — encabezado de tabla */
+    --tablero-tabla-encabezado-borde-abajo: 1px solid var(--panel-linea);   /* borde de abajo — encabezado de tabla */
+    --tablero-tabla-celda-relleno:          13px 16px;   /* espacio interno — celda de tabla */
+    --tablero-tabla-celda-color:            var(--color-texto);   /* color del texto — celda de tabla */
+    --tablero-tabla-celda-borde-abajo:      1px solid var(--panel-linea);   /* borde de abajo — celda de tabla */
+    --tablero-tabla-fila-hover-fondo:       color-mix(in oklab, var(--panel-fondo-suave) 60%, transparent);   /* fondo — fila de tabla (estado: hover) */
+    --tablero-tabla-hora-color:             var(--color-texto-secundario);   /* color del texto — hora de tabla */
+    --tablero-tabla-equipo-separacion:      8px;   /* separación entre elementos — equipo de tabla */
+    --tablero-tabla-equipo-punto-ancho:     6px;   /* ancho — punto de tabla equipo */
+    --tablero-tabla-equipo-punto-alto:      6px;   /* alto — punto de tabla equipo */
+    --tablero-tabla-equipo-punto-fondo:     var(--verde-500);   /* fondo — punto de tabla equipo */
+    --tablero-tabla-vacio-relleno:          36px 16px;   /* espacio interno — vacío de tabla */
+    --tablero-vacio-separacion:             6px;   /* separación entre elementos — vacío */
+    --tablero-vacio-color:                  var(--color-texto-suave);   /* color del texto — vacío */
+    --tablero-vacio-negrita-color:          var(--color-texto-secundario);   /* color del texto — negrita de vacío */
+    --tablero-vacio-negrita-tamano:         0.8438rem;   /* tamaño de letra — negrita de vacío */
+    --tablero-vacio-negrita-peso:           600;   /* grosor de letra — negrita de vacío */
+    --tablero-vacio-texto-tamano:           0.75rem;   /* tamaño de letra — texto de vacío */
+    --tablero-vacio-texto-ancho-max:        320px;   /* ancho máximo — texto de vacío */
+    --tablero-lecturas-pie-relleno:         12px 16px;   /* espacio interno — pie de lecturas */
+    --tablero-lecturas-pie-borde-arriba:    1px solid var(--panel-linea);   /* borde de arriba — pie de lecturas */
+    --tablero-lecturas-pie-color:           var(--color-texto-suave);   /* color del texto — pie de lecturas */
+    --tablero-lecturas-pie-tamano:          0.7188rem;   /* tamaño de letra — pie de lecturas */
+    --tablero-lecturas-pie-separacion:      8px;   /* separación entre elementos — pie de lecturas */
+
+    /* ---- Celular y tablet ------------------------------------------------ */
+    --tablero-portada-separacion-hasta-1180:     24px;   /* separación entre elementos — portada (hasta 1180px de ancho) */
+    --tablero-portada-tendencia-flex-hasta-1180: 0 0 220px;   /* tamaño dentro de la fila — tendencia de portada (hasta 1180px de ancho) */
+    --tablero-leds-lista-separacion-hasta-820:   10px;   /* separación entre elementos — lista de leds (hasta 820px de ancho) */
+    --tablero-modo-opcion-alto-min-hasta-960:    44px;   /* alto mínimo — opción de modo (hasta 960px de ancho) */
+    --tablero-portada-relleno-hasta-680:         22px;   /* espacio interno — portada (hasta 680px de ancho) */
+    --tablero-portada-pie-separacion-hasta-680:  12px 18px;   /* separación entre elementos — pie de portada (hasta 680px de ancho) */
+
+    /* ---- Refresco en vivo (panel-vivo.js) -------------------------------- */
+    --tablero-anim-vivo-destello-p0-fondo: color-mix(in srgb, var(--color-citrico) 45%, transparent);   /* fondo — animación "ea-vivo-destello" al 0% */
+    --tablero-vivo-cambio-animacion:       ea-vivo-destello 1.4s ease-out;   /* animación — cambio de vivo */
+    --tablero-vivo-cambio-redondeo:        4px;   /* redondeo de las esquinas — cambio de vivo */
+    --tablero-vivo-sello-margen-izquierda: 10px;   /* margen izquierdo — sello de vivo */
+    --tablero-vivo-sello-fuente:           var(--fuente-codigo);   /* tipografía — sello de vivo */
+    --tablero-vivo-sello-tamano:           0.6875rem;   /* tamaño de letra — sello de vivo */
+    --tablero-vivo-sello-espaciado:        0.04em;   /* separación entre letras — sello de vivo */
+    --tablero-vivo-sello-color:            var(--color-texto-suave);   /* color del texto — sello de vivo */
+    --tablero-vivo-sello-viejo-color:      var(--color-alerta);   /* color del texto — sello de vivo (estado: viejo) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 1180px de ancho                                         #
+   #     hasta 960px de ancho                                          #
+   #     hasta 820px de ancho                                          #
+   #     hasta 680px de ancho                                          #
+   #     hasta 520px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Títulos de sección ------------------------------------------------ */
+
+/* Section labels — separadores claros entre bloques del dashboard */
+.ea-sec {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tablero-seccion-separacion);
+    margin-top: var(--tablero-seccion-margen-arriba);
+    margin-bottom: var(--tablero-seccion-margen-abajo);
+    scroll-margin-top: var(--tablero-seccion-margen-ancla);
+}
+
+.ea-sec h2 {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-seccion-titulo-separacion);
+    font-family: var(--tablero-seccion-titulo-fuente);
+    font-size: var(--tablero-seccion-titulo-tamano);
+    font-weight: var(--tablero-seccion-titulo-peso);
+    letter-spacing: var(--tablero-seccion-titulo-espaciado);
+    text-transform: uppercase;
+    color: var(--tablero-seccion-titulo-color);
+}
+
+.ea-sec h2::before {
+    content: "";
+    width: var(--tablero-seccion-titulo-antes-ancho);
+    height: var(--tablero-seccion-titulo-antes-alto);
+    border-radius: var(--tablero-seccion-titulo-antes-redondeo);
+    background: var(--tablero-seccion-titulo-antes-fondo);
+    opacity: var(--tablero-seccion-titulo-antes-opacidad);
+}
+
+/* ---------- Tarjetas, insignias y botones del panel --------------------------- */
+
+/* Chevron del toggle de lecturas */
+.ea-readings-more-chevron {
+    transition: var(--tablero-lecturas-mas-flechita-transicion);
+}
+
+.ea-readings-card.is-expanded .ea-readings-more-chevron {
+    transform: var(--tablero-lecturas-tarjeta-lecturas-mas-flechita-expanded-transformacion);
+}
+
+/* ---------- Resumen del ambiente ---------------------------------------------- */
+
+/* KPI hero como panel de estado (gradiente de marca, texto claro).
+   El gradiente cambia según el estado general: verde / terracota / crítico. */
+.ea-hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: var(--tablero-portada-columnas);
+    gap: var(--tablero-portada-separacion);
+    padding: var(--tablero-portada-relleno);
+    border-radius: var(--tablero-portada-redondeo);
+    border: var(--tablero-portada-borde);
+    color: var(--tablero-portada-color);
+    /* El tramo final llevaba 22% de --ea-air y terminaba en rgb(88,142,109):
+       demasiado claro para texto blanco. Ahi el maximo alcanzable era 3.8:1,
+       o sea que NINGUN ajuste del color del texto podia llegar al 4.5:1 que
+       pide un cuerpo de texto. Se baja a 10% de aire: el degradado se sigue
+       viendo, pero deja de comerse el texto en la esquina inferior derecha
+       (que en celular es justo donde caen el titulo y el diagnostico, porque
+       las dos columnas se apilan). */
+    background: var(--tablero-portada-fondo);
+    box-shadow: var(--tablero-portada-sombra);
+}
+
+/* VELO OSCURO SOBRE LOS TONOS DE ALERTA
+   --ea-clay es #c89c7a, un tono claro: con texto blanco el maximo alcanzable
+   sobre el era 2.47:1, muy por debajo del 4.5:1 que pide un cuerpo de texto.
+   No habia color de texto que lo arreglara, porque el problema es el fondo.
+
+   Se resuelve con una capa negra translucida ENCIMA del degradado, en la misma
+   propiedad. Asi se conserva el color de marca (sigue siendo el naranja de
+   "atencion" y el rojo de "critico") y de paso los tres estados del hero
+   quedan con un peso visual parecido, en vez de que el amarillo pareciera
+   apagado al lado del verde. */
+.ea-hero.tone-warning {
+    background: var(--tablero-portada-tono-alerta-fondo);
+    box-shadow: var(--tablero-portada-tono-alerta-sombra);
+}
+
+.ea-hero.tone-danger {
+    background: var(--tablero-portada-tono-peligro-fondo);
+    box-shadow: var(--tablero-portada-tono-peligro-sombra);
+}
+
+:root[data-theme="dark"] .ea-hero {
+    box-shadow: var(--tablero-portada-sombra-oscuro);
+}
+
+.ea-hero-glow {
+    position: absolute;
+    top: var(--tablero-portada-brillo-arriba);
+    right: var(--tablero-portada-brillo-derecha);
+    width: var(--tablero-portada-brillo-ancho);
+    height: var(--tablero-portada-brillo-alto);
+    border-radius: 50%;
+    background: var(--tablero-portada-brillo-fondo);
+    pointer-events: none;
+    opacity: var(--tablero-portada-brillo-opacidad);
+}
+
+.ea-hero.tone-warning .ea-hero-glow,
+.ea-hero.tone-danger .ea-hero-glow {
+    background: var(--tablero-portada-portada-brillo-tono-alerta-fondo);
+}
+
+.ea-hero-main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-hero-top {
+    display: flex;
+    align-items: center;
+    gap: var(--tablero-portada-top-separacion);
+    flex-wrap: wrap;
+}
+
+.ea-hero-status {
+    height: var(--tablero-portada-estado-alto);
+    padding: var(--tablero-portada-estado-relleno);
+    font-size: var(--tablero-portada-estado-tamano);
+}
+
+/* Badges y tags legibles sobre el gradiente del hero */
+.ea-hero .ea-badge {
+    background: var(--tablero-portada-insignia-fondo);
+    color: var(--tablero-portada-insignia-color);
+    border-color: var(--tablero-portada-insignia-borde-color);
+}
+
+.ea-hero .ea-mode-tag,
+.ea-hero .ea-mode-tag.is-auto,
+.ea-hero .ea-mode-tag.is-manual {
+    color: var(--tablero-portada-modo-etiqueta-color);
+    background: var(--tablero-portada-modo-etiqueta-fondo);
+    border-color: var(--tablero-portada-modo-etiqueta-borde-color);
+}
+
+.ea-hero .ea-conn-dot {
+    background: var(--tablero-portada-conexion-punto-fondo);
+    box-shadow: var(--tablero-portada-conexion-punto-sombra);
+}
+
+.ea-mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-modo-etiqueta-separacion);
+    height: var(--tablero-modo-etiqueta-alto);
+    padding: var(--tablero-modo-etiqueta-relleno);
+    border-radius: var(--tablero-modo-etiqueta-redondeo);
+    font-family: var(--tablero-modo-etiqueta-fuente);
+    font-size: var(--tablero-modo-etiqueta-tamano);
+    font-weight: var(--tablero-modo-etiqueta-peso);
+    letter-spacing: var(--tablero-modo-etiqueta-espaciado);
+    border: var(--tablero-modo-etiqueta-borde);
+    background: var(--tablero-modo-etiqueta-fondo);
+    color: var(--tablero-modo-etiqueta-color);
+}
+
+.ea-mode-tag-dot {
+    width: var(--tablero-modo-etiqueta-punto-ancho);
+    height: var(--tablero-modo-etiqueta-punto-alto);
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: var(--tablero-modo-etiqueta-punto-sombra);
+}
+
+.ea-mode-tag.is-auto {
+    color: var(--tablero-modo-etiqueta-auto-color);
+    background: var(--tablero-modo-etiqueta-auto-fondo);
+    border-color: var(--tablero-modo-etiqueta-auto-borde-color);
+}
+
+.ea-mode-tag.is-manual {
+    color: var(--tablero-modo-etiqueta-manual-color);
+    background: var(--tablero-modo-etiqueta-manual-fondo);
+    border-color: var(--tablero-modo-etiqueta-manual-borde-color);
+}
+
+:root[data-theme="dark"] .ea-mode-tag.is-auto {
+    color: var(--tablero-modo-etiqueta-auto-color-oscuro);
+    background: var(--tablero-modo-etiqueta-auto-fondo-oscuro);
+    border-color: var(--tablero-modo-etiqueta-auto-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mode-tag.is-manual {
+    color: var(--tablero-modo-etiqueta-manual-color-oscuro);
+    background: var(--tablero-modo-etiqueta-manual-fondo-oscuro);
+    border-color: var(--tablero-modo-etiqueta-manual-borde-color-oscuro);
+}
+
+.ea-conn-dot {
+    width: var(--tablero-conexion-punto-ancho);
+    height: var(--tablero-conexion-punto-alto);
+    border-radius: 50%;
+    background: var(--tablero-conexion-punto-fondo);
+    box-shadow: var(--tablero-conexion-punto-sombra);
+    animation: var(--tablero-conexion-punto-animacion);
+    flex-shrink: 0;
+}
+
+@keyframes ead-breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: var(--tablero-anim-ead-breathe-p50-transformacion);
+        opacity: var(--tablero-anim-ead-breathe-p50-opacidad);
+    }
+}
+
+.ea-hero-eyebrow {
+    margin: var(--tablero-portada-etiqueta-superior-margen);
+    font-family: var(--tablero-portada-etiqueta-superior-fuente);
+    font-size: var(--tablero-portada-etiqueta-superior-tamano);
+    letter-spacing: var(--tablero-portada-etiqueta-superior-espaciado);
+    text-transform: uppercase;
+    /* Blanco puro: es texto chico y muy espaciado sobre el verde del hero.
+       Con 0.78 daba 3.75:1 y con 0.95 se quedaba en 4.46. */
+    color: var(--tablero-portada-etiqueta-superior-color);
+}
+
+.ea-hero-title {
+    margin: var(--tablero-portada-titulo-margen);
+    font-family: var(--tablero-portada-titulo-fuente);
+    font-weight: var(--tablero-portada-titulo-peso);
+    font-size: var(--tablero-portada-titulo-tamano);
+    line-height: var(--tablero-portada-titulo-interlineado);
+    letter-spacing: var(--tablero-portada-titulo-espaciado);
+    color: var(--tablero-portada-titulo-color);
+}
+
+.ea-hero-diag {
+    margin: var(--tablero-portada-diagnostico-margen);
+    /* 0.86 daba 3.27:1 sobre el tramo claro del degradado. */
+    color: var(--tablero-portada-diagnostico-color);
+    font-size: var(--tablero-portada-diagnostico-tamano);
+    line-height: var(--tablero-portada-diagnostico-interlineado);
+    max-width: var(--tablero-portada-diagnostico-ancho-max);
+}
+
+.ea-hero-foot {
+    margin-top: var(--tablero-portada-pie-margen-arriba);
+    padding-top: var(--tablero-portada-pie-relleno-arriba);
+    border-top: var(--tablero-portada-pie-borde-arriba);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--tablero-portada-pie-separacion);
+}
+
+.ea-hero-foot-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-portada-pie-item-separacion);
+    min-width: 0;
+}
+
+.ea-hero-foot-label {
+    font-family: var(--tablero-portada-pie-etiqueta-fuente);
+    font-size: var(--tablero-portada-pie-etiqueta-tamano);
+    letter-spacing: var(--tablero-portada-pie-etiqueta-espaciado);
+    text-transform: uppercase;
+    /* Blanco puro: era el texto mas chico del hero y el de peor contraste
+       (3.16:1 con 0.66). */
+    color: var(--tablero-portada-pie-etiqueta-color);
+}
+
+.ea-hero-foot-val {
+    font-size: var(--tablero-portada-pie-valor-tamano);
+    font-weight: var(--tablero-portada-pie-valor-peso);
+    color: var(--tablero-portada-pie-valor-color);
+    line-height: var(--tablero-portada-pie-valor-interlineado);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ea-hero-foot-val small {
+    font-weight: var(--tablero-portada-pie-valor-chico-peso);
+    color: var(--tablero-portada-pie-valor-chico-color);
+    font-size: var(--tablero-portada-pie-valor-chico-tamano);
+}
+
+.ea-hero-foot-conn {
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--tablero-portada-pie-conexion-separacion);
+}
+
+.ea-hero-foot-conn .ea-hero-foot-label {
+    order: 1;
+    margin-left: var(--tablero-portada-pie-conexion-portada-pie-etiqueta-margen-izquierda);
+}
+
+.ea-hero-foot-conn .ea-hero-foot-val {
+    order: 2;
+    font-family: var(--tablero-portada-pie-conexion-portada-pie-valor-fuente);
+    font-size: var(--tablero-portada-pie-conexion-portada-pie-valor-tamano);
+    margin-left: auto;
+    color: var(--tablero-portada-pie-conexion-portada-pie-valor-color);
+}
+
+/* Hero side */
+.ea-hero-side {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-portada-costado-separacion);
+}
+
+.ea-hero-trend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-portada-tendencia-separacion);
+    padding: var(--tablero-portada-tendencia-relleno);
+    border-radius: var(--tablero-portada-tendencia-redondeo);
+    /* Velo OSCURO, no claro. Estas cajas caen sobre el tramo mas claro del
+       degradado del hero, y aclararlas todavia mas dejaba el texto blanco en
+       2.4:1. Oscurecer el fondo sube todo lo de adentro de una sola vez. */
+    background: var(--tablero-portada-tendencia-fondo);
+    border: var(--tablero-portada-tendencia-borde);
+}
+
+.ea-hero-trend-label {
+    font-size: var(--tablero-portada-tendencia-etiqueta-tamano);
+    letter-spacing: var(--tablero-portada-tendencia-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--tablero-portada-tendencia-etiqueta-color);
+}
+
+.ea-hero-spark {
+    width: 100%;
+    height: var(--tablero-portada-minigrafico-alto);
+}
+
+.ea-hero-spark path[stroke] {
+    stroke: var(--tablero-portada-minigrafico-trazo-stroke-trazo);
+}
+
+/* Topes de la curva: el valor más bajo a la izquierda, el más alto a la
+   derecha. Sin esto la línea sube y baja sin decir cuánto. */
+.ea-hero-trend-escala {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--tablero-portada-tendencia-escala-tamano);
+    color: var(--tablero-portada-tendencia-escala-color);
+    padding-bottom: var(--tablero-portada-tendencia-escala-relleno-abajo);
+}
+
+/* ---------- Índice de calidad de aire (el titular numérico) ------------------- */
+
+.ea-hero-indice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-portada-indice-separacion);
+    padding: var(--tablero-portada-indice-relleno);
+    border-radius: var(--tablero-portada-indice-redondeo);
+    background: var(--tablero-portada-indice-fondo);
+    border: var(--tablero-portada-indice-borde);
+}
+
+.ea-hero-indice-label {
+    font-size: var(--tablero-portada-indice-etiqueta-tamano);
+    letter-spacing: var(--tablero-portada-indice-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--tablero-portada-indice-etiqueta-color);
+}
+
+.ea-hero-indice-dato {
+    display: flex;
+    align-items: baseline;
+    gap: var(--tablero-portada-indice-dato-separacion);
+    flex-wrap: wrap;
+}
+
+.ea-hero-indice-num {
+    font-family: var(--tablero-portada-indice-numero-fuente);
+    /* Cifras de ancho fijo: al refrescar, un 84 que pasa a 100 no debe
+       correr de lugar a la unidad ni al badge de al lado. */
+    font-variant-numeric: tabular-nums;
+    font-size: var(--tablero-portada-indice-numero-tamano);
+    line-height: var(--tablero-portada-indice-numero-interlineado);
+    color: var(--tablero-portada-indice-numero-color);
+}
+
+.ea-hero-indice-unidad {
+    font-size: var(--tablero-portada-indice-unidad-tamano);
+    color: var(--tablero-portada-indice-unidad-color);
+    margin-right: var(--tablero-portada-indice-unidad-margen-derecha);
+}
+
+.ea-hero-indice-badge {
+    align-self: center;
+}
+
+.ea-hero-indice-gauge {
+    margin-top: var(--tablero-portada-indice-medidor-margen-arriba);
+}
+
+.ea-hero-indice-hint {
+    font-size: var(--tablero-portada-indice-ayuda-tamano);
+    line-height: var(--tablero-portada-indice-ayuda-interlineado);
+    color: var(--tablero-portada-indice-ayuda-color);
+}
+
+/* De dónde salió el índice: medido por el sensor de aire o estimado con la
+   fórmula de respaldo. Va más chico y más apagado que el resto porque es una
+   aclaración, no un dato, pero tiene que estar: los dos números no valen lo
+   mismo y el panel no puede presentarlos como si fueran iguales. */
+.ea-hero-indice-fuente {
+    font-size: var(--tablero-portada-indice-fuente-tamano);
+    line-height: var(--tablero-portada-indice-fuente-interlineado);
+    color: var(--tablero-portada-indice-fuente-color);
+    font-style: italic;
+}
+
+/* ---------- Sensores (medidores) ---------------------------------------------- */
+
+.ea-sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--tablero-sensor-grilla-separacion);
+}
+
+.ea-sensor-card {
+    padding: var(--tablero-sensor-tarjeta-relleno);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-sensor-tarjeta-separacion);
+    min-height: var(--tablero-sensor-tarjeta-alto-min);
+    background: var(--tablero-sensor-tarjeta-fondo);
+    border: var(--tablero-sensor-tarjeta-borde);
+    border-radius: var(--tablero-sensor-tarjeta-redondeo);
+    box-shadow: var(--tablero-sensor-tarjeta-sombra);
+    transition: var(--tablero-sensor-tarjeta-transicion);
+    --accent: var(--tablero-sensor-tarjeta-valor-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-sensor-card:hover {
+        transform: var(--tablero-sensor-tarjeta-hover-transformacion);
+        box-shadow: var(--tablero-sensor-tarjeta-hover-sombra);
+        border-color: var(--tablero-sensor-tarjeta-hover-borde-color);
+    }
+}
+
+.ea-sensor-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.ea-sensor-card::after {
+    content: "";
+    position: absolute;
+    inset: var(--tablero-sensor-tarjeta-despues-posicion);
+    height: var(--tablero-sensor-tarjeta-despues-alto);
+    background: var(--tablero-sensor-tarjeta-despues-fondo);
+    opacity: 0;
+    transition: var(--tablero-sensor-tarjeta-despues-transicion);
+}
+
+.ea-sensor-card:has(.ea-sensor-badge.tone-warning)::after {
+    background: var(--tablero-sensor-tarjeta-con-sensor-insignia-tono-alerta-despues-fondo);
+    opacity: var(--tablero-sensor-tarjeta-con-sensor-insignia-tono-alerta-despues-opacidad);
+}
+
+.ea-sensor-card:has(.ea-sensor-badge.tone-danger)::after {
+    background: var(--tablero-sensor-tarjeta-con-sensor-insignia-tono-peligro-despues-fondo);
+    opacity: var(--tablero-sensor-tarjeta-con-sensor-insignia-tono-peligro-despues-opacidad);
+}
+
+.ea-sensor-card.accent-eden {
+    --accent: var(--tablero-sensor-tarjeta-accent-eden-valor-accent);
+}
+
+.ea-sensor-card.accent-breath {
+    --accent: var(--tablero-sensor-tarjeta-accent-breath-valor-accent);
+}
+
+.ea-sensor-card.accent-citrus {
+    --accent: var(--tablero-sensor-tarjeta-accent-citrus-valor-accent);
+}
+
+.ea-sensor-card.accent-clay {
+    --accent: var(--tablero-sensor-tarjeta-accent-clay-valor-accent);
+}
+
+.ea-sensor-head {
+    display: flex;
+    align-items: center;
+    gap: var(--tablero-sensor-cabeza-separacion);
+}
+
+.ea-sensor-icon {
+    width: var(--tablero-sensor-icono-ancho);
+    height: var(--tablero-sensor-icono-alto);
+    border-radius: var(--tablero-sensor-icono-redondeo);
+    display: grid;
+    place-items: center;
+    background: var(--tablero-sensor-icono-fondo);
+    border: var(--tablero-sensor-icono-borde);
+    color: var(--tablero-sensor-icono-color);
+    flex-shrink: 0;
+}
+
+.ea-sensor-icon svg {
+    width: var(--tablero-sensor-icono-icono-ancho);
+    height: var(--tablero-sensor-icono-icono-alto);
+}
+
+.ea-sensor-title {
+    font-size: var(--tablero-sensor-titulo-tamano);
+    font-weight: var(--tablero-sensor-titulo-peso);
+    color: var(--tablero-sensor-titulo-color);
+    flex: 1;
+    min-width: 0;
+}
+
+.ea-sensor-badge {
+    margin-left: auto;
+}
+
+.ea-sensor-value {
+    display: flex;
+    align-items: baseline;
+    gap: var(--tablero-sensor-valor-separacion);
+    margin-top: var(--tablero-sensor-valor-margen-arriba);
+}
+
+.ea-sensor-num {
+    font-family: var(--tablero-sensor-numero-fuente);
+    font-size: var(--tablero-sensor-numero-tamano);
+    font-weight: var(--tablero-sensor-numero-peso);
+    letter-spacing: var(--tablero-sensor-numero-espaciado);
+    line-height: var(--tablero-sensor-numero-interlineado);
+    color: var(--tablero-sensor-numero-color);
+}
+
+.ea-sensor-card:has(.ea-sensor-badge.tone-warning) .ea-sensor-num {
+    color: var(--tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-alerta-color);
+}
+
+.ea-sensor-card:has(.ea-sensor-badge.tone-danger) .ea-sensor-num {
+    color: var(--tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-peligro-color);
+}
+
+:root[data-theme="dark"] .ea-sensor-card:has(.ea-sensor-badge.tone-warning) .ea-sensor-num {
+    color: var(--tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-alerta-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-sensor-card:has(.ea-sensor-badge.tone-danger) .ea-sensor-num {
+    color: var(--tablero-sensor-tarjeta-sensor-numero-con-sensor-insignia-tono-peligro-color-oscuro);
+}
+
+.ea-sensor-unit {
+    font-size: var(--tablero-sensor-unidad-tamano);
+    color: var(--tablero-sensor-unidad-color);
+    font-weight: var(--tablero-sensor-unidad-peso);
+}
+
+.ea-sensor-foot {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-sensor-pie-separacion);
+}
+
+/* Gauge: track + zona ideal + pin del valor actual */
+.ea-gauge {
+    position: relative;
+    height: var(--tablero-medidor-alto);
+    border-radius: var(--tablero-medidor-redondeo);
+    background: var(--tablero-medidor-fondo);
+    border: var(--tablero-medidor-borde);
+}
+
+.ea-gauge-band {
+    position: absolute;
+    top: var(--tablero-medidor-franja-arriba);
+    bottom: var(--tablero-medidor-franja-abajo);
+    border-radius: var(--tablero-medidor-franja-redondeo);
+    background: var(--tablero-medidor-franja-fondo);
+    border: var(--tablero-medidor-franja-borde);
+}
+
+.ea-gauge-pin {
+    position: absolute;
+    top: 50%;
+    width: var(--tablero-medidor-marcador-ancho);
+    height: var(--tablero-medidor-marcador-alto);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--tablero-medidor-marcador-fondo);
+    border: var(--tablero-medidor-marcador-borde);
+    box-shadow: var(--tablero-medidor-marcador-sombra);
+    z-index: 1;
+}
+
+.ea-gauge-pin.tone-success {
+    background: var(--tablero-medidor-marcador-tono-exito-fondo);
+    box-shadow: var(--tablero-medidor-marcador-tono-exito-sombra);
+}
+
+.ea-gauge-pin.tone-warning {
+    background: var(--tablero-medidor-marcador-tono-alerta-fondo);
+    box-shadow: var(--tablero-medidor-marcador-tono-alerta-sombra);
+}
+
+.ea-gauge-pin.tone-danger {
+    background: var(--tablero-medidor-marcador-tono-peligro-fondo);
+    box-shadow: var(--tablero-medidor-marcador-tono-peligro-sombra);
+}
+
+.ea-sensor-hint {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--tablero-sensor-ayuda-tamano);
+    color: var(--tablero-sensor-ayuda-color);
+    gap: var(--tablero-sensor-ayuda-separacion);
+}
+
+.ea-sensor-hint > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ea-gauge-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-medidor-leyenda-separacion);
+    flex-shrink: 0;
+    font-size: var(--tablero-medidor-leyenda-tamano);
+}
+
+.ea-gauge-legend i {
+    width: var(--tablero-medidor-leyenda-icono-ancho);
+    height: var(--tablero-medidor-leyenda-icono-alto);
+    border-radius: var(--tablero-medidor-leyenda-icono-redondeo);
+    background: var(--tablero-medidor-leyenda-icono-fondo);
+    border: var(--tablero-medidor-leyenda-icono-borde);
+}
+
+.ea-mode-switch {
+    display: inline-flex;
+    padding: var(--tablero-modo-selector-relleno);
+    gap: var(--tablero-modo-selector-separacion);
+    border-radius: var(--tablero-modo-selector-redondeo);
+    background: var(--tablero-modo-selector-fondo);
+    border: var(--tablero-modo-selector-borde);
+    width: fit-content;
+}
+
+.ea-mode-opt {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--tablero-modo-opcion-color);
+    font-family: var(--tablero-modo-opcion-fuente);
+    font-size: var(--tablero-modo-opcion-tamano);
+    font-weight: var(--tablero-modo-opcion-peso);
+    padding: var(--tablero-modo-opcion-relleno);
+    border-radius: var(--tablero-modo-opcion-redondeo);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-modo-opcion-separacion);
+    transition: var(--tablero-modo-opcion-transicion);
+}
+
+.ea-mode-opt svg {
+    opacity: var(--tablero-modo-opcion-icono-opacidad);
+}
+
+.ea-mode-opt:hover {
+    color: var(--tablero-modo-opcion-hover-color);
+}
+
+.ea-mode-opt:active {
+    transform: var(--tablero-modo-opcion-presionado-transformacion);
+    transition-duration: var(--tablero-modo-opcion-presionado-duracion);
+}
+
+.ea-mode-opt:focus-visible {
+    outline: none;
+    box-shadow: var(--tablero-modo-opcion-foco-sombra);
+}
+
+.ea-mode-opt.is-active {
+    background: var(--tablero-modo-opcion-active-fondo);
+    color: var(--tablero-modo-opcion-active-color);
+    box-shadow: var(--tablero-modo-opcion-active-sombra);
+    cursor: default;
+}
+
+/* En modo manual el botón activo cambia de color: avisa que el sistema
+   dejó de decidir solo y ahora manda el usuario. */
+.ea-mode-switch.is-manual .ea-mode-opt.is-active {
+    background: var(--tablero-modo-selector-modo-opcion-manual-active-fondo);
+    color: var(--tablero-modo-selector-modo-opcion-manual-active-color);
+    box-shadow: var(--tablero-modo-selector-modo-opcion-manual-active-sombra);
+}
+
+:root[data-theme="dark"] .ea-mode-opt.is-active {
+    background: var(--tablero-modo-opcion-active-fondo-oscuro);
+    color: var(--tablero-modo-opcion-active-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-mode-switch.is-manual .ea-mode-opt.is-active {
+    background: var(--tablero-modo-selector-modo-opcion-manual-active-fondo-oscuro);
+    color: var(--tablero-modo-selector-modo-opcion-manual-active-color-oscuro);
+}
+
+/* Ops grid (actuadores + automatizaciones) */
+.ea-ops-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--tablero-operacion-grilla-separacion);
+    align-items: start;
+}
+
+/* ---------- Mensajes del equipo ----------------------------------------------- */
+
+.ea-msgs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-mensajes-separacion);
+}
+
+.ea-msg {
+    display: flex;
+    align-items: center;
+    gap: var(--tablero-mensaje-separacion);
+    margin: 0;
+    padding: var(--tablero-mensaje-relleno);
+    border-radius: var(--tablero-mensaje-redondeo);
+    font-size: var(--tablero-mensaje-tamano);
+    line-height: var(--tablero-mensaje-interlineado);
+    font-weight: var(--tablero-mensaje-peso);
+    border: var(--tablero-mensaje-borde);
+    background: var(--tablero-mensaje-fondo);
+    color: var(--tablero-mensaje-color);
+}
+
+.ea-msg .ea-dot {
+    width: var(--tablero-mensaje-punto-ancho);
+    height: var(--tablero-mensaje-punto-alto);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--tablero-mensaje-punto-fondo);
+}
+
+.ea-msg.tone-danger {
+    border-color: var(--tablero-mensaje-tono-peligro-borde-color);
+    background: var(--tablero-mensaje-tono-peligro-fondo);
+    color: var(--tablero-mensaje-tono-peligro-color);
+}
+
+.ea-msg.tone-warning {
+    border-color: var(--tablero-mensaje-tono-alerta-borde-color);
+    background: var(--tablero-mensaje-tono-alerta-fondo);
+    color: var(--tablero-mensaje-tono-alerta-color);
+}
+
+.ea-msg.tone-info {
+    border-color: var(--tablero-mensaje-tono-info-borde-color);
+    background: var(--tablero-mensaje-tono-info-fondo);
+    color: var(--tablero-mensaje-tono-info-color);
+}
+
+.ea-msg.tone-danger .ea-dot {
+    background: var(--tablero-mensaje-punto-tono-peligro-fondo);
+}
+
+.ea-msg.tone-warning .ea-dot {
+    background: var(--tablero-mensaje-punto-tono-alerta-fondo);
+}
+
+.ea-msg.tone-info .ea-dot {
+    background: var(--tablero-mensaje-punto-tono-info-fondo);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .ea-msg.tone-danger .ea-dot {
+        animation: var(--tablero-mensaje-punto-tono-peligro-animacion-sin-movimiento);
+    }
+}
+
+@keyframes ea-msg-latido {
+    0%, 100% {
+        box-shadow: var(--tablero-anim-mensaje-latido-p0100-sombra);
+    }
+    50% {
+        box-shadow: var(--tablero-anim-mensaje-latido-p50-sombra);
+    }
+}
+
+/* ---------- Los tres LEDs del equipo ------------------------------------------ */
+
+.ea-leds {
+    background: var(--tablero-leds-fondo);
+    border: var(--tablero-leds-borde);
+    border-radius: var(--tablero-leds-redondeo);
+    padding: var(--tablero-leds-relleno);
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-leds-separacion);
+}
+
+.ea-leds-title {
+    font-size: var(--tablero-leds-titulo-tamano);
+    letter-spacing: var(--tablero-leds-titulo-espaciado);
+    text-transform: uppercase;
+    color: var(--tablero-leds-titulo-color);
+}
+
+.ea-leds-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--tablero-leds-lista-separacion);
+}
+
+.ea-led {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tablero-led-separacion);
+    padding: var(--tablero-led-relleno);
+    border-radius: var(--tablero-led-redondeo);
+    border: var(--tablero-led-borde);
+    background: var(--tablero-led-fondo);
+    /* Apagado se ve apagado: el color solo aparece cuando el LED está
+       realmente encendido, igual que en el equipo. */
+    opacity: var(--tablero-led-opacidad);
+    transition: var(--tablero-led-transicion);
+}
+
+.ea-led.is-on {
+    opacity: 1;
+}
+
+.ea-led-dot {
+    width: var(--tablero-led-punto-ancho);
+    height: var(--tablero-led-punto-alto);
+    margin-top: var(--tablero-led-punto-margen-arriba);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--tablero-led-punto-fondo);
+}
+
+.ea-led.is-on.tone-success {
+    border-color: var(--tablero-led-on-tono-exito-borde-color);
+    background: var(--tablero-led-on-tono-exito-fondo);
+}
+
+.ea-led.is-on.tone-info {
+    border-color: var(--tablero-led-on-tono-info-borde-color);
+    background: var(--tablero-led-on-tono-info-fondo);
+}
+
+.ea-led.is-on.tone-danger {
+    border-color: var(--tablero-led-on-tono-peligro-borde-color);
+    background: var(--tablero-led-on-tono-peligro-fondo);
+}
+
+.ea-led.is-on.tone-success .ea-led-dot {
+    background: var(--tablero-led-led-punto-on-tono-exito-fondo);
+    box-shadow: var(--tablero-led-led-punto-on-tono-exito-sombra);
+}
+
+.ea-led.is-on.tone-info .ea-led-dot {
+    background: var(--tablero-led-led-punto-on-tono-info-fondo);
+    box-shadow: var(--tablero-led-led-punto-on-tono-info-sombra);
+}
+
+.ea-led.is-on.tone-danger .ea-led-dot {
+    background: var(--tablero-led-led-punto-on-tono-peligro-fondo);
+    box-shadow: var(--tablero-led-led-punto-on-tono-peligro-sombra);
+}
+
+.ea-led-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tablero-led-cuerpo-separacion);
+    min-width: 0;
+}
+
+.ea-led-name {
+    font-size: var(--tablero-led-nombre-tamano);
+    font-weight: var(--tablero-led-nombre-peso);
+    color: var(--tablero-led-nombre-color);
+    display: flex;
+    align-items: baseline;
+    gap: var(--tablero-led-nombre-separacion);
+    flex-wrap: wrap;
+}
+
+.ea-led-state {
+    font-family: var(--tablero-led-estado-fuente);
+    font-size: var(--tablero-led-estado-tamano);
+    font-weight: var(--tablero-led-estado-peso);
+    letter-spacing: var(--tablero-led-estado-espaciado);
+    color: var(--tablero-led-estado-color);
+    text-transform: uppercase;
+}
+
+.ea-led-detail {
+    font-size: var(--tablero-led-detail-tamano);
+    line-height: var(--tablero-led-detail-interlineado);
+    color: var(--tablero-led-detail-color);
+}
+
+/* ---------- Actuadores -------------------------------------------------------- */
+
+.ea-actuators-card {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-actuators-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-actuator-row {
+    display: flex;
+    align-items: center;
+    gap: var(--tablero-actuador-fila-separacion);
+    padding: var(--tablero-actuador-fila-relleno);
+    border-top: var(--tablero-actuador-fila-borde-arriba);
+}
+
+.ea-actuator-icon {
+    width: var(--tablero-actuador-icono-ancho);
+    height: var(--tablero-actuador-icono-alto);
+    border-radius: var(--tablero-actuador-icono-redondeo);
+    display: grid;
+    place-items: center;
+    background: var(--tablero-actuador-icono-fondo);
+    border: var(--tablero-actuador-icono-borde);
+    color: var(--tablero-actuador-icono-color);
+    flex-shrink: 0;
+    transition: var(--tablero-actuador-icono-transicion);
+}
+
+.ea-actuator-icon.is-on {
+    background: var(--tablero-actuador-icono-on-fondo);
+    border-color: var(--tablero-actuador-icono-on-borde-color);
+    color: var(--tablero-actuador-icono-on-color);
+}
+
+:root[data-theme="dark"] .ea-actuator-icon.is-on {
+    color: var(--tablero-actuador-icono-on-color-oscuro);
+}
+
+.ea-actuator-icon svg {
+    width: var(--tablero-actuador-icono-icono-ancho);
+    height: var(--tablero-actuador-icono-icono-alto);
+}
+
+.ea-actuator-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    gap: var(--tablero-actuador-cuerpo-separacion);
+}
+
+.ea-actuator-name {
+    font-size: var(--tablero-actuador-nombre-tamano);
+    font-weight: var(--tablero-actuador-nombre-peso);
+    color: var(--tablero-actuador-nombre-color);
+}
+
+.ea-actuator-reason {
+    font-size: var(--tablero-actuador-motivo-tamano);
+    color: var(--tablero-actuador-motivo-color);
+    line-height: var(--tablero-actuador-motivo-interlineado);
+}
+
+.ea-actuator-state {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-actuador-estado-separacion);
+    flex-shrink: 0;
+}
+
+.ea-actuator-form {
+    margin: 0;
+    display: inline-flex;
+}
+
+.ea-actuator-toggle {
+    width: var(--tablero-actuador-boton-ancho);
+    height: var(--tablero-actuador-boton-alto);
+    border-radius: var(--tablero-actuador-boton-redondeo);
+    border: var(--tablero-actuador-boton-borde);
+    background: var(--tablero-actuador-boton-fondo);
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    transition: var(--tablero-actuador-boton-transicion);
+}
+
+.ea-actuator-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--tablero-actuador-boton-foco-sombra);
+}
+
+.ea-actuator-toggle:active {
+    transform: var(--tablero-actuador-boton-presionado-transformacion);
+    transition-duration: var(--tablero-actuador-boton-presionado-duracion);
+}
+
+.ea-actuator-toggle-thumb {
+    position: absolute;
+    top: var(--tablero-actuador-boton-bolita-arriba);
+    left: var(--tablero-actuador-boton-bolita-izquierda);
+    width: var(--tablero-actuador-boton-bolita-ancho);
+    height: var(--tablero-actuador-boton-bolita-alto);
+    border-radius: 50%;
+    background: var(--tablero-actuador-boton-bolita-fondo);
+    box-shadow: var(--tablero-actuador-boton-bolita-sombra);
+    transition: var(--tablero-actuador-boton-bolita-transicion);
+}
+
+.ea-actuator-toggle.is-on {
+    background: var(--tablero-actuador-boton-on-fondo);
+    border-color: var(--tablero-actuador-boton-on-borde-color);
+}
+
+.ea-actuator-toggle.is-on .ea-actuator-toggle-thumb {
+    transform: var(--tablero-actuador-boton-actuador-boton-bolita-on-transformacion);
+    background: var(--tablero-actuador-boton-actuador-boton-bolita-on-fondo);
+}
+
+:root[data-theme="dark"] .ea-actuator-toggle.is-on {
+    background: var(--tablero-actuador-boton-on-fondo-oscuro);
+    border-color: var(--tablero-actuador-boton-on-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-actuator-toggle.is-on .ea-actuator-toggle-thumb {
+    background: var(--tablero-actuador-boton-actuador-boton-bolita-on-fondo-oscuro);
+}
+
+.ea-actuator-badge {
+    font-size: var(--tablero-actuador-insignia-tamano);
+}
+
+.ea-actuators-note {
+    margin: 0;
+    padding: var(--tablero-actuadores-nota-relleno);
+    font-size: var(--tablero-actuadores-nota-tamano);
+    color: var(--tablero-actuadores-nota-color);
+    line-height: var(--tablero-actuadores-nota-interlineado);
+    border-top: var(--tablero-actuadores-nota-borde-arriba);
+    background: var(--tablero-actuadores-nota-fondo);
+}
+
+/* ---------- Automatizaciones -------------------------------------------------- */
+
+.ea-rules-card {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-rules-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-rule {
+    display: flex;
+    align-items: center;
+    gap: var(--tablero-regla-separacion);
+    padding: var(--tablero-regla-relleno);
+    border-top: var(--tablero-regla-borde-arriba);
+}
+
+.ea-rule-state {
+    width: var(--tablero-regla-estado-ancho);
+    height: var(--tablero-regla-estado-alto);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--tablero-regla-estado-fondo);
+}
+
+.ea-rule-state.tone-success {
+    background: var(--tablero-regla-estado-tono-exito-fondo);
+    box-shadow: var(--tablero-regla-estado-tono-exito-sombra);
+}
+
+.ea-rule-state.tone-info {
+    background: var(--tablero-regla-estado-tono-info-fondo);
+    box-shadow: var(--tablero-regla-estado-tono-info-sombra);
+}
+
+.ea-rule-state.tone-warning {
+    background: var(--tablero-regla-estado-tono-alerta-fondo);
+    box-shadow: var(--tablero-regla-estado-tono-alerta-sombra);
+}
+
+.ea-rule-state.tone-danger {
+    background: var(--tablero-regla-estado-tono-peligro-fondo);
+    box-shadow: var(--tablero-regla-estado-tono-peligro-sombra);
+}
+
+.ea-rule-state.tone-neutral {
+    background: var(--tablero-regla-estado-tono-neutro-fondo);
+    opacity: var(--tablero-regla-estado-tono-neutro-opacidad);
+}
+
+.ea-rule-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.ea-rule-text {
+    margin: 0;
+    font-size: var(--tablero-regla-texto-tamano);
+    line-height: var(--tablero-regla-texto-interlineado);
+    color: var(--tablero-regla-texto-color);
+}
+
+.ea-rule-text strong {
+    color: var(--tablero-regla-texto-negrita-color);
+    font-weight: var(--tablero-regla-texto-negrita-peso);
+}
+
+/* "actúa" vs "avisa": la distinción más importante del sistema. EdenAir
+   ordena el aire acondicionado y el humidificador, pero sobre el CO2 y la
+   calidad de aire solo puede avisar, porque no renueva el aire. El chip lo
+   dice en cada regla para que el panel no prometa algo que no puede hacer. */
+.ea-rule-kind {
+    display: inline-block;
+    margin-right: var(--tablero-regla-tipo-margen-derecha);
+    padding: var(--tablero-regla-tipo-relleno);
+    border-radius: var(--tablero-regla-tipo-redondeo);
+    font-family: var(--tablero-regla-tipo-fuente);
+    font-size: var(--tablero-regla-tipo-tamano);
+    font-weight: var(--tablero-regla-tipo-peso);
+    letter-spacing: var(--tablero-regla-tipo-espaciado);
+    text-transform: uppercase;
+    vertical-align: 1px;
+}
+
+.ea-rule-kind.is-actua {
+    color: var(--tablero-regla-tipo-actua-color);
+    background: var(--tablero-regla-tipo-actua-fondo);
+}
+
+.ea-rule-kind.is-avisa {
+    color: var(--tablero-regla-tipo-avisa-color);
+    background: var(--tablero-regla-tipo-avisa-fondo);
+}
+
+/* El "hasta cuándo" de cada regla: la histéresis, el ciclo, el crítico. Sin
+   esto parece que el aire se apaga apenas baja un décimo del máximo. */
+.ea-rule-hint {
+    margin: var(--tablero-regla-ayuda-margen);
+    font-size: var(--tablero-regla-ayuda-tamano);
+    line-height: var(--tablero-regla-ayuda-interlineado);
+    color: var(--tablero-regla-ayuda-color);
+}
+
+.ea-rule-badge {
+    flex-shrink: 0;
+}
+
+/* ---------- Lecturas ---------------------------------------------------------- */
+
+.ea-readings-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.ea-readings-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ea-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--tablero-tabla-tamano);
+}
+
+.ea-table thead tr {
+    background: var(--tablero-tabla-fila-fondo);
+}
+
+.ea-table th {
+    text-align: left;
+    padding: var(--tablero-tabla-encabezado-relleno);
+    color: var(--tablero-tabla-encabezado-color);
+    font-family: var(--tablero-tabla-encabezado-fuente);
+    font-weight: var(--tablero-tabla-encabezado-peso);
+    font-size: var(--tablero-tabla-encabezado-tamano);
+    letter-spacing: var(--tablero-tabla-encabezado-espaciado);
+    text-transform: uppercase;
+    border-bottom: var(--tablero-tabla-encabezado-borde-abajo);
+    white-space: nowrap;
+}
+
+.ea-table th.ea-num {
+    text-align: right;
+}
+
+.ea-table td {
+    padding: var(--tablero-tabla-celda-relleno);
+    color: var(--tablero-tabla-celda-color);
+    border-bottom: var(--tablero-tabla-celda-borde-abajo);
+    vertical-align: middle;
+}
+
+.ea-table td.ea-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.ea-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.ea-table tbody tr:hover {
+    background: var(--tablero-tabla-fila-hover-fondo);
+}
+
+.ea-table tr.is-extra {
+    display: none;
+}
+
+.ea-readings-card.is-expanded .ea-table tr.is-extra {
+    display: table-row;
+}
+
+.ea-table-time {
+    color: var(--tablero-tabla-hora-color);
+}
+
+.ea-table-dev {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tablero-tabla-equipo-separacion);
+}
+
+.ea-table-dev-dot {
+    width: var(--tablero-tabla-equipo-punto-ancho);
+    height: var(--tablero-tabla-equipo-punto-alto);
+    border-radius: 50%;
+    background: var(--tablero-tabla-equipo-punto-fondo);
+}
+
+.ea-table-empty {
+    padding: var(--tablero-tabla-vacio-relleno);
+}
+
+.ea-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--tablero-vacio-separacion);
+    color: var(--tablero-vacio-color);
+    text-align: center;
+}
+
+.ea-empty strong {
+    color: var(--tablero-vacio-negrita-color);
+    font-size: var(--tablero-vacio-negrita-tamano);
+    font-weight: var(--tablero-vacio-negrita-peso);
+}
+
+.ea-empty p {
+    margin: 0;
+    font-size: var(--tablero-vacio-texto-tamano);
+    max-width: var(--tablero-vacio-texto-ancho-max);
+}
+
+.ea-readings-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--tablero-lecturas-pie-relleno);
+    border-top: var(--tablero-lecturas-pie-borde-arriba);
+    color: var(--tablero-lecturas-pie-color);
+    font-size: var(--tablero-lecturas-pie-tamano);
+    gap: var(--tablero-lecturas-pie-separacion);
+}
+
+/* ---------- Celular y tablet -------------------------------------------------- */
+
+@media (max-width: 1180px) {
+    .ea-hero {
+        grid-template-columns: 1fr;
+        gap: var(--tablero-portada-separacion-hasta-1180);
+    }
+    .ea-hero-side {
+        flex-direction: row;
+        align-items: stretch;
+    }
+    .ea-hero-trend {
+        flex: var(--tablero-portada-tendencia-flex-hasta-1180);
+        justify-content: center;
+    }
+}
+
+@media (max-width: 820px) {
+    /* Los tres LEDs pasan a una columna: uno debajo del otro se siguen
+           leyendo, apretados en tres columnas de 100 px no. */
+    .ea-leds-list {
+        grid-template-columns: 1fr;
+        gap: var(--tablero-leds-lista-separacion-hasta-820);
+    }
+}
+
+@media (max-width: 960px) {
+    .ea-sensor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .ea-ops-grid {
+        grid-template-columns: 1fr;
+    }
+    .ea-mode-opt {
+        min-height: var(--tablero-modo-opcion-alto-min-hasta-960);
+    }
+}
+
+@media (max-width: 680px) {
+    .ea-hero {
+        padding: var(--tablero-portada-relleno-hasta-680);
+    }
+    .ea-hero-side {
+        flex-direction: column;
+    }
+    .ea-hero-trend {
+        flex: 1;
+    }
+    .ea-hero-foot {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--tablero-portada-pie-separacion-hasta-680);
+    }
+    .ea-hero-foot-conn {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 520px) {
+    .ea-sensor-grid {
+        grid-template-columns: 1fr;
+    }
+    .ea-hero-foot {
+        grid-template-columns: 1fr;
+    }
+    .ea-readings-foot {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .ea-mode-switch {
+        justify-content: stretch;
+        width: 100%;
+    }
+    .ea-mode-opt {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+/* ---------- Impresión --------------------------------------------------------- */
+
+@media print {
+    .ea-hero,
+    .ea-sensor-card {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+}
+
+/* ---------- Refresco en vivo (panel-vivo.js) ---------------------------------- */
+
+/* Destello al cambiar un valor: el fondo se enciende y se apaga solo. */
+@keyframes ea-vivo-destello {
+    0% {
+        background-color: var(--tablero-anim-vivo-destello-p0-fondo);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.ea-vivo-cambio {
+    animation: var(--tablero-vivo-cambio-animacion);
+    border-radius: var(--tablero-vivo-cambio-redondeo);
+}
+
+/* Sello "actualizado hace…" junto a la última lectura. */
+.ea-vivo-sello {
+    display: inline-block;
+    margin-left: var(--tablero-vivo-sello-margen-izquierda);
+    font-family: var(--tablero-vivo-sello-fuente);
+    font-size: var(--tablero-vivo-sello-tamano);
+    letter-spacing: var(--tablero-vivo-sello-espaciado);
+    color: var(--tablero-vivo-sello-color);
+    white-space: nowrap;
+}
+
+/* Si el dato se puso viejo (más de 3 min), se avisa con color de alerta. */
+.ea-vivo-sello.is-viejo {
+    color: var(--tablero-vivo-sello-viejo-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-vivo-cambio {
+        animation: none;
+    }
+}

@@ -1,0 +1,640 @@
+/* =====================================================================
+   vistas/compra_mercadopago.css — pantalla "Comprar EdenAir" (plan, pago e historial)
+   ---------------------------------------------------------------------
+   Vista: app/Views/compra_mercadopago.php  ·  Ruta: /panel/compra
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Plan de compra -------------------------------------------------- */
+    --compra-contenido-flash-ancho-max:            900px;   /* ancho máximo — flash de contenido */
+    --compra-contenido-flash-margen-abajo:         14px;   /* margen de abajo — flash de contenido */
+    --compra-escenario-relleno:                    4px 0 8px;   /* espacio interno — escenario */
+    --compra-tarjeta-ancho-max:                    900px;   /* ancho máximo — tarjeta */
+    --compra-tarjeta-relleno:                      32px;   /* espacio interno — tarjeta */
+    --compra-tarjeta-redondeo:                     var(--panel-redondeo-grande);   /* redondeo de las esquinas — tarjeta */
+    --compra-tarjeta-fondo:                        linear-gradient(180deg, color-mix(in oklab, var(--verde-100) 35%, var(--panel-tarjeta)) 0%, var(--panel-tarjeta) 38%);   /* fondo — tarjeta */
+    --compra-tarjeta-borde:                        1px solid var(--panel-linea);   /* borde — tarjeta */
+    --compra-tarjeta-sombra:                       0 1px 0 rgba(255, 255, 255, 0.55) inset, 0 20px 50px -28px rgba(14, 31, 23, 0.28), 0 4px 14px -8px rgba(14, 31, 23, 0.10);   /* sombra — tarjeta */
+    --compra-grilla-separacion:                    36px;   /* separación entre elementos — grilla */
+    --compra-left-separacion:                      20px;   /* separación entre elementos — left */
+    --compra-right-relleno-izquierda:              32px;   /* espacio interno izquierdo — right */
+    --compra-right-borde-izquierda:                1px dashed var(--panel-linea);   /* borde izquierdo — right */
+    --compra-tarjeta-fondo-oscuro:                 linear-gradient(180deg, color-mix(in oklab, var(--verde-700) 22%, var(--panel-tarjeta)) 0%, var(--panel-tarjeta) 45%);   /* fondo — tarjeta (modo oscuro) */
+    --compra-tarjeta-borde-color-oscuro:           rgba(255, 255, 255, 0.10);   /* color del borde — tarjeta (modo oscuro) */
+    --compra-tarjeta-sombra-oscuro:                0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 60px -28px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(201, 216, 112, 0.06);   /* sombra — tarjeta (modo oscuro) */
+    --compra-brillo-posicion:                      -40% -20% auto -20%;   /* distancia a los bordes — brillo */
+    --compra-brillo-alto:                          280px;   /* alto — brillo */
+    --compra-brillo-fondo:                         radial-gradient(50% 60% at 50% 0%, rgba(201, 216, 112, 0.28), transparent 70%), radial-gradient(70% 80% at 20% 10%, rgba(74, 122, 85, 0.18), transparent 65%);   /* fondo — brillo */
+    --compra-brillo-fondo-oscuro:                  radial-gradient(50% 60% at 50% 0%, rgba(201, 216, 112, 0.18), transparent 70%), radial-gradient(70% 80% at 20% 10%, rgba(74, 122, 85, 0.28), transparent 65%);   /* fondo — brillo (modo oscuro) */
+    --compra-cabeza-separacion:                    10px;   /* separación entre elementos — cabeza */
+    --compra-etiqueta-separacion:                  6px;   /* separación entre elementos — etiqueta */
+    --compra-etiqueta-relleno:                     6px 11px;   /* espacio interno — etiqueta */
+    --compra-etiqueta-redondeo:                    999px;   /* redondeo de las esquinas — etiqueta */
+    --compra-etiqueta-fondo:                       color-mix(in oklab, var(--color-citrico) 38%, var(--panel-tarjeta));   /* fondo — etiqueta */
+    --compra-etiqueta-color:                       var(--verde-800);   /* color del texto — etiqueta */
+    --compra-etiqueta-tamano:                      0.7188rem;   /* tamaño de letra — etiqueta */
+    --compra-etiqueta-peso:                        700;   /* grosor de letra — etiqueta */
+    --compra-etiqueta-espaciado:                   0.02em;   /* separación entre letras — etiqueta */
+    --compra-etiqueta-borde:                       1px solid color-mix(in oklab, var(--color-citrico) 55%, transparent);   /* borde — etiqueta */
+    --compra-etiqueta-fondo-oscuro:                color-mix(in oklab, var(--color-citrico) 22%, transparent);   /* fondo — etiqueta (modo oscuro) */
+    --compra-etiqueta-color-oscuro:                var(--color-citrico);   /* color del texto — etiqueta (modo oscuro) */
+    --compra-etiqueta-borde-color-oscuro:          color-mix(in oklab, var(--color-citrico) 35%, transparent);   /* color del borde — etiqueta (modo oscuro) */
+    --compra-titulo-fuente:                        var(--fuente-titulos);   /* tipografía — título */
+    --compra-titulo-tamano:                        1.875rem;   /* tamaño de letra — título */
+    --compra-titulo-interlineado:                  1.1;   /* separación entre renglones — título */
+    --compra-titulo-espaciado:                     -0.01em;   /* separación entre letras — título */
+    --compra-titulo-color:                         var(--verde-800);   /* color del texto — título */
+    --compra-titulo-color-oscuro:                  #f0f6ec;   /* color del texto — título (modo oscuro) */
+    --compra-descripcion-color:                    var(--color-texto-secundario);   /* color del texto — descripción */
+    --compra-descripcion-tamano:                   0.9063rem;   /* tamaño de letra — descripción */
+    --compra-descripcion-interlineado:             1.55;   /* separación entre renglones — descripción */
+    --compra-precio-separacion:                    8px;   /* separación entre elementos — precio */
+    --compra-precio-relleno:                       18px 0;   /* espacio interno — precio */
+    --compra-precio-borde-arriba:                  1px dashed var(--panel-linea);   /* borde de arriba — precio */
+    --compra-precio-borde-abajo:                   1px dashed var(--panel-linea);   /* borde de abajo — precio */
+    --compra-benefits-etiqueta-fuente:             var(--fuente-codigo);   /* tipografía — etiqueta de benefits */
+    --compra-benefits-etiqueta-tamano:             0.6875rem;   /* tamaño de letra — etiqueta de benefits */
+    --compra-benefits-etiqueta-espaciado:          0.14em;   /* separación entre letras — etiqueta de benefits */
+    --compra-benefits-etiqueta-color:              var(--color-texto-suave);   /* color del texto — etiqueta de benefits */
+    --compra-benefits-etiqueta-peso:               600;   /* grosor de letra — etiqueta de benefits */
+    --compra-currency-fuente:                      var(--fuente-codigo);   /* tipografía — currency */
+    --compra-currency-tamano:                      1.125rem;   /* tamaño de letra — currency */
+    --compra-currency-peso:                        700;   /* grosor de letra — currency */
+    --compra-currency-color:                       var(--verde-700);   /* color del texto — currency */
+    --compra-currency-espaciado:                   0.02em;   /* separación entre letras — currency */
+    --compra-currency-color-oscuro:                var(--color-citrico);   /* color del texto — currency (modo oscuro) */
+    --compra-monto-fuente:                         var(--fuente-titulos);   /* tipografía — monto */
+    --compra-monto-tamano:                         clamp(48px, 10vw, 64px);   /* tamaño de letra — monto */
+    --compra-monto-interlineado:                   0.95;   /* separación entre renglones — monto */
+    --compra-monto-peso:                           700;   /* grosor de letra — monto */
+    --compra-monto-color:                          var(--verde-800);   /* color del texto — monto */
+    --compra-monto-espaciado:                      -0.03em;   /* separación entre letras — monto */
+    --compra-monto-color-oscuro:                   #f4faf0;   /* color del texto — monto (modo oscuro) */
+    --compra-periodo-color:                        var(--color-texto-suave);   /* color del texto — período */
+    --compra-periodo-tamano:                       0.7813rem;   /* tamaño de letra — período */
+    --compra-periodo-peso:                         600;   /* grosor de letra — período */
+    --compra-periodo-espaciado:                    0.06em;   /* separación entre letras — período */
+    --compra-periodo-margen-abajo:                 8px;   /* margen de abajo — período */
+    --compra-benefits-separacion:                  11px;   /* separación entre elementos — benefits */
+    --compra-benefits-item-separacion:             11px;   /* separación entre elementos — item de benefits */
+    --compra-benefits-item-color:                  var(--color-texto);   /* color del texto — item de benefits */
+    --compra-benefits-item-tamano:                 0.875rem;   /* tamaño de letra — item de benefits */
+    --compra-benefits-item-interlineado:           1.5;   /* separación entre renglones — item de benefits */
+    --compra-check-flex:                           0 0 22px;   /* tamaño dentro de la fila — check */
+    --compra-check-ancho:                          22px;   /* ancho — check */
+    --compra-check-alto:                           22px;   /* alto — check */
+    --compra-check-fondo:                          color-mix(in oklab, var(--verde-500) 16%, var(--panel-tarjeta));   /* fondo — check */
+    --compra-check-color:                          var(--verde-700);   /* color del texto — check */
+    --compra-check-borde:                          1px solid color-mix(in oklab, var(--verde-500) 30%, transparent);   /* borde — check */
+    --compra-check-margen-arriba:                  1px;   /* margen de arriba — check */
+    --compra-check-fondo-oscuro:                   color-mix(in oklab, var(--verde-500) 20%, transparent);   /* fondo — check (modo oscuro) */
+    --compra-check-color-oscuro:                   var(--color-citrico);   /* color del texto — check (modo oscuro) */
+    --compra-check-borde-color-oscuro:             color-mix(in oklab, var(--verde-500) 38%, transparent);   /* color del borde — check (modo oscuro) */
+    --compra-llamado-separacion:                   10px;   /* separación entre elementos — llamado */
+    --compra-llamado-margen-arriba:                2px;   /* margen de arriba — llamado */
+    --compra-boton-alto-min:                       50px;   /* alto mínimo — botón */
+    --compra-boton-redondeo:                       12px;   /* redondeo de las esquinas — botón */
+    --compra-boton-fondo:                          linear-gradient(180deg, var(--verde-500), var(--verde-700));   /* fondo — botón */
+    --compra-boton-color:                          #ffffff;   /* color del texto — botón */
+    --compra-boton-peso:                           700;   /* grosor de letra — botón */
+    --compra-boton-tamano:                         0.9375rem;   /* tamaño de letra — botón */
+    --compra-boton-espaciado:                      0.01em;   /* separación entre letras — botón */
+    --compra-boton-separacion:                     9px;   /* separación entre elementos — botón */
+    --compra-boton-sombra:                         0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 12px 28px -14px rgba(28, 64, 41, 0.65), 0 2px 6px -2px rgba(14, 31, 23, 0.25);   /* sombra — botón */
+    --compra-boton-transicion:                     transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;   /* animación de los cambios — botón */
+    --compra-boton-hover-transformacion:           translateY(-1px);   /* desplazamiento/escala/giro — botón (estado: hover) */
+    --compra-boton-hover-sombra:                   0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 18px 36px -16px rgba(28, 64, 41, 0.75), 0 4px 10px -3px rgba(14, 31, 23, 0.30);   /* sombra — botón (estado: hover) */
+    --compra-boton-presionado-transformacion:      scale(0.97);   /* desplazamiento/escala/giro — botón (estado: presionado) */
+    --compra-boton-presionado-duracion:            0.08s;   /* duración de los cambios — botón (estado: presionado) */
+    --compra-boton-foco-contorno:                  3px solid color-mix(in oklab, var(--color-citrico) 80%, transparent);   /* contorno — botón (estado: foco) */
+    --compra-boton-foco-contorno-separacion:       2px;   /* separación del contorno — botón (estado: foco) */
+    --compra-boton-loading-fondo:                  linear-gradient(180deg, var(--verde-700), var(--verde-800));   /* fondo — botón (estado: loading) */
+    --compra-boton-ruedita-ancho:                  16px;   /* ancho — ruedita de botón */
+    --compra-boton-ruedita-alto:                   16px;   /* alto — ruedita de botón */
+    --compra-boton-ruedita-borde:                  2px solid rgba(255, 255, 255, 0.35);   /* borde — ruedita de botón */
+    --compra-boton-ruedita-borde-arriba-color:     #ffffff;   /* color del borde de arriba — ruedita de botón */
+    --compra-boton-ruedita-animacion:              ea-plan-giro 0.7s linear infinite;   /* animación — ruedita de botón */
+    --compra-anim-giro-pto-transformacion:         rotate(360deg);   /* desplazamiento/escala/giro — animación "ea-plan-giro" al to */
+    --compra-boton-ruedita-animacion-duracion-sin-movimiento: 2s;   /* duración de la animación — ruedita de botón (si se pidió reducir el movimiento) */
+    --compra-boton-deshabilitado-no-is-loading-opacidad: 0.55;   /* opacidad (0 = invisible, 1 = opaco) — botón (estado: deshabilitado, no-is-loading) */
+    --compra-nota-color:                           var(--color-texto-suave);   /* color del texto — nota */
+    --compra-nota-tamano:                          0.7188rem;   /* tamaño de letra — nota */
+    --compra-nota-interlineado:                    1.5;   /* separación entre renglones — nota */
+    --compra-nota-separacion:                      6px;   /* separación entre elementos — nota */
+    --compra-nota-icono-opacidad:                  0.7;   /* opacidad (0 = invisible, 1 = opaco) — ícono de nota */
+
+    /* ---- Tus compras (historial debajo de la tarjeta) -------------------- */
+    --compra-historial-ancho-max:                  900px;   /* ancho máximo — historial */
+    --compra-historial-margen-arriba:              22px;   /* margen de arriba — historial */
+    --compra-historial-separacion:                 10px;   /* separación entre elementos — historial */
+    --compra-historial-titulo-fuente:              var(--fuente-codigo);   /* tipografía — título de historial */
+    --compra-historial-titulo-tamano:              0.6875rem;   /* tamaño de letra — título de historial */
+    --compra-historial-titulo-espaciado:           0.14em;   /* separación entre letras — título de historial */
+    --compra-historial-titulo-color:               var(--color-texto-suave);   /* color del texto — título de historial */
+    --compra-historial-titulo-peso:                600;   /* grosor de letra — título de historial */
+    --compra-historial-lista-borde:                1px solid var(--panel-linea);   /* borde — lista de historial */
+    --compra-historial-lista-redondeo:             var(--panel-redondeo);   /* redondeo de las esquinas — lista de historial */
+    --compra-historial-lista-fondo:                var(--panel-tarjeta);   /* fondo — lista de historial */
+    --compra-historial-item-separacion:            16px;   /* separación entre elementos — item de historial */
+    --compra-historial-item-relleno:               14px 18px;   /* espacio interno — item de historial */
+    --compra-historial-item-historial-item-borde-arriba: 1px dashed var(--panel-linea);   /* borde de arriba — item de historial item historial */
+    --compra-historial-main-separacion:            12px;   /* separación entre elementos — main de historial */
+    --compra-historial-main-separacion-2:          3px;   /* separación entre elementos — main de historial */
+    --compra-historial-nombre-peso:                700;   /* grosor de letra — nombre de historial */
+    --compra-historial-nombre-color:               var(--color-texto);   /* color del texto — nombre de historial */
+    --compra-historial-nombre-tamano:              0.9063rem;   /* tamaño de letra — nombre de historial */
+    --compra-historial-datos-color:                var(--color-texto-suave);   /* color del texto — datos de historial */
+    --compra-historial-datos-tamano:               0.7188rem;   /* tamaño de letra — datos de historial */
+    --compra-historial-monto-peso:                 700;   /* grosor de letra — monto de historial */
+    --compra-historial-monto-color:                var(--color-texto);   /* color del texto — monto de historial */
+    --compra-historial-monto-tamano:               0.9063rem;   /* tamaño de letra — monto de historial */
+    --compra-historial-monto-chico-color:          var(--color-texto-suave);   /* color del texto — chico de historial monto */
+    --compra-historial-monto-chico-peso:           600;   /* grosor de letra — chico de historial monto */
+    --compra-historial-monto-chico-tamano:         0.6875rem;   /* tamaño de letra — chico de historial monto */
+
+    /* ---- Celular y tablet ------------------------------------------------ */
+    --compra-tarjeta-relleno-hasta-820:           28px;   /* espacio interno — tarjeta (hasta 820px de ancho) */
+    --compra-tarjeta-ancho-max-hasta-820:         520px;   /* ancho máximo — tarjeta (hasta 820px de ancho) */
+    --compra-historial-ancho-max-hasta-820:       520px;   /* ancho máximo — historial (hasta 820px de ancho) */
+    --compra-grilla-separacion-hasta-820:         22px;   /* separación entre elementos — grilla (hasta 820px de ancho) */
+    --compra-right-relleno-arriba-hasta-820:      22px;   /* espacio interno de arriba — right (hasta 820px de ancho) */
+    --compra-right-borde-arriba-hasta-820:        1px dashed var(--panel-linea);   /* borde de arriba — right (hasta 820px de ancho) */
+    --compra-tarjeta-relleno-hasta-520:           24px 20px;   /* espacio interno — tarjeta (hasta 520px de ancho) */
+    --compra-tarjeta-redondeo-hasta-520:          var(--panel-redondeo);   /* redondeo de las esquinas — tarjeta (hasta 520px de ancho) */
+    --compra-historial-item-separacion-hasta-520: 10px;   /* separación entre elementos — item de historial (hasta 520px de ancho) */
+    --compra-historial-item-relleno-hasta-520:    14px 16px;   /* espacio interno — item de historial (hasta 520px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 820px de ancho                                          #
+   #     hasta 520px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Plan de compra ---------------------------------------------------- */
+
+.ea-plan-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    justify-content: center;
+}
+
+/* Los mensajes flash (resultado del pago) con el mismo ancho que la tarjeta. */
+.ea-plan-content > .ea-flash {
+    width: 100%;
+    max-width: var(--compra-contenido-flash-ancho-max);
+    margin-bottom: var(--compra-contenido-flash-margen-abajo);
+}
+
+.ea-plan-stage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: var(--compra-escenario-relleno);
+}
+
+.ea-plan-card {
+    position: relative;
+    width: 100%;
+    max-width: var(--compra-tarjeta-ancho-max);
+    padding: var(--compra-tarjeta-relleno);
+    border-radius: var(--compra-tarjeta-redondeo);
+    background: var(--compra-tarjeta-fondo);
+    border: var(--compra-tarjeta-borde);
+    box-shadow: var(--compra-tarjeta-sombra);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.ea-plan-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--compra-grilla-separacion);
+    align-items: stretch;
+}
+
+.ea-plan-left,
+.ea-plan-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--compra-left-separacion);
+    min-width: 0;
+}
+
+.ea-plan-right {
+    padding-left: var(--compra-right-relleno-izquierda);
+    border-left: var(--compra-right-borde-izquierda);
+}
+
+:root[data-theme="dark"] .ea-plan-card {
+    background: var(--compra-tarjeta-fondo-oscuro);
+    border-color: var(--compra-tarjeta-borde-color-oscuro);
+    box-shadow: var(--compra-tarjeta-sombra-oscuro);
+}
+
+.ea-plan-glow {
+    position: absolute;
+    inset: var(--compra-brillo-posicion);
+    height: var(--compra-brillo-alto);
+    background: var(--compra-brillo-fondo);
+    z-index: -1;
+    pointer-events: none;
+}
+
+:root[data-theme="dark"] .ea-plan-glow {
+    background: var(--compra-brillo-fondo-oscuro);
+}
+
+.ea-plan-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--compra-cabeza-separacion);
+}
+
+.ea-plan-tag {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--compra-etiqueta-separacion);
+    padding: var(--compra-etiqueta-relleno);
+    border-radius: var(--compra-etiqueta-redondeo);
+    background: var(--compra-etiqueta-fondo);
+    color: var(--compra-etiqueta-color);
+    font-size: var(--compra-etiqueta-tamano);
+    font-weight: var(--compra-etiqueta-peso);
+    letter-spacing: var(--compra-etiqueta-espaciado);
+    text-transform: uppercase;
+    border: var(--compra-etiqueta-borde);
+}
+
+:root[data-theme="dark"] .ea-plan-tag {
+    background: var(--compra-etiqueta-fondo-oscuro);
+    color: var(--compra-etiqueta-color-oscuro);
+    border-color: var(--compra-etiqueta-borde-color-oscuro);
+}
+
+.ea-plan-title {
+    margin: 0;
+    font-family: var(--compra-titulo-fuente);
+    font-size: var(--compra-titulo-tamano);
+    line-height: var(--compra-titulo-interlineado);
+    letter-spacing: var(--compra-titulo-espaciado);
+    color: var(--compra-titulo-color);
+}
+
+:root[data-theme="dark"] .ea-plan-title {
+    color: var(--compra-titulo-color-oscuro);
+}
+
+.ea-plan-desc {
+    margin: 0;
+    color: var(--compra-descripcion-color);
+    font-size: var(--compra-descripcion-tamano);
+    line-height: var(--compra-descripcion-interlineado);
+}
+
+.ea-plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--compra-precio-separacion);
+    padding: var(--compra-precio-relleno);
+    border-top: var(--compra-precio-borde-arriba);
+    border-bottom: var(--compra-precio-borde-abajo);
+}
+
+.ea-plan-benefits-label {
+    font-family: var(--compra-benefits-etiqueta-fuente);
+    font-size: var(--compra-benefits-etiqueta-tamano);
+    letter-spacing: var(--compra-benefits-etiqueta-espaciado);
+    text-transform: uppercase;
+    color: var(--compra-benefits-etiqueta-color);
+    font-weight: var(--compra-benefits-etiqueta-peso);
+}
+
+.ea-plan-currency {
+    font-family: var(--compra-currency-fuente);
+    font-size: var(--compra-currency-tamano);
+    font-weight: var(--compra-currency-peso);
+    color: var(--compra-currency-color);
+    letter-spacing: var(--compra-currency-espaciado);
+}
+
+:root[data-theme="dark"] .ea-plan-currency {
+    color: var(--compra-currency-color-oscuro);
+}
+
+.ea-plan-amount {
+    font-family: var(--compra-monto-fuente);
+    font-size: var(--compra-monto-tamano);
+    line-height: var(--compra-monto-interlineado);
+    font-weight: var(--compra-monto-peso);
+    color: var(--compra-monto-color);
+    letter-spacing: var(--compra-monto-espaciado);
+}
+
+:root[data-theme="dark"] .ea-plan-amount {
+    color: var(--compra-monto-color-oscuro);
+}
+
+.ea-plan-period {
+    color: var(--compra-periodo-color);
+    font-size: var(--compra-periodo-tamano);
+    font-weight: var(--compra-periodo-peso);
+    text-transform: uppercase;
+    letter-spacing: var(--compra-periodo-espaciado);
+    align-self: flex-end;
+    margin-bottom: var(--compra-periodo-margen-abajo);
+}
+
+.ea-plan-benefits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--compra-benefits-separacion);
+}
+
+.ea-plan-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--compra-benefits-item-separacion);
+    color: var(--compra-benefits-item-color);
+    font-size: var(--compra-benefits-item-tamano);
+    line-height: var(--compra-benefits-item-interlineado);
+}
+
+.ea-plan-check {
+    flex: var(--compra-check-flex);
+    width: var(--compra-check-ancho);
+    height: var(--compra-check-alto);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--compra-check-fondo);
+    color: var(--compra-check-color);
+    border: var(--compra-check-borde);
+    margin-top: var(--compra-check-margen-arriba);
+}
+
+:root[data-theme="dark"] .ea-plan-check {
+    background: var(--compra-check-fondo-oscuro);
+    color: var(--compra-check-color-oscuro);
+    border-color: var(--compra-check-borde-color-oscuro);
+}
+
+.ea-plan-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--compra-llamado-separacion);
+    margin-top: var(--compra-llamado-margen-arriba);
+}
+
+.ea-plan-btn {
+    width: 100%;
+    min-height: var(--compra-boton-alto-min);
+    border: 0;
+    border-radius: var(--compra-boton-redondeo);
+    background: var(--compra-boton-fondo);
+    color: var(--compra-boton-color);
+    font: inherit;
+    font-weight: var(--compra-boton-peso);
+    font-size: var(--compra-boton-tamano);
+    letter-spacing: var(--compra-boton-espaciado);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--compra-boton-separacion);
+    box-shadow: var(--compra-boton-sombra);
+    transition: var(--compra-boton-transicion);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-plan-btn:hover {
+        transform: var(--compra-boton-hover-transformacion);
+        box-shadow: var(--compra-boton-hover-sombra);
+    }
+}
+
+.ea-plan-btn:active {
+    transform: var(--compra-boton-presionado-transformacion);
+    transition-duration: var(--compra-boton-presionado-duracion);
+}
+
+.ea-plan-btn:focus-visible {
+    outline: var(--compra-boton-foco-contorno);
+    outline-offset: var(--compra-boton-foco-contorno-separacion);
+}
+
+/* Mientras se genera el link de Mercado Pago (lo pone compra.js). */
+.ea-plan-btn.is-loading {
+    cursor: progress;
+    background: var(--compra-boton-loading-fondo);
+}
+
+.ea-plan-btn.is-loading svg {
+    display: none;
+}
+
+.ea-plan-btn-spinner {
+    display: none;
+    width: var(--compra-boton-ruedita-ancho);
+    height: var(--compra-boton-ruedita-alto);
+    border-radius: 50%;
+    border: var(--compra-boton-ruedita-borde);
+    border-top-color: var(--compra-boton-ruedita-borde-arriba-color);
+    animation: var(--compra-boton-ruedita-animacion);
+}
+
+.ea-plan-btn.is-loading .ea-plan-btn-spinner {
+    display: inline-block;
+}
+
+@keyframes ea-plan-giro {
+    to {
+        transform: var(--compra-anim-giro-pto-transformacion);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-plan-btn-spinner {
+        animation-duration: var(--compra-boton-ruedita-animacion-duracion-sin-movimiento);
+    }
+}
+
+/* Sin credenciales de Mercado Pago en el .env el botón queda apagado. */
+.ea-plan-btn:disabled:not(.is-loading) {
+    cursor: not-allowed;
+    opacity: var(--compra-boton-deshabilitado-no-is-loading-opacidad);
+    box-shadow: none;
+    transform: none;
+}
+
+.ea-plan-note {
+    margin: 0;
+    color: var(--compra-nota-color);
+    font-size: var(--compra-nota-tamano);
+    text-align: center;
+    line-height: var(--compra-nota-interlineado);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--compra-nota-separacion);
+}
+
+.ea-plan-note svg {
+    opacity: var(--compra-nota-icono-opacidad);
+}
+
+/* ---------- Tus compras (historial debajo de la tarjeta) ---------------------- */
+
+.ea-plan-history {
+    width: 100%;
+    max-width: var(--compra-historial-ancho-max);
+    margin-top: var(--compra-historial-margen-arriba);
+    display: flex;
+    flex-direction: column;
+    gap: var(--compra-historial-separacion);
+}
+
+.ea-plan-history-title {
+    margin: 0;
+    font-family: var(--compra-historial-titulo-fuente);
+    font-size: var(--compra-historial-titulo-tamano);
+    letter-spacing: var(--compra-historial-titulo-espaciado);
+    text-transform: uppercase;
+    color: var(--compra-historial-titulo-color);
+    font-weight: var(--compra-historial-titulo-peso);
+}
+
+.ea-plan-history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: var(--compra-historial-lista-borde);
+    border-radius: var(--compra-historial-lista-redondeo);
+    background: var(--compra-historial-lista-fondo);
+    overflow: hidden;
+}
+
+.ea-plan-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--compra-historial-item-separacion);
+    padding: var(--compra-historial-item-relleno);
+}
+
+.ea-plan-history-item + .ea-plan-history-item {
+    border-top: var(--compra-historial-item-historial-item-borde-arriba);
+}
+
+.ea-plan-history-main,
+.ea-plan-history-side {
+    display: flex;
+    align-items: center;
+    gap: var(--compra-historial-main-separacion);
+    min-width: 0;
+}
+
+.ea-plan-history-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--compra-historial-main-separacion-2);
+}
+
+.ea-plan-history-name {
+    font-weight: var(--compra-historial-nombre-peso);
+    color: var(--compra-historial-nombre-color);
+    font-size: var(--compra-historial-nombre-tamano);
+}
+
+.ea-plan-history-meta {
+    color: var(--compra-historial-datos-color);
+    font-size: var(--compra-historial-datos-tamano);
+    overflow-wrap: anywhere;
+}
+
+.ea-plan-history-amount {
+    font-weight: var(--compra-historial-monto-peso);
+    color: var(--compra-historial-monto-color);
+    font-size: var(--compra-historial-monto-tamano);
+    white-space: nowrap;
+}
+
+.ea-plan-history-amount small {
+    color: var(--compra-historial-monto-chico-color);
+    font-weight: var(--compra-historial-monto-chico-peso);
+    font-size: var(--compra-historial-monto-chico-tamano);
+}
+
+/* ---------- Celular y tablet -------------------------------------------------- */
+
+@media (max-width: 820px) {
+    .ea-plan-card {
+        padding: var(--compra-tarjeta-relleno-hasta-820);
+        max-width: var(--compra-tarjeta-ancho-max-hasta-820);
+    }
+    .ea-plan-history,
+    .ea-plan-content > .ea-flash {
+        max-width: var(--compra-historial-ancho-max-hasta-820);
+    }
+    .ea-plan-grid {
+        grid-template-columns: 1fr;
+        gap: var(--compra-grilla-separacion-hasta-820);
+    }
+    .ea-plan-right {
+        padding-left: 0;
+        padding-top: var(--compra-right-relleno-arriba-hasta-820);
+        border-left: 0;
+        border-top: var(--compra-right-borde-arriba-hasta-820);
+    }
+}
+
+@media (max-width: 520px) {
+    .ea-plan-card {
+        padding: var(--compra-tarjeta-relleno-hasta-520);
+        border-radius: var(--compra-tarjeta-redondeo-hasta-520);
+    }
+    .ea-plan-period {
+        align-self: baseline;
+        flex-basis: 100%;
+        margin-bottom: 0;
+    }
+    .ea-plan-price {
+        flex-wrap: wrap;
+    }
+    .ea-plan-history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--compra-historial-item-separacion-hasta-520);
+        padding: var(--compra-historial-item-relleno-hasta-520);
+    }
+    .ea-plan-history-side {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

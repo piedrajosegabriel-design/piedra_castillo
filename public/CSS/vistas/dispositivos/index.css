@@ -1,0 +1,198 @@
+/* =====================================================================
+   vistas/dispositivos/index.css — pantalla "Mis dispositivos"
+   ---------------------------------------------------------------------
+   Vista: app/Views/dispositivos/index.php  ·  Ruta: /panel/dispositivos
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Mis dispositivos ------------------------------------------------ */
+    --dispositivos-etiqueta-tamano:            0.6875rem;   /* tamaño de letra — etiqueta */
+    --dispositivos-etiqueta-espaciado:         0.08em;   /* separación entre letras — etiqueta */
+    --dispositivos-etiqueta-relleno:           1px 5px;   /* espacio interno — etiqueta */
+    --dispositivos-etiqueta-redondeo:          5px;   /* redondeo de las esquinas — etiqueta */
+    --dispositivos-etiqueta-margen-izquierda:  4px;   /* margen izquierdo — etiqueta */
+    --dispositivos-etiqueta-fondo:             var(--color-linea-suave);   /* fondo — etiqueta */
+    --dispositivos-etiqueta-color:             var(--color-texto-suave);   /* color del texto — etiqueta */
+    --dispositivos-etiqueta-peso:              600;   /* grosor de letra — etiqueta */
+    --dispositivos-notes-relleno:              10px 12px;   /* espacio interno — notes */
+    --dispositivos-notes-redondeo:             10px;   /* redondeo de las esquinas — notes */
+    --dispositivos-notes-fondo:                var(--color-linea-suave);   /* fondo — notes */
+    --dispositivos-notes-color:                var(--color-texto-secundario);   /* color del texto — notes */
+    --dispositivos-notes-tamano:               0.8125rem;   /* tamaño de letra — notes */
+    --dispositivos-notes-interlineado:         1.45;   /* separación entre renglones — notes */
+    --dispositivos-tarjeta-add-color:          var(--color-texto-suave);   /* color del texto — add de tarjeta */
+    --dispositivos-tarjeta-add-separacion:     6px;   /* separación entre elementos — add de tarjeta */
+    --dispositivos-tarjeta-add-hover-color:    var(--verde-500);   /* color del texto — add de tarjeta (estado: hover) */
+    --dispositivos-add-plus-tamano:            1.875rem;   /* tamaño de letra — plus de add */
+    --dispositivos-add-plus-interlineado:      1;   /* separación entre renglones — plus de add */
+    --dispositivos-add-plus-peso:              300;   /* grosor de letra — plus de add */
+    --dispositivos-add-plus-color:             var(--verde-500);   /* color del texto — plus de add */
+    --dispositivos-add-etiqueta-peso:          600;   /* grosor de letra — etiqueta de add */
+    --dispositivos-add-etiqueta-color:         var(--color-texto-secundario);   /* color del texto — etiqueta de add */
+    --dispositivos-add-ayuda-tamano:           0.7813rem;   /* tamaño de letra — ayuda de add */
+    --dispositivos-vacio-ayuda-tamano:         0.8125rem;   /* tamaño de letra — ayuda de vacío */
+    --dispositivos-vacio-ayuda-negrita-fuente: var(--fuente-codigo);   /* tipografía — negrita de vacío ayuda */
+    --dispositivos-vacio-ayuda-negrita-color:  var(--verde-500);   /* color del texto — negrita de vacío ayuda */
+    --dispositivos-info-relleno:               24px;   /* espacio interno — info */
+    --dispositivos-info-redondeo:              var(--redondeo-grande, 22px);   /* redondeo de las esquinas — info */
+    --dispositivos-info-fondo:                 var(--color-tarjeta);   /* fondo — info */
+    --dispositivos-info-borde:                 1px solid var(--color-linea);   /* borde — info */
+    --dispositivos-info-titulo-fuente:         var(--fuente-titulos);   /* tipografía — título de info */
+    --dispositivos-info-titulo-tamano:         1.125rem;   /* tamaño de letra — título de info */
+    --dispositivos-info-titulo-margen:         0 0 16px;   /* margen — título de info */
+    --dispositivos-info-titulo-color:          var(--color-texto);   /* color del texto — título de info */
+    --dispositivos-pasos-margen:               0 0 14px;   /* margen — pasos */
+    --dispositivos-pasos-separacion:           10px;   /* separación entre elementos — pasos */
+    --dispositivos-pasos-item-separacion:      12px;   /* separación entre elementos — item de pasos */
+    --dispositivos-pasos-item-tamano:          0.875rem;   /* tamaño de letra — item de pasos */
+    --dispositivos-pasos-item-color:           var(--color-texto-secundario);   /* color del texto — item de pasos */
+    --dispositivos-pasos-span-ancho:           26px;   /* ancho — span de pasos */
+    --dispositivos-pasos-span-alto:            26px;   /* alto — span de pasos */
+    --dispositivos-pasos-span-fondo:           var(--color-exito-suave);   /* fondo — span de pasos */
+    --dispositivos-pasos-span-color:           var(--verde-500);   /* color del texto — span de pasos */
+    --dispositivos-pasos-span-fuente:          var(--fuente-codigo);   /* tipografía — span de pasos */
+    --dispositivos-pasos-span-peso:            600;   /* grosor de letra — span de pasos */
+    --dispositivos-pasos-span-tamano:          0.8125rem;   /* tamaño de letra — span de pasos */
+    --dispositivos-info-nota-tamano:           0.8125rem;   /* tamaño de letra — nota de info */
+    --dispositivos-info-nota-color:            var(--color-texto-suave);   /* color del texto — nota de info */
+    --dispositivos-info-nota-interlineado:     1.5;   /* separación entre renglones — nota de info */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Este archivo no tiene cortes de pantalla propios.            #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Mis dispositivos -------------------------------------------------- */
+
+.ea-dev-tag {
+    font-size: var(--dispositivos-etiqueta-tamano);
+    text-transform: uppercase;
+    letter-spacing: var(--dispositivos-etiqueta-espaciado);
+    padding: var(--dispositivos-etiqueta-relleno);
+    border-radius: var(--dispositivos-etiqueta-redondeo);
+    margin-left: var(--dispositivos-etiqueta-margen-izquierda);
+    background: var(--dispositivos-etiqueta-fondo);
+    color: var(--dispositivos-etiqueta-color);
+    font-weight: var(--dispositivos-etiqueta-peso);
+}
+
+.ea-dev-notes {
+    margin: 0;
+    padding: var(--dispositivos-notes-relleno);
+    border-radius: var(--dispositivos-notes-redondeo);
+    background: var(--dispositivos-notes-fondo);
+    color: var(--dispositivos-notes-color);
+    font-size: var(--dispositivos-notes-tamano);
+    line-height: var(--dispositivos-notes-interlineado);
+}
+
+/* Tarjeta "agregar" */
+.ea-dev-card-add {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    border-style: dashed;
+    color: var(--dispositivos-tarjeta-add-color);
+    gap: var(--dispositivos-tarjeta-add-separacion);
+}
+
+.ea-dev-card-add:hover {
+    color: var(--dispositivos-tarjeta-add-hover-color);
+}
+
+.ea-dev-add-plus {
+    font-size: var(--dispositivos-add-plus-tamano);
+    line-height: var(--dispositivos-add-plus-interlineado);
+    font-weight: var(--dispositivos-add-plus-peso);
+    color: var(--dispositivos-add-plus-color);
+}
+
+.ea-dev-add-label {
+    font-weight: var(--dispositivos-add-etiqueta-peso);
+    color: var(--dispositivos-add-etiqueta-color);
+}
+
+.ea-dev-add-hint {
+    font-size: var(--dispositivos-add-ayuda-tamano);
+}
+
+.ea-dev-empty-hint {
+    font-size: var(--dispositivos-vacio-ayuda-tamano);
+}
+
+.ea-dev-empty-hint strong {
+    font-family: var(--dispositivos-vacio-ayuda-negrita-fuente);
+    color: var(--dispositivos-vacio-ayuda-negrita-color);
+}
+
+/* Bloque informativo de pasos */
+.ea-dev-info {
+    padding: var(--dispositivos-info-relleno);
+    border-radius: var(--dispositivos-info-redondeo);
+    background: var(--dispositivos-info-fondo);
+    border: var(--dispositivos-info-borde);
+}
+
+.ea-dev-info h3 {
+    font-family: var(--dispositivos-info-titulo-fuente);
+    font-size: var(--dispositivos-info-titulo-tamano);
+    margin: var(--dispositivos-info-titulo-margen);
+    color: var(--dispositivos-info-titulo-color);
+}
+
+.ea-dev-steps {
+    list-style: none;
+    margin: var(--dispositivos-pasos-margen);
+    padding: 0;
+    display: grid;
+    gap: var(--dispositivos-pasos-separacion);
+}
+
+.ea-dev-steps li {
+    display: flex;
+    align-items: center;
+    gap: var(--dispositivos-pasos-item-separacion);
+    font-size: var(--dispositivos-pasos-item-tamano);
+    color: var(--dispositivos-pasos-item-color);
+}
+
+.ea-dev-steps li span {
+    flex: none;
+    width: var(--dispositivos-pasos-span-ancho);
+    height: var(--dispositivos-pasos-span-alto);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dispositivos-pasos-span-fondo);
+    color: var(--dispositivos-pasos-span-color);
+    font-family: var(--dispositivos-pasos-span-fuente);
+    font-weight: var(--dispositivos-pasos-span-peso);
+    font-size: var(--dispositivos-pasos-span-tamano);
+}
+
+.ea-dev-info-note {
+    margin: 0;
+    font-size: var(--dispositivos-info-nota-tamano);
+    color: var(--dispositivos-info-nota-color);
+    line-height: var(--dispositivos-info-nota-interlineado);
+}

@@ -1,0 +1,229 @@
+/* =====================================================================
+   vistas/panel/bienvenida.css — bienvenida para quien todavía no tiene equipos
+   ---------------------------------------------------------------------
+   Vista: app/Views/panel/bienvenida.php
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Bienvenida ------------------------------------------------------ */
+    --bienvenida-ancho-max:            1080px;   /* ancho máximo — el componente */
+    --bienvenida-portada-relleno:      clamp(24px, 4vw, 40px);   /* espacio interno — portada */
+    --bienvenida-portada-redondeo:     var(--redondeo-grande, 22px);   /* redondeo de las esquinas — portada */
+    --bienvenida-portada-fondo:        radial-gradient(120% 90% at 90% 0%, rgba(184, 213, 208, 0.22), transparent 60%), radial-gradient(80% 90% at 0% 100%, rgba(201, 216, 112, 0.18), transparent 60%), var(--color-tarjeta);   /* fondo — portada */
+    --bienvenida-portada-borde:        1px solid var(--color-linea);   /* borde — portada */
+    --bienvenida-portada-sombra:       var(--sombra-media);   /* sombra — portada */
+    --bienvenida-portada-margen-abajo: 24px;   /* margen de abajo — portada */
+    --bienvenida-titulo-fuente:        var(--fuente-titulos);   /* tipografía — título */
+    --bienvenida-titulo-tamano:        clamp(28px, 4.2vw, 44px);   /* tamaño de letra — título */
+    --bienvenida-titulo-interlineado:  1.1;   /* separación entre renglones — título */
+    --bienvenida-titulo-margen:        14px 0 12px;   /* margen — título */
+    --bienvenida-titulo-color:         var(--color-texto);   /* color del texto — título */
+    --bienvenida-titulo-espaciado:     -0.01em;   /* separación entre letras — título */
+    --bienvenida-titulo-cursiva-color: var(--verde-600);   /* color del texto — cursiva de título */
+    --bienvenida-bajada-ancho-max:     60ch;   /* ancho máximo — bajada */
+    --bienvenida-bajada-color:         var(--color-texto-secundario);   /* color del texto — bajada */
+    --bienvenida-bajada-tamano:        0.9688rem;   /* tamaño de letra — bajada */
+    --bienvenida-bajada-interlineado:  1.6;   /* separación entre renglones — bajada */
+    --bienvenida-bajada-margen:        0 0 22px;   /* margen — bajada */
+    --bienvenida-insignia-separacion:  7px;   /* separación entre elementos — insignia */
+    --bienvenida-insignia-relleno:     5px 12px 5px 10px;   /* espacio interno — insignia */
+    --bienvenida-insignia-redondeo:    999px;   /* redondeo de las esquinas — insignia */
+    --bienvenida-insignia-fondo:       var(--verde-100);   /* fondo — insignia */
+    --bienvenida-insignia-color:       var(--verde-700);   /* color del texto — insignia */
+    --bienvenida-insignia-borde:       1px solid var(--verde-300);   /* borde — insignia */
+    --bienvenida-insignia-tamano:      0.7813rem;   /* tamaño de letra — insignia */
+    --bienvenida-insignia-peso:        600;   /* grosor de letra — insignia */
+    --bienvenida-insignia-espaciado:   .01em;   /* separación entre letras — insignia */
+
+    /* ---- El tutorial de tres pasos --------------------------------------- */
+    --bienvenida-pasos-margen-abajo:     24px;   /* margen de abajo — pasos */
+    --bienvenida-subtitulo-fuente:       var(--fuente-titulos);   /* tipografía — subtitulo */
+    --bienvenida-subtitulo-tamano:       1.25rem;   /* tamaño de letra — subtitulo */
+    --bienvenida-subtitulo-color:        var(--color-texto);   /* color del texto — subtitulo */
+    --bienvenida-subtitulo-margen:       0 0 14px;   /* margen — subtitulo */
+    --bienvenida-subtitulo-espaciado:    -0.01em;   /* separación entre letras — subtitulo */
+    --bienvenida-pasos-lista-separacion: 12px;   /* separación entre elementos — lista de pasos */
+    --bienvenida-pasos-lista-columnas:   repeat(auto-fit, minmax(240px, 1fr));   /* columnas de la grilla — lista de pasos */
+    --bienvenida-paso-separacion:        12px;   /* separación entre elementos — paso */
+    --bienvenida-paso-relleno:           14px 16px;   /* espacio interno — paso */
+    --bienvenida-paso-redondeo:          var(--redondeo-medio, 14px);   /* redondeo de las esquinas — paso */
+    --bienvenida-paso-fondo:             var(--color-tarjeta);   /* fondo — paso */
+    --bienvenida-paso-borde:             1px solid var(--color-linea);   /* borde — paso */
+    --bienvenida-paso-tamano:            0.8438rem;   /* tamaño de letra — paso */
+    --bienvenida-paso-interlineado:      1.5;   /* separación entre renglones — paso */
+    --bienvenida-paso-color:             var(--color-texto-secundario);   /* color del texto — paso */
+    --bienvenida-paso-numero-ancho:      26px;   /* ancho — número de paso */
+    --bienvenida-paso-numero-alto:       26px;   /* alto — número de paso */
+    --bienvenida-paso-numero-fondo:      var(--verde-500);   /* fondo — número de paso */
+    --bienvenida-paso-numero-color:      #fff;   /* color del texto — número de paso */
+    --bienvenida-paso-numero-tamano:     0.8125rem;   /* tamaño de letra — número de paso */
+    --bienvenida-paso-numero-peso:       700;   /* grosor de letra — número de paso */
+
+    /* ---- Las dos acciones del saludo ------------------------------------- */
+    --bienvenida-llamado-separacion: 10px 12px;   /* separación entre elementos — llamado */
+
+    /* ---- Modo oscuro ----------------------------------------------------- */
+    --bienvenida-bajada-tamano-hasta-560: 1rem;   /* tamaño de letra — bajada (hasta 560px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 560px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Bienvenida -------------------------------------------------------- */
+
+.ea-welcome {
+    max-width: var(--bienvenida-ancho-max);
+}
+
+.ea-welcome-hero {
+    padding: var(--bienvenida-portada-relleno);
+    border-radius: var(--bienvenida-portada-redondeo);
+    background: var(--bienvenida-portada-fondo);
+    border: var(--bienvenida-portada-borde);
+    box-shadow: var(--bienvenida-portada-sombra);
+    margin-bottom: var(--bienvenida-portada-margen-abajo);
+}
+
+.ea-welcome-title {
+    font-family: var(--bienvenida-titulo-fuente);
+    font-size: var(--bienvenida-titulo-tamano);
+    line-height: var(--bienvenida-titulo-interlineado);
+    margin: var(--bienvenida-titulo-margen);
+    color: var(--bienvenida-titulo-color);
+    letter-spacing: var(--bienvenida-titulo-espaciado);
+}
+
+.ea-welcome-title em {
+    font-style: italic;
+    color: var(--bienvenida-titulo-cursiva-color);
+}
+
+.ea-welcome-lede {
+    max-width: var(--bienvenida-bajada-ancho-max);
+    color: var(--bienvenida-bajada-color);
+    font-size: var(--bienvenida-bajada-tamano);
+    line-height: var(--bienvenida-bajada-interlineado);
+    margin: var(--bienvenida-bajada-margen);
+}
+
+/* Sello "tu cuenta está lista": lo primero que se lee, para que quien entra
+   sepa que no le falta ningún trámite previo. */
+.ea-welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bienvenida-insignia-separacion);
+    padding: var(--bienvenida-insignia-relleno);
+    border-radius: var(--bienvenida-insignia-redondeo);
+    background: var(--bienvenida-insignia-fondo);
+    color: var(--bienvenida-insignia-color);
+    border: var(--bienvenida-insignia-borde);
+    font-size: var(--bienvenida-insignia-tamano);
+    font-weight: var(--bienvenida-insignia-peso);
+    letter-spacing: var(--bienvenida-insignia-espaciado);
+}
+
+.ea-welcome-badge svg {
+    flex: none;
+}
+
+/* ---------- El tutorial de tres pasos ----------------------------------------- */
+
+.ea-welcome-pasos {
+    margin-bottom: var(--bienvenida-pasos-margen-abajo);
+}
+
+.ea-welcome-subtitulo {
+    font-family: var(--bienvenida-subtitulo-fuente);
+    font-size: var(--bienvenida-subtitulo-tamano);
+    color: var(--bienvenida-subtitulo-color);
+    margin: var(--bienvenida-subtitulo-margen);
+    letter-spacing: var(--bienvenida-subtitulo-espaciado);
+}
+
+.ea-pasos-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--bienvenida-pasos-lista-separacion);
+    grid-template-columns: var(--bienvenida-pasos-lista-columnas);
+    counter-reset: none;
+}
+
+/* Un renglón por paso: número y frase, alineados al centro. Antes cada paso
+   tenía título y párrafo y la pantalla pesaba más que la decisión que pide. */
+.ea-paso {
+    display: flex;
+    gap: var(--bienvenida-paso-separacion);
+    align-items: center;
+    padding: var(--bienvenida-paso-relleno);
+    border-radius: var(--bienvenida-paso-redondeo);
+    background: var(--bienvenida-paso-fondo);
+    border: var(--bienvenida-paso-borde);
+    font-size: var(--bienvenida-paso-tamano);
+    line-height: var(--bienvenida-paso-interlineado);
+    color: var(--bienvenida-paso-color);
+}
+
+.ea-paso-num {
+    flex: none;
+    width: var(--bienvenida-paso-numero-ancho);
+    height: var(--bienvenida-paso-numero-alto);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--bienvenida-paso-numero-fondo);
+    color: var(--bienvenida-paso-numero-color);
+    font-size: var(--bienvenida-paso-numero-tamano);
+    font-weight: var(--bienvenida-paso-numero-peso);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Las dos acciones del saludo --------------------------------------- */
+
+.ea-welcome-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--bienvenida-llamado-separacion);
+}
+
+/* ---------- Modo oscuro ------------------------------------------------------- */
+
+@media (max-width: 560px) {
+    /* Apilados y a todo el ancho: en celular, dos botones lado a lado quedan
+           angostos y se toca el equivocado. */
+    .ea-welcome-cta {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .ea-welcome-cta .ea-button {
+        width: 100%;
+    }
+    /* 16px es el mínimo cómodo de lectura en celular. Este párrafo es lo
+           primero que lee alguien que recién entra, así que no se achica. */
+    .ea-welcome-lede {
+        font-size: var(--bienvenida-bajada-tamano-hasta-560);
+    }
+}

@@ -1,0 +1,279 @@
+/* =====================================================================
+   vistas/perfil_usuario.css — pantalla "Perfil" (editar datos y contraseña)
+   ---------------------------------------------------------------------
+   Vista: app/Views/perfil_usuario.php  ·  Ruta: /panel/perfil
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Perfil: editar datos y contraseña ------------------------------- */
+    --perfil-introduccion-separacion:              12px;   /* separación entre elementos — introducción */
+    --perfil-introduccion-relleno:                 4px 0 6px;   /* espacio interno — introducción */
+    --perfil-introduccion-ancho-max:               640px;   /* ancho máximo — introducción */
+    --perfil-titulo-margen:                        4px 0 0;   /* margen — título */
+    --perfil-titulo-fuente:                        var(--fuente-titulos);   /* tipografía — título */
+    --perfil-titulo-peso:                          400;   /* grosor de letra — título */
+    --perfil-titulo-tamano:                        clamp(26px, 3.4vw, 36px);   /* tamaño de letra — título */
+    --perfil-titulo-interlineado:                  1.08;   /* separación entre renglones — título */
+    --perfil-titulo-espaciado:                     -0.015em;   /* separación entre letras — título */
+    --perfil-titulo-color:                         var(--verde-800);   /* color del texto — título */
+    --perfil-titulo-color-oscuro:                  var(--verde-100);   /* color del texto — título (modo oscuro) */
+    --perfil-bajada-color:                         var(--color-texto-secundario);   /* color del texto — bajada */
+    --perfil-bajada-tamano:                        0.9063rem;   /* tamaño de letra — bajada */
+    --perfil-bajada-interlineado:                  1.55;   /* separación entre renglones — bajada */
+    --perfil-bajada-ancho-max:                     56ch;   /* ancho máximo — bajada */
+    --perfil-grilla-columnas:                      1.35fr 1fr;   /* columnas de la grilla — grilla */
+    --perfil-grilla-separacion:                    var(--panel-separacion);   /* separación entre elementos — grilla */
+    --perfil-tarjeta-relleno:                      0 0 var(--panel-relleno-chico);   /* espacio interno — tarjeta */
+    --perfil-formulario-separacion:                14px;   /* separación entre elementos — formulario */
+    --perfil-formulario-relleno:                   12px var(--panel-relleno-chico) 0;   /* espacio interno — formulario */
+    --perfil-formulario-etiqueta-separacion:       7px;   /* separación entre elementos — etiqueta de formulario */
+    --perfil-formulario-etiqueta-tamano:           0.75rem;   /* tamaño de letra — etiqueta de formulario */
+    --perfil-formulario-etiqueta-peso:             600;   /* grosor de letra — etiqueta de formulario */
+    --perfil-formulario-etiqueta-color:            var(--color-texto-secundario);   /* color del texto — etiqueta de formulario */
+    --perfil-formulario-span-separacion:           7px;   /* separación entre elementos — span de formulario */
+    --perfil-formulario-span-fuente:               var(--fuente-codigo);   /* tipografía — span de formulario */
+    --perfil-formulario-span-tamano:               0.6875rem;   /* tamaño de letra — span de formulario */
+    --perfil-formulario-span-peso:                 600;   /* grosor de letra — span de formulario */
+    --perfil-formulario-span-espaciado:            0.1em;   /* separación entre letras — span de formulario */
+    --perfil-formulario-span-color:                var(--color-texto-suave);   /* color del texto — span de formulario */
+    --perfil-formulario-chico-fuente:              var(--fuente-texto);   /* tipografía — chico de formulario */
+    --perfil-formulario-chico-tamano:              0.6875rem;   /* tamaño de letra — chico de formulario */
+    --perfil-formulario-chico-color:               var(--color-texto-suave);   /* color del texto — chico de formulario */
+    --perfil-formulario-chico-peso:                500;   /* grosor de letra — chico de formulario */
+    --perfil-formulario-campo-alto-min:            44px;   /* alto mínimo — campo de formulario */
+    --perfil-formulario-campo-borde:               1px solid var(--panel-linea-fuerte);   /* borde — campo de formulario */
+    --perfil-formulario-campo-redondeo:            10px;   /* redondeo de las esquinas — campo de formulario */
+    --perfil-formulario-campo-fondo:               var(--panel-tarjeta);   /* fondo — campo de formulario */
+    --perfil-formulario-campo-color:               var(--color-texto);   /* color del texto — campo de formulario */
+    --perfil-formulario-campo-relleno:             0 14px;   /* espacio interno — campo de formulario */
+    --perfil-formulario-campo-peso:                500;   /* grosor de letra — campo de formulario */
+    --perfil-formulario-campo-transicion:          border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;   /* animación de los cambios — campo de formulario */
+    --perfil-formulario-campo-ayuda-campo-color:   var(--color-texto-suave);   /* color del texto — campo de formulario (estado: ayuda-campo) */
+    --perfil-formulario-campo-ayuda-campo-opacidad: 0.7;   /* opacidad (0 = invisible, 1 = opaco) — campo de formulario (estado: ayuda-campo) */
+    --perfil-formulario-campo-foco-borde-color:    var(--verde-500);   /* color del borde — campo de formulario (estado: foco) */
+    --perfil-formulario-campo-foco-sombra:         0 0 0 3px rgba(74, 122, 85, 0.22);   /* sombra — campo de formulario (estado: foco) */
+    --perfil-formulario-campo-fondo-oscuro:        color-mix(in oklab, var(--panel-tarjeta) 90%, transparent);   /* fondo — campo de formulario (modo oscuro) */
+    --perfil-formulario-campo-borde-color-oscuro:  rgba(255, 255, 255, 0.12);   /* color del borde — campo de formulario (modo oscuro) */
+    --perfil-formulario-campo-foco-borde-color-oscuro: var(--verde-300);   /* color del borde — campo de formulario (estado: foco; modo oscuro) */
+    --perfil-formulario-campo-foco-sombra-oscuro:  0 0 0 3px rgba(188, 210, 189, 0.2);   /* sombra — campo de formulario (estado: foco; modo oscuro) */
+    --perfil-seguro-fondo:                         color-mix(in oklab, var(--color-alerta-suave) 45%, transparent);   /* fondo — seguro */
+    --perfil-seguro-borde:                         1px dashed color-mix(in oklab, var(--color-arcilla) 38%, var(--panel-linea-fuerte));   /* borde — seguro */
+    --perfil-seguro-redondeo:                      var(--panel-redondeo-chico);   /* redondeo de las esquinas — seguro */
+    --perfil-seguro-relleno:                       12px 14px 10px;   /* espacio interno — seguro */
+    --perfil-seguro-margen-arriba:                 4px;   /* margen de arriba — seguro */
+    --perfil-formulario-campo-readonly-fondo:      color-mix(in oklab, var(--panel-fondo-suave) 70%, var(--panel-tarjeta));   /* fondo — campo de formulario (estado: readonly) */
+    --perfil-formulario-campo-readonly-color:      var(--color-texto-suave);   /* color del texto — campo de formulario (estado: readonly) */
+    --perfil-ayuda-relleno:                        8px 12px;   /* espacio interno — ayuda */
+    --perfil-ayuda-tamano:                         0.75rem;   /* tamaño de letra — ayuda */
+    --perfil-ayuda-color:                          var(--color-texto-suave);   /* color del texto — ayuda */
+    --perfil-ayuda-fondo:                          var(--panel-fondo-suave);   /* fondo — ayuda */
+    --perfil-ayuda-redondeo:                       8px;   /* redondeo de las esquinas — ayuda */
+    --perfil-ayuda-interlineado:                   1.4;   /* separación entre renglones — ayuda */
+    --perfil-seguro-fondo-oscuro:                  color-mix(in oklab, var(--color-alerta-suave) 28%, transparent);   /* fondo — seguro (modo oscuro) */
+    --perfil-acciones-separacion:                  10px;   /* separación entre elementos — acciones */
+    --perfil-acciones-relleno-arriba:              6px;   /* espacio interno de arriba — acciones */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 1100px de ancho                                         #
+   #     hasta 640px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Perfil: editar datos y contraseña --------------------------------- */
+
+.ea-account-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--perfil-introduccion-separacion);
+    padding: var(--perfil-introduccion-relleno);
+    max-width: var(--perfil-introduccion-ancho-max);
+}
+
+.ea-account-title {
+    margin: var(--perfil-titulo-margen);
+    font-family: var(--perfil-titulo-fuente);
+    font-weight: var(--perfil-titulo-peso);
+    font-size: var(--perfil-titulo-tamano);
+    line-height: var(--perfil-titulo-interlineado);
+    letter-spacing: var(--perfil-titulo-espaciado);
+    color: var(--perfil-titulo-color);
+}
+
+:root[data-theme="dark"] .ea-account-title {
+    color: var(--perfil-titulo-color-oscuro);
+}
+
+.ea-account-lede {
+    margin: 0;
+    color: var(--perfil-bajada-color);
+    font-size: var(--perfil-bajada-tamano);
+    line-height: var(--perfil-bajada-interlineado);
+    max-width: var(--perfil-bajada-ancho-max);
+}
+
+.ea-account-grid {
+    display: grid;
+    grid-template-columns: var(--perfil-grilla-columnas);
+    gap: var(--perfil-grilla-separacion);
+    align-items: start;
+}
+
+.ea-account-card {
+    padding: var(--perfil-tarjeta-relleno);
+    overflow: hidden;
+}
+
+.ea-account-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--perfil-formulario-separacion);
+    padding: var(--perfil-formulario-relleno);
+}
+
+.ea-account-form label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--perfil-formulario-etiqueta-separacion);
+    font-size: var(--perfil-formulario-etiqueta-tamano);
+    font-weight: var(--perfil-formulario-etiqueta-peso);
+    color: var(--perfil-formulario-etiqueta-color);
+}
+
+.ea-account-form label > span {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--perfil-formulario-span-separacion);
+    font-family: var(--perfil-formulario-span-fuente);
+    font-size: var(--perfil-formulario-span-tamano);
+    font-weight: var(--perfil-formulario-span-peso);
+    letter-spacing: var(--perfil-formulario-span-espaciado);
+    text-transform: uppercase;
+    color: var(--perfil-formulario-span-color);
+}
+
+.ea-account-form label > span small {
+    text-transform: none;
+    font-family: var(--perfil-formulario-chico-fuente);
+    font-size: var(--perfil-formulario-chico-tamano);
+    color: var(--perfil-formulario-chico-color);
+    font-weight: var(--perfil-formulario-chico-peso);
+    letter-spacing: 0;
+}
+
+.ea-account-form input {
+    width: 100%;
+    min-height: var(--perfil-formulario-campo-alto-min);
+    border: var(--perfil-formulario-campo-borde);
+    border-radius: var(--perfil-formulario-campo-redondeo);
+    background: var(--perfil-formulario-campo-fondo);
+    color: var(--perfil-formulario-campo-color);
+    padding: var(--perfil-formulario-campo-relleno);
+    font: inherit;
+    font-weight: var(--perfil-formulario-campo-peso);
+    outline: none;
+    transition: var(--perfil-formulario-campo-transicion);
+}
+
+.ea-account-form input::placeholder {
+    color: var(--perfil-formulario-campo-ayuda-campo-color);
+    opacity: var(--perfil-formulario-campo-ayuda-campo-opacidad);
+}
+
+.ea-account-form input:focus,
+.ea-account-form input:focus-visible {
+    border-color: var(--perfil-formulario-campo-foco-borde-color);
+    box-shadow: var(--perfil-formulario-campo-foco-sombra);
+}
+
+:root[data-theme="dark"] .ea-account-form input {
+    background: var(--perfil-formulario-campo-fondo-oscuro);
+    border-color: var(--perfil-formulario-campo-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-account-form input:focus {
+    border-color: var(--perfil-formulario-campo-foco-borde-color-oscuro);
+    box-shadow: var(--perfil-formulario-campo-foco-sombra-oscuro);
+}
+
+.ea-account-wide {
+    grid-column: 1 / -1;
+}
+
+.ea-account-secure {
+    background: var(--perfil-seguro-fondo);
+    border: var(--perfil-seguro-borde);
+    border-radius: var(--perfil-seguro-redondeo);
+    padding: var(--perfil-seguro-relleno);
+    margin-top: var(--perfil-seguro-margen-arriba);
+}
+
+.ea-account-form input[readonly] {
+    background: var(--perfil-formulario-campo-readonly-fondo);
+    color: var(--perfil-formulario-campo-readonly-color);
+    cursor: not-allowed;
+}
+
+.ea-account-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: var(--perfil-ayuda-relleno);
+    font-size: var(--perfil-ayuda-tamano);
+    color: var(--perfil-ayuda-color);
+    background: var(--perfil-ayuda-fondo);
+    border-radius: var(--perfil-ayuda-redondeo);
+    line-height: var(--perfil-ayuda-interlineado);
+}
+
+:root[data-theme="dark"] .ea-account-secure {
+    background: var(--perfil-seguro-fondo-oscuro);
+}
+
+.ea-account-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--perfil-acciones-separacion);
+    padding-top: var(--perfil-acciones-relleno-arriba);
+}
+
+@media (max-width: 1100px) {
+    .ea-account-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .ea-account-form {
+        grid-template-columns: 1fr;
+    }
+    .ea-account-actions {
+        flex-wrap: wrap;
+        justify-content: stretch;
+    }
+    .ea-account-actions .ea-kbtn {
+        flex: 1;
+        justify-content: center;
+    }
+}

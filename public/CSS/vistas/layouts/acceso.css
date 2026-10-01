@@ -1,0 +1,133 @@
+/* =====================================================================
+   vistas/layouts/acceso.css — la tarjeta centrada de las pantallas de acceso
+   ---------------------------------------------------------------------
+   Vista: app/Views/layouts/acceso.php
+   Se carga sola en login, registro, recuperar y restablecer contraseña (app/Libraries/Vista.php).
+
+   Depende de: comun.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Acceso (login, registro, recuperación) -------------------------- */
+    --acceso-alto-min:                    calc(100vh - 88px);   /* alto mínimo — el componente */
+    --acceso-main-relleno:                clamp(32px, 5vw, 64px) 24px;   /* espacio interno — main */
+    --acceso-main-separacion:             var(--espacio-medio);   /* separación entre elementos — main */
+    --acceso-main-fondo:                  var(--color-fondo);   /* fondo — main */
+    --acceso-tarjeta-ancho-max:           460px;   /* ancho máximo — tarjeta */
+    --acceso-tarjeta-separacion:          var(--espacio-medio);   /* separación entre elementos — tarjeta */
+    --acceso-tarjeta-titulo-fuente:       var(--fuente-titulos);   /* tipografía — título de tarjeta */
+    --acceso-tarjeta-titulo-peso:         400;   /* grosor de letra — título de tarjeta */
+    --acceso-tarjeta-titulo-tamano:       1.75rem;   /* tamaño de letra — título de tarjeta */
+    --acceso-tarjeta-titulo-espaciado:    -0.015em;   /* separación entre letras — título de tarjeta */
+    --acceso-tarjeta-titulo-interlineado: 1.05;   /* separación entre renglones — título de tarjeta */
+    --acceso-tarjeta-titulo-color:        var(--color-texto);   /* color del texto — título de tarjeta */
+    --acceso-tarjeta-bajada-color:        var(--color-texto-secundario);   /* color del texto — bajada de tarjeta */
+    --acceso-tarjeta-bajada-tamano:       0.9375rem;   /* tamaño de letra — bajada de tarjeta */
+    --acceso-pie-separacion:              10px 24px;   /* separación entre elementos — pie */
+    --acceso-pie-margen-arriba:           4px;   /* margen de arriba — pie */
+    --acceso-link-fuente:                 var(--fuente-texto);   /* tipografía — link */
+    --acceso-link-color:                  var(--verde-700);   /* color del texto — link */
+    --acceso-link-peso:                   500;   /* grosor de letra — link */
+    --acceso-link-borde-abajo:            1px solid transparent;   /* borde de abajo — link */
+    --acceso-link-transicion:             border-color 0.18s ease;   /* animación de los cambios — link */
+    --acceso-link-hover-borde-color:      var(--verde-500);   /* color del borde — link (estado: hover) */
+    --acceso-link-color-oscuro:           var(--verde-300);   /* color del texto — link (modo oscuro) */
+    --acceso-main-relleno-hasta-960:      40px 20px;   /* espacio interno — main (hasta 960px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 960px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Acceso (login, registro, recuperación) ---------------------------- */
+
+.ea-auth {
+    min-height: var(--acceso-alto-min);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-auth-main {
+    width: 100%;
+    padding: var(--acceso-main-relleno);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--acceso-main-separacion);
+    background: var(--acceso-main-fondo);
+}
+
+.ea-auth-card {
+    width: 100%;
+    max-width: var(--acceso-tarjeta-ancho-max);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--acceso-tarjeta-separacion);
+}
+
+.ea-auth-card h1,
+.ea-auth-card h2 {
+    font-family: var(--acceso-tarjeta-titulo-fuente);
+    font-weight: var(--acceso-tarjeta-titulo-peso);
+    font-size: var(--acceso-tarjeta-titulo-tamano);
+    letter-spacing: var(--acceso-tarjeta-titulo-espaciado);
+    line-height: var(--acceso-tarjeta-titulo-interlineado);
+    color: var(--acceso-tarjeta-titulo-color);
+}
+
+.ea-auth-card p.ea-lede {
+    color: var(--acceso-tarjeta-bajada-color);
+    font-size: var(--acceso-tarjeta-bajada-tamano);
+}
+
+.ea-auth-foot {
+    display: flex;
+    /* Con la tipografia mas grande los dos enlaces del login no entraban
+       en una linea y el segundo se salia de la tarjeta. Que bajen. */
+    flex-wrap: wrap;
+    gap: var(--acceso-pie-separacion);
+    justify-content: space-between;
+    margin-top: var(--acceso-pie-margen-arriba);
+}
+
+.ea-auth-link {
+    font-family: var(--acceso-link-fuente);
+    text-wrap: nowrap;
+    color: var(--acceso-link-color);
+    font-weight: var(--acceso-link-peso);
+    border-bottom: var(--acceso-link-borde-abajo);
+    transition: var(--acceso-link-transicion);
+}
+
+.ea-auth-link:hover {
+    border-color: var(--acceso-link-hover-borde-color);
+}
+
+:root[data-theme="dark"] .ea-auth-link {
+    color: var(--acceso-link-color-oscuro);
+}
+
+@media (max-width: 960px) {
+    .ea-auth-main {
+        padding: var(--acceso-main-relleno-hasta-960);
+    }
+}

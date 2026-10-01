@@ -60,7 +60,6 @@ $estadoBody = $conLoader ? 'dashboard-loading' : 'dashboard-ready';
 <head>
     <?= view('partials/head', [
         'title'     => $tituloPagina,
-        'extraCss'  => ['CSS/dashboard.css'],
         'extraHead' => ($descripcion !== '' ? '<meta name="description" content="' . esc($descripcion) . '">' : '')
             . '<meta name="robots" content="noindex, nofollow">'
             . '<meta name="color-scheme" content="light dark">',

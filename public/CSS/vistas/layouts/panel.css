@@ -38,11 +38,18 @@
     /* ---- Valores compartidos del panel --------------------------------
        Los usan también el menú lateral y la barra superior. */
     --panel-redondeo:         16px;
+    --panel-redondeo-chico:   11px;
+    --panel-redondeo-grande:  22px;
+    --panel-relleno-chico:    clamp(13px, 1.8vw, 16px);   /* crece con el ancho de la ventana */
     --panel-separacion:       clamp(14px, 2vw, 18px);     /* espacio entre los bloques del contenido */
     --panel-linea:            rgba(14, 31, 23, 0.08);     /* bordes finos */
     --panel-linea-fuerte:     rgba(14, 31, 23, 0.14);     /* bordes más marcados */
     --panel-fondo-suave:      #f0ece2;
     --panel-tarjeta:          #ffffff;                    /* fondo de tarjetas y botones de la barra */
+    --panel-sombra-tarjeta:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 1px 2px rgba(14, 31, 23, 0.04),
+        0 8px 20px -14px rgba(14, 31, 23, 0.20);
     --panel-sombra-elevada:
         0 1px 0 rgba(255, 255, 255, 0.5) inset,
         0 14px 34px -16px rgba(14, 31, 23, 0.24);
@@ -194,6 +201,133 @@
        Si la compu pide "reducir movimiento", todas las animaciones del
        panel duran esto (prácticamente nada). */
     --panel-movimiento-reducido:    0.01ms;
+
+    /* =========== Agregado en la migración del resto de las pantallas =========== */
+
+    /* ---- Tarjetas, insignias y botones del panel ------------------------- */
+    --panel-tarjeta-fondo:                         var(--panel-tarjeta);   /* fondo — tarjeta */
+    --panel-tarjeta-borde:                         1px solid var(--panel-linea);   /* borde — tarjeta */
+    --panel-tarjeta-redondeo:                      var(--panel-redondeo);   /* redondeo de las esquinas — tarjeta */
+    --panel-tarjeta-sombra:                        var(--panel-sombra-tarjeta);   /* sombra — tarjeta */
+    --panel-tarjeta-transicion:                    box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;   /* animación de los cambios — tarjeta */
+    --panel-insignia-separacion:                   6px;   /* separación entre elementos — insignia */
+    --panel-insignia-alto:                         22px;   /* alto — insignia */
+    --panel-insignia-relleno:                      0 9px;   /* espacio interno — insignia */
+    --panel-insignia-redondeo:                     999px;   /* redondeo de las esquinas — insignia */
+    --panel-insignia-fuente:                       var(--fuente-codigo);   /* tipografía — insignia */
+    --panel-insignia-tamano:                       0.6875rem;   /* tamaño de letra — insignia */
+    --panel-insignia-peso:                         500;   /* grosor de letra — insignia */
+    --panel-insignia-espaciado:                    0.05em;   /* separación entre letras — insignia */
+    --panel-insignia-borde:                        1px solid transparent;   /* borde — insignia */
+    --panel-insignia-interlineado:                 1;   /* separación entre renglones — insignia */
+    --panel-punto-ancho:                           6px;   /* ancho — punto */
+    --panel-punto-alto:                            6px;   /* alto — punto */
+    --panel-insignia-tono-exito-color:             #3f5a0e;   /* color del texto — insignia (estado: tono-exito) */
+    --panel-insignia-tono-exito-fondo:             color-mix(in oklab, var(--color-citrico) 28%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-exito) */
+    --panel-insignia-tono-exito-borde-color:       color-mix(in oklab, var(--color-citrico) 55%, transparent);   /* color del borde — insignia (estado: tono-exito) */
+    --panel-insignia-tono-alerta-color:            #7a4a2c;   /* color del texto — insignia (estado: tono-alerta) */
+    --panel-insignia-tono-alerta-fondo:            color-mix(in oklab, var(--color-arcilla) 22%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-alerta) */
+    --panel-insignia-tono-alerta-borde-color:      color-mix(in oklab, var(--color-arcilla) 55%, transparent);   /* color del borde — insignia (estado: tono-alerta) */
+    --panel-insignia-tono-peligro-color:           #7a2f19;   /* color del texto — insignia (estado: tono-peligro) */
+    --panel-insignia-tono-peligro-fondo:           color-mix(in oklab, var(--color-tierra) 22%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-peligro) */
+    --panel-insignia-tono-peligro-borde-color:     color-mix(in oklab, var(--color-tierra) 60%, transparent);   /* color del borde — insignia (estado: tono-peligro) */
+    --panel-insignia-tono-info-color:              #2f6a6f;   /* color del texto — insignia (estado: tono-info) */
+    --panel-insignia-tono-info-fondo:              color-mix(in oklab, var(--color-menta) 28%, var(--panel-tarjeta));   /* fondo — insignia (estado: tono-info) */
+    --panel-insignia-tono-info-borde-color:        color-mix(in oklab, var(--color-menta) 55%, transparent);   /* color del borde — insignia (estado: tono-info) */
+    --panel-insignia-tono-neutro-color:            var(--color-texto-secundario);   /* color del texto — insignia (estado: tono-neutro) */
+    --panel-insignia-tono-neutro-fondo:            var(--panel-fondo-suave);   /* fondo — insignia (estado: tono-neutro) */
+    --panel-insignia-tono-neutro-borde-color:      var(--panel-linea);   /* color del borde — insignia (estado: tono-neutro) */
+    --panel-insignia-tono-exito-color-oscuro:      #e2ee9c;   /* color del texto — insignia (estado: tono-exito; modo oscuro) */
+    --panel-insignia-tono-exito-fondo-oscuro:      color-mix(in oklab, var(--color-citrico) 18%, transparent);   /* fondo — insignia (estado: tono-exito; modo oscuro) */
+    --panel-insignia-tono-exito-borde-color-oscuro: color-mix(in oklab, var(--color-citrico) 32%, transparent);   /* color del borde — insignia (estado: tono-exito; modo oscuro) */
+    --panel-insignia-tono-alerta-color-oscuro:     #f1c9a8;   /* color del texto — insignia (estado: tono-alerta; modo oscuro) */
+    --panel-insignia-tono-alerta-fondo-oscuro:     color-mix(in oklab, var(--color-arcilla) 20%, transparent);   /* fondo — insignia (estado: tono-alerta; modo oscuro) */
+    --panel-insignia-tono-alerta-borde-color-oscuro: color-mix(in oklab, var(--color-arcilla) 42%, transparent);   /* color del borde — insignia (estado: tono-alerta; modo oscuro) */
+    --panel-insignia-tono-peligro-color-oscuro:    #f2b79e;   /* color del texto — insignia (estado: tono-peligro; modo oscuro) */
+    --panel-insignia-tono-peligro-fondo-oscuro:    color-mix(in oklab, var(--color-tierra) 22%, transparent);   /* fondo — insignia (estado: tono-peligro; modo oscuro) */
+    --panel-insignia-tono-peligro-borde-color-oscuro: color-mix(in oklab, var(--color-tierra) 48%, transparent);   /* color del borde — insignia (estado: tono-peligro; modo oscuro) */
+    --panel-insignia-tono-info-color-oscuro:       var(--color-menta);   /* color del texto — insignia (estado: tono-info; modo oscuro) */
+    --panel-insignia-tono-info-fondo-oscuro:       color-mix(in oklab, var(--color-menta) 18%, transparent);   /* fondo — insignia (estado: tono-info; modo oscuro) */
+    --panel-insignia-tono-info-borde-color-oscuro: color-mix(in oklab, var(--color-menta) 36%, transparent);   /* color del borde — insignia (estado: tono-info; modo oscuro) */
+    --panel-botoncito-separacion:                  6px;   /* separación entre elementos — botón chico */
+    --panel-botoncito-alto:                        32px;   /* alto — botón chico */
+    --panel-botoncito-relleno:                     0 14px;   /* espacio interno — botón chico */
+    --panel-botoncito-redondeo:                    10px;   /* redondeo de las esquinas — botón chico */
+    --panel-botoncito-borde:                       1px solid var(--panel-linea);   /* borde — botón chico */
+    --panel-botoncito-fondo:                       var(--panel-tarjeta);   /* fondo — botón chico */
+    --panel-botoncito-color:                       var(--color-texto-secundario);   /* color del texto — botón chico */
+    --panel-botoncito-fuente:                      var(--fuente-texto);   /* tipografía — botón chico */
+    --panel-botoncito-tamano:                      0.75rem;   /* tamaño de letra — botón chico */
+    --panel-botoncito-peso:                        500;   /* grosor de letra — botón chico */
+    --panel-botoncito-transicion:                  background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;   /* animación de los cambios — botón chico */
+    --panel-botoncito-hover-fondo:                 var(--verde-100);   /* fondo — botón chico (estado: hover) */
+    --panel-botoncito-hover-borde-color:           var(--panel-linea-fuerte);   /* color del borde — botón chico (estado: hover) */
+    --panel-botoncito-hover-color:                 var(--color-texto);   /* color del texto — botón chico (estado: hover) */
+    --panel-botoncito-hover-fondo-oscuro:          rgba(74, 122, 85, 0.18);   /* fondo — botón chico (estado: hover; modo oscuro) */
+    --panel-botoncito-hover-color-oscuro:          var(--verde-100);   /* color del texto — botón chico (estado: hover; modo oscuro) */
+    --panel-botoncito-presionado-transformacion:   scale(0.97);   /* desplazamiento/escala/giro — botón chico (estado: presionado) */
+    --panel-botoncito-presionado-duracion:         0.08s;   /* duración de los cambios — botón chico (estado: presionado) */
+    --panel-botoncito-disabled-true-opacidad:      0.65;   /* opacidad (0 = invisible, 1 = opaco) — botón chico (estado: disabled-true) */
+    --panel-botoncito-disabled-true-hover-fondo:   var(--panel-tarjeta);   /* fondo — botón chico (estado: disabled-true, hover) */
+    --panel-botoncito-disabled-true-hover-borde-color: var(--panel-linea);   /* color del borde — botón chico (estado: disabled-true, hover) */
+    --panel-botoncito-disabled-true-hover-color:   var(--color-texto-secundario);   /* color del texto — botón chico (estado: disabled-true, hover) */
+    --panel-botoncito-foco-borde-color:            var(--verde-500);   /* color del borde — botón chico (estado: foco) */
+    --panel-botoncito-foco-sombra:                 0 0 0 3px rgba(74, 122, 85, 0.3);   /* sombra — botón chico (estado: foco) */
+    --panel-botoncito-primario-fondo:              var(--verde-700);   /* fondo — primario de botón chico */
+    --panel-botoncito-primario-borde-color:        var(--verde-700);   /* color del borde — primario de botón chico */
+    --panel-botoncito-primario-color:              var(--verde-100);   /* color del texto — primario de botón chico */
+    --panel-botoncito-primario-peso:               600;   /* grosor de letra — primario de botón chico */
+    --panel-botoncito-primario-sombra:             0 6px 16px -10px rgba(14, 31, 23, 0.6);   /* sombra — primario de botón chico */
+    --panel-botoncito-primario-hover-fondo:        var(--verde-800);   /* fondo — primario de botón chico (estado: hover) */
+    --panel-botoncito-primario-hover-borde-color:  var(--verde-800);   /* color del borde — primario de botón chico (estado: hover) */
+    --panel-botoncito-primario-hover-color:        var(--verde-100);   /* color del texto — primario de botón chico (estado: hover) */
+    --panel-botoncito-primario-presionado-transformacion: scale(0.97);   /* desplazamiento/escala/giro — primario de botón chico (estado: presionado) */
+    --panel-botoncito-primario-presionado-duracion: 0.08s;   /* duración de los cambios — primario de botón chico (estado: presionado) */
+    --panel-botoncito-primario-fondo-oscuro:       var(--verde-500);   /* fondo — primario de botón chico (modo oscuro) */
+    --panel-botoncito-primario-borde-color-oscuro: var(--verde-500);   /* color del borde — primario de botón chico (modo oscuro) */
+    --panel-botoncito-primario-color-oscuro:       var(--verde-900);   /* color del texto — primario de botón chico (modo oscuro) */
+    --panel-botoncito-primario-hover-fondo-oscuro: var(--verde-400);   /* fondo — primario de botón chico (estado: hover; modo oscuro) */
+    --panel-botoncito-primario-hover-borde-color-oscuro: var(--verde-400);   /* color del borde — primario de botón chico (estado: hover; modo oscuro) */
+    --panel-botoncito-primario-hover-color-oscuro: var(--verde-900);   /* color del texto — primario de botón chico (estado: hover; modo oscuro) */
+    --panel-tarjeta-cabeza-separacion:             8px 10px;   /* separación entre elementos — cabeza de tarjeta */
+    --panel-tarjeta-cabeza-relleno:                16px var(--panel-relleno-chico) 12px;   /* espacio interno — cabeza de tarjeta */
+    --panel-tarjeta-cabeza-titulo-fuente:          var(--fuente-texto);   /* tipografía — título de tarjeta cabeza */
+    --panel-tarjeta-cabeza-titulo-tamano:          0.9063rem;   /* tamaño de letra — título de tarjeta cabeza */
+    --panel-tarjeta-cabeza-titulo-peso:            600;   /* grosor de letra — título de tarjeta cabeza */
+    --panel-tarjeta-cabeza-titulo-espaciado:       -0.005em;   /* separación entre letras — título de tarjeta cabeza */
+    --panel-tarjeta-cabeza-titulo-color:           var(--color-texto);   /* color del texto — título de tarjeta cabeza */
+    --panel-tarjeta-datos-tamano:                  0.6875rem;   /* tamaño de letra — datos de tarjeta */
+    --panel-tarjeta-datos-color:                   var(--color-texto-suave);   /* color del texto — datos de tarjeta */
+    --panel-tarjeta-datos-espaciado:               0.06em;   /* separación entre letras — datos de tarjeta */
+
+    /* ---- Celular y tablet ------------------------------------------------ */
+    --panel-botoncito-alto-min-hasta-960:       44px;   /* alto mínimo — botón chico (hasta 960px de ancho) */
+    --panel-botoncito-relleno-arriba-hasta-960: 6px;   /* espacio interno de arriba — botón chico (hasta 960px de ancho) */
+    --panel-botoncito-relleno-abajo-hasta-960:  6px;   /* espacio interno de abajo — botón chico (hasta 960px de ancho) */
+
+    /* ---- Link "volver" --------------------------------------------------- */
+    --panel-volver-link-separacion:   6px;   /* separación entre elementos — link de volver */
+    --panel-volver-link-margen-abajo: 18px;   /* margen de abajo — link de volver */
+    --panel-volver-link-color:        var(--color-texto-suave);   /* color del texto — link de volver */
+    --panel-volver-link-tamano:       0.8438rem;   /* tamaño de letra — link de volver */
+    --panel-volver-link-hover-color:  var(--verde-500);   /* color del texto — link de volver (estado: hover) */
+
+    /* ---- Tarjeta de formulario ------------------------------------------- */
+    --panel-paso-etiqueta-superior-fuente:        var(--fuente-codigo);   /* tipografía — superior de paso etiqueta */
+    --panel-paso-etiqueta-superior-tamano:        0.6875rem;   /* tamaño de letra — superior de paso etiqueta */
+    --panel-paso-etiqueta-superior-espaciado:     0.14em;   /* separación entre letras — superior de paso etiqueta */
+    --panel-paso-etiqueta-superior-color:         var(--verde-500);   /* color del texto — superior de paso etiqueta */
+    --panel-paso-titulo-fuente:                   var(--fuente-titulos);   /* tipografía — título de paso */
+    --panel-paso-titulo-tamano:                   1.4375rem;   /* tamaño de letra — título de paso */
+    --panel-paso-titulo-margen:                   8px 0 6px;   /* margen — título de paso */
+    --panel-paso-titulo-color:                    var(--color-texto);   /* color del texto — título de paso */
+    --panel-paso-bajada-margen:                   0 0 20px;   /* margen — bajada de paso */
+    --panel-paso-bajada-color:                    var(--color-texto-suave);   /* color del texto — bajada de paso */
+    --panel-paso-bajada-interlineado:             1.55;   /* separación entre renglones — bajada de paso */
+    --panel-paso-bajada-tamano:                   0.9063rem;   /* tamaño de letra — bajada de paso */
+    --panel-asistente-navegacion-separacion:      12px;   /* separación entre elementos — navegación de asistente */
+    --panel-asistente-navegacion-margen-arriba:   8px;   /* margen de arriba — navegación de asistente */
+    --panel-asistente-navegacion-boton-ancho-min: 120px;   /* ancho mínimo — botón de asistente navegación */
 }
 
 /* ---- Valores compartidos en modo oscuro ------------------------------ */
@@ -202,6 +336,9 @@
     --panel-linea-fuerte:   rgba(255, 255, 255, 0.14);
     --panel-fondo-suave:    #101e17;
     --panel-tarjeta:        #14221c;
+    --panel-sombra-tarjeta:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 8px 22px -14px rgba(0, 0, 0, 0.65);
     --panel-sombra-elevada:
         0 1px 0 rgba(255, 255, 255, 0.05) inset,
         0 18px 42px -20px rgba(0, 0, 0, 0.72);
@@ -326,6 +463,206 @@ body.dashboard-body { overflow-x: hidden; }
 /* En pantallas muy anchas el contenido se ensancha (igual que .ea-page) */
 @media (min-width: 1700px) { .ea-content { max-width: var(--panel-contenido-ancho-max-ancha); } }
 
+/* ---------- Tarjetas, insignias y botones del panel --------------------------- */
+
+.ea-card {
+    background: var(--panel-tarjeta-fondo);
+    border: var(--panel-tarjeta-borde);
+    border-radius: var(--panel-tarjeta-redondeo);
+    box-shadow: var(--panel-tarjeta-sombra);
+    transition: var(--panel-tarjeta-transicion);
+}
+
+.ea-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--panel-insignia-separacion);
+    height: var(--panel-insignia-alto);
+    padding: var(--panel-insignia-relleno);
+    border-radius: var(--panel-insignia-redondeo);
+    font-family: var(--panel-insignia-fuente);
+    font-size: var(--panel-insignia-tamano);
+    font-weight: var(--panel-insignia-peso);
+    letter-spacing: var(--panel-insignia-espaciado);
+    text-transform: uppercase;
+    border: var(--panel-insignia-borde);
+    white-space: nowrap;
+    line-height: var(--panel-insignia-interlineado);
+}
+
+.ea-dot {
+    width: var(--panel-punto-ancho);
+    height: var(--panel-punto-alto);
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.ea-badge.tone-success {
+    color: var(--panel-insignia-tono-exito-color);
+    background: var(--panel-insignia-tono-exito-fondo);
+    border-color: var(--panel-insignia-tono-exito-borde-color);
+}
+
+.ea-badge.tone-warning {
+    color: var(--panel-insignia-tono-alerta-color);
+    background: var(--panel-insignia-tono-alerta-fondo);
+    border-color: var(--panel-insignia-tono-alerta-borde-color);
+}
+
+.ea-badge.tone-danger {
+    color: var(--panel-insignia-tono-peligro-color);
+    background: var(--panel-insignia-tono-peligro-fondo);
+    border-color: var(--panel-insignia-tono-peligro-borde-color);
+}
+
+.ea-badge.tone-info {
+    color: var(--panel-insignia-tono-info-color);
+    background: var(--panel-insignia-tono-info-fondo);
+    border-color: var(--panel-insignia-tono-info-borde-color);
+}
+
+.ea-badge.tone-neutral {
+    color: var(--panel-insignia-tono-neutro-color);
+    background: var(--panel-insignia-tono-neutro-fondo);
+    border-color: var(--panel-insignia-tono-neutro-borde-color);
+}
+
+:root[data-theme="dark"] .ea-badge.tone-success {
+    color: var(--panel-insignia-tono-exito-color-oscuro);
+    background: var(--panel-insignia-tono-exito-fondo-oscuro);
+    border-color: var(--panel-insignia-tono-exito-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge.tone-warning {
+    color: var(--panel-insignia-tono-alerta-color-oscuro);
+    background: var(--panel-insignia-tono-alerta-fondo-oscuro);
+    border-color: var(--panel-insignia-tono-alerta-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge.tone-danger {
+    color: var(--panel-insignia-tono-peligro-color-oscuro);
+    background: var(--panel-insignia-tono-peligro-fondo-oscuro);
+    border-color: var(--panel-insignia-tono-peligro-borde-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-badge.tone-info {
+    color: var(--panel-insignia-tono-info-color-oscuro);
+    background: var(--panel-insignia-tono-info-fondo-oscuro);
+    border-color: var(--panel-insignia-tono-info-borde-color-oscuro);
+}
+
+.ea-kbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--panel-botoncito-separacion);
+    height: var(--panel-botoncito-alto);
+    padding: var(--panel-botoncito-relleno);
+    border-radius: var(--panel-botoncito-redondeo);
+    border: var(--panel-botoncito-borde);
+    background: var(--panel-botoncito-fondo);
+    color: var(--panel-botoncito-color);
+    font-family: var(--panel-botoncito-fuente);
+    font-size: var(--panel-botoncito-tamano);
+    font-weight: var(--panel-botoncito-peso);
+    cursor: pointer;
+    transition: var(--panel-botoncito-transicion);
+    text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-kbtn:hover {
+        background: var(--panel-botoncito-hover-fondo);
+        border-color: var(--panel-botoncito-hover-borde-color);
+        color: var(--panel-botoncito-hover-color);
+    }
+    :root[data-theme="dark"] .ea-kbtn:hover {
+        background: var(--panel-botoncito-hover-fondo-oscuro);
+        color: var(--panel-botoncito-hover-color-oscuro);
+    }
+}
+
+.ea-kbtn:active {
+    transform: var(--panel-botoncito-presionado-transformacion);
+    transition-duration: var(--panel-botoncito-presionado-duracion);
+}
+
+.ea-kbtn[aria-disabled="true"] {
+    opacity: var(--panel-botoncito-disabled-true-opacidad);
+    cursor: default;
+}
+
+.ea-kbtn[aria-disabled="true"]:hover {
+    background: var(--panel-botoncito-disabled-true-hover-fondo);
+    border-color: var(--panel-botoncito-disabled-true-hover-borde-color);
+    color: var(--panel-botoncito-disabled-true-hover-color);
+}
+
+.ea-kbtn:focus-visible {
+    outline: none;
+    border-color: var(--panel-botoncito-foco-borde-color);
+    box-shadow: var(--panel-botoncito-foco-sombra);
+}
+
+/* Botón primario: acción de mayor peso (guardar, confirmar, ver más) */
+.ea-kbtn-primary {
+    background: var(--panel-botoncito-primario-fondo);
+    border-color: var(--panel-botoncito-primario-borde-color);
+    color: var(--panel-botoncito-primario-color);
+    font-weight: var(--panel-botoncito-primario-peso);
+    box-shadow: var(--panel-botoncito-primario-sombra);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-kbtn-primary:hover {
+        background: var(--panel-botoncito-primario-hover-fondo);
+        border-color: var(--panel-botoncito-primario-hover-borde-color);
+        color: var(--panel-botoncito-primario-hover-color);
+    }
+}
+
+.ea-kbtn-primary:active {
+    transform: var(--panel-botoncito-primario-presionado-transformacion);
+    transition-duration: var(--panel-botoncito-primario-presionado-duracion);
+}
+
+:root[data-theme="dark"] .ea-kbtn-primary {
+    background: var(--panel-botoncito-primario-fondo-oscuro);
+    border-color: var(--panel-botoncito-primario-borde-color-oscuro);
+    color: var(--panel-botoncito-primario-color-oscuro);
+}
+
+:root[data-theme="dark"] .ea-kbtn-primary:hover {
+    background: var(--panel-botoncito-primario-hover-fondo-oscuro);
+    border-color: var(--panel-botoncito-primario-hover-borde-color-oscuro);
+    color: var(--panel-botoncito-primario-hover-color-oscuro);
+}
+
+/* Card head */
+.ea-card-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    /* en pantallas angostas las acciones bajan de línea en vez de desbordar */
+    gap: var(--panel-tarjeta-cabeza-separacion);
+    padding: var(--panel-tarjeta-cabeza-relleno);
+}
+
+.ea-card-head h3 {
+    margin: 0;
+    font-family: var(--panel-tarjeta-cabeza-titulo-fuente);
+    font-size: var(--panel-tarjeta-cabeza-titulo-tamano);
+    font-weight: var(--panel-tarjeta-cabeza-titulo-peso);
+    letter-spacing: var(--panel-tarjeta-cabeza-titulo-espaciado);
+    color: var(--panel-tarjeta-cabeza-titulo-color);
+}
+
+.ea-card-meta {
+    font-size: var(--panel-tarjeta-datos-tamano);
+    color: var(--panel-tarjeta-datos-color);
+    letter-spacing: var(--panel-tarjeta-datos-espaciado);
+}
+
 /* ---------- Cuadro de confirmación (lo arma JS/dashboard.js) ---------- */
 .confirm-lock {
     overflow: hidden;
@@ -406,10 +743,28 @@ body.dashboard-body { overflow-x: hidden; }
     padding-top: var(--confirmar-botones-margen);
 }
 
+/* ---------- Celular y tablet: botones chicos -------------------------------------------------- */
+
+@media (max-width: 960px) {
+    .ea-kbtn {
+        height: auto;
+        min-height: var(--panel-botoncito-alto-min-hasta-960);
+        padding-top: var(--panel-botoncito-relleno-arriba-hasta-960);
+        padding-bottom: var(--panel-botoncito-relleno-abajo-hasta-960);
+    }
+}
+
 /* ---------- Impresión ------------------------------------------------- */
 @media print {
     .ea-main { margin-left: 0; padding-top: 0; }
     .ea-content { padding: var(--panel-impresion-relleno); }
+}
+
+@media print {
+    .ea-card {
+        break-inside: avoid;
+        box-shadow: none;
+    }
 }
 
 /* ---------- Layout fijo: el contenido deja lugar al menú y a la barra -
@@ -443,6 +798,22 @@ body.dashboard-body { overflow-x: hidden; }
         animation-duration: var(--panel-movimiento-reducido) !important;
         transition-duration: var(--panel-movimiento-reducido) !important;
     }
+}
+
+/* ---------- Link "volver" ----------------------------------------------------- */
+
+.ea-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--panel-volver-link-separacion);
+    margin-bottom: var(--panel-volver-link-margen-abajo);
+    color: var(--panel-volver-link-color);
+    font-size: var(--panel-volver-link-tamano);
+    text-decoration: none;
+}
+
+.ea-back-link:hover {
+    color: var(--panel-volver-link-hover-color);
 }
 
 /* ---------- Título de sección (ej: "Tus ambientes" + botón) ----------- */
@@ -535,8 +906,58 @@ body.dashboard-body { overflow-x: hidden; }
 .ea-dev-empty h3 { font-family: var(--fuente-titulos); font-size: var(--panel-vacio-titulo-tamano); margin: 0 0 var(--panel-vacio-titulo-margen); color: var(--panel-vacio-titulo-color); }
 .ea-dev-empty p { margin: 0 auto var(--panel-vacio-texto-margen); max-width: var(--panel-vacio-texto-ancho); color: var(--panel-vacio-texto-color); line-height: var(--panel-vacio-texto-interlineado); }
 
+/* ---------- Tarjeta de formulario --------------------------------------------- */
+
+.ea-step-eyebrow {
+    font-family: var(--panel-paso-etiqueta-superior-fuente);
+    font-size: var(--panel-paso-etiqueta-superior-tamano);
+    letter-spacing: var(--panel-paso-etiqueta-superior-espaciado);
+    text-transform: uppercase;
+    color: var(--panel-paso-etiqueta-superior-color);
+}
+
+.ea-step-title {
+    font-family: var(--panel-paso-titulo-fuente);
+    font-size: var(--panel-paso-titulo-tamano);
+    margin: var(--panel-paso-titulo-margen);
+    color: var(--panel-paso-titulo-color);
+}
+
+.ea-step-title:focus {
+    outline: none;
+}
+
+.ea-step-lede {
+    margin: var(--panel-paso-bajada-margen);
+    color: var(--panel-paso-bajada-color);
+    line-height: var(--panel-paso-bajada-interlineado);
+    font-size: var(--panel-paso-bajada-tamano);
+}
+
+.ea-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--panel-asistente-navegacion-separacion);
+    margin-top: var(--panel-asistente-navegacion-margen-arriba);
+}
+
+.ea-wizard-nav .ea-button {
+    min-width: var(--panel-asistente-navegacion-boton-ancho-min);
+}
+
+/* Variante con los botones pegados a la izquierda (pantalla del QR). */
+.ea-wizard-nav--izq {
+    justify-content: flex-start;
+}
+
 /* ---------- Celular angosto ------------------------------------------- */
 @media (max-width: 520px) {
     .ea-dev-toolbar { flex-direction: column; align-items: stretch; }
     .ea-dev-toolbar .ea-button { justify-content: center; }
+}
+@media (max-width: 520px) {
+    .ea-wizard-nav .ea-button {
+        min-width: 0;
+        flex: 1;
+    }
 }

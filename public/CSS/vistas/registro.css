@@ -1,0 +1,64 @@
+/* =====================================================================
+   vistas/registro.css — pantalla "Crear cuenta" (medidor de fuerza de la contraseña)
+   ---------------------------------------------------------------------
+   Vista: app/Views/registro.php
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/acceso.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- Medidor de fuerza de la contraseña ------------------------------ */
+    --registro-fuerza-separacion:           6px;   /* separación entre elementos — fuerza */
+    --registro-fuerza-riel-alto:            8px;   /* alto — riel de fuerza */
+    --registro-fuerza-riel-redondeo:        var(--redondeo-pildora);   /* redondeo de las esquinas — riel de fuerza */
+    --registro-fuerza-riel-fondo:           var(--color-linea-suave);   /* fondo — riel de fuerza */
+    --registro-fuerza-riel-span-ancho:      10%;   /* ancho — span de fuerza riel */
+    --registro-fuerza-riel-span-fondo:      var(--verde-500);   /* fondo — span de fuerza riel */
+    --registro-fuerza-riel-span-redondeo:   var(--redondeo-pildora);   /* redondeo de las esquinas — span de fuerza riel */
+    --registro-fuerza-riel-span-transicion: width 0.25s ease, background-color 0.25s ease;   /* animación de los cambios — span de fuerza riel */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Este archivo no tiene cortes de pantalla propios.            #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- Medidor de fuerza de la contraseña -------------------------------- */
+
+.ea-strength {
+    display: flex;
+    flex-direction: column;
+    gap: var(--registro-fuerza-separacion);
+}
+
+.ea-strength-track {
+    width: 100%;
+    height: var(--registro-fuerza-riel-alto);
+    border-radius: var(--registro-fuerza-riel-redondeo);
+    background: var(--registro-fuerza-riel-fondo);
+    overflow: hidden;
+}
+
+.ea-strength-track span {
+    display: block;
+    height: 100%;
+    width: var(--registro-fuerza-riel-span-ancho);
+    background: var(--registro-fuerza-riel-span-fondo);
+    border-radius: var(--registro-fuerza-riel-span-redondeo);
+    transition: var(--registro-fuerza-riel-span-transicion);
+}

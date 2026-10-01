@@ -1,7 +1,7 @@
 <?php
 /* =============================================================================
    VISTA: inicio.php — LANDING PÚBLICA de EdenAir (ruta "/")
-   CSS:  public/CSS/inicio.css (+ eden-brand.css global, cargado por el head)
+   CSS:  public/CSS/vistas/inicio.css (+ comun.css). Se cargan solos (app/Libraries/Vista.php)
    JS:   inicio.js (menú, fetch sensores) · inicio-gsap.js (animaciones de
          scroll) · eden-core-3d.js (núcleo 3D del hero) · ea-scrollbar.js
    CÓMO LEER ESTA VISTA: cada sección está marcada con un comentario
@@ -27,7 +27,6 @@ ob_start(); ?>
 <head>
     <?= view('partials/head', [
         'title'    => 'Eden Air · Monitoreo y ambientación inteligente del aire',
-        'extraCss' => ['CSS/inicio.css'],
         'extraHead' =>
               '<meta name="description" content="Eden Air es un sistema inteligente de monitoreo y ambientación automática para interiores: sensa temperatura, humedad, CO₂ y calidad del aire, decide y actúa con un dashboard propio.">'
             . '<meta name="keywords" content="Eden Air, calidad del aire, monitoreo ambiental, IoT, ESP32, automatización ambiental, sustentable, smart home">'

@@ -1,0 +1,424 @@
+/* =====================================================================
+   vistas/dispositivos/conectar.css — pantalla "Conectá tu Eden Air" (QR y espera de la vinculación)
+   ---------------------------------------------------------------------
+   Vista: app/Views/dispositivos/conectar.php  ·  Ruta: /panel/dispositivos/conectar
+   Se carga sola cuando se dibuja esa vista (app/Libraries/Vista.php).
+
+   Depende de: comun.css y vistas/layouts/panel.css.
+   ===================================================================== */
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 1 — AJUSTES                                               #
+   #   Colores, letras, tamaños, espacios, bordes, sombras y tiempos.  #
+   #                                                                   #
+   ##################################################################### */
+
+:root {
+    /* ---- "Conectá tu Eden Air" — pantalla única con QR de vinculación ---- */
+    --conectar-ancho-max:                    880px;   /* ancho máximo — el componente */
+    --conectar-tarjeta-relleno:              clamp(20px, 4vw, 34px);   /* espacio interno — tarjeta */
+    --conectar-tarjeta-redondeo:             var(--redondeo-grande, 22px);   /* redondeo de las esquinas — tarjeta */
+    --conectar-tarjeta-fondo:                radial-gradient(120% 90% at 90% 0%, rgba(184, 213, 208, 0.18), transparent 60%), var(--color-tarjeta);   /* fondo — tarjeta */
+    --conectar-tarjeta-borde:                1px solid var(--color-linea);   /* borde — tarjeta */
+    --conectar-tarjeta-sombra:               var(--sombra-media);   /* sombra — tarjeta */
+    --conectar-panel-animacion:              ea-pair-in 0.28s ease;   /* animación — panel */
+    --conectar-anim-in-pfrom-transformacion: translateY(6px);   /* desplazamiento/escala/giro — animación "ea-pair-in" al from */
+
+    /* ---- Reposo: el botón "Conectar" ------------------------------------- */
+    --conectar-pasos-margen:             0 0 24px;   /* margen — pasos */
+    --conectar-pasos-separacion:         12px;   /* separación entre elementos — pasos */
+    --conectar-pasos-item-separacion:    12px;   /* separación entre elementos — item de pasos */
+    --conectar-pasos-item-tamano:        0.9063rem;   /* tamaño de letra — item de pasos */
+    --conectar-pasos-item-color:         var(--color-texto-secundario);   /* color del texto — item de pasos */
+    --conectar-pasos-item-interlineado:  1.5;   /* separación entre renglones — item de pasos */
+    --conectar-pasos-negrita-ancho:      26px;   /* ancho — negrita de pasos */
+    --conectar-pasos-negrita-alto:       26px;   /* alto — negrita de pasos */
+    --conectar-pasos-negrita-fondo:      var(--verde-700);   /* fondo — negrita de pasos */
+    --conectar-pasos-negrita-color:      var(--verde-100);   /* color del texto — negrita de pasos */
+    --conectar-pasos-negrita-fuente:     var(--fuente-codigo);   /* tipografía — negrita de pasos */
+    --conectar-pasos-negrita-tamano:     0.7813rem;   /* tamaño de letra — negrita de pasos */
+    --conectar-pasos-negrita-peso:       600;   /* grosor de letra — negrita de pasos */
+    --conectar-pasos-chico-color:        var(--color-texto-suave);   /* color del texto — chico de pasos */
+    --conectar-pasos-chico-tamano:       0.8125rem;   /* tamaño de letra — chico de pasos */
+    --conectar-nota-final-margen-arriba: 18px;   /* margen de arriba — final de nota */
+    --conectar-nota-final-tamano:        0.8438rem;   /* tamaño de letra — final de nota */
+    --conectar-llamado-ancho-min:        220px;   /* ancho mínimo — llamado */
+    --conectar-llamado-tamano:           0.9688rem;   /* tamaño de letra — llamado */
+    --conectar-llamado-relleno:          13px 26px;   /* espacio interno — llamado */
+
+    /* ---- En vivo: QR + espera -------------------------------------------- */
+    --conectar-envivo-columnas:                    minmax(0, 260px) minmax(0, 1fr);   /* columnas de la grilla — en vivo */
+    --conectar-envivo-separacion:                  clamp(20px, 4vw, 34px);   /* separación entre elementos — en vivo */
+    --conectar-qr-relleno:                         14px;   /* espacio interno — qr */
+    --conectar-qr-redondeo:                        18px;   /* redondeo de las esquinas — qr */
+    --conectar-qr-fondo:                           #ffffff;   /* fondo — qr */
+    --conectar-qr-borde:                           1px solid var(--color-linea);   /* borde — qr */
+    --conectar-qr-sombra:                          var(--sombra-chica);   /* sombra — qr */
+    --conectar-qr-icono-redondeo:                  8px;   /* redondeo de las esquinas — ícono de qr */
+    --conectar-qr-nota-margen:                     10px 0 0;   /* margen — nota de qr */
+    --conectar-qr-nota-tamano:                     0.75rem;   /* tamaño de letra — nota de qr */
+    --conectar-qr-nota-interlineado:               1.45;   /* separación entre renglones — nota de qr */
+    --conectar-qr-nota-color:                      var(--color-texto-suave);   /* color del texto — nota de qr */
+    --conectar-net-margen:                         0 0 18px;   /* margen — net */
+    --conectar-net-separacion:                     8px;   /* separación entre elementos — net */
+    --conectar-net-relleno:                        14px 16px;   /* espacio interno — net */
+    --conectar-net-redondeo:                       12px;   /* redondeo de las esquinas — net */
+    --conectar-net-fondo:                          var(--color-linea-suave);   /* fondo — net */
+    --conectar-net-caja-separacion:                14px;   /* separación entre elementos — caja de net */
+    --conectar-net-caja-tamano:                    0.8438rem;   /* tamaño de letra — caja de net */
+    --conectar-net-nombre-color:                   var(--color-texto-suave);   /* color del texto — nombre de net */
+    --conectar-net-valor-fuente:                   var(--fuente-codigo);   /* tipografía — valor de net */
+    --conectar-net-valor-tamano:                   0.8125rem;   /* tamaño de letra — valor de net */
+    --conectar-net-valor-color:                    var(--color-texto);   /* color del texto — valor de net */
+    --conectar-net-valor-peso:                     600;   /* grosor de letra — valor de net */
+    --conectar-hints-margen:                       0 0 18px;   /* margen — hints */
+    --conectar-hints-relleno:                      0 0 0 18px;   /* espacio interno — hints */
+    --conectar-hints-separacion:                   7px;   /* separación entre elementos — hints */
+    --conectar-hints-tamano:                       0.8125rem;   /* tamaño de letra — hints */
+    --conectar-hints-interlineado:                 1.5;   /* separación entre renglones — hints */
+    --conectar-hints-color:                        var(--color-texto-suave);   /* color del texto — hints */
+    --conectar-hints-negrita-color:                var(--color-texto-secundario);   /* color del texto — negrita de hints */
+    --conectar-hints-negrita-peso:                 600;   /* grosor de letra — negrita de hints */
+    --conectar-estado-separacion:                  10px;   /* separación entre elementos — estado */
+    --conectar-estado-relleno:                     12px 14px;   /* espacio interno — estado */
+    --conectar-estado-redondeo:                    12px;   /* redondeo de las esquinas — estado */
+    --conectar-estado-fondo:                       var(--color-info-suave);   /* fondo — estado */
+    --conectar-estado-color:                       var(--color-texto-secundario);   /* color del texto — estado */
+    --conectar-estado-tamano:                      0.875rem;   /* tamaño de letra — estado */
+    --conectar-estado-peso:                        500;   /* grosor de letra — estado */
+    --conectar-ruedita-ancho:                      16px;   /* ancho — ruedita */
+    --conectar-ruedita-alto:                       16px;   /* alto — ruedita */
+    --conectar-ruedita-borde:                      2px solid var(--color-info);   /* borde — ruedita */
+    --conectar-ruedita-animacion:                  ea-pair-spin 0.8s linear infinite;   /* animación — ruedita */
+    --conectar-anim-spin-pto-transformacion:       rotate(360deg);   /* desplazamiento/escala/giro — animación "ea-pair-spin" al to */
+    --conectar-ruedita-animacion-duracion-sin-movimiento: 2.4s;   /* duración de la animación — ruedita (si se pidió reducir el movimiento) */
+    --conectar-timer-margen:                       10px 0 18px;   /* margen — timer */
+    --conectar-timer-tamano:                       0.8125rem;   /* tamaño de letra — timer */
+    --conectar-timer-color:                        var(--color-texto-suave);   /* color del texto — timer */
+    --conectar-timer-negrita-fuente:               var(--fuente-codigo);   /* tipografía — negrita de timer */
+    --conectar-timer-negrita-color:                var(--color-texto-secundario);   /* color del texto — negrita de timer */
+
+    /* ---- Resultado ------------------------------------------------------- */
+    --conectar-result-relleno:                 10px 0;   /* espacio interno — result */
+    --conectar-result-icono-ancho:             62px;   /* ancho — ícono de result */
+    --conectar-result-icono-alto:              62px;   /* alto — ícono de result */
+    --conectar-result-icono-margen:            0 auto 16px;   /* margen — ícono de result */
+    --conectar-result-icono-fondo:             var(--color-exito-suave);   /* fondo — ícono de result */
+    --conectar-result-icono-color:             var(--verde-500);   /* color del texto — ícono de result */
+    --conectar-result-icono-icono-ancho:       30px;   /* ancho — ícono de result ícono */
+    --conectar-result-icono-icono-alto:        30px;   /* alto — ícono de result ícono */
+    --conectar-result-warn-result-icono-fondo: var(--color-alerta-suave);   /* fondo — ícono de result warn result */
+    --conectar-result-warn-result-icono-color: var(--color-alerta);   /* color del texto — ícono de result warn result */
+    --conectar-result-titulo-fuente:           var(--fuente-titulos);   /* tipografía — título de result */
+    --conectar-result-titulo-tamano:           1.5rem;   /* tamaño de letra — título de result */
+    --conectar-result-titulo-margen:           0 0 8px;   /* margen — título de result */
+    --conectar-result-titulo-color:            var(--color-texto);   /* color del texto — título de result */
+    --conectar-result-texto-margen:            0 auto 22px;   /* margen — texto de result */
+    --conectar-result-texto-ancho-max:         46ch;   /* ancho máximo — texto de result */
+    --conectar-result-texto-color:             var(--color-texto-suave);   /* color del texto — texto de result */
+    --conectar-result-texto-interlineado:      1.55;   /* separación entre renglones — texto de result */
+    --conectar-acciones-separacion:            12px;   /* separación entre elementos — acciones */
+    --conectar-qr-ancho-max-hasta-720:         260px;   /* ancho máximo — qr (hasta 720px de ancho) */
+}
+
+
+/* #####################################################################
+   #                                                                   #
+   #   PARTE 2 — ESTRUCTURA                                            #
+   #   Para cambiar cómo se ve algo NO hace falta tocar nada de acá:   #
+   #   todo sale de las variables de la parte 1.                       #
+   #                                                                   #
+   #   Cortes de pantalla que se usan abajo (los @media no aceptan     #
+   #   variables, por eso están escritos como número):                 #
+   #     hasta 720px de ancho                                          #
+   #     hasta 520px de ancho                                          #
+   #                                                                   #
+   ##################################################################### */
+
+/* ---------- "Conectá tu Eden Air" — pantalla única con QR de vinculación ------ */
+
+.ea-pair {
+    max-width: var(--conectar-ancho-max);
+}
+
+.ea-pair-card {
+    padding: var(--conectar-tarjeta-relleno);
+    border-radius: var(--conectar-tarjeta-redondeo);
+    background: var(--conectar-tarjeta-fondo);
+    border: var(--conectar-tarjeta-borde);
+    box-shadow: var(--conectar-tarjeta-sombra);
+}
+
+.ea-pair-panel[hidden] {
+    display: none;
+}
+
+.ea-pair-panel {
+    animation: var(--conectar-panel-animacion);
+}
+
+@keyframes ea-pair-in {
+    from {
+        opacity: 0;
+        transform: var(--conectar-anim-in-pfrom-transformacion);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---------- Reposo: el botón "Conectar" --------------------------------------- */
+
+.ea-pair-steps {
+    list-style: none;
+    margin: var(--conectar-pasos-margen);
+    padding: 0;
+    display: grid;
+    gap: var(--conectar-pasos-separacion);
+}
+
+.ea-pair-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--conectar-pasos-item-separacion);
+    font-size: var(--conectar-pasos-item-tamano);
+    color: var(--conectar-pasos-item-color);
+    line-height: var(--conectar-pasos-item-interlineado);
+}
+
+.ea-pair-steps li b {
+    flex: none;
+    width: var(--conectar-pasos-negrita-ancho);
+    height: var(--conectar-pasos-negrita-alto);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--conectar-pasos-negrita-fondo);
+    color: var(--conectar-pasos-negrita-color);
+    font-family: var(--conectar-pasos-negrita-fuente);
+    font-size: var(--conectar-pasos-negrita-tamano);
+    font-weight: var(--conectar-pasos-negrita-peso);
+}
+
+.ea-pair-steps small {
+    display: block;
+    color: var(--conectar-pasos-chico-color);
+    font-size: var(--conectar-pasos-chico-tamano);
+}
+
+.ea-pair-nota-final {
+    margin-top: var(--conectar-nota-final-margen-arriba);
+    font-size: var(--conectar-nota-final-tamano);
+}
+
+.ea-pair-cta {
+    min-width: var(--conectar-llamado-ancho-min);
+    font-size: var(--conectar-llamado-tamano);
+    padding: var(--conectar-llamado-relleno);
+}
+
+/* ---------- En vivo: QR + espera ---------------------------------------------- */
+
+.ea-pair-live {
+    display: grid;
+    grid-template-columns: var(--conectar-envivo-columnas);
+    gap: var(--conectar-envivo-separacion);
+    align-items: start;
+}
+
+.ea-pair-qr {
+    padding: var(--conectar-qr-relleno);
+    border-radius: var(--conectar-qr-redondeo);
+    background: var(--conectar-qr-fondo);
+    border: var(--conectar-qr-borde);
+    box-shadow: var(--conectar-qr-sombra);
+    line-height: 0;
+}
+
+.ea-pair-qr svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--conectar-qr-icono-redondeo);
+}
+
+.ea-pair-qr-note {
+    margin: var(--conectar-qr-nota-margen);
+    font-size: var(--conectar-qr-nota-tamano);
+    line-height: var(--conectar-qr-nota-interlineado);
+    color: var(--conectar-qr-nota-color);
+    text-align: center;
+}
+
+.ea-pair-net {
+    margin: var(--conectar-net-margen);
+    display: grid;
+    gap: var(--conectar-net-separacion);
+    padding: var(--conectar-net-relleno);
+    border-radius: var(--conectar-net-redondeo);
+    background: var(--conectar-net-fondo);
+}
+
+.ea-pair-net > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--conectar-net-caja-separacion);
+    font-size: var(--conectar-net-caja-tamano);
+}
+
+.ea-pair-net dt {
+    margin: 0;
+    color: var(--conectar-net-nombre-color);
+}
+
+.ea-pair-net dd {
+    margin: 0;
+    font-family: var(--conectar-net-valor-fuente);
+    font-size: var(--conectar-net-valor-tamano);
+    color: var(--conectar-net-valor-color);
+    font-weight: var(--conectar-net-valor-peso);
+}
+
+/* Anticipa lo que el usuario va a ver en el celular: sin esto, el aviso de
+   "esta red no tiene internet" y la pagina que no abre sola se leen como
+   fallas del producto y la gente abandona la vinculacion a mitad de camino. */
+.ea-pair-hints {
+    margin: var(--conectar-hints-margen);
+    padding: var(--conectar-hints-relleno);
+    display: grid;
+    gap: var(--conectar-hints-separacion);
+    list-style: disc;
+    font-size: var(--conectar-hints-tamano);
+    line-height: var(--conectar-hints-interlineado);
+    color: var(--conectar-hints-color);
+}
+
+.ea-pair-hints b {
+    color: var(--conectar-hints-negrita-color);
+    font-weight: var(--conectar-hints-negrita-peso);
+}
+
+.ea-pair-status {
+    display: flex;
+    align-items: center;
+    gap: var(--conectar-estado-separacion);
+    padding: var(--conectar-estado-relleno);
+    border-radius: var(--conectar-estado-redondeo);
+    background: var(--conectar-estado-fondo);
+    color: var(--conectar-estado-color);
+    font-size: var(--conectar-estado-tamano);
+    font-weight: var(--conectar-estado-peso);
+}
+
+.ea-pair-spinner {
+    flex: none;
+    width: var(--conectar-ruedita-ancho);
+    height: var(--conectar-ruedita-alto);
+    border-radius: 50%;
+    border: var(--conectar-ruedita-borde);
+    border-top-color: transparent;
+    animation: var(--conectar-ruedita-animacion);
+}
+
+@keyframes ea-pair-spin {
+    to {
+        transform: var(--conectar-anim-spin-pto-transformacion);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-pair-spinner {
+        animation-duration: var(--conectar-ruedita-animacion-duracion-sin-movimiento);
+    }
+    .ea-pair-panel {
+        animation: none;
+    }
+}
+
+.ea-pair-timer {
+    margin: var(--conectar-timer-margen);
+    font-size: var(--conectar-timer-tamano);
+    color: var(--conectar-timer-color);
+}
+
+.ea-pair-timer b {
+    font-family: var(--conectar-timer-negrita-fuente);
+    color: var(--conectar-timer-negrita-color);
+}
+
+/* ---------- Resultado --------------------------------------------------------- */
+
+.ea-pair-result {
+    text-align: center;
+    padding: var(--conectar-result-relleno);
+}
+
+.ea-pair-result-icon {
+    width: var(--conectar-result-icono-ancho);
+    height: var(--conectar-result-icono-alto);
+    margin: var(--conectar-result-icono-margen);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--conectar-result-icono-fondo);
+    color: var(--conectar-result-icono-color);
+}
+
+.ea-pair-result-icon svg {
+    width: var(--conectar-result-icono-icono-ancho);
+    height: var(--conectar-result-icono-icono-alto);
+}
+
+.ea-pair-result--warn .ea-pair-result-icon {
+    background: var(--conectar-result-warn-result-icono-fondo);
+    color: var(--conectar-result-warn-result-icono-color);
+}
+
+.ea-pair-result h2 {
+    font-family: var(--conectar-result-titulo-fuente);
+    font-size: var(--conectar-result-titulo-tamano);
+    margin: var(--conectar-result-titulo-margen);
+    color: var(--conectar-result-titulo-color);
+}
+
+.ea-pair-result p {
+    margin: var(--conectar-result-texto-margen);
+    max-width: var(--conectar-result-texto-ancho-max);
+    color: var(--conectar-result-texto-color);
+    line-height: var(--conectar-result-texto-interlineado);
+}
+
+.ea-pair-actions {
+    display: flex;
+    gap: var(--conectar-acciones-separacion);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+    .ea-pair-live {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    .ea-pair-qr {
+        max-width: var(--conectar-qr-ancho-max-hasta-720);
+    }
+    .ea-pair-live > div:last-child {
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .ea-pair-cta {
+        width: 100%;
+        min-width: 0;
+    }
+    .ea-pair-actions .ea-button {
+        flex: 1;
+    }
+}
