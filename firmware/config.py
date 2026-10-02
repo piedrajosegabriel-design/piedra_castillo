@@ -24,7 +24,7 @@ tiempos que protegen al hardware.
 # OJO: no sirve "localhost" ni "127.0.0.1". Para la ESP32, localhost es ella
 # misma. Tenes que poner la IP de la computadora que corre XAMPP dentro de
 # tu red WiFi (en Windows se averigua con `ipconfig`, campo IPv4).
-SERVIDOR_DEFECTO = "http://192.168.2.130/piedra_castillo/public"
+SERVIDOR_DEFECTO = "http://192.168.2.130/EdenAir/public"
 
 
 def servidor():

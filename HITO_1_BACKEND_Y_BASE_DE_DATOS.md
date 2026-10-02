@@ -54,8 +54,8 @@ de alerta).
 | Capa | Tecnología |
 |---|---|
 | Lenguaje / Framework | PHP 8.2 + **CodeIgniter 4** (patrón MVC) |
-| Servidor | Apache (XAMPP), `http://localhost/piedra_castillo/public/` |
-| Base de datos | MySQL / MariaDB (`tesina_esp32`) |
+| Servidor | Apache (XAMPP), `http://localhost/EdenAir/public/` |
+| Base de datos | MySQL / MariaDB (`edenair`) |
 | Hardware (IoT) | ESP32 que envía mediciones y recibe comandos por una API REST |
 | Frontend | HTML + CSS propio (sistema de tokens) + JavaScript |
 
@@ -491,7 +491,7 @@ completo está en **`services.md`**.
 
 # 12. BASE DE DATOS (sección detallada)
 
-La base se llama **`tesina_esp32`**. Idea central: un **usuario** tiene uno o
+La base se llama **`edenair`**. Idea central: un **usuario** tiene uno o
 varios **ambientes** (con sus rangos ideales) y uno o varios **dispositivos**;
 cada dispositivo genera **mediciones** y tiene un **estado** de actuadores; y
 existe una **cola de comandos** para hablar con el hardware. Un **código de

@@ -13,11 +13,11 @@
 -- En la tabla users se guarda password_hash.
 -- La aplicacion usa password_hash() y password_verify().
 
-CREATE DATABASE IF NOT EXISTS tesina_esp32
+CREATE DATABASE IF NOT EXISTS edenair
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
 
-USE tesina_esp32;
+USE edenair;
 
 -- =========================================================
 -- TABLA: users

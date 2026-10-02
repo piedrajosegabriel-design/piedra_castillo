@@ -635,7 +635,7 @@ Otros pendientes de hardware:
 
 ## 9. Cómo probar cada vista
 
-> Base local: `http://localhost/piedra_castillo/public/`
+> Base local: `http://localhost/EdenAir/public/`
 > Migrar antes: `php spark migrate`.
 
 **Landing** (`/`)
@@ -663,7 +663,7 @@ sola llamada HTTP:
 3. Simulá que el equipo se conectó, desde otra terminal:
 
    ```bash
-   curl -X POST http://localhost/piedra_castillo/public/api/devices/pair -H "Content-Type: application/json" -d "{\"mac\":\"AA:BB:CC:11:22:33\",\"firmware\":\"1.0.0\"}"
+   curl -X POST http://localhost/EdenAir/public/api/devices/pair -H "Content-Type: application/json" -d "{\"mac\":\"AA:BB:CC:11:22:33\",\"firmware\":\"1.0.0\"}"
    ```
 
 4. En menos de 3 segundos la página tiene que saltar sola a **"quedó conectado"**.

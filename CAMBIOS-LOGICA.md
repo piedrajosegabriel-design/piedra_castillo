@@ -262,7 +262,7 @@ En la carpeta del proyecto **no hay `.env`** (solo `.env.example`), así que la
 web no puede conectarse a la base por sí sola. Para correr la migración pasé las
 credenciales como variables de entorno del proceso, sin tocar el proyecto. Antes
 de la feria necesitás recrear tu `.env` a partir de `.env.example` con
-`database.default.database = tesina_esp32`.
+`database.default.database = edenair`.
 
 ### 5. El firmware no se probó en la placa física
 

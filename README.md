@@ -42,7 +42,7 @@ El backend y la web estan terminados y esperan al hardware. La arquitectura fina
 1. Crear la base de datos:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS tesina_esp32
+CREATE DATABASE IF NOT EXISTS edenair
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_general_ci;
 ```
@@ -57,7 +57,7 @@ Y ajustar los datos de conexion:
 
 ```dotenv
 database.default.hostname = 127.0.0.1
-database.default.database = tesina_esp32
+database.default.database = edenair
 database.default.username = root
 database.default.password =
 database.default.DBDriver = MySQLi
@@ -88,7 +88,7 @@ C:\xampp\php\php.exe spark db:seed DatabaseSeeder
 
 4. Abrir en navegador:
 
-`http://localhost/piedra_castillo/public/`
+`http://localhost/EdenAir/public/`
 
 ## Trabajar en dos computadoras
 
