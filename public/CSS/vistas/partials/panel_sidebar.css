@@ -142,6 +142,7 @@
     --menu-compra-peso:        600;
     --menu-compra-sombra:      0 6px 18px rgba(28, 64, 41, 0.25), inset 0 0 0 1px rgba(201, 216, 112, 0.22);
     --menu-compra-sombra-hover: 0 10px 24px rgba(28, 64, 41, 0.30), inset 0 0 0 1px rgba(201, 216, 112, 0.38);
+    --menu-compra-fondo-hover: var(--menu-compra-fondo);    /* fondo al pasar el mouse (por defecto, el mismo verde) */
     --menu-compra-subida:      -1px;                      /* cuánto sube al pasar el mouse */
     --menu-compra-duracion:    0.16s;
 }
@@ -437,8 +438,12 @@
     transition: transform var(--menu-compra-duracion) ease, box-shadow var(--menu-compra-duracion) ease;
 }
 .ea-sidebar-item--cta:hover {
+    background: var(--menu-compra-fondo-hover);
     transform: translateY(var(--menu-compra-subida));
     box-shadow: var(--menu-compra-sombra-hover);
 }
+/* En oscuro, la regla de hover de las opciones es más fuerte: se repite acá
+   para que el botón no pierda su fondo verde (el texto es blanco). */
+:root[data-theme="dark"] .ea-sidebar-item--cta:hover { background: var(--menu-compra-fondo-hover); }
 .ea-sidebar-item--cta .ea-sidebar-icon { color: var(--menu-compra-icono-color); }
 .ea-sidebar-item--cta .ea-sidebar-label { color: var(--menu-compra-color) !important; font-weight: var(--menu-compra-peso); }

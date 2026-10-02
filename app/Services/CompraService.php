@@ -216,6 +216,7 @@ class CompraService
     {
         return [
             'nombre'      => self::PRODUCTO,
+            'descripcion' => self::DESCRIPCION,
             'precio'      => self::formatearMonto(self::PRECIO),
             'moneda'      => self::MONEDA,
             'configurado' => MercadoPago::configurado(),

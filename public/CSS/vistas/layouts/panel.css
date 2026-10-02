@@ -754,19 +754,6 @@ body.dashboard-body { overflow-x: hidden; }
     }
 }
 
-/* ---------- Impresión ------------------------------------------------- */
-@media print {
-    .ea-main { margin-left: 0; padding-top: 0; }
-    .ea-content { padding: var(--panel-impresion-relleno); }
-}
-
-@media print {
-    .ea-card {
-        break-inside: avoid;
-        box-shadow: none;
-    }
-}
-
 /* ---------- Layout fijo: el contenido deja lugar al menú y a la barra -
    El menú y la barra superior son position:fixed (ver sus archivos).
    Tiene que ser así para que funcione el scroll suave de GSAP: su
@@ -790,6 +777,19 @@ body.dashboard-body { overflow-x: hidden; }
     /* En celular el menú se superpone (es un cajón): el contenido no se corre */
     .ea-main { margin-left: 0; transition: none; }
     .ea-dashboard.sidebar-closed .ea-main { margin-left: 0; }
+}
+
+/* ---------- Impresión -------------------------------------------------
+   Va DESPUÉS del layout fijo: si estuviera antes, el margen del menú le
+   ganaría y la hoja impresa quedaría corrida a la derecha. */
+@media print {
+    .ea-main,
+    .ea-dashboard.sidebar-closed .ea-main { margin-left: 0; padding-top: 0; }
+    .ea-content { padding: var(--panel-impresion-relleno); }
+    .ea-card {
+        break-inside: avoid;
+        box-shadow: none;
+    }
 }
 
 /* ---------- Movimiento reducido --------------------------------------- */
