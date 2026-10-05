@@ -16,6 +16,7 @@ El nombre y la clave de esa red estan en config.py y TIENEN que coincidir
 con los que la web mete adentro del QR.
 """
 
+import gc
 import json
 import select
 import socket
@@ -427,14 +428,19 @@ def _enviar_todo(cliente, texto):
     escribio. Con la pagina vieja (chica) casi nunca pasaba; con esta, mas
     grande, pasa seguido: si no se reintenta, el celular recibe HTML cortado
     y muestra una pagina rota a la mitad.
+
+    Se reintenta sobre un memoryview: con datos[enviados:] cada vuelta copiaba
+    el resto de la pagina, y con poca RAM libre eso terminaba en MemoryError.
     """
     datos = texto.encode("utf-8") if isinstance(texto, str) else texto
+    vista = memoryview(datos)
     enviados = 0
 
     while enviados < len(datos):
         try:
-            escritos = cliente.send(datos[enviados:])
-        except OSError:
+            escritos = cliente.send(vista[enviados:])
+        except OSError as e:
+            print("Portal: envio cortado en %d de %d bytes (%s)" % (enviados, len(datos), e))
             return False
 
         if not escritos:
@@ -443,6 +449,22 @@ def _enviar_todo(cliente, texto):
         enviados += escritos
 
     return True
+
+
+def _responder(cliente, estado, cuerpo=b"", extra=""):
+    """
+    Manda una respuesta HTTP completa, con Content-Length.
+
+    Sin Content-Length el navegador solo sabe que la pagina termino cuando se
+    cierra la conexion; si ese cierre llega de golpe, descarta lo recibido y
+    muestra la pagina en blanco.
+    """
+    _enviar_todo(cliente,
+        "HTTP/1.1 %s\r\nContent-Type: text/html; charset=utf-8\r\n"
+        "Content-Length: %d\r\nCache-Control: no-store\r\nConnection: close\r\n%s\r\n"
+        % (estado, len(cuerpo), extra))
+    if cuerpo:
+        _enviar_todo(cliente, cuerpo)
 
 
 # URLs con las que Android, iOS y Windows preguntan "¿hay internet acá?".
@@ -590,6 +612,16 @@ def abrir_portal(error=None):
     # clave y vuelve a intentar, el link que ya tiene en la mano sigue valiendo.
     sesion = leer_sesion() or nueva_sesion()
 
+    # La pagina se arma UNA vez: las redes y el banner no cambian mientras el
+    # portal esta abierto. Armarla en cada pedido hacia varias copias de ~6 KB
+    # y, con la RAM que dejan los demas modulos, terminaba en MemoryError.
+    gc.collect()
+    pagina = (PAGINA.replace("%REDES%", opciones)
+                    .replace("%ERROR%", banner)
+                    .replace("%SERVIDOR%", _escapar_html(config.servidor()))).encode("utf-8")
+    opciones = banner = None
+    gc.collect()
+
     # 3) Apagar la interfaz de estacion: nada mas debe tocar la antena.
     sta = network.WLAN(network.STA_IF)
     sta.active(False)
@@ -654,8 +686,12 @@ def abrir_portal(error=None):
                 except OSError:
                     continue
 
+                camino = "?"
                 try:
-                    cliente.settimeout(5)
+                    # Corto a proposito: el celular abre conexiones que nunca
+                    # usa, y mientras se espera en una no se atiende el DNS
+                    # ni el pedido real.
+                    cliente.settimeout(2)
                     pedido, cuerpo = _leer_pedido(cliente)
                     camino = pedido.split(" ")[1] if " " in pedido else "/"
 
@@ -694,14 +730,14 @@ def abrir_portal(error=None):
                             except OSError:
                                 pass
 
-                            _enviar_todo(cliente,
-                                "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n"
-                                + PAGINA_OK.replace("%SSID%", _escapar_html(ssid))
-                                           .replace("%AP%", _escapar_html(config.AP_SSID))
-                                           .replace("%PANEL%", _escapar_html(panel)))
+                            _responder(cliente, "200 OK",
+                                PAGINA_OK.replace("%SSID%", _escapar_html(ssid))
+                                         .replace("%AP%", _escapar_html(config.AP_SSID))
+                                         .replace("%PANEL%", _escapar_html(panel))
+                                         .encode("utf-8"))
                             elegido = (ssid, password, nuevo_servidor)
                         else:
-                            _enviar_todo(cliente, "HTTP/1.1 303 See Other\r\nLocation: /\r\nConnection: close\r\n\r\n")
+                            _responder(cliente, "303 See Other", extra="Location: /\r\n")
 
                     elif _es_sonda(camino):
                         # El sistema operativo esta chequeando si hay internet.
@@ -709,23 +745,21 @@ def abrir_portal(error=None):
                         # "aca hay que iniciar sesion" y dispara la ventana
                         # automatica. Funciona aunque el DNS este secuestrado
                         # por un DNS privado del propio telefono.
-                        _enviar_todo(cliente,
-                            "HTTP/1.1 302 Found\r\nLocation: http://" + ip_portal +
-                            "/\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n")
+                        _responder(cliente, "302 Found",
+                                   extra="Location: http://" + ip_portal + "/\r\n")
 
                     else:
                         # Cualquier otra URL devuelve el formulario. Junto con
                         # el DNS y las sondas, esto hace que el celular lo abra
                         # solo casi siempre.
-                        _enviar_todo(cliente,
-                            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n"
-                            + PAGINA.replace("%REDES%", opciones)
-                                    .replace("%ERROR%", banner)
-                                    .replace("%SERVIDOR%", _escapar_html(config.servidor())))
-                except OSError:
-                    pass
+                        _responder(cliente, "200 OK", pagina)
+                except Exception as e:
+                    # Nunca en silencio, y nunca tumba el portal: un error en
+                    # un pedido no puede apagar el AP ni cortar main().
+                    print("Portal: fallo atendiendo", camino, "->", repr(e))
                 finally:
                     cliente.close()
+                    gc.collect()
     finally:
         vigilante.unregister(dns)
         vigilante.unregister(web)
