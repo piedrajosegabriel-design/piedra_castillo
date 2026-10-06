@@ -6,7 +6,9 @@ en voltaje. No decide nada: eso es trabajo de reglas.py.
 
 QUE MUEVE
   fan        -> rele del aire acondicionado (en la maqueta, el cooler)
-  aromatizer -> rele del atomizador ultrasonico (humidificador)
+  aromatizer -> rele del atomizador ultrasonico (humidificador). Este rele
+                esta soldado al BOTON del modulo: no se deja cerrado, se
+                le dan toques (ver ATOMIZADOR_POR_PULSOS en config.py)
   alert_led  -> LED rojo:  alerta de CO2 alto o calidad de aire mala
   green_led  -> LED verde: todo normal, monitoreo pasivo
   blue_led   -> LED azul:  orden de aire acondicionado activa
@@ -131,6 +133,44 @@ class Actuadores:
     def _escribir(self, nombre, valor):
         self._pines[nombre].value(self._nivel(nombre, valor))
 
+    def _por_toques(self, nombre):
+        """True si este actuador se maneja con toques en vez de nivel fijo."""
+        return nombre == "aromatizer" and config.ATOMIZADOR_POR_PULSOS
+
+    def _tocar(self, nombre, veces):
+        """
+        Aprieta el boton del modulo `veces` veces, como un dedo.
+
+        Cada toque: rele cerrado ATOMIZADOR_TOQUE_MS, despues abierto. Entre
+        toque y toque se espera ATOMIZADOR_ENTRE_TOQUES_MS para que el modulo
+        registre cada uno por separado. El rele SIEMPRE termina abierto.
+
+        Bloquea el ciclo mientras dura: 0,5 s para encender y 2,5 s para
+        apagar. Ocurre como mucho una vez cada RELE_MINIMO_ESTADO.
+        """
+        for i in range(veces):
+            if i > 0:
+                time.sleep_ms(config.ATOMIZADOR_ENTRE_TOQUES_MS)
+            self._escribir(nombre, "on")
+            time.sleep_ms(config.ATOMIZADOR_TOQUE_MS)
+            self._escribir(nombre, "off")
+
+    def _mover(self, nombre, valor):
+        """
+        Lleva el actuador al estado pedido.
+
+        Los toques dependen de saber en que modo quedo el modulo, por eso solo
+        se llama cuando el estado CAMBIA (aplicar() ya filtra lo repetido).
+        """
+        if not self._por_toques(nombre):
+            self._escribir(nombre, valor)
+            return
+
+        if valor == "on":
+            self._tocar(nombre, config.ATOMIZADOR_TOQUES_ENCENDER)
+        else:
+            self._tocar(nombre, config.ATOMIZADOR_TOQUES_APAGAR)
+
     def _puede_conmutar(self, nombre, ahora):
         """
         Los LEDs cambian cuando haga falta; los reles, no antes de tiempo.
@@ -193,7 +233,7 @@ class Actuadores:
             if nombre == "fan":
                 self._ordenar_por_infrarrojo(valor, ahora)
 
-            self._escribir(nombre, valor)
+            self._mover(nombre, valor)
             self.estado[nombre] = valor
             self._desde[nombre] = ahora
             cambios.append(nombre)
@@ -206,9 +246,21 @@ class Actuadores:
 
         Salta el tiempo minimo a proposito: es una parada de emergencia, no una
         regulacion.
+
+        EL ATOMIZADOR ES LA EXCEPCION. Sus toques no dicen "apagate": hacen
+        avanzar el modo del modulo. Si ya estaba apagado (por ejemplo al
+        arrancar, que el modulo nace apagado), mandarle los 3 toques lo
+        dejaria ENCENDIDO. Por eso solo se le dan si estaba encendido; si no,
+        alcanza con asegurar el rele abierto.
         """
         for nombre in self._pines:
-            self._escribir(nombre, "off")
+            if self._por_toques(nombre):
+                if self.estado[nombre] == "on":
+                    self._tocar(nombre, config.ATOMIZADOR_TOQUES_APAGAR)
+                else:
+                    self._escribir(nombre, "off")    # solo suelta el rele
+            else:
+                self._escribir(nombre, "off")
             self.estado[nombre] = "off"
 
     def como_dict(self):
@@ -229,7 +281,9 @@ GLOSARIO DE ESTE ARCHIVO
 - hay_alguno() / conectados()   -> que hay realmente armado en esta placa
 - encendido(nombre)             -> si ese actuador esta prendido ahora
 - aplicar(deseado, ahora)       -> mueve lo que cambia; devuelve que movio
-- apagar_todo()                 -> parada de emergencia, sin tiempo minimo
+- apagar_todo()                 -> parada de emergencia, sin tiempo minimo;
+                                   al atomizador solo le da toques si estaba
+                                   encendido
 - como_dict()                   -> el estado para el reporte al servidor
 - ir_confirmado                 -> True / False / None de la ultima orden IR
 - demorados                     -> reles que pidieron cambiar pero todavia no
@@ -239,4 +293,7 @@ Privados:
 - _nivel(nombre, valor)         -> "on"/"off" al nivel electrico de cada tipo
 - _puede_conmutar(nombre, ahora)-> tiempo minimo de los reles
 - _ordenar_por_infrarrojo()     -> emite la trama antes de mover el rele
+- _por_toques(nombre)           -> si ese actuador va por toques (atomizador)
+- _tocar(nombre, veces)         -> aprieta el boton del modulo N veces
+- _mover(nombre, valor)         -> nivel fijo o toques, segun el actuador
 """

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Estudio EdenAir</title>
+<style>
+/* ==========================================================================
+   Estudio EdenAir — hoja autocontenida. Sin CDNs ni archivos externos.
+   Si IBM Plex está instalada en la PC se usa; si no, cae a la del sistema.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  --bg: #EDE9E0;
+  --panel: #FAF8F4;
+  --ink: #23262A;
+  --ink2: #5A5E62;
+  --line: #D8D1C4;
+
+  --fw: #14706E;   --fw-t: #DCEBE8;   /* FIRMWARE  = verde     */
+  --be: #2E5A7D;   --be-t: #DEE7EF;   /* BACKEND   = azul      */
+  --db: #8A5115;   --db-t: #F2E6D6;   /* BASE DATOS= ámbar     */
+  --al: #B2402E;   --al-t: #F6E0DA;   /* ALERTA    = terracota */
+  --vi: #6A4C7D;   --vi-t: #ECE4F0;   /* VISTAS (parciales/layouts) */
+
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 var(--sans);
+}
+code, .mono { font-family: var(--mono); font-size: .9em; }
+code { background: rgba(35,38,42,.06); padding: 1px 5px; border-radius: 4px; }
+h1, h2, h3, h4 { line-height: 1.2; margin: 0 0 .5em; }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.12rem; }
+h4 { font-size: .95rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); margin-top: 1em; }
+p { margin: .4em 0 .8em; }
+ul { margin: .3em 0 .8em; padding-left: 1.2em; }
+li { margin: .15em 0; }
+a { color: var(--be); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 80px; }
+
+/* ---------- Portada ---------- */
+.hero {
+  background: var(--ink); color: var(--panel);
+  padding: 34px 16px 26px; margin-bottom: 0;
+}
+.hero .in { max-width: 1180px; margin: 0 auto; }
+.hero h1 { font-size: 2.3rem; letter-spacing: -.01em; }
+.hero h1 span { color: #7FC4C1; }
+.hero p { color: #CFCBC2; max-width: 760px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.legend .chip { font-size: .85rem; }
+
+/* ---------- Índice fijo ---------- */
+.toc {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(250,248,244,.96); border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(6px);
+}
+.toc .in {
+  max-width: 1180px; margin: 0 auto; padding: 8px 16px;
+  display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;
+}
+.toc a {
+  text-decoration: none; color: var(--ink); font-size: .82rem; font-weight: 600;
+  padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel);
+}
+.toc a.fw { border-color: var(--fw); color: var(--fw); }
+.toc a.be { border-color: var(--be); color: var(--be); }
+.toc a.db { border-color: var(--db); color: var(--db); }
+.toc a.al { border-color: var(--al); color: var(--al); background: var(--al-t); }
+.toc a.vi { border-color: var(--vi); color: var(--vi); }
+
+/* ---------- Chips de tipo ---------- */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px; font-weight: 600; font-size: .78rem;
+  color: #fff; background: var(--ink);
+}
+.chip.fw { background: var(--fw); } .chip.be { background: var(--be); }
+.chip.db { background: var(--db); } .chip.al { background: var(--al); }
+.chip.vi { background: var(--vi); }
+.chip.ghost { background: transparent; color: var(--ink2); border: 1px solid var(--line); }
+
+/* ---------- Secciones ---------- */
+.sec {
+  background: var(--panel); border-radius: 14px; margin-top: 26px;
+  padding: 22px 22px 18px; border-top: 6px solid var(--ink);
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+.sec.fw { border-top-color: var(--fw); } .sec.be { border-top-color: var(--be); }
+.sec.db { border-top-color: var(--db); } .sec.al { border-top-color: var(--al); }
+.sec.vi { border-top-color: var(--vi); }
+.sec > header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.num {
+  font: 700 1rem var(--mono); color: #fff; background: var(--ink);
+  width: 34px; height: 34px; border-radius: 9px; display: inline-grid; place-items: center;
+}
+.fw .num { background: var(--fw); } .be .num { background: var(--be); }
+.db .num { background: var(--db); } .al .num { background: var(--al); } .vi .num { background: var(--vi); }
+
+.one {
+  font-size: 1.02rem; font-weight: 600; border-left: 4px solid var(--ink);
+  padding: 4px 0 4px 12px; margin: 8px 0 14px;
+}
+.fw .one { border-color: var(--fw); } .be .one { border-color: var(--be); }
+.db .one { border-color: var(--db); } .vi .one { border-color: var(--vi); }
+
+/* ---------- Grillas y tarjetas ---------- */
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+.card {
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; position: relative;
+}
+.card.fw { border-left: 6px solid var(--fw); } .card.be { border-left: 6px solid var(--be); }
+.card.db { border-left: 6px solid var(--db); } .card.vi { border-left: 6px solid var(--vi); }
+.card.al { border-left: 6px solid var(--al); background: #FFF9F7; }
+.card h3 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card h3 .ic { font-size: 1.25rem; }
+.card .tag { font-size: .8rem; color: var(--ink2); font-style: italic; margin: -2px 0 8px; }
+.kv { display: grid; grid-template-columns: 112px 1fr; gap: 4px 10px; font-size: .9rem; margin-top: 6px; }
+.kv dt { font-weight: 700; color: var(--ink2); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.card, .card p, .card li { overflow-wrap: anywhere; }
+
+/* ---------- Cajas especiales ---------- */
+.memo {
+  background: #FFF6E0; border: 1px dashed #C99A3E; border-radius: 12px;
+  padding: 12px 14px 10px 46px; position: relative; margin: 12px 0;
+}
+.memo::before { content: "🧠"; position: absolute; left: 13px; top: 10px; font-size: 1.3rem; }
+.memo b { color: #6B4510; }
+.note {
+  background: var(--be-t); border-radius: 10px; padding: 10px 14px; margin: 10px 0; font-size: .92rem;
+}
+.warn {
+  background: var(--al-t); border: 1px solid #E2B2A8; border-radius: 10px;
+  padding: 10px 14px; margin: 10px 0; font-size: .92rem;
+}
+.stop {
+  background: #fff; border: 3px solid var(--al); border-radius: 14px; padding: 16px 18px; margin: 16px 0;
+}
+.stop > h3 { color: var(--al); }
+.prop { border-top: 1px dashed #E2B2A8; padding-top: 10px; margin-top: 10px; }
+.prop:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.prop h4 { color: var(--al); text-transform: none; letter-spacing: 0; font-size: 1rem; margin: 4px 0; }
+.diff { font-family: var(--mono); font-size: .85rem; background: #F7F4EE; border-radius: 8px; padding: 8px 10px; overflow-x: auto; white-space: pre; }
+.diff .m { color: var(--al); } .diff .p { color: var(--fw); }
+
+/* ---------- Tablas ---------- */
+.tw { overflow-x: auto; margin: 8px 0 12px; border-radius: 10px; border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; background: #fff; font-size: .9rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #EEE9DF; vertical-align: top; }
+th { background: #F3EFE7; font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink2); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.v { font: 700 1.05rem var(--mono); white-space: nowrap; }
+td.k { font-family: var(--mono); font-size: .84rem; font-weight: 600; white-space: nowrap; }
+tr.bad td { background: #FDF1EE; }
+tr.bad td:first-child { box-shadow: inset 5px 0 0 var(--al); }
+tr.ok td:first-child { box-shadow: inset 5px 0 0 var(--fw); }
+.ok-b, .bad-b, .info-b {
+  display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+}
+.ok-b { background: var(--fw-t); color: var(--fw); }
+.bad-b { background: var(--al); color: #fff; }
+.info-b { background: var(--be-t); color: var(--be); }
+
+/* ---------- Diagramas ---------- */
+.fig { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 10px 0 14px; }
+.fig svg { width: 100%; height: auto; display: block; }
+.fig figcaption { font-size: .82rem; color: var(--ink2); padding: 6px 4px 0; }
+svg text { font-family: var(--sans); }
+svg .mono { font-family: var(--mono); }
+
+/* ---------- Placa de pines ---------- */
+.pins { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 8px; }
+.pin { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: flex; gap: 10px; align-items: center; }
+.pin b { font: 700 1.3rem var(--mono); color: var(--fw); min-width: 34px; }
+.pin span { font-size: .84rem; line-height: 1.3; }
+
+/* ---------- Pasos ---------- */
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps li { counter-increment: s; position: relative; padding: 6px 0 6px 40px; }
+.steps li::before {
+  content: counter(s); position: absolute; left: 0; top: 5px;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: #fff;
+  font: 700 .85rem var(--mono); display: grid; place-items: center;
+}
+.steps.fw li::before { background: var(--fw); } .steps.be li::before { background: var(--be); }
+
+.split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0,1fr); } .kv { grid-template-columns: 1fr; } .hero h1 { font-size: 1.8rem; } .sec { padding: 18px 14px; } }
+
+.foot { text-align: center; color: var(--ink2); font-size: .82rem; margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<!-- =================================================================== -->
+<div class="hero">
+  <div class="in">
+    <h1>Estudio <span>EdenAir</span></h1>
+    <p>Mapa para entender y memorizar el proyecto: firmware MicroPython (ESP32) + backend CodeIgniter 4 + base MySQL.
+       Todo sale del código real del repo (rama actual, último commit <code>4cefd89</code>, 05/10/2026). Donde el código no dice algo, está marcado como <b>“no está en el código”</b>.</p>
+    <div class="legend">
+      <span class="chip fw">● Firmware (.py, ESP32)</span>
+      <span class="chip be">● Backend (PHP, servidor)</span>
+      <span class="chip db">● Base de datos</span>
+      <span class="chip vi">● Vistas: parciales y layouts</span>
+      <span class="chip al">● Alerta / incoherencia</span>
+    </div>
+  </div>
+</div>
+
+<nav class="toc"><div class="in">
+  <a href="#mapa">0 · Mapa</a>
+  <a class="fw" href="#firmware">1 · Firmware</a>
+  <a class="al" href="#tiempos">2 · Tiempos ⏱</a>
+  <a class="db" href="#bd">3 · Base de datos</a>
+  <a class="db" href="#relaciones">4 · Relaciones</a>
+  <a class="be" href="#modelos">5 · Modelos</a>
+  <a class="be" href="#servicios">6 · Servicios</a>
+  <a class="be" href="#controladores">7 · Controladores</a>
+  <a class="vi" href="#vistas">8 · Parciales y layouts</a>
+  <a class="be" href="#nuevo">9 · Lo nuevo</a>
+  <a class="al" href="#faltantes">10 · Pendientes</a>
+</div></nav>
+
+<div class="wrap">
+
+<!-- =================================================================== -->
+<section class="sec" id="mapa">
+  <header><span class="num">0</span><h2>El mapa completo en una imagen</h2></header>
+  <p class="one">El equipo <b>mide y decide solo</b>; el servidor <b>da los números, guarda y muestra</b>.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 1100 430" role="img" aria-label="Arquitectura EdenAir">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#23262A"/></marker>
+      </defs>
+      <!-- ESP32 -->
+      <rect x="10" y="20" width="330" height="390" rx="16" fill="#DCEBE8" stroke="#14706E" stroke-width="2"/>
+      <text x="26" y="50" font-size="20" font-weight="700" fill="#14706E">ESP32 · firmware/</text>
+      <text x="26" y="72" font-size="13" fill="#23262A">main.py orquesta todo</text>
+      <g font-size="13">
+        <rect x="26" y="88" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="36" y="108" font-weight="700">sensor.py</text><text x="36" y="124" fill="#5A5E62">SCD41 · T, H, CO₂</text>
+        <rect x="184" y="88" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="194" y="108" font-weight="700">aire.py</text><text x="194" y="124" fill="#5A5E62">MQ-135 · índice</text>
+        <rect x="26" y="150" width="298" height="44" rx="8" fill="#14706E"/><text x="36" y="170" font-weight="700" fill="#fff">reglas.py · DECIDE</text><text x="36" y="186" fill="#DCEBE8">histéresis + ciclo atomizador</text>
+        <rect x="26" y="212" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="36" y="232" font-weight="700">actuadores.py</text><text x="36" y="248" fill="#5A5E62">relés + 3 LEDs</text>
+        <rect x="184" y="212" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="194" y="232" font-weight="700">infrarrojo.py</text><text x="194" y="248" fill="#5A5E62">trama NEC 38 kHz</text>
+        <rect x="26" y="274" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="36" y="294" font-weight="700">red.py</text><text x="36" y="310" fill="#5A5E62">WiFi + portal QR</text>
+        <rect x="184" y="274" width="140" height="44" rx="8" fill="#fff" stroke="#14706E"/><text x="194" y="294" font-weight="700">servidor.py</text><text x="194" y="310" fill="#5A5E62">habla con la API</text>
+        <rect x="26" y="336" width="298" height="58" rx="8" fill="#fff" stroke="#14706E" stroke-dasharray="5 4"/><text x="36" y="358" font-weight="700">config.py</text><text x="36" y="376" fill="#5A5E62">pines · tiempos de arranque · calibración</text>
+      </g>
+      <!-- HTTP -->
+      <g font-size="11.5" class="mono">
+        <line x1="345" y1="140" x2="470" y2="140" stroke="#23262A" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="350" y="132">POST pair</text>
+        <line x1="470" y1="175" x2="345" y2="175" stroke="#23262A" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="350" y="168">GET config</text>
+        <line x1="345" y1="215" x2="470" y2="215" stroke="#23262A" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="350" y="207">POST measurem.</text>
+        <line x1="470" y1="255" x2="345" y2="255" stroke="#23262A" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="350" y="247">GET commands</text>
+        <line x1="345" y1="295" x2="470" y2="295" stroke="#23262A" stroke-width="1.6" marker-end="url(#ah)"/>
+        <text x="350" y="287">POST executed</text>
+        <text x="352" y="330" font-family="IBM Plex Sans,system-ui" fill="#5A5E62">X-Device-Token</text>
+        <text x="352" y="346" font-family="IBM Plex Sans,system-ui" fill="#5A5E62">(todas menos pair)</text>
+      </g>
+      <!-- Servidor -->
+      <rect x="475" y="20" width="440" height="390" rx="16" fill="#DEE7EF" stroke="#2E5A7D" stroke-width="2"/>
+      <text x="491" y="50" font-size="20" font-weight="700" fill="#2E5A7D">Servidor · CodeIgniter 4</text>
+      <g font-size="13">
+        <rect x="491" y="70" width="408" height="40" rx="8" fill="#fff" stroke="#2E5A7D"/><text x="503" y="95"><tspan font-weight="700">Routes.php</tspan> · la puerta: qué URL va a qué método</text>
+        <rect x="491" y="122" width="408" height="40" rx="8" fill="#fff" stroke="#2E5A7D"/><text x="503" y="147"><tspan font-weight="700">Controllers</tspan> · el mozo: recibe, valida, delega, responde</text>
+        <rect x="491" y="174" width="408" height="40" rx="8" fill="#2E5A7D"/><text x="503" y="199" fill="#fff"><tspan font-weight="700">Services</tspan> · el cocinero: TODA la lógica</text>
+        <rect x="491" y="226" width="408" height="40" rx="8" fill="#fff" stroke="#2E5A7D"/><text x="503" y="251"><tspan font-weight="700">Models</tspan> · el despensero: una tabla cada uno</text>
+        <rect x="491" y="290" width="408" height="104" rx="8" fill="#F2E6D6" stroke="#8A5115"/>
+        <text x="503" y="314" font-weight="700" fill="#8A5115">MySQL · base edenair · 8 tablas propias</text>
+        <text x="503" y="336" fill="#23262A" class="mono" font-size="12">users · spaces · devices · device_states</text>
+        <text x="503" y="354" fill="#23262A" class="mono" font-size="12">measurements · device_commands</text>
+        <text x="503" y="372" fill="#23262A" class="mono" font-size="12">device_pairings · purchases (+ migrations)</text>
+      </g>
+      <g stroke="#2E5A7D" stroke-width="1.6" marker-end="url(#ah)">
+        <line x1="695" y1="110" x2="695" y2="121"/><line x1="695" y1="162" x2="695" y2="173"/>
+        <line x1="695" y1="214" x2="695" y2="225"/><line x1="695" y1="266" x2="695" y2="289"/>
+      </g>
+      <!-- Navegador -->
+      <rect x="935" y="20" width="155" height="390" rx="16" fill="#ECE4F0" stroke="#6A4C7D" stroke-width="2"/>
+      <text x="948" y="50" font-size="18" font-weight="700" fill="#6A4C7D">Navegador</text>
+      <g font-size="12.5">
+        <text x="948" y="80">/panel</text><text x="948" y="98" fill="#5A5E62">dashboard</text>
+        <text x="948" y="128">panel-vivo.js</text><text x="948" y="146" fill="#5A5E62">pide /panel/datos</text><text x="948" y="162" fill="#5A5E62">cada 10 s</text>
+        <text x="948" y="192">/panel/ambientes</text><text x="948" y="210" fill="#5A5E62">edita umbrales</text>
+        <text x="948" y="240">/panel/dispositivos</text><text x="948" y="258" fill="#5A5E62">QR “Conectar”</text>
+        <text x="948" y="288">/panel/compra</text><text x="948" y="306" fill="#5A5E62">Mercado Pago</text>
+        <text x="948" y="336">Celular</text><text x="948" y="354" fill="#5A5E62">/vinculacion/</text><text x="948" y="370" fill="#5A5E62">seguir?s=…</text>
+      </g>
+      <line x1="933" y1="145" x2="917" y2="145" stroke="#6A4C7D" stroke-width="2" marker-end="url(#ah)"/>
+    </svg>
+    <figcaption>Las 5 llamadas del equipo están en <code>Routes.php</code> (grupo <code>api/devices</code>) y en <code>servidor.py</code>, una función por llamada.</figcaption>
+  </figure>
+
+  <div class="memo"><b>Restaurante:</b> Ruta = <b>la puerta</b> · Controlador = <b>el mozo</b> · Servicio = <b>el cocinero</b> · Modelo = <b>el despensero</b> · Tabla = <b>la heladera</b>.
+  El mozo nunca cocina y el cocinero nunca atiende la mesa.</div>
+  <div class="memo"><b>El equipo en 4 verbos:</b> <b>MIDO</b> (sensor + aire) → <b>DECIDO</b> (reglas) → <b>MUEVO</b> (actuadores + infrarrojo) → <b>CUENTO</b> (servidor). Y dos ayudantes: <b>me conecto</b> (red) y <b>me configuro</b> (config). <b>main</b> es el director de orquesta.</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec fw" id="firmware">
+  <header><span class="num">1</span><h2>Firmware — una ficha por archivo</h2><span class="chip fw">firmware/*.py</span></header>
+  <p class="one">10 archivos Python: 9 van a la placa, 1 (<code>pruebas/prueba_infrarrojo.py</code>) corre en la PC.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="Quién importa a quién en el firmware">
+      <defs><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#14706E"/></marker></defs>
+      <rect x="420" y="20" width="160" height="50" rx="10" fill="#14706E"/>
+      <text x="500" y="51" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">main.py</text>
+      <g font-size="14" font-weight="700" text-anchor="middle">
+        <rect x="10"  y="130" width="105" height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="62"  y="155">red.py</text>
+        <rect x="130" y="130" width="115" height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="187" y="155">servidor.py</text>
+        <rect x="260" y="130" width="105" height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="312" y="155">sensor.py</text>
+        <rect x="380" y="130" width="95"  height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="427" y="155">aire.py</text>
+        <rect x="490" y="130" width="110" height="40" rx="8" fill="#DCEBE8" stroke="#14706E" stroke-width="2"/><text x="545" y="155">reglas.py</text>
+        <rect x="620" y="130" width="130" height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="685" y="155">actuadores.py</text>
+        <rect x="790" y="130" width="125" height="40" rx="8" fill="#fff" stroke="#14706E"/><text x="852" y="155">infrarrojo.py</text>
+        <rect x="300" y="240" width="400" height="44" rx="10" fill="#fff" stroke="#14706E" stroke-dasharray="6 4"/><text x="500" y="268">config.py  (lo leen todos menos reglas.py)</text>
+      </g>
+      <g stroke="#14706E" stroke-width="1.6" marker-end="url(#ag)">
+        <line x1="440" y1="70" x2="70" y2="128"/><line x1="455" y1="70" x2="190" y2="128"/>
+        <line x1="470" y1="70" x2="315" y2="128"/><line x1="490" y1="70" x2="430" y2="128"/>
+        <line x1="510" y1="70" x2="545" y2="128"/><line x1="535" y1="70" x2="680" y2="128"/>
+        <line x1="560" y1="70" x2="845" y2="128"/>
+        <line x1="750" y1="150" x2="788" y2="150"/>
+      </g>
+      <g stroke="#14706E" stroke-width="1" stroke-dasharray="3 3" opacity=".7">
+        <line x1="62" y1="170" x2="330" y2="240"/><line x1="187" y1="170" x2="360" y2="240"/><line x1="312" y1="170" x2="420" y2="240"/>
+        <line x1="427" y1="170" x2="460" y2="240"/><line x1="685" y1="170" x2="600" y2="240"/><line x1="852" y1="170" x2="660" y2="240"/>
+      </g>
+      <text x="545" y="190" text-anchor="middle" font-size="12" fill="#14706E" font-weight="700">PURO: no importa nada</text>
+      <text x="769" y="122" text-anchor="middle" font-size="11" fill="#5A5E62">usa</text>
+    </svg>
+    <figcaption>Flecha llena = import directo. Punteada = lee constantes de <code>config.py</code>. <code>actuadores.py</code> usa a <code>infrarrojo.py</code> (lo recibe ya armado desde main).</figcaption>
+  </figure>
+
+  <div class="grid g2">
+
+    <article class="card fw">
+      <h3><span class="ic">🎛️</span> config.py</h3>
+      <p class="tag">“Lo único que se toca al programar una placa nueva.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Valores propios de ESTA placa: servidor, pines, calibración y tiempos de arranque. Los <b>umbrales</b> (temp, humedad, CO₂, aire) <b>NO</b> están acá: los manda el servidor.</dd>
+        <dt>Contiene</dt><dd><code>SERVIDOR_DEFECTO</code> = <code>http://192.168.2.130/EdenAir/public</code> y <code>servidor()</code> (prefiere <code>servidor.json</code> del portal) · <code>AP_SSID</code>/<code>AP_PASSWORD</code> = <code>EdenAir-Setup</code>/<code>edenair.setup</code> · mapa de pines · <code>RELES_INVERTIDOS = True</code> · MQ-135: <code>CRUDO_LIMPIO 105</code>, <code>CRUDO_SUCIO 340</code>, <code>MUESTRAS 16</code> · tiempos (sección 2) · archivos <code>wifi.json</code>, <code>credenciales.json</code>, <code>servidor.json</code>, <code>sesion.json</code>.</dd>
+        <dt>Depende de</dt><dd>Nada (solo <code>json</code> dentro de <code>servidor()</code>).</dd>
+        <dt>Lo usan</dt><dd>main, red, servidor, sensor, aire, infrarrojo, actuadores.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">🎼</span> main.py</h3>
+      <p class="tag">“Orquestar. No mide, no decide, no habla HTTP.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Arranque + ciclo infinito. MicroPython lo ejecuta solo al prender (última línea: <code>main()</code>).</dd>
+        <dt>Contiene</dt><dd><code>leer/guardar_credenciales</code> · <code>obtener_credenciales</code> (alta por MAC, reintenta para siempre) · <code>avisar_reconexion</code> · <code>bajar_config</code> (si falla, sigue con la anterior) · <code>sincronizar_tiempos</code> (aplica los tiempos del servidor a objetos ya creados) · <code>medir</code> (SCD41 + MQ-135; si no hay índice confiable usa la fórmula de respaldo) · <code>avisos_de_los_sensores</code> · <code>atender_comandos</code> · <code>main()</code>.</dd>
+        <dt>Depende de</dt><dd>aire, config, red, reglas, actuadores, infrarrojo, sensor, servidor.</dd>
+        <dt>Lo llama</dt><dd>MicroPython al arrancar.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">📶</span> red.py</h3>
+      <p class="tag">“El huevo y la gallina: necesito WiFi para pedir el WiFi.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Conectarse al WiFi de la casa y, si no puede, levantar su propia red <b>EdenAir-Setup</b> con un portal cautivo.</dd>
+        <dt>Contiene</dt><dd>WiFi guardado (<code>wifi.json</code>) · código de sesión de 16 bytes al azar (<code>sesion.json</code>) · <code>conectar()</code> con 20 s de espera y errores traducidos (<code>_motivo_falla</code>; corta antes si la clave tiene &lt; 8 caracteres) · <code>mac()</code> · <code>hay_internet()</code> · páginas <code>PAGINA</code>/<code>PAGINA_OK</code> · escaneo de redes con barritas de señal · servidor <b>DNS</b> (todo nombre → IP del equipo) + <b>HTTP</b> · sondas de Android/iOS/Windows → 302 · <code>_leer_pedido</code> (lee hasta Content-Length) · <code>asegurar_conexion()</code> (no vuelve hasta estar conectado).</dd>
+        <dt>Depende de</dt><dd>config, network, socket, select, json, gc.</dd>
+        <dt>Lo llama</dt><dd>main (<code>asegurar_conexion</code>, <code>mac</code>, <code>leer/olvidar_sesion</code>, <code>hay_internet</code>).</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">📡</span> servidor.py</h3>
+      <p class="tag">“El único que habla con la API.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Traduce el contrato HTTP a funciones Python. No decide ni toca pines.</dd>
+        <dt>Contiene</dt><dd><code>ErrorServidor</code> · <code>SinVentana</code> (HTTP 202: nadie apretó “Conectar”) · clase <code>Servidor</code>: <code>_pedir</code> (siempre cierra la respuesta, por RAM), <code>vincular()</code>, <code>config()</code>, <code>enviar_medicion()</code> (manda medición + actuadores + motivo + diagnóstico), <code>comandos_pendientes()</code>, <code>confirmar_comando()</code>.</dd>
+        <dt>Depende de</dt><dd>urequests, json, config.</dd>
+        <dt>Lo llama</dt><dd>main.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">🌡️</span> sensor.py</h3>
+      <p class="tag">“SCD41 por I2C: temperatura, humedad y CO₂ real (NDIR).”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Leer el SCD41 (dirección <code>0x62</code>, I2C a 50 kHz). Devuelve números crudos.</dd>
+        <dt>Contiene</dt><dd><code>ErrorSensor</code> · <code>SCD41</code>: <code>_crc8</code> (polinomio 0x31), <code>hay_dato</code>, <code>_esperar_dato</code>, <code>rearrancar()</code> (parar + <b>1000 ms</b> + arrancar; existe por una falla real del 11/08/2026), descarte de la 1.ª lectura tras arrancar, <code>leer(espera_maxima=10)</code> → <code>(co2, temp, hum)</code>.</dd>
+        <dt>Depende de</dt><dd>machine.I2C, struct, config.</dd>
+        <dt>Lo llama</dt><dd>main.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">💨</span> aire.py</h3>
+      <p class="tag">“MQ-135: solo lee; nunca muestra ppm, siempre índice 0–100.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Leer el MQ-135 por ADC (GPIO 34, con divisor 10k/10k) y resolver lo que es del sensor: warm-up, enmascarado y conversión.</dd>
+        <dt>Contiene</dt><dd>Estados <code>AUSENTE</code> · <code>WARMUP</code> · <code>PAUSA</code> · <code>OK</code> · <code>MedidorAire</code>: <code>presente</code>, <code>calentando</code>, <code>segundos_de_warmup</code>, <code>crudo()</code> (promedio de 16 lecturas), <code>leer(ahora, atomizando)</code>, <code>_a_indice</code> (regla de tres: 105 → 100, 340 → 0).</dd>
+        <dt>Depende de</dt><dd>machine.ADC, config.</dd>
+        <dt>Lo llama</dt><dd>main (lo crea ANTES del WiFi para que empiece a calentar ya).</dd>
+      </dl>
+    </article>
+
+    <article class="card fw" style="background:#F4FAF9">
+      <h3><span class="ic">🧠</span> reglas.py <span class="chip fw">el corazón</span></h3>
+      <p class="tag">“El servidor manda los NÚMEROS; el equipo aplica la REGLA.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>La lógica de control. <b>Pura</b>: no toca pines, red, sensores ni reloj (recibe <code>ahora</code> como número).</dd>
+        <dt>Contiene</dt><dd>8 códigos de aviso (<code>ventilar</code>, <code>co2_critico</code>, <code>aire_acondicionado</code>, <code>humidificando</code>, <code>humedad_alta</code>, <code>ir_sin_confirmar</code>, <code>aire_en_pausa</code>, <code>aire_calentando</code>) · <code>_redondear</code> (como PHP, no “banker’s”) · <code>calcular_indice_aire</code> (respaldo, misma fórmula que MeasurementService) · <code>etiqueta_aire</code> (85/70/55) · <code>Decisor.decidir()</code> → <code>(actuadores, avisos, motivo)</code> · <code>_decidir_atomizador</code> (histéresis + ciclo).</dd>
+        <dt>Depende de</dt><dd>Nada.</dd>
+        <dt>Lo llama</dt><dd>main.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">🔴</span> infrarrojo.py</h3>
+      <p class="tag">“Al aire no se le manda corriente: se le manda una ORDEN.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Emitir la trama IR (protocolo NEC, portadora 38 kHz) y decir si el receptor la vio.</dd>
+        <dt>Contiene</dt><dd>Dirección <code>0x0E</code>, órdenes <code>0xA1</code> encender / <code>0xA2</code> apagar · <code>Infrarrojo</code>: <code>puede_emitir(orden)</code> (orden distinta → siempre; repetida → espera el mínimo), <code>enviar_orden</code> → <code>True</code>/<code>False</code>/<code>None</code>, <code>_esperar_confirmacion</code>, <code>_emitir</code>/<code>_byte</code>/<code>_marca</code>/<code>_espacio</code>/<code>_portadora</code> (PWM al 50 %), <code>_contar_pulso</code> (interrupción).</dd>
+        <dt>Depende de</dt><dd>machine.PWM/Pin, config.</dd>
+        <dt>Lo llama</dt><dd>actuadores (<code>enviar_orden</code>); main lo crea.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw">
+      <h3><span class="ic">⚡</span> actuadores.py</h3>
+      <p class="tag">“El único que toca pines de salida. No decide nada.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Convertir decisiones en voltaje: 2 relés (<code>fan</code> = aire acondicionado, <code>aromatizer</code> = atomizador) y 3 LEDs (<code>alert_led</code> rojo, <code>green_led</code>, <code>blue_led</code>).</dd>
+        <dt>Contiene</dt><dd>Arranque limpio (<code>value=</code> en el constructor) · <code>_nivel</code> (relés activos en bajo) · <code>_puede_conmutar</code> (mínimo de los relés; LEDs libres) · <code>_ordenar_por_infrarrojo</code> (antes de mover el relé del aire) · <code>aplicar()</code> → lista de cambios · <code>demorados</code> · <code>apagar_todo()</code> (sin mínimo: emergencia) · <code>como_dict()</code> · <code>ir_confirmado</code>. Pines en <code>None</code> = se ignoran.</dd>
+        <dt>Depende de</dt><dd>machine.Pin, config, infrarrojo.</dd>
+        <dt>Lo llama</dt><dd>main.</dd>
+      </dl>
+    </article>
+
+    <article class="card fw" style="border-style:dashed">
+      <h3><span class="ic">🧪</span> pruebas/prueba_infrarrojo.py</h3>
+      <p class="tag">“Corre en la PC, no va a la ESP32.”</p>
+      <dl class="kv">
+        <dt>Rol</dt><dd>Prueba de escritorio de la regla del IR: la misma orden espera, una distinta sale siempre.</dd>
+        <dt>Contiene</dt><dd>Reemplazos falsos de <code>machine</code> (Pin, PWM) · <code>CadenaDePrueba</code> · 4 casos (encender t=0, repetir t=10, apagar t=15, repetir t=80) con <code>minimo_entre_tramas=60</code> fijo.</dd>
+        <dt>Depende de</dt><dd>infrarrojo.py.</dd>
+        <dt>Se corre</dt><dd><code>python firmware/pruebas/prueba_infrarrojo.py</code></dd>
+      </dl>
+    </article>
+  </div>
+
+  <h4>Mapa de pines (config.py)</h4>
+  <div class="pins">
+    <div class="pin"><b>21</b><span>SDA · SCD41 (I2C)</span></div>
+    <div class="pin"><b>22</b><span>SCL · SCD41 (I2C)</span></div>
+    <div class="pin"><b>34</b><span>MQ-135 (ADC, solo entrada, por divisor)</span></div>
+    <div class="pin"><b>26</b><span>Relé aire (IN1, cooler)</span></div>
+    <div class="pin"><b>27</b><span>Relé atomizador (IN2)</span></div>
+    <div class="pin"><b>25</b><span>Emisor IR (KY-005)</span></div>
+    <div class="pin"><b>33</b><span>Receptor IR (VS1838B)</span></div>
+    <div class="pin"><b>14</b><span>LED verde · todo normal</span></div>
+    <div class="pin"><b>16</b><span>LED rojo · alerta</span></div>
+    <div class="pin"><b>17</b><span>LED azul · aire activo</span></div>
+  </div>
+
+  <h4>La regla de oro de reglas.py</h4>
+  <div class="tw"><table>
+    <tr><th>Variable</th><th>Enciende / avisa cuando…</th><th>Apaga / deja de avisar cuando…</th><th>Qué hace</th><th>Tipo</th></tr>
+    <tr><td>🌡️ Temperatura</td><td>&gt; <code>temp_max</code></td><td>&lt; <code>temp_max − 2 °C</code></td><td>Aire acondicionado por IR + LED azul</td><td><span class="ok-b">ACTÚA</span></td></tr>
+    <tr><td>💧 Humedad baja</td><td>&lt; <code>hum_min</code></td><td>&gt; <code>hum_min + 8</code></td><td>Atomizador por ciclos 60 s ON / 120 s OFF</td><td><span class="ok-b">ACTÚA</span></td></tr>
+    <tr><td>💧 Humedad alta</td><td>&gt; <code>hum_max</code></td><td>—</td><td>Solo avisa (no hay deshumidificador)</td><td><span class="info-b">AVISA</span></td></tr>
+    <tr><td>🫁 CO₂</td><td>&gt; <code>co2_max</code> (crítico &gt; 1400)</td><td>&lt; <code>co2_max − 150</code> (crítico sale &lt; 1100)</td><td>LED rojo + “ventilá”</td><td><span class="info-b">AVISA</span></td></tr>
+    <tr><td>💨 Calidad de aire</td><td>&lt; <code>aire_min</code> (70)</td><td>&gt; <code>aire_min + 5</code></td><td>LED rojo + “ventilá” (solo con lectura fresca)</td><td><span class="info-b">AVISA</span></td></tr>
+  </table></div>
+  <p style="font-size:.88rem;color:var(--ink2)">Los números de histéresis (2 / 8 / 150 / 5) y el CO₂ crítico (1400, salida −300) son los valores por defecto de <code>EnvironmentPresetService::CONTROL</code> y <code>DeviceConfigService</code>; el usuario los puede cambiar por ambiente. LEDs: <b>rojo</b> = alerta CO₂ o aire · <b>azul</b> = aire acondicionado · <b>verde</b> = ni rojo ni azul.</p>
+  <div class="memo"><b>“Mide 4, mueve 2.”</b> Temperatura y humedad (baja) <b>actúan</b>; CO₂, calidad de aire y humedad alta <b>avisan</b>. Orden de decisión: <b>A</b>ire → <b>C</b>O₂ → <b>T</b>emperatura → <b>H</b>umedad → LEDs (“<b>ACTH</b>”).</div>
+
+  <h4>Un arranque y un ciclo de main.py</h4>
+  <div class="split">
+    <ol class="steps fw">
+      <li>Arma IR + actuadores y <b>apaga todo</b>.</li>
+      <li>Crea el MQ-135 → empieza el warm-up <b>ya</b>.</li>
+      <li><code>red.asegurar_conexion()</code> (portal si hace falta).</li>
+      <li>SCD41; si no responde, el programa termina.</li>
+      <li>Credenciales (o alta por MAC, reintenta cada 15 s).</li>
+      <li>Baja la config hasta lograrlo y sincroniza tiempos.</li>
+    </ol>
+    <ol class="steps fw">
+      <li><b>Cada 30 s</b>: medir → decidir (solo si modo <code>automatic</code> y hay actuadores) → aplicar → reportar.</li>
+      <li><b>Cada 15 s</b>: órdenes manuales pendientes.</li>
+      <li><b>Cada 3600 s</b>: volver a bajar config (umbrales + <b>modo</b>).</li>
+      <li><b>Cada vuelta</b>: si se cayó el WiFi, reconectar.</li>
+      <li>Duerme <b>1 s</b> y repite. Un error inesperado → espera 15 s y sigue.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec al" id="tiempos">
+  <header><span class="num">2</span><h2>⏱ Tiempos — lo más importante</h2><span class="chip fw">config.py</span><span class="chip be">DeviceConfigService.php</span></header>
+  <p class="one" style="border-color:var(--al)">Cada tiempo existe dos veces: en <code>config.py</code> (arranque) y en <code>DeviceConfigService</code> (el que manda después de bajar la config).</p>
+
+  <div class="note">🔁 <b>Quién gana:</b> al arrancar, la placa usa <code>config.py</code>. Apenas baja la configuración, <code>sincronizar_tiempos()</code> (y <code>reglas.py</code> / el ciclo de <code>main.py</code>) usan los del servidor. Por eso <b>cambiar un tiempo solo en config.py no alcanza</b>: hay que cambiarlo también en <code>DeviceConfigService.php</code>. Hoy los dos lados tienen exactamente los mismos valores.</div>
+
+  <div class="tw"><table>
+    <tr><th>Constante (config.py)</th><th>Valor</th><th>Clave que manda el servidor</th><th>Qué controla</th><th>Por qué ese valor (según el código)</th><th>Estado</th></tr>
+    <tr class="ok"><td class="k">INTERVALO_MEDICION</td><td class="v">30 s</td><td class="k">intervalos.medicion = 30</td><td>Ciclo de medición: SCD41 + MQ-135 → decidir → accionar → reportar.</td><td>Se ve la reacción en vivo sin llenar la base: 2.880 filas/día (con 8 s eran 10.800). No bajar de 5: el SCD41 no da dato antes.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="ok"><td class="k">INTERVALO_COMANDOS</td><td class="v">15 s</td><td class="k">intervalos.comandos = 15</td><td>Cada cuánto pregunta si hay órdenes manuales del panel.</td><td>No está justificado en el código.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="bad"><td class="k">INTERVALO_CONFIG</td><td class="v">3600 s</td><td class="k">intervalos.config = 3600</td><td>Cada cuánto vuelve a pedir la config: <b>umbrales</b> y <b>modo automático/manual</b>.</td><td>No está justificado en el código. Ver problema B.</td><td><span class="bad-b">⚠ B</span></td></tr>
+    <tr class="ok"><td class="k">INTERVALO_CICLO</td><td class="v">1 s</td><td>— (solo firmware)</td><td>Duración de una vuelta del <code>while True</code>.</td><td>Corto para que cada tarea arranque cerca de su horario; no es el ritmo de ninguna.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="ok"><td class="k">REINTENTO_RED</td><td class="v">15 s</td><td>— (solo firmware)</td><td>Espera tras un error del servidor, sin config todavía, o una excepción inesperada.</td><td>No está justificado en el código.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="ok"><td class="k">RELE_MINIMO_ESTADO</td><td class="v">30 s</td><td class="k">tiempos.rele_minimo = 30</td><td>Mínimo que un relé se queda quieto antes de volver a conmutar.</td><td>Evita el traqueteo y el desgaste del contacto cuando el valor baila en el umbral.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="bad"><td class="k">IR_MINIMO_ENTRE_TRAMAS</td><td class="v">60 s</td><td class="k">tiempos.ir_minimo = 60</td><td>La <b>misma</b> orden IR no se repite antes de esto (una orden distinta sale siempre, desde <code>e083e39</code>).</td><td>No saturar el receptor. El comentario de config.py quedó viejo. Ver problema A.</td><td><span class="bad-b">⚠ A</span></td></tr>
+    <tr class="ok"><td class="k">IR_ESPERA_CONFIRMACION_MS</td><td class="v">1000 ms</td><td class="k">tiempos.ir_espera_ms = 1000</td><td>Cuánto espera que el receptor confirme la trama. Si no, prende igual y avisa <code>ir_sin_confirmar</code>.</td><td>La trama dura ~70 ms; el resto es margen para un receptor lejos o mal apuntado.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="ok"><td class="k">MQ135_WARMUP</td><td class="v">300 s</td><td class="k">tiempos.mq135_warmup = 300</td><td>Calentamiento del MQ-135, contado desde que prende la placa.</td><td>Tiene calefactor: antes, su lectura no sirve ni dispara alertas.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="ok"><td class="k">MQ135_ENMASCARADO</td><td class="v">90 s</td><td class="k">tiempos.mq135_enmascarado = 90</td><td>Mientras atomiza <b>y 90 s después</b>, el MQ-135 se ignora (valor congelado).</td><td>La niebla es vapor pero el MQ-135 la lee como contaminante.</td><td><span class="ok-b">OK</span></td></tr>
+    <tr class="bad"><td class="k">ATOMIZADOR_CICLO_ON<br>ATOMIZADOR_CICLO_OFF</td><td class="v">60 s<br>120 s</td><td class="k">tiempos.atomizador_on = 60<br>tiempos.atomizador_off = 120</td><td>Ciclo de niebla mientras la humedad siga baja.</td><td>No encharcar ni vaciar el depósito; la pausa deja que la humedad suba. <b>Las de config.py no las usa nadie</b> (problema D).</td><td><span class="bad-b">⚠ D</span></td></tr>
+  </table></div>
+
+  <h4>Cómo encajan atomizador, enmascarado y medición (después del warm-up)</h4>
+  <figure class="fig">
+    <svg viewBox="0 0 1000 230" role="img" aria-label="Línea de tiempo del atomizador y el MQ-135">
+      <g font-size="12" fill="#5A5E62">
+        <text x="10" y="58" font-weight="700" fill="#23262A">Atomizador</text>
+        <text x="10" y="118" font-weight="700" fill="#23262A">MQ-135</text>
+        <text x="10" y="178" font-weight="700" fill="#23262A">Mediciones</text>
+      </g>
+      <!-- escala: x = 120 + t*3.25 ; t de 0 a 270 -->
+      <rect x="120" y="38" width="195" height="30" rx="5" fill="#14706E"/><text x="217" y="58" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">ON 60 s</text>
+      <rect x="315" y="38" width="390" height="30" rx="5" fill="#DCEBE8" stroke="#14706E"/><text x="510" y="58" text-anchor="middle" fill="#14706E" font-size="13" font-weight="700">OFF 120 s</text>
+      <rect x="705" y="38" width="195" height="30" rx="5" fill="#14706E"/><text x="802" y="58" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">ON 60 s</text>
+
+      <rect x="217" y="98" width="390" height="30" rx="5" fill="#F2E6D6" stroke="#8A5115"/><text x="412" y="118" text-anchor="middle" fill="#8A5115" font-size="12.5" font-weight="700">PAUSA: valor congelado (hasta t=60+90)</text>
+      <rect x="607" y="98" width="98" height="30" rx="5" fill="#fff" stroke="#14706E"/><text x="656" y="118" text-anchor="middle" fill="#14706E" font-size="12" font-weight="700">lee fresco</text>
+      <rect x="802" y="98" width="98" height="30" rx="5" fill="#F2E6D6" stroke="#8A5115"/><text x="851" y="118" text-anchor="middle" fill="#8A5115" font-size="12" font-weight="700">PAUSA…</text>
+      <rect x="120" y="98" width="97" height="30" rx="5" fill="#fff" stroke="#14706E"/><text x="168" y="118" text-anchor="middle" fill="#14706E" font-size="12" font-weight="700">lee fresco</text>
+
+      <line x1="120" y1="168" x2="910" y2="168" stroke="#23262A"/>
+      <g font-size="11" text-anchor="middle" class="mono">
+        <circle cx="120" cy="168" r="7" fill="#14706E"/><text x="120" y="196">0</text>
+        <circle cx="217" cy="168" r="7" fill="#8A5115"/><text x="217" y="196">30</text>
+        <circle cx="315" cy="168" r="7" fill="#8A5115"/><text x="315" y="196">60</text>
+        <circle cx="412" cy="168" r="7" fill="#8A5115"/><text x="412" y="196">90</text>
+        <circle cx="510" cy="168" r="7" fill="#8A5115"/><text x="510" y="196">120</text>
+        <circle cx="607" cy="168" r="7" fill="#14706E"/><text x="607" y="196">150</text>
+        <circle cx="705" cy="168" r="7" fill="#14706E"/><text x="705" y="196">180</text>
+        <circle cx="802" cy="168" r="7" fill="#8A5115"/><text x="802" y="196">210</text>
+        <circle cx="900" cy="168" r="7" fill="#8A5115"/><text x="900" y="196">240 s</text>
+      </g>
+      <text x="120" y="222" font-size="12" fill="#5A5E62">● verde = lectura fresca del MQ-135 · ● ámbar = congelada. En cada medición main.py mide ANTES de decidir, por eso en t=0 y t=180 todavía lee fresco.</text>
+    </svg>
+    <figcaption>Como la decisión solo ocurre cada 30 s, los ciclos 60/120 caen justo sobre múltiplos de la medición. 90 &lt; 120: queda una ventana (t=150 y t=180) de lecturas frescas en cada OFF. <b>Coherente.</b></figcaption>
+  </figure>
+
+  <div class="memo">
+    <b>Canción de los tiempos:</b><br>
+    “<b>Mido</b> cada medio minuto (30), <b>escucho</b> cada cuarto (15), me <b>actualizo</b> cada hora (3600).<br>
+    El relé se queda <b>medio minuto quieto</b> (30). La misma orden IR, <b>una por minuto</b> (60), y la confirmación espera <b>un segundo</b> (1000 ms).<br>
+    El MQ-135 <b>calienta 5 minutos</b> (300) y queda <b>ciego minuto y medio</b> (90) después de la niebla.<br>
+    El atomizador <b>echa 1 minuto, descansa 2</b> (60/120).”
+  </div>
+
+  <div class="note">💡 <b>Dato que surge del código:</b> como la decisión automática pasa cada 30 s y el mínimo del relé es 30 s, en modo automático el mínimo casi nunca frena nada (la siguiente decisión ya llega con 30 s cumplidos). Donde sí frena es en las <b>órdenes manuales</b>, que se atienden cada 15 s: ahí aparece “Orden demorada… espera su tiempo mínimo”.</div>
+
+  <h4>Otros tiempos escritos a mano (no están en config.py)</h4>
+  <div class="grid g2">
+    <div class="tw"><table>
+      <tr><th colspan="3" style="background:var(--fw-t);color:var(--fw)">Firmware</th></tr>
+      <tr><td class="k">main.py</td><td class="v">15 s</td><td>Reintento del alta cuando el servidor dice 202 (“nadie apretó Conectar”). Número literal, no usa <code>REINTENTO_RED</code>.</td></tr>
+      <tr><td class="k">main.py</td><td class="v">5 s</td><td>Pausa tras una lectura fallida del SCD41.</td></tr>
+      <tr><td class="k">main.py</td><td class="v">3 s</td><td>Entre los 2 intentos de <code>avisar_reconexion</code>.</td></tr>
+      <tr><td class="k">red.py</td><td class="v">20 s</td><td>Espera de <code>conectar()</code> (40 vueltas de 500 ms).</td></tr>
+      <tr><td class="k">red.py</td><td class="v">1 s · 2 s</td><td>Portal: <code>poll(1000)</code> y timeout de cada cliente HTTP.</td></tr>
+      <tr><td class="k">red.py</td><td class="v">60 s</td><td>TTL de la respuesta DNS del portal.</td></tr>
+      <tr><td class="k">sensor.py</td><td class="v">10 s</td><td><code>espera_maxima</code> de un dato nuevo (si no llega: rearranca y espera otra vez).</td></tr>
+      <tr><td class="k">sensor.py</td><td class="v">1000 ms</td><td>Entre “parar” y “arrancar” el SCD41 (con 500 ms fallaba).</td></tr>
+      <tr><td class="k">sensor.py</td><td class="v">~5 s</td><td>El SCD41 entrega un dato cada ~5 s (docstring).</td></tr>
+      <tr><td class="k">aire.py</td><td class="v">16 × 2 ms</td><td>Promedio del ADC (~32 ms por medición).</td></tr>
+      <tr><td class="k">infrarrojo.py</td><td class="v">9000/4500/560/1690 µs</td><td>Tiempos del protocolo NEC; la trama completa ≈ 70 ms.</td></tr>
+    </table></div>
+    <div class="tw"><table>
+      <tr><th colspan="3" style="background:var(--be-t);color:var(--be)">Backend y navegador</th></tr>
+      <tr><td class="k">DevicePairingService</td><td class="v">10 min</td><td><code>MINUTOS_VENTANA</code>: cuánto vive una ventana de vinculación.</td></tr>
+      <tr class="bad"><td class="k">DeviceApiController::pair</td><td class="v">300 s</td><td><code>intervalo_envio</code> “sugerido”. Viejo: el real es 30 s. El firmware no lo lee. Problema C.</td></tr>
+      <tr><td class="k">DeviceApiController::pair</td><td class="v">15 s</td><td><code>reintentar_en</code> sugerido (el firmware no lo lee; usa su 15 literal).</td></tr>
+      <tr><td class="k">conectar.js</td><td class="v">2,5 s</td><td>La pantalla del QR pregunta si el equipo apareció.</td></tr>
+      <tr><td class="k">vinculacion.js</td><td class="v">2 s</td><td>El celular pregunta si quedó vinculado.</td></tr>
+      <tr><td class="k">panel-vivo.js</td><td class="v">10 s</td><td>El dashboard pide <code>/panel/datos</code>.</td></tr>
+      <tr><td class="k">panel-vivo.js</td><td class="v">180 s</td><td><code>VIEJO_SEG</code>: sin medición nueva en 3 min = “algo se cortó”.</td></tr>
+      <tr><td class="k">panel-vivo.js</td><td class="v">15 s</td><td>Refresca el sello “actualizado hace…”.</td></tr>
+      <tr><td class="k">AccesoController</td><td class="v">15 min</td><td>Vencimiento del token de recuperación de contraseña.</td></tr>
+      <tr><td class="k">PurchaseModel</td><td class="v">3 días</td><td><code>abiertasDe()</code>: compras iniciadas/pendientes que se re-consultan.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- ===== PROPUESTAS ===== -->
+  <div class="stop" id="propuestas">
+    <h3>🛑 Tiempos desactualizados o incoherentes — PROPUESTAS (NO aplicadas)</h3>
+    <p>Nada de esto está cambiado en el código. Espero tu OK.</p>
+
+    <div class="prop">
+      <h4>A · IR_MINIMO_ENTRE_TRAMAS = 60 → propongo <b>30</b> (y corregir el comentario)</h4>
+      <p><b>Qué pasa:</b> desde el commit <code>e083e39</code> (22/09) el mínimo <b>solo frena repeticiones</b> de la misma orden. Pero el comentario de <code>config.py:160</code> sigue diciendo “La trama IR no se emite más de una vez cada tanto”. Además, <code>actuadores.aplicar()</code> solo emite IR cuando el relé del aire <b>cambia</b> de estado, y los cambios siempre alternan encender/apagar: hoy el límite de 60 s nunca llega a aplicarse (es un valor inerte). El número 60 &gt; 30 del relé es justo la contradicción que describe ese commit.</p>
+      <p><b>Propuesta:</b> igualarlo al mínimo del relé (30) para que los dos relojes digan lo mismo, en los <b>dos</b> lados, y reescribir el comentario:</p>
+      <div class="diff"><span class="m">- # La trama IR no se emite mas de una vez cada tanto...</span>
+<span class="m">- IR_MINIMO_ENTRE_TRAMAS = 60</span>
+<span class="p">+ # La MISMA orden IR no se repite antes de esto (una orden distinta sale siempre)...</span>
+<span class="p">+ IR_MINIMO_ENTRE_TRAMAS = 30</span>
+   firmware/config.py:160-161   y   app/Services/DeviceConfigService.php:66  (60 → 30)</div>
+      <p style="font-size:.88rem;color:var(--ink2)">La prueba <code>prueba_infrarrojo.py</code> no se rompe: pasa <code>minimo_entre_tramas=60</code> fijo. Habría que actualizar también la fila del README del firmware y CAMBIOS-LOGICA.md (“máximo una cada 60 s”).</p>
+    </div>
+
+    <div class="prop">
+      <h4>B · INTERVALO_CONFIG = 3600 → propongo <b>60</b></h4>
+      <p><b>Qué pasa:</b> el <b>modo</b> (automático/manual) y los <b>umbrales</b> que editás en <code>/panel/ambientes</code> le llegan al equipo <b>solo</b> cuando refresca la config. Con 3600 s puede tardar <b>hasta 1 hora</b>. Mientras tanto: el panel dice “Modo manual activado. El equipo va a esperar tus órdenes.”, pero el equipo sigue en automático; <code>atender_comandos()</code> aplica la orden manual igual (no mira el modo) y en la siguiente medición <code>reglas.py</code> la puede revertir.</p>
+      <p><b>Propuesta:</b> 60 s en los dos lados. Costo: 1.440 GET livianos por día (hoy ya hay 2.880 POST de mediciones). Alternativa más conservadora: 300 s (hasta 5 min de demora).</p>
+      <div class="diff"><span class="m">- INTERVALO_CONFIG = 3600</span>                       firmware/config.py:140
+<span class="p">+ INTERVALO_CONFIG = 60</span>
+<span class="m">- public const INTERVALO_CONFIG = 3600;</span>         app/Services/DeviceConfigService.php:60
+<span class="p">+ public const INTERVALO_CONFIG = 60;</span></div>
+    </div>
+
+    <div class="prop">
+      <h4>C · intervalo_envio = 300 en la respuesta de <code>pair</code> → propongo <b>30</b></h4>
+      <p>Viene de cuando el equipo medía cada 5 minutos. El firmware lo ignora (usa <code>intervalos.medicion</code> de la config), así que no rompe nada, pero es información falsa. Mejor: <code>DeviceConfigService::INTERVALO_MEDICION</code> en lugar del número.</p>
+      <div class="diff"><span class="m">- 'intervalo_envio' => 300,</span>                    app/Controllers/Api/DeviceApiController.php:97
+<span class="p">+ 'intervalo_envio' => DeviceConfigService::INTERVALO_MEDICION,   // 30</span></div>
+    </div>
+
+    <div class="prop">
+      <h4>D · ATOMIZADOR_CICLO_ON / OFF de config.py no se usan</h4>
+      <p><code>reglas.py:330-332</code> usa <code>tiempos.get("atomizador_on", 60)</code> y <code>("atomizador_off", 120)</code> con el 60/120 <b>escrito a mano</b>; ningún archivo lee <code>config.ATOMIZADOR_CICLO_*</code>. Si cambiás config.py, no pasa nada. No es un valor mal puesto (60/120 está bien) sino una constante muerta. Propuesta (a confirmar): que <code>main.py</code> complete <code>cfg["tiempos"]</code> con los de config.py como respaldo, así <code>reglas.py</code> sigue siendo puro.</p>
+    </div>
+
+    <div class="prop">
+      <h4>E · Textos con tiempos viejos (solo comentarios / mensajes)</h4>
+      <ul>
+        <li><code>firmware/infrarrojo.py</code> (docstring de <code>puede_emitir</code>) y <code>CommandService.php:252</code>: dicen “cada <b>ocho</b> segundos” → hoy son <b>30</b>.</li>
+        <li><code>PanelService.php:500</code>: el panel muestra “Trabaja por ciclos de 60 s” → real: <b>60 s encendido / 120 s en pausa</b>.</li>
+        <li><code>DevicePairingService.php:31</code>: “preguntando cada 2 segundos” → <code>conectar.js</code> pregunta cada <b>2,5 s</b>.</li>
+        <li><code>CAMBIOS-LOGICA.md</code>: dice medición cada <b>8 s</b> (hoy 30) y “máximo una trama cada 60 s” (hoy solo para repeticiones).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec db" id="bd">
+  <header><span class="num">3</span><h2>Base de datos — esquema completo</h2><span class="chip db">mysql_setup.sql + 9 migraciones</span></header>
+  <p class="one">Base <code>edenair</code> (utf8mb4, InnoDB). 8 tablas propias + <code>migrations</code> (control interno de CodeIgniter).</p>
+
+  <div class="memo"><b>Las 8 en 4 parejas:</b> <b>U</b>suarios y <b>S</b>us espacios (users, spaces) · el <b>D</b>ispositivo y su <b>E</b>stado (devices, device_states) · lo que <b>M</b>ide y lo que se le <b>O</b>rdena (measurements, device_commands) · cómo se <b>V</b>incula y cómo se <b>C</b>ompra (device_pairings, purchases).</div>
+
+  <div class="grid g3">
+    <article class="card db">
+      <h3>👤 users</h3>
+      <p class="tag">Las cuentas.</p>
+      <p><code>id</code>, <code>nombre</code>, <code>apellido</code>, <code>email</code> (único), <code>usuario</code> (único), <code>password_hash</code>, <code>reset_token</code>, <code>reset_expires_at</code>, timestamps.</p>
+      <p style="font-size:.88rem">Sirve para login, perfil y recuperación de contraseña (el token se guarda hasheado; vence a los 15 min).</p>
+    </article>
+    <article class="card db">
+      <h3>🏠 spaces</h3>
+      <p class="tag">Los ambientes y sus umbrales.</p>
+      <p><code>user_id</code> → users, <code>environment_type</code> (oficina | aula | hogar | dormitorio | personalizable), <code>custom_name</code>, <code>min/max_temperature</code>, <code>min/max_humidity</code>, <code>max_co2</code>, <code>min_air_quality</code>, <code>temp/hum/co2/air_hysteresis</code>, <code>critical_co2</code>.</p>
+      <p style="font-size:.88rem">Es <b>la fuente de los números</b> que viajan al equipo en <code>/config</code>. Un usuario puede tener varios.</p>
+    </article>
+    <article class="card db">
+      <h3>📟 devices</h3>
+      <p class="tag">Cada Eden Air físico.</p>
+      <p><code>user_id</code> → users, <code>space_id</code> → spaces, <code>name</code>, <code>device_type</code>, <code>device_uid</code> (único, público: <code>EDN-XXXXXXXX</code>), <code>api_token</code> (único, secreto), <code>is_simulated</code>, <code>is_active</code>, <code>status</code>, <code>mac_address</code>, <code>notes</code>, <code>last_seen_at</code>, <code>last_command_sync_at</code>.</p>
+      <p style="font-size:.88rem">Identidad y credenciales del equipo. La MAC evita duplicados si se reinicia.</p>
+    </article>
+    <article class="card db">
+      <h3>🎚️ device_states</h3>
+      <p class="tag">La foto del “ahora” de cada equipo.</p>
+      <p><code>device_id</code> → devices (<b>único</b>), <code>operating_mode</code> (automatic | manual), <code>fan_state</code>, <code>aromatizer_state</code>, <code>alert_led_state</code>, <code>green_led_state</code>, <code>blue_led_state</code>, <code>ir_confirmed</code>, <code>air_sensor_status</code>, <code>avisos</code> (JSON de códigos), <code>last_reason</code>, <code>updated_by</code>.</p>
+      <p style="font-size:.88rem">Se <b>sobrescribe</b>, no acumula. Lo lee el panel (LEDs, mensajes) y la config (modo).</p>
+    </article>
+    <article class="card db">
+      <h3>📈 measurements</h3>
+      <p class="tag">El historial de lecturas.</p>
+      <p><code>device_id</code>, <code>user_id</code>, <code>space_id</code>, <code>source</code>, <code>temperature</code>, <code>humidity</code>, <code>co2_ppm</code>, <code>air_quality_index</code>, <code>air_quality_label</code>, <code>air_quality_source</code> (sensor | calculado), <code>notes</code>, <code>captured_at</code>.</p>
+      <p style="font-size:.88rem">Una fila cada 30 s por equipo. Índice <code>(device_id, captured_at)</code> para traer la última rápido.</p>
+    </article>
+    <article class="card db">
+      <h3>📨 device_commands</h3>
+      <p class="tag">La cola de órdenes + el historial de acciones.</p>
+      <p><code>device_id</code> → devices, <code>issued_by_user_id</code> → users (nullable), <code>source</code> (web | device | automation), <code>command_type</code> (fan | aromatizer | alert_led | mode), <code>target_value</code>, <code>payload</code> (JSON con el motivo), <code>status</code> (pending | executed | cancelled), <code>executed_at</code>.</p>
+      <p style="font-size:.88rem">Órdenes manuales quedan <code>pending</code> hasta que el equipo confirma; lo que el equipo decidió solo entra ya <code>executed</code> (solo cuando cambia).</p>
+    </article>
+    <article class="card db">
+      <h3>🔗 device_pairings</h3>
+      <p class="tag">Las ventanas de vinculación (botón “Conectar”).</p>
+      <p><code>user_id</code>, <code>token</code> (único, del navegador), <code>session_code</code> (el que inventa la ESP32), <code>ap_ssid</code>, <code>ap_password</code>, <code>status</code> (esperando | vinculado | expirado | cancelado), <code>device_id</code>, <code>client_ip</code>, <code>expires_at</code>, <code>completed_at</code>.</p>
+      <p style="font-size:.88rem">Dura 10 min. <code>client_ip</code> desempata si dos personas conectan a la vez (misma red /24).</p>
+    </article>
+    <article class="card db">
+      <h3>🛒 purchases</h3>
+      <p class="tag">Compras con Mercado Pago.</p>
+      <p><code>user_id</code>, <code>reference</code> (única, <code>EA-…</code>), <code>product</code>, <code>amount</code>, <code>currency</code>, <code>status</code> (iniciada | pendiente | aprobada | rechazada | cancelada | devuelta), <code>mp_preference_id</code>, <code>mp_payment_id</code>, <code>mp_status</code>, <code>mp_status_detail</code>, <code>payment_method</code>, <code>paid_at</code>.</p>
+      <p style="font-size:.88rem">Una compra aprobada no vuelve atrás (solo a “devuelta”).</p>
+    </article>
+    <article class="card" style="border-left:6px solid var(--line)">
+      <h3>⚙️ migrations</h3>
+      <p class="tag">Interna de CodeIgniter.</p>
+      <p style="font-size:.88rem">Qué migraciones ya se aplicaron. Hay 9 (desde <code>2026-05-06 CreateTesinaSimulationSchema</code> hasta <code>2026-09-15 CreatePurchasesTable</code>). La tabla vieja <code>device_activation_codes</code> se borró al pasar al QR.</p>
+    </article>
+  </div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec db" id="relaciones">
+  <header><span class="num">4</span><h2>Relaciones entre tablas</h2></header>
+  <p class="one">Todo cuelga de <b>users</b>. El centro operativo es <b>devices</b>.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 1000 520" role="img" aria-label="Diagrama entidad relación">
+      <defs>
+        <marker id="many" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 7L13 1M0 7L13 7M0 7L13 13" stroke="#8A5115" stroke-width="1.6" fill="none"/></marker>
+        <marker id="manyd" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 7L13 1M0 7L13 7M0 7L13 13" stroke="#5A5E62" stroke-width="1.6" fill="none"/></marker>
+      </defs>
+      <!-- cajas -->
+      <g font-size="15" font-weight="700" text-anchor="middle">
+        <rect x="400" y="15" width="200" height="54" rx="10" fill="#8A5115"/><text x="500" y="47" fill="#fff">users</text>
+        <rect x="90" y="170" width="190" height="54" rx="10" fill="#F2E6D6" stroke="#8A5115" stroke-width="2"/><text x="185" y="202">spaces</text>
+        <rect x="400" y="170" width="200" height="54" rx="10" fill="#F2E6D6" stroke="#8A5115" stroke-width="2"/><text x="500" y="202">devices</text>
+        <rect x="760" y="170" width="200" height="54" rx="10" fill="#fff" stroke="#5A5E62" stroke-dasharray="6 4"/><text x="860" y="202">purchases</text>
+        <rect x="60" y="400" width="210" height="54" rx="10" fill="#F2E6D6" stroke="#8A5115" stroke-width="2"/><text x="165" y="432">measurements</text>
+        <rect x="300" y="400" width="200" height="54" rx="10" fill="#F2E6D6" stroke="#8A5115" stroke-width="2"/><text x="400" y="432">device_states</text>
+        <rect x="530" y="400" width="210" height="54" rx="10" fill="#F2E6D6" stroke="#8A5115" stroke-width="2"/><text x="635" y="432">device_commands</text>
+        <rect x="770" y="400" width="210" height="54" rx="10" fill="#fff" stroke="#5A5E62" stroke-dasharray="6 4"/><text x="875" y="432">device_pairings</text>
+      </g>
+      <!-- lineas FK -->
+      <g stroke="#8A5115" stroke-width="2" fill="none">
+        <path d="M430 69 L230 168" marker-end="url(#many)"/>
+        <path d="M500 69 L500 168" marker-end="url(#many)"/>
+        <path d="M280 197 L398 197" marker-end="url(#many)"/>
+        <path d="M450 224 L190 398" marker-end="url(#many)"/>
+        <path d="M500 224 L410 398"/>
+        <path d="M550 224 L630 398" marker-end="url(#many)"/>
+        <path d="M185 224 L150 398" marker-end="url(#many)" stroke-dasharray="2 0" opacity=".55"/>
+        <path d="M400 45 C 10 45, 10 300, 80 398" marker-end="url(#many)" opacity=".55"/>
+        <path d="M600 50 C 720 90, 700 300, 680 398" marker-end="url(#many)" opacity=".55"/>
+      </g>
+      <g stroke="#5A5E62" stroke-width="2" fill="none" stroke-dasharray="6 5">
+        <path d="M600 40 L860 168" marker-end="url(#manyd)"/>
+        <path d="M600 30 C 950 40, 980 250, 900 398" marker-end="url(#manyd)"/>
+        <path d="M600 210 L800 398" marker-end="url(#manyd)"/>
+      </g>
+      <!-- 1:1 marca -->
+      <g stroke="#8A5115" stroke-width="2"><line x1="398" y1="389" x2="422" y2="389"/><line x1="398" y1="394" x2="422" y2="394"/></g>
+      <!-- etiquetas -->
+      <g font-size="12" class="mono" fill="#23262A">
+        <text x="250" y="110">spaces.user_id</text>
+        <text x="508" y="120">devices.user_id</text>
+        <text x="292" y="190">devices.space_id</text>
+        <text x="226" y="300">device_id</text>
+        <text x="415" y="320" fill="#8A5115" font-weight="700">1 : 1</text>
+        <text x="415" y="336">device_id UNIQUE</text>
+        <text x="600" y="320">device_id</text>
+        <text x="40" y="250">user_id</text>
+        <text x="120" y="330">space_id</text>
+        <text x="652" y="220">issued_by_user_id</text>
+        <text x="700" y="96" fill="#5A5E62">purchases.user_id</text>
+        <text x="900" y="300" fill="#5A5E62">user_id</text>
+        <text x="690" y="330" fill="#5A5E62">device_id</text>
+      </g>
+      <g font-size="12" fill="#5A5E62">
+        <text x="20" y="500">━ ámbar = clave foránea real (CASCADE; issued_by_user_id con SET NULL)   ╍ gris punteado = relación lógica, SIN foreign key en la base   ⋔ = “muchos”</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="tw"><table>
+    <tr><th>Tipo</th><th>De → a</th><th>Campo (clave foránea)</th><th>Por qué</th></tr>
+    <tr><td><span class="ok-b">1 : 1</span></td><td><b>devices → device_states</b></td><td><code>device_states.device_id</code> UNIQUE · FK CASCADE</td><td>Cada equipo tiene una sola “foto del ahora”.</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>users → spaces</td><td><code>spaces.user_id</code> · FK CASCADE</td><td>Un usuario, varios ambientes (desde la migración AllowMultipleSpacesPerUser).</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>users → devices</td><td><code>devices.user_id</code> · FK CASCADE</td><td>Dueño del equipo.</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>spaces → devices</td><td><code>devices.space_id</code> · FK CASCADE</td><td>En qué ambiente está instalado (de ahí salen sus umbrales).</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>devices → measurements</td><td><code>measurements.device_id</code> · FK CASCADE</td><td>Historial del equipo.</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>users → measurements · spaces → measurements</td><td><code>measurements.user_id</code>, <code>.space_id</code> · FK CASCADE</td><td>Copias para filtrar sin JOIN; guardan dónde estaba el equipo al medir.</td></tr>
+    <tr><td><span class="info-b">1 : N</span></td><td>devices → device_commands</td><td><code>device_commands.device_id</code> · FK CASCADE</td><td>Cola + historial del equipo.</td></tr>
+    <tr><td><span class="info-b">1 : N (opcional)</span></td><td>users → device_commands</td><td><code>issued_by_user_id</code> · FK <b>SET NULL</b></td><td>Quién mandó la orden; vacío si la decidió el equipo.</td></tr>
+    <tr><td><span class="info-b">1 : N</span> <i>lógica</i></td><td>users → device_pairings</td><td><code>device_pairings.user_id</code> · <b>sin FK</b></td><td>Ventanas que abrió el usuario.</td></tr>
+    <tr><td><span class="info-b">1 : N</span> <i>lógica</i></td><td>devices → device_pairings</td><td><code>device_pairings.device_id</code> (nullable) · <b>sin FK</b></td><td>Qué equipo cerró la ventana.</td></tr>
+    <tr><td><span class="info-b">1 : N</span> <i>lógica</i></td><td>users → purchases</td><td><code>purchases.user_id</code> · <b>sin FK</b></td><td>Compras del usuario.</td></tr>
+    <tr><td><span class="bad-b">N : M</span></td><td colspan="3"><b>No hay ninguna.</b> No existe tabla puente. Lo más parecido: <code>devices</code> une users con spaces, pero cada ambiente ya pertenece a un solo usuario, así que sigue siendo 1:N por los dos lados.</td></tr>
+  </table></div>
+  <div class="memo"><b>“Uno solo, de a uno”:</b> la única 1:1 es <b>D</b>ispositivo ↔ <b>E</b>stado (“DE”: <i>de</i> cada equipo, <i>un</i> estado). Todo lo demás es 1:N. Muchos a muchos: <b>cero</b>.</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec be" id="modelos">
+  <header><span class="num">5</span><h2>Modelos — uno por tabla</h2><span class="chip be">app/Models</span></header>
+  <p class="one">El modelo es el único que “toca” su tabla. Todos: <code>returnType = 'array'</code>, timestamps automáticos y <code>$allowedFields</code> (lista blanca).</p>
+  <div class="tw"><table>
+    <tr><th>Modelo</th><th>Tabla</th><th>Para qué</th><th>Métodos propios</th></tr>
+    <tr><td class="k">UserModel</td><td class="k">users</td><td>Todo el acceso a cuentas. La contraseña nunca en claro.</td><td><code>obtenerPorId</code>, <code>buscarParaLogin</code>, <code>existeCorreoOUsuario(Excepto)</code>, <code>crearUsuario</code>, <code>actualizarPerfil</code>, <code>actualizarHashContrasena</code>, <code>guardarToken</code>/<code>buscarPorToken</code>/<code>actualizarPasswordConToken</code>/<code>limpiarTokenRecuperacion</code>, <code>hashToken</code> (privado)</td></tr>
+    <tr><td class="k">SpaceModel</td><td class="k">spaces</td><td>Ambientes y umbrales.</td><td>Ninguno (query builder desde services/controllers).</td></tr>
+    <tr><td class="k">DeviceModel</td><td class="k">devices</td><td>Equipos.</td><td><code>obtenerDeUsuario</code> (JOIN con spaces para el nombre del ambiente)</td></tr>
+    <tr><td class="k">DeviceStateModel</td><td class="k">device_states</td><td>Estado actual (1 fila por equipo).</td><td>Ninguno.</td></tr>
+    <tr><td class="k">MeasurementModel</td><td class="k">measurements</td><td>Historial de lecturas.</td><td>Ninguno.</td></tr>
+    <tr><td class="k">DeviceCommandModel</td><td class="k">device_commands</td><td>Cola de órdenes.</td><td>Ninguno (la lógica está en CommandService).</td></tr>
+    <tr><td class="k">DevicePairingModel</td><td class="k">device_pairings</td><td>Ventanas de vinculación.</td><td><code>buscarPorToken</code>, <code>buscarPorSesion</code>, <code>abiertas</code>, <code>marcarVencidas</code>, <code>cancelarAbiertasDe</code></td></tr>
+    <tr><td class="k">PurchaseModel</td><td class="k">purchases</td><td>Compras.</td><td><code>buscarPorReferencia</code>, <code>deUsuario</code>, <code>abiertasDe</code> (últimos 3 días)</td></tr>
+  </table></div>
+  <div class="memo"><b>Regla rápida:</b> los modelos con métodos propios son los que tienen <b>búsquedas especiales</b>: Usuario (login/token), Dispositivo (JOIN), Vinculación (ventanas) y Compra (referencia). Los otros 4 son “mudos”.</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec be" id="servicios">
+  <header><span class="num">6</span><h2>Servicios — donde vive la lógica</h2><span class="chip be">app/Services · 7 archivos</span></header>
+  <p class="one">Si hay que pensar, está en un servicio. Los controladores solo orquestan.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 1000 250" role="img" aria-label="Quién usa a quién entre servicios">
+      <defs><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2E5A7D"/></marker></defs>
+      <g font-size="13.5" font-weight="700" text-anchor="middle">
+        <rect x="20"  y="20" width="190" height="44" rx="9" fill="#2E5A7D"/><text x="115" y="47" fill="#fff">DeviceConfigService</text>
+        <rect x="250" y="20" width="190" height="44" rx="9" fill="#2E5A7D"/><text x="345" y="47" fill="#fff">MeasurementService</text>
+        <rect x="480" y="20" width="160" height="44" rx="9" fill="#2E5A7D"/><text x="560" y="47" fill="#fff">PanelService</text>
+        <rect x="680" y="20" width="200" height="44" rx="9" fill="#2E5A7D"/><text x="780" y="47" fill="#fff">DevicePairingService</text>
+        <rect x="180" y="170" width="190" height="48" rx="9" fill="#fff" stroke="#2E5A7D" stroke-width="2"/><text x="275" y="199">CommandService</text>
+        <rect x="470" y="170" width="250" height="48" rx="9" fill="#DEE7EF" stroke="#2E5A7D" stroke-width="2"/><text x="595" y="192">EnvironmentPresetService</text><text x="595" y="210" font-size="11" font-weight="400">sin modelos: solo constantes</text>
+        <rect x="790" y="170" width="190" height="48" rx="9" fill="#fff" stroke="#2E5A7D" stroke-dasharray="5 4"/><text x="885" y="192">CompraService</text><text x="885" y="210" font-size="11" font-weight="400">aparte: Mercado Pago</text>
+      </g>
+      <g stroke="#2E5A7D" stroke-width="1.7" marker-end="url(#ab)">
+        <line x1="115" y1="64" x2="250" y2="168"/><line x1="140" y1="64" x2="520" y2="168"/>
+        <line x1="345" y1="64" x2="285" y2="168"/>
+        <line x1="545" y1="64" x2="320" y2="168"/><line x1="575" y1="64" x2="595" y2="168"/>
+        <line x1="760" y1="64" x2="640" y2="168"/>
+      </g>
+    </svg>
+    <figcaption>CommandService y EnvironmentPresetService son las dos “bases” que usan los demás. CompraService no depende de ningún otro servicio.</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <article class="card be">
+      <h3>⚙️ DeviceConfigService</h3>
+      <p class="tag">“Le dice al equipo CON QUÉ NÚMEROS decidir.”</p>
+      <p><b>Contiene:</b> las constantes de tiempos (sección 2) + <code>CO2_CRITICO_HISTERESIS = 300</code> y un solo método público: <code>paraDispositivo($device, $space)</code>.</p>
+      <p><b>Qué hace:</b> arma el JSON de <code>GET /config</code> con 8 bloques:</p>
+      <ul>
+        <li><code>ambiente</code> (id, nombre legible, tipo) · <code>umbrales</code> (dónde ENCIENDE/avisa)</li>
+        <li><code>apagado</code> (dónde APAGA: la histéresis <b>ya restada</b>, así el firmware no hace cuentas)</li>
+        <li><code>critico</code> (CO₂ 1400, salida 1100) · <code>tiempos</code> · <code>intervalos</code></li>
+        <li><code>modo</code> (automatic/manual) · <code>actuadores</code> (lo que el servidor cree que está prendido)</li>
+      </ul>
+      <p><b>Usa:</b> CommandService (<code>asegurarEstado</code>), EnvironmentPresetService (<code>control</code>, nombre). <b>Lo usa:</b> DeviceApiController::config.</p>
+    </article>
+
+    <article class="card be">
+      <h3>📥 MeasurementService</h3>
+      <p class="tag">“Valida, guarda y registra. No decide nada.”</p>
+      <p><b>Contiene:</b> <code>LIMITES</code> físicos (temp −20…60 °C, humedad 0…100 %, CO₂ 300…10000 ppm) · <code>registrar()</code> · <code>calcularIndiceAire()</code> (respaldo, misma fórmula que reglas.py) · <code>etiquetaAire()</code> (85 Excelente / 70 Buena / 55 Aceptable / Mala) · <code>exigirNumero()</code> · <code>origenDelIndice()</code>.</p>
+      <p><b>Qué hace:</b> 1) exige temperatura, humedad y CO₂ dentro de rango (si no → excepción → HTTP 422); 2) <b>respeta el índice de aire del equipo</b> (solo calcula si no vino); 3) guarda la fila con <code>air_quality_source</code>; 4) si vinieron <code>actuadores</code>, se los pasa a CommandService con el motivo y el diagnóstico.</p>
+      <p><b>Usa:</b> MeasurementModel, CommandService. <b>Lo usa:</b> DeviceApiController::storeMeasurement.</p>
+    </article>
+
+    <article class="card be">
+      <h3>📨 CommandService</h3>
+      <p class="tag">“La cola de órdenes y la foto del estado.”</p>
+      <p><b>Contiene:</b> mapa <code>fan/aromatizer/alert_led → *_state</code> (dejan historial) y <code>green_led/blue_led</code> (solo se guardan, no historizan).</p>
+      <p><b>Qué hace — dos caminos:</b></p>
+      <ul>
+        <li><b>Órdenes del usuario</b> (<code>source='web'</code>): <code>encolarComandoManual</code> cancela la pendiente anterior del mismo actuador y deja una nueva <code>pending</code>. El equipo la pide (<code>getPendingCommands</code>) y la confirma (<code>markCommandAsExecuted</code>, idempotente) → recién ahí cambia <code>device_states</code>.</li>
+        <li><b>Lo que el equipo decidió</b> (<code>source='device'</code>): <code>registrarEstadoReportado</code> actualiza el estado y deja fila <code>executed</code> solo si el actuador cambió; <code>cambiosDeDiagnostico</code> guarda <code>ir_confirmed</code>, <code>air_sensor_status</code> y <code>avisos</code> solo si cambiaron.</li>
+      </ul>
+      <p>También: <code>changeOperatingMode</code> (registra comando <code>mode</code> ya ejecutado; al pasar a manual cancela pendientes viejos de <code>automation</code>), <code>getStateByDeviceId</code>, <code>asegurarEstado</code> (crea la fila si falta).</p>
+      <p><b>Usa:</b> DeviceCommandModel, DeviceStateModel. <b>Lo usan:</b> MeasurementService, DeviceConfigService, PanelService, PanelController, DeviceApiController.</p>
+    </article>
+
+    <article class="card be">
+      <h3>🔗 DevicePairingService</h3>
+      <p class="tag">“Conectar un equipo sin escribir ningún código.”</p>
+      <p><b>Contiene:</b> <code>MINUTOS_VENTANA = 10</code> · <code>AP_SSID/PASSWORD_DEFECTO</code> (deben coincidir con config.py; se pueden pisar con <code>.env</code>) · nombre base “Eden Air”.</p>
+      <p><b>Qué hace:</b></p>
+      <ol class="steps be">
+        <li><code>abrirVentana</code>: cancela las anteriores, crea token, guarda la ventana 10 min y dibuja el QR <code>WIFI:</code> con la red del equipo (<code>paquetePantalla</code>, <code>payloadWifi</code>).</li>
+        <li><code>estado</code>: lo consulta la pantalla del QR (esperando / vinculado / expirado / cancelado).</li>
+        <li><code>registrarDispositivo</code>: llega el equipo con su MAC. ¿MAC conocida? → le devuelve sus credenciales. ¿Ventana abierta? → <code>crearDispositivo</code> (transacción: ambiente “hogar” si no hay + device con <code>EDN-…</code> y token + estado inicial). ¿Ninguna? → <code>sin_ventana</code> (HTTP 202).</li>
+        <li><code>estadoPorSesion</code>: el celular (sin login) pregunta con el código que le dio el portal.</li>
+      </ol>
+      <p>Extras: <code>elegirVentana</code> (prefiere la misma red /24), <code>registrarReconexion</code>, <code>nombreLibre</code> (“Eden Air 2”…), <code>listarDeUsuario</code>, <code>estadoLegible</code>, <code>cancelar</code>.</p>
+      <p><b>Usa:</b> QrCode, DevicePairingModel, DeviceModel, SpaceModel, DeviceStateModel, EnvironmentPresetService. <b>Lo usan:</b> DispositivosController, VinculacionController, DeviceApiController::pair.</p>
+    </article>
+
+    <article class="card be">
+      <h3>🏷️ EnvironmentPresetService</h3>
+      <p class="tag">“El catálogo de ambientes. No toca la base.”</p>
+      <p><b>Contiene:</b> <code>CONTROL</code> (aire mín 70, histéresis 2 °C / 8 % / 150 ppm / 5 pts, CO₂ crítico 1400) · <code>PRESETS</code>:</p>
+      <div class="tw"><table>
+        <tr><th>Tipo</th><th>Temp</th><th>Hum</th><th>CO₂ máx</th></tr>
+        <tr><td>oficina</td><td>21–25</td><td>40–60</td><td>900</td></tr>
+        <tr><td>aula</td><td>20–24</td><td>40–60</td><td>1000</td></tr>
+        <tr><td><b>hogar</b> (respaldo)</td><td>20–26</td><td>40–60</td><td>1000</td></tr>
+        <tr><td>dormitorio</td><td>18–24</td><td>40–55</td><td>900</td></tr>
+        <tr><td>personalizable</td><td>20–26</td><td>40–60</td><td>1000</td></tr>
+      </table></div>
+      <p><b>Qué hace:</b> <code>getPreset</code> (desconocido → hogar), <code>getCatalogo</code>, <code>buildSpaceData</code>, <code>getDisplayName</code>, <code>formatearRangos</code>, <code>siguePreset</code>, y <code>control($space)</code>: los umbrales de control efectivos, <b>los mismos</b> para DeviceConfigService y PanelService.</p>
+    </article>
+
+    <article class="card be">
+      <h3>📊 PanelService</h3>
+      <p class="tag">“Cocina el dashboard: la vista solo recorre arrays.”</p>
+      <p><b>Contiene:</b> márgenes de color (<code>MARGEN_TEMP 2</code>, <code>MARGEN_HUM 10</code>, <code>MARGEN_AIRE 15</code>), escalas de los medidores (temp 10–35, CO₂ 0–1500), <code>LECTURAS = 6</code>, catálogo <code>AVISOS</code> (código → texto + tono).</p>
+      <p><b>Qué hace (una pasada):</b> <code>contexto</code> (las únicas consultas: usuario, equipos, ambiente, estado, últimas 6 mediciones) → <code>lecturas</code> → <code>evaluar*</code> (semáforo success/warning/danger) → bloques <code>sensores</code>, <code>actuadores</code>, <code>leds</code>, <code>reglas</code>, <code>mensajes</code>, <code>historial</code>, <code>sparkPath</code> → <code>armarVista</code>.</p>
+      <p>Regla: el panel <b>pinta</b>, el equipo <b>decide</b>. Los números viajan como números hasta el final.</p>
+      <p><b>Usa:</b> UserModel, SpaceModel, DeviceModel, MeasurementModel, CommandService, EnvironmentPresetService. <b>Lo usa:</b> PanelController (<code>obtenerVistaPanel</code>, <code>obtenerDatos</code>).</p>
+    </article>
+
+    <article class="card be">
+      <h3>🛒 CompraService</h3>
+      <p class="tag">“Cobrar con Mercado Pago sin ver nunca una tarjeta.”</p>
+      <p><b>Contiene:</b> el producto en un solo lugar: <code>EdenAir</code>, <b>$450.000 ARS</b>.</p>
+      <ol class="steps be">
+        <li><code>iniciarPago</code>: referencia <code>EA-…</code>, pide la preferencia a MP, guarda la compra <code>iniciada</code>, devuelve el link.</li>
+        <li><code>confirmarRegreso</code>: el usuario vuelve; no se cree la URL: se consulta el pago real (<code>sincronizar</code>).</li>
+        <li><code>procesarAviso</code>: webhook de MP; mismo criterio.</li>
+      </ol>
+      <p>Todo termina en <code>aplicarPago</code> (una aprobada no retrocede). Extras: <code>actualizarAbiertas</code>, <code>listarDeUsuario</code>, <code>estadoLegible</code>, <code>estadoDesdeMercadoPago</code>, <code>urlAvisos</code>/<code>esUrlPublica</code> (webhook y auto_return solo con https público).</p>
+      <p><b>Usa:</b> Libraries/MercadoPago, PurchaseModel, UserModel. <b>Lo usan:</b> CompraController, Api/MercadoPagoController.</p>
+    </article>
+  </div>
+
+  <div class="memo"><b>“CoMe De PaPEn Co”:</b> <b>Co</b>mmand · <b>Me</b>asurement · <b>De</b>viceConfig · <b>Pa</b>nel · <b>P</b>airing · <b>En</b>vironmentPreset · <b>Co</b>mpra. Y cada uno con su verbo: ordena · guarda · configura · muestra · vincula · cataloga · cobra.</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec be" id="controladores">
+  <header><span class="num">7</span><h2>Controladores — qué maneja cada uno</h2><span class="chip be">app/Controllers</span></header>
+  <p class="one">Agrupados como en <code>Routes.php</code>: públicas · solo sin sesión (<code>guest</code>) · solo con sesión (<code>auth</code>) · API del equipo.</p>
+  <div class="tw"><table>
+    <tr><th>Controlador</th><th>Maneja</th><th>Rutas</th><th>Acceso</th></tr>
+    <tr><td class="k">AccesoController</td><td>Landing, login, registro, recuperar y restablecer contraseña, logout.</td><td><code>/</code>, <code>login</code>, <code>registro</code>, <code>recuperar</code>, <code>restablecer/{token}</code>, <code>logout</code></td><td>público / guest</td></tr>
+    <tr><td class="k">PortfolioController</td><td>Página pública del portfolio.</td><td><code>portfolio</code></td><td>público</td></tr>
+    <tr><td class="k">VinculacionController</td><td>La vuelta del celular tras configurar el WiFi (sin login, con el código de sesión).</td><td><code>vinculacion/seguir</code>, <code>…/estado</code></td><td>público</td></tr>
+    <tr><td class="k">PanelController</td><td>Dashboard (o bienvenida si no hay equipos), datos en vivo, equipo activo, perfil y contraseña, <b>modo</b> y <b>actuadores</b> (solo en manual).</td><td><code>panel</code>, <code>panel/datos</code>, <code>panel/perfil</code>, <code>panel/password</code>, <code>panel/dispositivo-activo</code>, <code>panel/modo</code>, <code>panel/actuador</code>, <code>dashboard</code></td><td>auth</td></tr>
+    <tr><td class="k">DispositivosController</td><td>“Mis dispositivos” y el flujo de conectar por QR.</td><td><code>panel/dispositivos</code>, <code>…/conectar</code> (GET/POST), <code>…/conectar/estado</code>, <code>…/conectar/cancelar</code></td><td>auth</td></tr>
+    <tr><td class="k">AmbientesController</td><td>Listar y editar ambientes y sus umbrales.</td><td><code>panel/ambientes</code>, <code>…/{id}/editar</code>, POST <code>…/{id}</code></td><td>auth</td></tr>
+    <tr><td class="k">CompraController</td><td>Pantalla de compra, ir a pagar, resultado de Mercado Pago.</td><td><code>panel/compra</code>, <code>…/pagar</code>, <code>…/resultado</code></td><td>auth</td></tr>
+    <tr><td class="k">Api\DeviceApiController</td><td>La API del ESP32: alta, config, mediciones, órdenes. Autentica con <code>device_uid</code> + <code>X-Device-Token</code>.</td><td><code>api/devices/pair</code>, <code>{uid}/config</code>, <code>{uid}/measurements</code>, <code>{uid}/commands/pending</code>, <code>{uid}/commands/{id}/executed</code></td><td>token</td></tr>
+    <tr><td class="k">Api\MercadoPagoController</td><td>Webhook de Mercado Pago (solo trae el id; el estado se consulta).</td><td>POST <code>api/pagos/mercadopago</code></td><td>público</td></tr>
+    <tr><td class="k">BaseController</td><td>Clase madre de todos.</td><td>—</td><td>—</td></tr>
+  </table></div>
+  <div class="note">Extra en <code>Routes.php</code>: <code>GET api/sensores</code> es una <b>función anónima</b> (no un controlador) que devuelve la última medición de toda la base en JSON. Filtros: <code>AuthFilter</code> (pide sesión) y <code>GuestFilter</code> (solo sin sesión).</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec vi" id="vistas">
+  <header><span class="num">8</span><h2>Parciales vs. layouts</h2><span class="chip vi">app/Views/partials · app/Views/layouts</span></header>
+  <p class="one">El <b>layout</b> es el MARCO que envuelve a la vista; el <b>parcial</b> es una PIEZA que se pega adentro.</p>
+
+  <div class="split">
+    <div class="card vi">
+      <h3>🖼️ Layout = el marco</h3>
+      <p>La vista dice “<b>usame este marco</b>” y llena un hueco con nombre. El layout pone todo lo que se repite alrededor.</p>
+      <div class="diff">&lt;?= $this-&gt;extend('layouts/panel') ?&gt;
+&lt;?= $this-&gt;section('contenido') ?&gt;
+    ... solo el HTML de ESTA pantalla ...
+&lt;?= $this-&gt;endSection() ?&gt;</div>
+      <p>Adentro del layout: <code>&lt;?= $this-&gt;renderSection('contenido') ?&gt;</code>. Lo que escribas <b>fuera</b> de la sección no se muestra.</p>
+    </div>
+    <div class="card vi">
+      <h3>🧩 Parcial = la pieza</h3>
+      <p>Un pedazo de HTML reutilizable que se <b>inserta donde lo llamás</b>, con sus datos.</p>
+      <div class="diff">&lt;?= view('partials/ojo_password',
+         ['objetivo' =&gt; '#miPassword']) ?&gt;</div>
+      <p>Truco del proyecto: los parciales reciben todo dentro de <b>una clave</b> (<code>'logo'</code>, <code>'toggle'</code>, <code>'selector'</code>) porque CodeIgniter comparte los datos entre los <code>view()</code> de una página y si no, uno hereda los del otro.</p>
+    </div>
+  </div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 1000 300" role="img" aria-label="Cómo se arma una pantalla del panel">
+      <rect x="10" y="10" width="980" height="280" rx="14" fill="#ECE4F0" stroke="#6A4C7D" stroke-width="2"/>
+      <text x="26" y="36" font-size="15" font-weight="700" fill="#6A4C7D">layouts/panel.php  (el marco)</text>
+      <rect x="26" y="48" width="948" height="30" rx="7" fill="#fff" stroke="#6A4C7D" stroke-dasharray="4 3"/><text x="40" y="68" font-size="13">partials/head  → &lt;head&gt;, CSS (marca para Vista.php)</text>
+      <rect x="26" y="88" width="190" height="190" rx="9" fill="#fff" stroke="#6A4C7D" stroke-dasharray="4 3"/><text x="40" y="112" font-size="13" font-weight="700">partials/</text><text x="40" y="130" font-size="13" font-weight="700">panel_sidebar</text><text x="40" y="152" font-size="12" fill="#5A5E62">menú lateral</text>
+      <rect x="230" y="88" width="744" height="38" rx="7" fill="#fff" stroke="#6A4C7D" stroke-dasharray="4 3"/><text x="244" y="112" font-size="13"><tspan font-weight="700">partials/panel_header</tspan> · barra superior (adentro usa theme_toggle)</text>
+      <rect x="230" y="134" width="744" height="28" rx="7" fill="#fff" stroke="#6A4C7D" stroke-dasharray="4 3"/><text x="244" y="153" font-size="13"><tspan font-weight="700">partials/flashes</tspan> · “Guardado con éxito”</text>
+      <rect x="230" y="170" width="744" height="108" rx="9" fill="#6A4C7D"/><text x="602" y="214" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">section('contenido')</text><text x="602" y="238" text-anchor="middle" font-size="13" fill="#ECE4F0">acá entra la VISTA: panel.php, ambientes/index.php, compra_mercadopago.php…</text><text x="602" y="258" text-anchor="middle" font-size="12" fill="#ECE4F0">(panel.php además usa partials/selector_dispositivo)</text>
+    </svg>
+    <figcaption>Opcionales del layout: <code>partials/panel_loader</code> (con <code>conLoader</code>) y GSAP (con <code>conScrollSuave</code>).</figcaption>
+  </figure>
+
+  <h4>Los 2 layouts</h4>
+  <div class="tw"><table>
+    <tr><th>Layout</th><th>Qué arma</th><th>Parciales que incluye</th><th>Vistas que lo usan</th></tr>
+    <tr><td class="k">layouts/panel.php</td><td>Esqueleto del área privada: head, menú, barra, flashes, scripts (<code>tema.js</code>, <code>dashboard.js</code> + los de la pantalla).</td><td>head, panel_loader*, panel_sidebar, panel_header, flashes</td><td>panel, panel/bienvenida, dispositivos/index, dispositivos/conectar, ambientes/index, ambientes/editar, perfil_usuario, compra_mercadopago</td></tr>
+    <tr><td class="k">layouts/acceso.php</td><td>Tarjeta centrada con un formulario.</td><td>head, navbar, mensajes_acceso</td><td>login, registro, recuperar, restablecer_password</td></tr>
+  </table></div>
+  <p style="font-size:.88rem;color:var(--ink2)">Sin layout (arman su página con parciales a mano): <code>inicio.php</code> y <code>portfolio.php</code> (head, navbar, theme_toggle, footer, logo). <code>vinculacion/seguir.php</code> no usa ni layout ni parciales.</p>
+
+  <h4>Los 12 parciales</h4>
+  <div class="grid g3">
+    <div class="card vi"><b>head</b> — el <code>&lt;head&gt;</code> compartido (título, favicon, CSS y la marca <code>&lt;!-- ESTILOS DE LAS VISTAS --&gt;</code>).</div>
+    <div class="card vi"><b>navbar</b> — barra superior <b>pública</b> (landing, portfolio, acceso).</div>
+    <div class="card vi"><b>footer</b> — pie de las páginas públicas.</div>
+    <div class="card vi"><b>logo</b> — la marca EdenAir; parámetros en la clave <code>'logo'</code>.</div>
+    <div class="card vi"><b>theme_toggle</b> — interruptor claro/oscuro (lógica en <code>tema.js</code>).</div>
+    <div class="card vi"><b>ojo_password</b> — botón para ver la contraseña (lo engancha <code>acceso.js</code>).</div>
+    <div class="card vi"><b>mensajes_acceso</b> — avisos de login/registro (estilo tarjeta).</div>
+    <div class="card vi"><b>flashes</b> — mensajes de una vez del panel (lee la sesión).</div>
+    <div class="card vi"><b>panel_header</b> — barra superior <b>del panel</b> (antes copiada en 8 vistas).</div>
+    <div class="card vi"><b>panel_sidebar</b> — menú lateral; para agregar opción, una línea en <code>$menu</code>.</div>
+    <div class="card vi"><b>panel_loader</b> — pantalla de carga con anillos girando.</div>
+    <div class="card vi"><b>selector_dispositivo</b> — elegir qué equipo ver (si hay más de uno).</div>
+  </div>
+  <div class="memo"><b>Marco y figurita:</b> el <b>layout</b> es el <b>marco</b> del cuadro (hay 2: panel y acceso); el <b>parcial</b> es una <b>figurita</b> que pegás donde quieras (hay 12). La vista <b>se mete</b> en el marco (<code>extend</code>); la figurita <b>se mete</b> en la vista (<code>view()</code>).</div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec be" id="nuevo">
+  <header><span class="num">9</span><h2>Lo que cambió en el último tiempo</h2><span class="chip ghost">según git log</span></header>
+  <div class="tw"><table>
+    <tr><th>Fecha</th><th>Commit</th><th>Qué cambió</th><th>Dónde</th></tr>
+    <tr><td>05/10</td><td class="k">4cefd89 · red.py</td><td>Portal más robusto con poca RAM: envío con <code>memoryview</code> (antes copiaba el resto de la página en cada vuelta → MemoryError), respuestas con <code>Content-Length</code> (<code>_responder</code>), la página del portal se arma <b>una sola vez</b>, <code>gc.collect()</code>.</td><td><span class="chip fw">firmware</span></td></tr>
+    <tr><td>02/10</td><td class="k">6048dbe · cambio de nombre</td><td>Carpeta/URL <code>piedra_castillo</code> → <code>EdenAir</code> (<code>baseURL</code>, <code>SERVIDOR_DEFECTO</code>, docs) + script <code>herramientas/renombrar_base_a_edenair.sql</code>.</td><td><span class="chip fw">firmware</span> <span class="chip be">backend</span> <span class="chip db">BD</span></td></tr>
+    <tr><td>02/10</td><td class="k">308f2be</td><td>Arreglos de compra, botón “Comprar EdenAir” (hover) e impresión del panel.</td><td><span class="chip be">backend</span> <span class="chip vi">CSS</span></td></tr>
+    <tr><td>01/10</td><td class="k">831156c … 8b7565a</td><td><b>CSS por vista</b>: <code>Libraries/Vista.php</code> carga sola <code>public/CSS/vistas/&lt;misma ruta&gt;.css</code> de cada vista, layout y parcial usados; se borraron los CSS viejos y nace <code>CSS/comun.css</code>.</td><td><span class="chip vi">vistas</span></td></tr>
+    <tr><td>25/09</td><td class="k">76b6216 · mq calibrado</td><td>Calibración MQ-135: <code>CRUDO_LIMPIO</code> 700 → <b>105</b>, <code>CRUDO_SUCIO</code> 2800 → <b>340</b>.</td><td><span class="chip fw">firmware</span></td></tr>
+    <tr><td>25/09</td><td class="k">609d845 · ubicacion pines</td><td>Se asignaron los pines reales: relés 26/27, IR 25/33, LEDs 14/16/17 (antes <code>None</code>).</td><td><span class="chip fw">firmware</span></td></tr>
+    <tr><td>22/09</td><td class="k">e083e39</td><td>IR: una orden distinta se emite siempre; el mínimo de 60 s solo frena repeticiones (+ <code>prueba_infrarrojo.py</code>).</td><td><span class="chip fw">firmware</span></td></tr>
+    <tr><td>15–25/09</td><td class="k">cbb3fc5 · fe40160 …</td><td><b>Compras con Mercado Pago</b>: tabla <code>purchases</code>, CompraService, CompraController, webhook.</td><td><span class="chip be">backend</span> <span class="chip db">BD</span></td></tr>
+    <tr><td>08–10/09</td><td class="k">50fc658 · Nueva logica</td><td>La decisión se mudó al firmware (histéresis, ciclo del atomizador, MQ-135, 3 LEDs, IR, diagnóstico). Migración <code>ActualizarLogicaControl</code>. Detalle en <code>CAMBIOS-LOGICA.md</code>.</td><td><span class="chip fw">firmware</span> <span class="chip be">backend</span> <span class="chip db">BD</span></td></tr>
+  </table></div>
+</section>
+
+<!-- =================================================================== -->
+<section class="sec al" id="faltantes">
+  <header><span class="num">10</span><h2>Qué falta o quedó incompleto</h2></header>
+  <div class="grid g2">
+    <div class="card al">
+      <h3>En este documento</h3>
+      <ul>
+        <li>Las <b>vistas completas</b> no están (pedido tuyo); tampoco los <b>JS</b> de <code>public/JS</code> ni los CSS, salvo los tiempos de los JS.</li>
+        <li>De las librerías <code>MercadoPago.php</code> y <code>QrCode.php</code> y del helper <code>eden_helper.php</code> solo se nombra qué hacen; no se explican por dentro.</li>
+        <li><code>firmware/README.md</code> y los HITO_*.md no se resumieron: son documentación, no código.</li>
+        <li>No se probó nada en la placa: todo sale de leer el código.</li>
+      </ul>
+    </div>
+    <div class="card al">
+      <h3>En el código (además de los tiempos)</h3>
+      <ul>
+        <li><b>Modo manual tarda hasta 1 h</b> en llegar al equipo y, mientras tanto, <code>atender_comandos()</code> aplica las órdenes aunque el equipo siga en automático (su docstring dice “solo tienen efecto en modo manual”, pero el código no lo verifica). Ver propuesta B.</li>
+        <li><code>PanelController</code> dice en su encabezado que maneja “la carga manual de mediciones” y <code>MeasurementModel</code> menciona “el form manual del panel y el simulador”: <b>no existe ninguna ruta</b> para eso hoy.</li>
+        <li><code>device_pairings</code> y <code>purchases</code> no tienen <b>foreign keys</b> en la base (solo índices): la relación es lógica.</li>
+        <li>El README del firmware muestra <code>192.168.1.100</code> y <code>config.py</code> tiene <code>192.168.2.130</code> (es un ejemplo, pero conviene saberlo).</li>
+      </ul>
+    </div>
+  </div>
+  <p class="one" style="border-color:var(--al)">Ver las propuestas de tiempos en <a href="#propuestas">🛑 Tiempos — propuestas</a>. Ninguna está aplicada.</p>
+</section>
+
+<p class="foot">Estudio EdenAir · generado leyendo el código del repo · colores: <span style="color:var(--fw)">■ firmware</span> <span style="color:var(--be)">■ backend</span> <span style="color:var(--db)">■ base de datos</span> <span style="color:var(--vi)">■ vistas</span> <span style="color:var(--al)">■ alerta</span></p>
+</div>
+</body>
+</html>

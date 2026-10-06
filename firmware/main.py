@@ -248,11 +248,16 @@ def avisos_de_los_sensores(estado_aire, salidas, avisos):
 # ---------------------------------------------------------------------------
 # Ordenes manuales del usuario
 # ---------------------------------------------------------------------------
-def atender_comandos(api, salidas):
+def atender_comandos(api, salidas, cfg):
     """
     Aplica las ordenes que el usuario mando desde el dashboard y las confirma.
 
     Solo tienen efecto en modo manual; en automatico manda reglas.py.
+
+    De paso actualiza el modo en `cfg`: el servidor lo manda junto con los
+    comandos. Antes el modo solo llegaba al refrescar la configuracion (cada
+    una hora), asi que al pasar a manual el equipo seguia decidiendo solo y
+    en la medicion siguiente deshacia la orden del usuario.
 
     Una orden se confirma UNICAMENTE si se pudo cumplir de verdad. Si pide un
     actuador que no esta conectado, o si el rele todavia esta cumpliendo su
@@ -261,8 +266,17 @@ def atender_comandos(api, salidas):
     por actuador, asi que no se llena la cola.
     """
     try:
-        pendientes = api.comandos_pendientes()
+        modo, pendientes = api.comandos_pendientes()
     except ErrorServidor:
+        return
+
+    if modo in ("automatic", "manual") and modo != cfg.get("modo"):
+        print("Modo cambiado desde el panel:", modo)
+        cfg["modo"] = modo
+
+    # En automatico las ordenes manuales no se aplican: reglas.py las
+    # pisaria en la siguiente medicion. Quedan pendientes en el servidor.
+    if cfg.get("modo") != "manual":
         return
 
     for comando in pendientes:
@@ -418,7 +432,7 @@ def main():
             # ---- Ordenes manuales ----
             if ahora - ultimos_comandos >= intervalos.get("comandos", config.INTERVALO_COMANDOS):
                 ultimos_comandos = ahora
-                atender_comandos(api, salidas)
+                atender_comandos(api, salidas, cfg)
 
             # ---- Refrescar configuracion ----
             if ahora - ultima_config >= intervalos.get("config", config.INTERVALO_CONFIG):

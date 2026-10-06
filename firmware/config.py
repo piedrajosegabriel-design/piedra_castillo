@@ -105,6 +105,22 @@ PIN_LED_AZUL = 17
 # que esperas, es esto. NO aplica a los LEDs, que siempre encienden con 1.
 RELES_INVERTIDOS = True
 
+# --- Atomizador por toques -------------------------------------------------
+# El rele IN2 NO alimenta al atomizador: esta soldado al BOTON del modulo y
+# hace de dedo. El boton cicla modos, asi que el rele no se puede dejar
+# cerrado: hay que dar toques cortos. Probado a mano en la placa:
+#   apagado  --1 toque-->   continuo (encendido)
+#   continuo --3 toques-->  apagado
+# Al llegar la corriente el modulo arranca APAGADO, y el firmware arranca
+# suponiendo eso mismo.
+# En False el rele vuelve a quedar cerrado todo el tiempo que humidifica
+# (sirve si algun dia el atomizador se alimenta directo por el rele).
+ATOMIZADOR_POR_PULSOS = True
+ATOMIZADOR_TOQUES_ENCENDER = 1
+ATOMIZADOR_TOQUES_APAGAR = 3
+ATOMIZADOR_TOQUE_MS = 500           # rele cerrado: el dedo apretando
+ATOMIZADOR_ENTRE_TOQUES_MS = 500    # rele abierto entre un toque y el otro
+
 # ---------------------------------------------------------------------------
 # CALIBRACION DEL MQ-135
 # ---------------------------------------------------------------------------
