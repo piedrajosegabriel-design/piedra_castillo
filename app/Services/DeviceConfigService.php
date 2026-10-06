@@ -60,7 +60,7 @@ class DeviceConfigService
     public const INTERVALO_CONFIG = 60;
 
     /** Segundos que un relé tiene que quedarse quieto antes de volver a conmutar. */
-    public const RELE_MINIMO_ESTADO = 30;
+    public const RELE_MINIMO_ESTADO = 10;
 
     /** La trama infrarroja no se emite más seguido que esto (segundos). */
     public const IR_MINIMO_ENTRE_TRAMAS = 60;

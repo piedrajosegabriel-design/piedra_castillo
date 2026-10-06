@@ -174,7 +174,7 @@ REINTENTO_RED = 15
 RELE_MINIMO_ESTADO = 30
 
 # La trama IR no se emite mas de una vez cada tanto...
-IR_MINIMO_ENTRE_TRAMAS = 60
+IR_MINIMO_ENTRE_TRAMAS = 30
 # ...y despues de emitirla se espera como mucho esto (en MILISEGUNDOS) a que
 # el receptor la confirme. Si no confirma, el rele se activa igual y el
 # servidor se entera de que la confirmacion no llego.
