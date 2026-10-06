@@ -235,7 +235,7 @@ Cuando termine, en la consola de Thonny (abajo) tiene que aparecer `>>>`.
 Es el unico archivo que hay que editar. Lo importante:
 
 ```python
-SERVIDOR_DEFECTO = "http://192.168.1.100/EdenAir/public"
+SERVIDOR_DEFECTO = "http://192.168.1.100/piedra_castillo/public"
 ```
 
 > **Ojo con esto.** No sirve `localhost` ni `127.0.0.1`: para la ESP32,
@@ -475,13 +475,13 @@ servidor), `critico` (el CO2 que ya es grave), `tiempos` (las protecciones) e
 Podes simular al equipo desde la terminal de tu PC:
 
 ```bash
-curl -X POST http://localhost/EdenAir/public/api/devices/pair -H "Content-Type: application/json" -d "{\"mac\":\"AA:BB:CC:11:22:33\",\"firmware\":\"1.0.0\"}"
+curl -X POST http://localhost/piedra_castillo/public/api/devices/pair -H "Content-Type: application/json" -d "{\"mac\":\"AA:BB:CC:11:22:33\",\"firmware\":\"1.0.0\"}"
 ```
 
 Con el `api_token` que te devuelve podes pedir la configuracion:
 
 ```bash
-curl http://localhost/EdenAir/public/api/devices/TU_UID/config -H "X-Device-Token: TU_TOKEN"
+curl http://localhost/piedra_castillo/public/api/devices/TU_UID/config -H "X-Device-Token: TU_TOKEN"
 ```
 
 ---

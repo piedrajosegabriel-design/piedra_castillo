@@ -54,7 +54,7 @@ de alerta).
 | Capa | Tecnología |
 |---|---|
 | Lenguaje / Framework | PHP 8.2 + **CodeIgniter 4** (patrón MVC) |
-| Servidor | Apache (XAMPP), `http://localhost/EdenAir/public/` |
+| Servidor | Apache (XAMPP), `http://localhost/piedra_castillo/public/` |
 | Base de datos | MySQL / MariaDB (`edenair`) |
 | Hardware (IoT) | ESP32 que envía mediciones y recibe comandos por una API REST |
 | Frontend | HTML + CSS propio (sistema de tokens) + JavaScript |
