@@ -53,8 +53,12 @@ class DeviceConfigService
      */
     public const INTERVALO_MEDICION = 30;
 
-    /** Segundos entre consultas de comandos manuales. */
-    public const INTERVALO_COMANDOS = 15;
+    /**
+     * Segundos entre consultas de comandos manuales (y del modo). Es lo que
+     * tarda, como mucho, una orden del panel en llegar al equipo. 5 y no 15:
+     * con 15 el usuario tocaba un botón y no pasaba nada durante un rato.
+     */
+    public const INTERVALO_COMANDOS = 5;
 
     /** Cada cuánto conviene que el equipo vuelva a pedir su configuración. */
     public const INTERVALO_CONFIG = 60;

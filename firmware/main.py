@@ -339,14 +339,18 @@ def main():
     # 1) WiFi. No devuelve hasta estar conectado (abre el portal si hace falta).
     red.asegurar_conexion()
 
-    # 2) Sensor.
-    try:
-        sensor = SCD41()
-        print("Sensor SCD41 listo.")
-    except ErrorSensor as e:
-        print("ERROR DE SENSOR:", e)
-        print("El equipo no puede funcionar sin sensor. Revisa el cableado.")
-        return
+    # 2) Sensor. Sin el no hay medicion, pero el equipo NO se rinde: antes
+    # main() terminaba aca y la placa quedaba conectada al WiFi sin medir
+    # nunca. Ahora reintenta: apenas se acomoda el cable, arranca solo.
+    sensor = None
+    while sensor is None:
+        try:
+            sensor = SCD41()
+            print("Sensor SCD41 listo.")
+        except ErrorSensor as e:
+            print("ERROR DE SENSOR:", e)
+            print("Sin sensor no hay mediciones. Revisa el cableado; reintento en 10 s.")
+            time.sleep(10)
 
     # 3) Credenciales y configuracion.
     api = Servidor()

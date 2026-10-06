@@ -357,7 +357,13 @@ def _redes_disponibles():
 
     try:
         for red in wlan.scan():
-            nombre = red[0].decode("utf-8", "ignore")
+            # MicroPython no respeta el "ignore": un nombre de red que no es
+            # UTF-8 valido (lo elige el vecino) tira UnicodeError. Se saltea
+            # esa red en vez de dejar al equipo sin portal.
+            try:
+                nombre = red[0].decode("utf-8", "ignore")
+            except UnicodeError:
+                continue
 
             if not nombre or nombre in nombres or nombre == config.AP_SSID:
                 continue
@@ -492,16 +498,29 @@ def _es_sonda(camino):
 
 
 def _desescapar(texto):
-    """Deshace el encoding de formulario (%XX y '+')."""
-    texto = texto.replace("+", " ")
-    partes = texto.split("%")
-    salida = partes[0]
+    """
+    Deshace el encoding de formulario (%XX y '+').
+
+    Cada %XX es UN BYTE, no una letra: la ñ llega como %C3%B1 (dos bytes de
+    UTF-8). Por eso se juntan los bytes y recien al final se decodifican.
+    Convertir cada %XX a letra por separado dejaba "Peña" como "PeÃ±a", y una
+    red o clave con ñ o acentos no conectaba nunca aunque estuviera bien.
+    """
+    partes = texto.replace("+", " ").split("%")
+    salida = bytearray(partes[0].encode("utf-8"))
     for parte in partes[1:]:
-        try:
-            salida += chr(int(parte[:2], 16)) + parte[2:]
-        except ValueError:
-            salida += "%" + parte
-    return salida
+        par = parte[:2]
+        if len(par) == 2 and all(c in "0123456789abcdefABCDEF" for c in par):
+            salida.append(int(par, 16))
+            salida.extend(parte[2:].encode("utf-8"))
+        else:
+            salida.extend(("%" + parte).encode("utf-8"))
+
+    try:
+        return bytes(salida).decode("utf-8")
+    except UnicodeError:
+        # Bytes que no son UTF-8 valido: se devuelven tal cual, uno por letra.
+        return "".join(chr(b) for b in salida)
 
 
 def _leer_pedido(cliente):

@@ -30,6 +30,23 @@ class ErrorSensor(Exception):
 
 class SCD41:
     def __init__(self):
+        # Lo deja en False; rearrancar() lo pone en True. Se declara igual aca
+        # para que el atributo exista siempre, sin depender del orden de las
+        # llamadas.
+        self._descartar_primera = False
+        self._bus_caido = False
+
+        self._abrir_bus()
+
+        # Arranque del modo periodico. Es la misma maniobra que hace falta si el
+        # sensor se sale del modo mas adelante, asi que vive en un solo lugar.
+        self.rearrancar()
+
+    # -----------------------------------------------------------------------
+    # Bus I2C
+    # -----------------------------------------------------------------------
+    def _abrir_bus(self):
+        """Crea el bus I2C y confirma que el SCD41 este del otro lado."""
         self.i2c = I2C(
             0,
             sda=Pin(config.PIN_I2C_SDA),
@@ -37,20 +54,50 @@ class SCD41:
             freq=50000,
         )
 
-        if DIRECCION not in self.i2c.scan():
+        encontrados = self.i2c.scan()
+
+        if DIRECCION not in encontrados:
+            if encontrados:
+                detalle = "En el bus hay otra cosa (%s) pero no el SCD41 (0x62)." % (
+                    ", ".join("0x%02X" % d for d in encontrados))
+            else:
+                detalle = "No contesta nada en el bus: cable suelto, SDA/SCL al reves o sin 3V3/GND."
+
             raise ErrorSensor(
-                "No se detecta el SCD41 en I2C. Revisa el cableado y los pines "
-                "PIN_I2C_SDA / PIN_I2C_SCL en config.py"
+                "No se detecta el SCD41 (SDA=GPIO%s, SCL=GPIO%s). %s"
+                % (config.PIN_I2C_SDA, config.PIN_I2C_SCL, detalle)
             )
 
-        # Lo deja en False; rearrancar() lo pone en True. Se declara igual aca
-        # para que el atributo exista siempre, sin depender del orden de las
-        # llamadas.
-        self._descartar_primera = False
+        self._bus_caido = False
 
-        # Arranque del modo periodico. Es la misma maniobra que hace falta si el
-        # sensor se sale del modo mas adelante, asi que vive en un solo lugar.
-        self.rearrancar()
+    def _escribir(self, comando):
+        try:
+            self.i2c.writeto(DIRECCION, comando)
+        except OSError as e:
+            self._caido(e)
+
+    def _leer_bytes(self, cantidad):
+        try:
+            return self.i2c.readfrom(DIRECCION, cantidad)
+        except OSError as e:
+            self._caido(e)
+
+    def _caido(self, e):
+        """
+        El SCD41 dejo de contestar a mitad de camino.
+
+        En la ESP32 eso llega como OSError [Errno 19] ENODEV (o ETIMEDOUT). Antes
+        escapaba como un error cualquiera: main() no lo reconocia como falla de
+        sensor y el equipo quedaba conectado al WiFi sin medir nunca, repitiendo
+        "Error inesperado: [Errno 19]". Ahora se traduce a ErrorSensor y la
+        proxima lectura vuelve a abrir el bus: si fue un falso contacto
+        momentaneo, el equipo se recupera solo.
+        """
+        self._bus_caido = True
+        raise ErrorSensor(
+            "El SCD41 no contesta por I2C (%s). Suele ser un cable flojo en "
+            "SDA (GPIO%s), SCL (GPIO%s), 3V3 o GND." % (e, config.PIN_I2C_SDA, config.PIN_I2C_SCL)
+        )
 
     # -----------------------------------------------------------------------
     # Checksum
@@ -77,9 +124,9 @@ class SCD41:
     # -----------------------------------------------------------------------
     def hay_dato(self):
         """¿El sensor tiene una medicion nueva lista?"""
-        self.i2c.writeto(DIRECCION, CMD_LISTO)
+        self._escribir(CMD_LISTO)
         time.sleep_ms(2)
-        crudo = self.i2c.readfrom(DIRECCION, 3)
+        crudo = self._leer_bytes(3)
 
         if self._crc8(crudo[0:2]) != crudo[2]:
             raise ErrorSensor("Checksum invalido al consultar si hay dato")
@@ -127,7 +174,7 @@ class SCD41:
         # "arrancar": queda detenido, contestando por I2C pero sin medir nunca.
         time.sleep_ms(1000)
 
-        self.i2c.writeto(DIRECCION, CMD_ARRANCAR)
+        self._escribir(CMD_ARRANCAR)
         time.sleep_ms(100)
 
         # La hoja de datos avisa que la PRIMERA lectura despues de arrancar
@@ -145,9 +192,9 @@ class SCD41:
         self._descartar_primera = False
 
         if self._esperar_dato(espera_maxima):
-            self.i2c.writeto(DIRECCION, CMD_LEER)
+            self._escribir(CMD_LEER)
             time.sleep_ms(2)
-            self.i2c.readfrom(DIRECCION, 9)
+            self._leer_bytes(9)
 
     def leer(self, espera_maxima=10):
         """
@@ -156,7 +203,15 @@ class SCD41:
         Espera hasta `espera_maxima` segundos a que haya un dato nuevo. Si no
         llega, asume que el sensor se salio del modo periodico, lo rearranca y
         vuelve a esperar UNA vez. Recien si tampoco asi, lanza ErrorSensor.
+
+        Si la lectura anterior se corto por I2C, primero vuelve a abrir el bus y
+        a arrancar el sensor: asi un falso contacto no lo deja muerto para siempre.
         """
+        if self._bus_caido:
+            print("Reconectando el SCD41...")
+            self._abrir_bus()
+            self.rearrancar()
+
         self._descartar_si_hace_falta(espera_maxima)
 
         if not self._esperar_dato(espera_maxima):
@@ -167,9 +222,9 @@ class SCD41:
             if not self._esperar_dato(espera_maxima):
                 raise ErrorSensor("El sensor no entrego datos ni despues de rearrancarlo")
 
-        self.i2c.writeto(DIRECCION, CMD_LEER)
+        self._escribir(CMD_LEER)
         time.sleep_ms(2)
-        crudo = self.i2c.readfrom(DIRECCION, 9)
+        crudo = self._leer_bytes(9)
 
         # Tres grupos de [dato_alto, dato_bajo, crc].
         for i in (0, 3, 6):

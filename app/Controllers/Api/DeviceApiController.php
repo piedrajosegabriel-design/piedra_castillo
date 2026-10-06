@@ -178,7 +178,7 @@ class DeviceApiController extends BaseController
             'status'           => 'success',
             'device_uid'       => $device['device_uid'],
             // El modo viaja acá y no solo en /config: el equipo consulta los
-            // comandos cada 15 s pero la configuración cada una hora. Sin
+            // comandos cada 5 s y la configuración cada un minuto. Sin
             // esto, al pasar a manual la placa seguía en automático y
             // deshacía la orden del usuario en la medición siguiente.
             'modo'             => (string) ($estado['operating_mode'] ?? 'automatic'),
