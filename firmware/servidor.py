@@ -178,6 +178,13 @@ class Servidor:
     # 4) Ordenes manuales del usuario
     # -----------------------------------------------------------------------
     def comandos_pendientes(self):
+        """
+        Devuelve (modo, comandos).
+
+        `modo` es el que tiene el equipo en el panel ahora mismo ("automatic"
+        o "manual"), o None si el servidor no lo manda. Viaja aca porque esta
+        consulta es frecuente y la de configuracion no.
+        """
         estado, datos = self._pedir(
             "GET", "/api/devices/%s/commands/pending" % self.device_uid
         )
@@ -185,7 +192,7 @@ class Servidor:
         if estado != 200:
             raise ErrorServidor("No se pudieron consultar los comandos (HTTP %s)" % estado)
 
-        return datos.get("pending_commands", [])
+        return datos.get("modo"), datos.get("pending_commands", [])
 
     def confirmar_comando(self, comando_id):
         """Avisa que la orden ya se aplico fisicamente."""

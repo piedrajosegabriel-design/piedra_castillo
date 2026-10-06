@@ -168,13 +168,20 @@ class DeviceApiController extends BaseController
             return $this->responderNoAutorizado($exception->getMessage());
         }
 
-        $commands = (new CommandService())->getPendingCommands((int) $device['id']);
+        $comandos = new CommandService();
+        $commands = $comandos->getPendingCommands((int) $device['id']);
+        $estado   = $comandos->getStateByDeviceId((int) $device['id']);
 
         $this->actualizarActividadDispositivo((int) $device['id'], true);
 
         return $this->response->setJSON([
             'status'           => 'success',
             'device_uid'       => $device['device_uid'],
+            // El modo viaja acá y no solo en /config: el equipo consulta los
+            // comandos cada 15 s pero la configuración cada una hora. Sin
+            // esto, al pasar a manual la placa seguía en automático y
+            // deshacía la orden del usuario en la medición siguiente.
+            'modo'             => (string) ($estado['operating_mode'] ?? 'automatic'),
             'pending_commands' => array_map([$this, 'formatCommand'], $commands),
         ]);
     }
