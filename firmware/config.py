@@ -24,7 +24,7 @@ tiempos que protegen al hardware.
 # OJO: no sirve "localhost" ni "127.0.0.1". Para la ESP32, localhost es ella
 # misma. Tenes que poner la IP de la computadora que corre XAMPP dentro de
 # tu red WiFi (en Windows se averigua con `ipconfig`, campo IPv4).
-SERVIDOR_DEFECTO = "http://192.168.2.130/piedra_castillo/public"
+SERVIDOR_DEFECTO = "http://192.168.1.194/piedra_castillo/public"
 
 
 def servidor():
@@ -137,7 +137,7 @@ INTERVALO_MEDICION = 30
 
 # Cada cuanto preguntar por ordenes manuales del usuario y refrescar umbrales.
 INTERVALO_COMANDOS = 15
-INTERVALO_CONFIG = 3600
+INTERVALO_CONFIG = 60
 
 # Cada cuanto da una vuelta el ciclo principal. Es corto para que cada tarea
 # arranque cerca de su horario; no es el ritmo de ninguna de ellas.
@@ -158,7 +158,7 @@ REINTENTO_RED = 15
 RELE_MINIMO_ESTADO = 30
 
 # La trama IR no se emite mas de una vez cada tanto...
-IR_MINIMO_ENTRE_TRAMAS = 60
+IR_MINIMO_ENTRE_TRAMAS = 30
 # ...y despues de emitirla se espera como mucho esto (en MILISEGUNDOS) a que
 # el receptor la confirme. Si no confirma, el rele se activa igual y el
 # servidor se entera de que la confirmacion no llego.
