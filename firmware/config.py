@@ -153,7 +153,7 @@ INTERVALO_MEDICION = 30
 
 # Cada cuanto preguntar por ordenes manuales del usuario y refrescar umbrales.
 INTERVALO_COMANDOS = 15
-INTERVALO_CONFIG = 3600
+INTERVALO_CONFIG = 60
 
 # Cada cuanto da una vuelta el ciclo principal. Es corto para que cada tarea
 # arranque cerca de su horario; no es el ritmo de ninguna de ellas.
