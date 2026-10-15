@@ -32,13 +32,12 @@ $extraHead = $extraHead ?? '';
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<?php /* asset() agrega ?v=<fecha del archivo> para que el navegador no siga
-         mostrando el CSS viejo después de un cambio. Ver app/Helpers/eden_helper.php */ ?>
-<?php /* comun.css: lo que comparten TODAS las pantallas (paleta, tipografía,
-         botones...). Después, la marca: app/Libraries/Vista.php la cambia por
-         el CSS de cada vista que usó la página (layout, partials y pantalla),
-         cada uno con el mismo nombre que su vista. */ ?>
-<link rel="stylesheet" href="<?= asset('CSS/comun.css') ?>">
+<?php /* El CSS de la pantalla: app/Libraries/Vista.php cambia esta marca por
+         UN solo <link>, al CSS con el mismo nombre que la pantalla
+         (app/Views/login.php → public/CSS/login.css). Ese archivo tiene todo
+         lo que se ve en la pantalla; no hay otro CSS. El link lleva
+         ?v=<fecha del archivo> (asset(), en app/Helpers/eden_helper.php) para
+         que el navegador no siga mostrando el CSS viejo después de un cambio. */ ?>
 <?= \App\Libraries\Vista::MARCA_ESTILOS ?>
 <?php /* Red de seguridad: .ea-reveal arranca en opacity:0 y lo destapa
          dashboard.js al entrar en pantalla. Si el JS no llega a correr

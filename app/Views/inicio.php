@@ -1,7 +1,7 @@
 <?php
 /* =============================================================================
    VISTA: inicio.php — LANDING PÚBLICA de EdenAir (ruta "/")
-   CSS:  public/CSS/vistas/inicio.css (+ comun.css). Se cargan solos (app/Libraries/Vista.php)
+   CSS:  public/CSS/inicio.css (todo lo de esta página; se carga solo, ver app/Libraries/Vista.php)
    JS:   inicio.js (menú, fetch sensores) · inicio-gsap.js (animaciones de
          scroll) · eden-core-3d.js (núcleo 3D del hero) · ea-scrollbar.js
    CÓMO LEER ESTA VISTA: cada sección está marcada con un comentario
@@ -98,7 +98,7 @@ ob_start(); ?>
              Columna izquierda: tagline + título + CTAs.
              Columna derecha: el núcleo 3D con sus tarjetas HUD. -->
         <!-- ===== ANIMACIÓN (CSS + GSAP + Three.js) =====
-             · glow/orbits/leaves: decorado animado por CSS (vistas/inicio.css)
+             · glow/orbits/leaves: decorado animado por CSS (public/CSS/inicio.css)
              · data-eden-core: eden-core-3d.js monta el modelo .glb en el
                canvas y actualiza las tarjetas HUD con /api/sensores
              · la entrada del hero la anima inicio-gsap.js -->

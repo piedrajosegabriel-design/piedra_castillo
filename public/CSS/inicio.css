@@ -1,0 +1,4551 @@
+/* =====================================================================
+   inicio.css — la página de inicio (landing)
+   ---------------------------------------------------------------------
+   Vista: app/Views/inicio.php  ·  Ruta: /
+
+   TODO lo que se ve en esta pantalla sale de este archivo: no hay otro
+   CSS mezclado. Para cambiar algo, buscá la clase en la vista (o con
+   clic derecho → Inspeccionar en el navegador) y después buscala acá
+   con Ctrl+F. Los valores están escritos directo en cada regla.
+
+   Colores del modo oscuro: los pocos colores que cambian solos entre
+   claro y oscuro están escritos como var(--nombre). Su valor está en
+   "Colores del tema", justo abajo. Si querés que UN elemento tenga
+   otro color, reemplazá el var(...) de su regla por el color que
+   quieras. Si querés cambiar ese color en toda la pantalla, cambialo
+   en "Colores del tema".
+
+   Qué hay acá, en orden (buscá el título con Ctrl+F):
+     BASE Y PIEZAS GENERALES
+       · Reset suave
+       · Escala de la interfaz
+       · Base
+       · Armazón de las páginas públicas
+       · Logo (partials/logo.php y marca_e() del helper)
+       · Barra de navegación
+       · Menú grande del portfolio
+       · Links de la barra y cajón del celular
+       · Interruptor claro / oscuro
+       · Botones
+       · Insignias de estado
+       · Portada (páginas públicas)
+       · Pie de página
+       · Utilidades
+       · Barra de scroll moderna flotante (EdenAir)
+     ESTA PANTALLA: LA PÁGINA DE INICIO (LANDING)
+       · Portada (páginas públicas)
+       · Grilla de características
+       · Scroll suave: barra fija fuera del envoltorio
+       · Portada: alto de pantalla y adornos animados
+       · Sección "Qué es" pasos de funcionamiento
+       · Carrusel de módulos
+       · Grilla de sensores y actuadores
+       · Llamado final
+       · Aparición al hacer scroll
+       · Saltos a secciones
+       · Tarjetas de características
+       · Portada: hojas flotantes
+       · Ítems de hardware: tonos
+       · Sección Automatización (reglas)
+       · Portada: números
+       · Sección "Sensores y actuadores": efecto al pasar el mouse
+       · Bloque de hardware
+       · Hero — Núcleo 3D flotante (EdenAir Core)
+       · HUD: micro-paneles ambientales emitidos por el núcleo
+       · Bloque de datos
+       · Tipografía: jerarquía clara
+       · Leader: hairline + punto conector hacia el núcleo
+       · Posiciones alrededor del núcleo
+       · Celular y tablet
+       · Eden Air Experience — video fullscreen controlado por scroll
+       · Video a pantalla completa
+       · Overlays cinematográficos
+       · Respaldo
+       · Capa de tipografía premium
+       · Tablet
+       · Mobile: experiencia simplificada y compacta
+       · prefers-reduced-motion
+       · Bridge — puente narrativo entre hero y video (continuidad de marca)
+       · Environmental Control Core — reemplaza al carrusel genérico
+       · Encabezado
+       · Diagrama orbital
+       · Stats discretos
+       · Tablet
+       · Mobile: layout más compacto, evitar superposición
+       · prefers-reduced-motion
+       · Sección "Ingeniería interna" (video exploded view)
+       · Sección de compra / plan
+       · Respeto a prefers-reduced-motion
+       · ScrollSmoother (GSAP) — FASE 1
+   ===================================================================== */
+
+
+/* Tipografías (Google Fonts). Tiene que ir arriba de todo. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");
+
+
+/* ---------- Colores del tema (modo claro / modo oscuro) ----------------
+   Los únicos colores escritos como variable: cambian solos cuando se
+   toca el interruptor claro/oscuro. Arriba van los del modo claro; en
+   el bloque de abajo, los mismos en modo oscuro. ------------------- */
+:root {
+    color-scheme: light;
+    --color-fondo: #f6f4ec;   /* fondo principal de las páginas */
+    --color-fondo-suave: #eaf1ea;   /* fondo secundario (ej: el menú lateral) */
+    --color-tarjeta: #ffffff;   /* fondo de tarjetas */
+    --color-texto: #14231b;   /* texto principal */
+    --color-texto-secundario: #45544a;   /* texto de apoyo */
+    --color-texto-suave: #5f6e64;   /* texto apagado: aclaraciones, etiquetas (contraste mínimo 4.5 sobre blanco) */
+    --color-exito-suave: rgba(74, 122, 85, 0.14);
+    --color-info: #2f8a7e;   /* información, humedad, aire */
+    --color-info-suave: rgba(143, 214, 200, 0.20);
+    --color-alerta-suave: rgba(200, 156, 122, 0.18);
+    --color-peligro-suave: rgba(166, 91, 61, 0.16);
+    --color-primario: #2f6b4f;
+    --color-linea: rgba(20, 35, 27, 0.11);   /* bordes de tarjetas, botones secundarios */
+    --color-linea-suave: rgba(20, 35, 27, 0.055);   /* fondos grisados muy suaves */
+    --sombra-chica: 0 6px 16px rgba(20, 32, 26, 0.06);
+    --sombra-media: 0 14px 32px rgba(20, 32, 26, 0.08);
+    --sombra-grande: 0 28px 56px rgba(20, 32, 26, 0.12);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-fondo: #0e1f17;
+    --color-fondo-suave: #13261d;
+    --color-tarjeta: #1a2c23;
+    --color-texto: #f4f1ea;
+    --color-texto-secundario: #c8d4c6;
+    --color-texto-suave: #93a194;
+    --color-exito-suave: rgba(74, 122, 85, 0.34);
+    --color-info: #8fd6c8;
+    --color-info-suave: rgba(143, 214, 200, 0.18);
+    --color-alerta-suave: rgba(200, 156, 122, 0.24);
+    --color-peligro-suave: rgba(166, 91, 61, 0.28);
+    --color-primario: #4f9a6f;
+    --color-linea: rgba(143, 214, 200, 0.15);
+    --color-linea-suave: rgba(143, 214, 200, 0.07);
+    --sombra-chica: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --sombra-media: 0 14px 32px rgba(0, 0, 0, 0.55);
+    --sombra-grande: 0 28px 56px rgba(0, 0, 0, 0.6);
+}
+
+
+/* =====================================================================
+   BASE Y PIEZAS GENERALES
+   letras, reset, logo, barra de arriba, botones, formularios, mensajes…
+   ===================================================================== */
+
+
+/* ---------- Reset suave ---------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó con el zoom del navegador en 125%, así que al 100%
+   todo quedaba chico. Como las letras están en rem, subir el tamaño de
+   la raíz agranda toda la tipografía de una vez. Los saltos son por ancho
+   de ventana (CSS no puede leer el zoom): en una pantalla de 1920 al 100%
+   la ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no cambia. */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+}
+
+@media (min-width: 1400px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 1700px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Cualquier sección con id como destino directo de un link #ancla */
+section[id],
+article[id],
+div[id] {
+    scroll-margin-top: 96px;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul {
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+
+/* ---------- Base ------------------------------------------------------ */
+body.ea-body {
+    min-height: 100vh;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "ss02" on;
+}
+
+:root[data-theme="dark"] body.ea-body {
+    background:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%),
+        var(--color-fondo);
+}
+
+.ea-eyebrow {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.ea-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4a7a55;
+    flex-shrink: 0;
+}
+
+
+/* ---------- Armazón de las páginas públicas ----------------------------------- */
+.ea-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-page {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+}
+
+@media (min-width: 1400px) {
+    .ea-page {
+        max-width: 1400px;
+    }
+}
+
+@media (min-width: 1700px) {
+    .ea-page {
+        max-width: 1600px;
+    }
+}
+
+.ea-section {
+    padding: clamp(36px, 6vw, 72px) 0;
+    position: relative;
+}
+
+.ea-section + .ea-section {
+    border-top: 1px solid var(--color-linea);
+}
+
+.ea-section-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 22px;
+    align-items: end;
+    margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.ea-section-head h2 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 10px 0 0;
+}
+
+.ea-section-head h2 em {
+    font-style: italic;
+    color: #4a7a55;
+}
+
+.ea-section-head p {
+    font-size: 1.0625rem;
+    color: var(--color-texto-secundario);
+    max-width: 56ch;
+    margin: 0;
+}
+
+@media (max-width: 820px) {
+    .ea-section-head {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Logo (partials/logo.php y marca_e() del helper) ---------- */
+.ea-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.ea-logo--stacked {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
+}
+
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* La "e": un solo trazo con un degradado de 3 colores que salen de
+   --ea-elogo-a/b/c. Así el mismo SVG sirve en toda la página: la landing,
+   el pie, el menú del panel y la pantalla de carga dibujan el mismo logo. */
+/* Sobre fondo claro */
+.ea-logo-mark--e {
+    --ea-elogo-a: #143326;
+    --ea-elogo-b: var(--color-primario);
+    --ea-elogo-c: #3fae97;
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Sobre fondo oscuro: el modo oscuro y el tono "cream" (el pie) */
+:root[data-theme="dark"] .ea-logo-mark--e,
+.ea-logo--tone-cream .ea-logo-mark--e {
+    --ea-elogo-a: #F6F4EC;
+    --ea-elogo-b: #8FD6C8;
+    --ea-elogo-c: #5BE5B6;
+    filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
+}
+
+/* Tono "moss": todo verde, igual en claro y en oscuro */
+.ea-logo--tone-moss .ea-logo-mark--e,
+:root[data-theme="dark"] .ea-logo--tone-moss .ea-logo-mark--e {
+    --ea-elogo-a: #1c4029;
+    --ea-elogo-b: #2b5638;
+    --ea-elogo-c: #4a7a55;
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.ea-logo-word {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ea-logo--tone-ink .ea-logo-word {
+    color: var(--color-texto);
+}
+
+.ea-logo--tone-ink .ea-logo-word em {
+    color: #4a7a55;
+    font-style: italic;
+}
+
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word {
+    color: #ecf2e8;
+}
+
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word em {
+    color: #bcd2bd;
+}
+
+.ea-logo--tone-cream .ea-logo-word {
+    color: #ecf2e8;
+}
+
+.ea-logo--tone-cream .ea-logo-word em {
+    color: #c9d870;
+    font-style: italic;
+}
+
+.ea-logo--tone-moss .ea-logo-word {
+    color: #4a7a55;
+}
+
+.ea-logo--tone-moss .ea-logo-word em {
+    color: #bcd2bd;
+    font-style: italic;
+}
+
+.ea-logo-text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1;
+}
+
+.ea-logo-sub {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+    line-height: 1;
+}
+
+.ea-logo--tone-cream .ea-logo-sub {
+    color: rgba(236, 242, 232, 0.65);
+}
+
+.ea-slogan {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-style: italic;
+    color: var(--color-texto-secundario);
+    margin: 12px 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+}
+
+
+/* ---------- Barra de navegación ----------------------------------------------- */
+.ea-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.92);
+    backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--color-linea);
+    /* Al scrollear la barra se achica: el alto lo pone el padding vertical del
+       .ea-navbar-inner, asi que el que cambia es --ea-nav-pad (12px en reposo,
+       6px al scrollear). Ponerle padding al <header> lo agrandaba en vez de
+       achicarlo, porque se sumaba al del inner. */
+    --ea-nav-pad: 12px;
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+:root[data-theme="dark"] .ea-navbar {
+    background: rgba(13, 22, 18, 0.88);
+}
+
+.ea-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
+       mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
+       los botones quedaban pegados al borde de la ventana. */
+    padding-block: var(--ea-nav-pad, 12px);
+    transition: padding-block 0.25s ease;
+}
+
+.ea-nav-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ---------- Menú grande del portfolio ----------------------------------------- */
+.ea-mega {
+    position: relative;
+    list-style: none;
+}
+
+.ea-mega-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.8438rem;
+    font-weight: 500;
+    color: var(--color-texto-secundario);
+    cursor: pointer;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-mega-trigger::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: #4a7a55;
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.ea-mega:hover .ea-mega-trigger,
+.ea-mega.is-open .ea-mega-trigger,
+.ea-mega-trigger.is-active {
+    color: #1c4029;
+}
+
+.ea-mega-trigger:focus-visible {
+    outline: 2px solid #4a7a55;
+    outline-offset: 3px;
+    color: #1c4029;
+}
+
+.ea-mega:hover .ea-mega-trigger::after,
+.ea-mega.is-open .ea-mega-trigger::after,
+.ea-mega-trigger.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+:root[data-theme="dark"] .ea-mega-trigger {
+    color: var(--color-texto-secundario);
+}
+
+:root[data-theme="dark"] .ea-mega:hover .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega.is-open .ea-mega-trigger,
+:root[data-theme="dark"] .ea-mega-trigger.is-active {
+    color: #bcd2bd;
+}
+
+:root[data-theme="dark"] .ea-mega-trigger::after {
+    background: #bcd2bd;
+}
+
+.ea-mega-caret {
+    transition: transform 0.28s cubic-bezier(.2,.7,.2,1);
+}
+
+.ea-mega:hover .ea-mega-caret,
+.ea-mega.is-open .ea-mega-caret {
+    transform: rotate(180deg);
+}
+
+.ea-mega-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: min(540px, calc(100vw - 32px));
+    padding-top: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition:
+        opacity 0.28s cubic-bezier(.2,.7,.2,1),
+        transform 0.28s cubic-bezier(.2,.7,.2,1),
+        visibility 0s linear 0.28s;
+    z-index: 60;
+}
+
+/* Bridge invisible: evita perder el hover entre trigger y panel */
+.ea-mega-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: transparent;
+}
+
+.ea-mega:hover .ea-mega-panel,
+.ea-mega.is-open .ea-mega-panel,
+.ea-mega:focus-within .ea-mega-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+.ea-mega-inner {
+    background: rgba(248, 248, 242, 0.97);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+    border: 1px solid rgba(20, 32, 26, 0.1);
+    border-radius: 22px;
+    box-shadow: var(--sombra-grande);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ea-mega-inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(120% 80% at 0% 0%, rgba(201, 216, 112, 0.18), transparent 55%),
+        radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.18), transparent 60%);
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+:root[data-theme="dark"] .ea-mega-inner {
+    background: rgba(13, 22, 18, 0.97);
+    border-color: rgba(236, 242, 232, 0.14);
+}
+
+:root[data-theme="dark"] .ea-mega-inner::before {
+    background:
+        radial-gradient(120% 80% at 0% 0%, rgba(74, 122, 85, 0.32), transparent 55%),
+        radial-gradient(80% 60% at 100% 100%, rgba(184, 213, 208, 0.16), transparent 60%);
+}
+
+.ea-mega-head {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.ea-mega-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+}
+
+.ea-mega-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.375rem;
+    letter-spacing: -0.012em;
+    margin: 6px 0 4px;
+    color: var(--color-texto);
+}
+
+.ea-mega-title em {
+    font-style: italic;
+    color: #4a7a55;
+}
+
+:root[data-theme="dark"] .ea-mega-title {
+    color: #ecf2e8;
+}
+
+:root[data-theme="dark"] .ea-mega-title em {
+    color: #bcd2bd;
+}
+
+.ea-mega-lede {
+    font-size: 0.8125rem;
+    color: var(--color-texto-secundario);
+    margin: 0;
+}
+
+.ea-mega-list {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ea-mega-list a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    color: var(--color-texto);
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.ea-mega-list a:hover,
+.ea-mega-list a:focus-visible {
+    background: rgba(74, 122, 85, 0.08);
+    border-color: rgba(74, 122, 85, 0.18);
+    outline: none;
+    transform: translateX(2px);
+}
+
+:root[data-theme="dark"] .ea-mega-list a {
+    color: #ecf2e8;
+}
+
+:root[data-theme="dark"] .ea-mega-list a:hover,
+:root[data-theme="dark"] .ea-mega-list a:focus-visible {
+    background: rgba(74, 122, 85, 0.28);
+    border-color: rgba(188, 210, 189, 0.22);
+}
+
+.ea-mega-link-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.ea-mega-link-hint {
+    display: block;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    color: var(--color-texto-suave);
+    margin-top: 4px;
+}
+
+.ea-mega-foot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-linea-suave);
+    flex-wrap: wrap;
+}
+
+.ea-mega-foot-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+}
+
+.ea-mega-foot-tag strong {
+    color: #1c4029;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+:root[data-theme="dark"] .ea-mega-foot-tag strong {
+    color: #bcd2bd;
+}
+
+.ea-mega-foot-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c9d870;
+    box-shadow: 0 0 0 0 rgba(201, 216, 112, 0.55);
+    animation: ea-mega-foot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ea-mega-foot-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(201, 216, 112, 0.55);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(201, 216, 112, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(201, 216, 112, 0);
+    }
+}
+
+.ea-mega-foot-link {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #1c4029;
+    transition: color 0.18s ease;
+}
+
+.ea-mega-foot-link:hover {
+    color: #16301f;
+}
+
+:root[data-theme="dark"] .ea-mega-foot-link {
+    color: #bcd2bd;
+}
+
+:root[data-theme="dark"] .ea-mega-foot-link:hover {
+    color: #c9d870;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-mega-panel,
+    .ea-mega-caret,
+    .ea-mega-list a {
+        transition: none;
+    }
+
+    .ea-mega-foot-dot {
+        animation: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .ea-mega-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    /* En mobile el navbar oculta los nav-links; el portfolio entra al drawer */
+    .ea-mega {
+        display: none;
+    }
+}
+
+
+/* ---------- Links de la barra y cajón del celular ----------------------------- */
+.ea-navbar.is-scrolled {
+    --ea-nav-pad: 6px;
+    box-shadow: var(--sombra-chica);
+    background: rgba(244, 241, 234, 0.96);
+}
+
+:root[data-theme="dark"] .ea-navbar.is-scrolled {
+    background: rgba(13, 22, 18, 0.94);
+}
+
+.ea-nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+    list-style: none;
+    padding: 0;
+}
+
+.ea-nav-links a {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.8438rem;
+    color: var(--color-texto-secundario);
+    font-weight: 500;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: #4a7a55;
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.ea-nav-links a:hover,
+.ea-nav-links a.is-active {
+    color: #1c4029;
+}
+
+.ea-nav-links a:hover::after,
+.ea-nav-links a.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+:root[data-theme="dark"] .ea-nav-links a {
+    color: var(--color-texto-secundario);
+}
+
+:root[data-theme="dark"] .ea-nav-links a:hover,
+:root[data-theme="dark"] .ea-nav-links a.is-active {
+    color: #bcd2bd;
+}
+
+:root[data-theme="dark"] .ea-nav-links a::after {
+    background: #bcd2bd;
+}
+
+@media (max-width: 900px) {
+    .ea-nav-links {
+        display: none;
+    }
+}
+
+.ea-nav-toggle {
+    display: none;
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 50;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--color-linea);
+    background: var(--color-tarjeta);
+    color: var(--color-texto);
+    box-shadow: var(--sombra-chica);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-nav-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.3);
+}
+
+.ea-nav-toggle-bars {
+    position: relative;
+    width: 18px;
+    height: 14px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ea-nav-toggle-bars span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+    transform-origin: center;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(2) {
+    opacity: 0;
+}
+
+.ea-nav-toggle[aria-expanded="true"] .ea-nav-toggle-bars span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+.ea-mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(13, 22, 18, 0.96);
+    backdrop-filter: blur(14px);
+    color: #ecf2e8;
+    padding: 80px 28px 32px;
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.ea-mobile-nav.is-open {
+    display: flex;
+    opacity: 1;
+    transform: none;
+}
+
+.ea-mobile-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-mobile-nav a {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.012em;
+    color: #ecf2e8;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ea-mobile-nav a:hover,
+.ea-mobile-nav a:focus-visible {
+    background: rgba(74, 122, 85, 0.28);
+    border-color: rgba(188, 210, 189, 0.18);
+    outline: none;
+}
+
+.ea-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(236, 242, 232, 0.1);
+}
+
+.ea-mobile-nav-actions .ea-button-secondary {
+    background: rgba(236, 242, 232, 0.08);
+    color: #ecf2e8;
+    border-color: rgba(236, 242, 232, 0.22);
+}
+
+.ea-mobile-nav-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 6px 4px 14px;
+    border-bottom: 1px solid rgba(236, 242, 232, 0.08);
+    margin-bottom: 6px;
+}
+
+.ea-mobile-nav-theme-label {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.58);
+}
+
+@media (max-width: 900px) {
+    .ea-nav-toggle {
+        display: inline-flex;
+    }
+
+    .ea-landing .ea-navbar .ea-nav-actions {
+        display: none;
+    }
+}
+
+body.ea-nav-open {
+    overflow: hidden;
+}
+
+
+/* ---------- Interruptor claro / oscuro --------------------------------
+   HTML: partials/theme_toggle.php · lógica: JS/tema.js. --------------- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* El checkbox real queda invisible: se ve la pastilla de abajo */
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    background: #ecf2e8;
+    border: 1px solid var(--color-linea);
+    border-radius: 999px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: var(--color-tarjeta);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(20, 32, 26, 0.18);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1c4029;
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ea-theme-sun {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ea-theme-moon {
+    opacity: 0;
+    transform: scale(0.4) rotate(calc(-1 * 25deg));
+}
+
+/* Tildado = modo oscuro: la bolita se corre y cambia el sol por la luna */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: #16301f;
+    border-color: #1c4029;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(26px);
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun {
+    opacity: 0;
+    transform: scale(0.4) rotate(25deg);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+}
+
+
+/* ---------- Botones ---------------------------------------------------
+   La primera regla es la forma de TODOS los botones. Los colores salen
+   de tres variables que cada variante (primario, secundario, fantasma,
+   compra) define en su propia regla:
+     --boton-fondo   el fondo
+     --boton-texto   el color de la letra
+     --boton-borde   el color del borde
+   Ej: para cambiar el fondo del botón primario, buscá .ea-button-primary
+   y cambiá su --boton-fondo por el color que quieras. ------------------ */
+.ea-button,
+.ea-button-primary,
+.ea-button-secondary,
+.ea-button-ghost {
+    --boton-fondo: #1c4029;
+    --boton-texto: #ecf2e8;
+    --boton-borde: transparent;
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--boton-borde);
+    background: var(--boton-fondo);
+    color: var(--boton-texto);
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 500;
+    font-size: 0.8438rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        background-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        border-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.14s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: var(--sombra-chica);
+}
+
+/* Táctil: zona de toque mínima en pantallas chicas */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary,
+    .ea-button-ghost {
+        min-height: 44px;
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
+/* Al apretar, el botón se achica un poco: se siente que respondió */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+        transition-duration: 0.08s;
+    }
+}
+
+/* Pantallas táctiles: el mismo achique al tocar */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+    }
+
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+    }
+}
+
+.ea-button:focus-visible,
+.ea-button-primary:focus-visible,
+.ea-button-secondary:focus-visible,
+.ea-button-ghost:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+.ea-button-primary {
+    --boton-fondo: var(--color-primario);
+    --boton-texto: #ffffff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --boton-fondo: #1c4029;
+        transform: translateY(-1px);
+        box-shadow: var(--sombra-media);
+    }
+}
+
+.ea-button-secondary {
+    --boton-fondo: transparent;
+    --boton-texto: var(--color-texto);
+    --boton-borde: var(--color-linea);
+    box-shadow: none;
+    color: var(--color-texto);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --boton-fondo: #ecf2e8;
+        --boton-borde: #bcd2bd;
+        color: #1c4029;
+    }
+}
+
+:root[data-theme="dark"] .ea-button-secondary {
+    --boton-borde: rgba(236, 242, 232, 0.18);
+    color: #ecf2e8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --boton-fondo: rgba(74, 122, 85, 0.22);
+        --boton-borde: #4a7a55;
+        color: #bcd2bd;
+    }
+}
+
+.ea-button-ghost {
+    --boton-fondo: transparent;
+    --boton-texto: #4a7a55;
+    --boton-borde: transparent;
+    box-shadow: none;
+    padding: 8px 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover {
+        --boton-fondo: #ecf2e8;
+    }
+
+    :root[data-theme="dark"] .ea-button-ghost:hover {
+        --boton-fondo: rgba(74, 122, 85, 0.22);
+    }
+}
+
+:root[data-theme="dark"] .ea-button-ghost {
+    --boton-texto: #bcd2bd;
+}
+
+.ea-button-block {
+    width: 100%;
+}
+
+/* Botón de compra destacado — en la landing y en el panel */
+.ea-button-buy {
+    --boton-fondo: linear-gradient(120deg, var(--color-primario) 0%, #3c7a57 52%, #4e9069 100%);
+    --boton-texto: #ffffff;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    padding-inline: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+        0 10px 26px rgba(28, 64, 41, 0.30),
+        inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+}
+
+/* Brillo que "respira" detrás del texto */
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    opacity: 0.7;
+    animation: ea-buy-glow 3.6s ease-in-out infinite;
+}
+
+/* Reflejo que cruza el botón cada tanto */
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    animation: ea-buy-shine 4.8s ease-in-out infinite;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --boton-fondo: linear-gradient(120deg, #1c4029 0%, var(--color-primario) 55%, #3c7a57 100%);
+        transform: translateY(-2px);
+        box-shadow:
+            0 16px 34px rgba(47, 107, 79, 0.4),
+            inset 0 0 0 1px rgba(201, 216, 112, 0.55);
+    }
+}
+
+@keyframes ea-buy-glow {
+    0%, 100% {
+        opacity: 0.45;
+    }
+    50% {
+        opacity: 0.85;
+    }
+}
+
+@keyframes ea-buy-shine {
+    0%, 62% {
+        left: -120%;
+    }
+    88%, 100% {
+        left: 140%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before {
+        animation: none !important;
+    }
+
+    .ea-button-buy::after {
+        display: none;
+    }
+}
+
+.ea-button:disabled,
+.ea-button-primary:disabled,
+.ea-button-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ---------- Insignias de estado ----------------------------------------------- */
+.ea-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: #ecf2e8;
+    color: #1c4029;
+    border: 1px solid transparent;
+    line-height: 1;
+}
+
+.ea-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+.ea-badge--neutral {
+    background: var(--color-linea-suave);
+    color: var(--color-texto-secundario);
+}
+
+.ea-badge--info {
+    background: var(--color-info-suave);
+    color: #2f6a6f;
+}
+
+.ea-badge--warning {
+    background: var(--color-alerta-suave);
+    color: #7a4a23;
+}
+
+.ea-badge--danger {
+    background: var(--color-peligro-suave);
+    color: #a65b3d;
+}
+
+:root[data-theme="dark"] .ea-badge--info {
+    color: #b8d5d0;
+}
+
+:root[data-theme="dark"] .ea-badge--warning {
+    color: #c89c7a;
+}
+
+:root[data-theme="dark"] .ea-badge--danger {
+    color: #e08465;
+}
+
+
+/* ---------- Portada (páginas públicas) ---------------------------------------- */
+.ea-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(40px, 7vw, 88px) 0;
+    background:
+        radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.18), transparent 55%),
+        radial-gradient(ellipse at bottom left, rgba(188, 210, 189, 0.22), transparent 55%),
+        var(--color-fondo);
+    isolation: isolate;
+    min-height: calc(100svh - var(--ea-nav-h, 72px));
+    display: flex;
+    align-items: center;
+    padding-top: clamp(24px, 4vw, 56px);
+    padding-bottom: clamp(40px, 6vw, 88px);
+}
+
+:root[data-theme="dark"] .ea-hero {
+    background:
+        radial-gradient(ellipse at top right, rgba(74, 122, 85, 0.22), transparent 55%),
+        radial-gradient(ellipse at bottom left, rgba(28, 64, 41, 0.5), transparent 60%),
+        var(--color-fondo);
+}
+
+.ea-hero-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 14px 0 18px;
+}
+
+.ea-hero-title em {
+    font-style: italic;
+    color: #4a7a55;
+}
+
+
+/* ---------- Pie de página ----------------------------------------------------- */
+.ea-footer {
+    background: #0e1f17;
+    color: rgba(236, 242, 232, 0.78);
+    padding: clamp(36px, 5.5vw, 60px) 0 24px;
+    margin-top: auto;
+}
+
+.ea-footer-inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.ea-footer p {
+    color: rgba(236, 242, 232, 0.7);
+    font-size: 0.9063rem;
+    max-width: 40ch;
+    margin-top: 18px;
+    line-height: 1.55;
+}
+
+.ea-footer h4 {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.5);
+    margin-bottom: 12px;
+}
+
+.ea-footer ul li,
+.ea-footer span {
+    color: rgba(236, 242, 232, 0.78);
+    font-size: 0.875rem;
+}
+
+.ea-footer-bottom {
+    border-top: 1px solid rgba(236, 242, 232, 0.1);
+    margin-top: 40px;
+    padding-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.5);
+}
+
+@media (max-width: 820px) {
+    .ea-footer-inner {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* "● Aire limpio" en la lista del pie */
+.ea-footer .ea-footer-aire {
+    color: #c9d870;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+
+/* ---------- Utilidades -------------------------------------------------------- */
+.ea-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* ---------- Barra de scroll moderna flotante (EdenAir) ------------------------ */
+html.ea-floatbar-on {
+    scrollbar-width: none;
+}
+
+/* Firefox */
+html.ea-floatbar-on::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* WebKit */
+.ea-floatbar {
+    position: fixed;
+    top: 8px;
+    right: 4px;
+    bottom: 8px;
+    width: 12px;
+    /* zona de agarre; el thumb visible es más fino */
+    z-index: 90;
+    /* sobre navbar/menús (≤60), bajo el loader (100) */
+    pointer-events: none;
+    /* el track nunca bloquea clicks */
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.ea-floatbar.is-active {
+    opacity: 1;
+}
+
+.ea-floatbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 2px;
+    width: 4px;
+    min-height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, color-mix(in srgb, #8fd6c8 92%, transparent), color-mix(in srgb, var(--color-primario) 92%, transparent));
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 2px 10px -3px color-mix(in srgb, var(--color-primario) 55%, transparent);
+    pointer-events: auto;
+    /* sólo el thumb captura el arrastre */
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+    transition: width 0.18s ease, right 0.18s ease, background 0.2s ease;
+}
+
+.ea-floatbar-thumb:hover,
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    width: 7px;
+    right: 0;
+}
+
+.ea-floatbar.is-dragging .ea-floatbar-thumb {
+    cursor: grabbing;
+}
+
+:root[data-theme="dark"] .ea-floatbar-thumb {
+    background: linear-gradient(to bottom, color-mix(in srgb, #8fd6c8 96%, transparent), color-mix(in srgb, #4a7a55 94%, transparent));
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 2px 12px -3px color-mix(in srgb, #8fd6c8 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-floatbar,
+    .ea-floatbar-thumb {
+        transition: none;
+    }
+
+    .ea-floatbar.is-active {
+        opacity: 0.85;
+    }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .ea-floatbar {
+        display: none;
+    }
+
+    html.ea-floatbar-on {
+        scrollbar-width: auto;
+    }
+
+    html.ea-floatbar-on::-webkit-scrollbar {
+        width: auto;
+        height: auto;
+    }
+}
+
+
+/* =====================================================================
+   ESTA PANTALLA: LA PÁGINA DE INICIO (LANDING)
+   HTML: app/Views/inicio.php
+   ===================================================================== */
+
+
+/* ---------- Portada (páginas públicas) ---------------------------------------- */
+.ea-hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 36px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.ea-hero-lede {
+    font-size: 1.0313rem;
+    line-height: 1.55;
+    color: var(--color-texto-secundario);
+    max-width: 52ch;
+    margin: 0 0 22px;
+}
+
+.ea-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.ea-hero-pattern {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+}
+
+@media (max-width: 920px) {
+    .ea-hero-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Grilla de características ----------------------------------------- */
+.ea-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+.ea-feature-card {
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea-suave);
+    border-radius: 22px;
+    padding: clamp(18px, 2.4vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--sombra-chica);
+    position: relative;
+    overflow: hidden;
+}
+
+.ea-feature-card:hover {
+    transform: translateY(-3px);
+    border-color: #bcd2bd;
+    box-shadow: var(--sombra-media);
+}
+
+.ea-feature-card h3 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+}
+
+.ea-feature-card p {
+    color: var(--color-texto-secundario);
+    font-size: 0.9063rem;
+    line-height: 1.55;
+}
+
+.ea-feature-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: #ecf2e8;
+    color: #1c4029;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-theme="dark"] .ea-feature-icon {
+    background: rgba(74, 122, 85, 0.2);
+    color: #bcd2bd;
+}
+
+
+/* ---------- Scroll suave: barra fija fuera del envoltorio --------------------- */
+.ea-landing .ea-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.ea-landing #smooth-content {
+    padding-top: var(--ea-nav-h, 72px);
+}
+
+/* GSAP fija #smooth-wrapper (inset:0) cuando ScrollSmoother está activo.
+   Sin smoother (reduced-motion / sin GSAP) se comporta como bloque normal. */
+.ea-landing #smooth-wrapper {
+    position: relative;
+}
+
+
+/* ---------- Portada: alto de pantalla y adornos animados ---------------------- */
+.ea-hero .ea-page,
+.ea-hero .ea-hero-grid {
+    width: 100%;
+}
+
+@media (max-width: 920px) {
+    .ea-hero {
+        min-height: auto;
+        padding-top: clamp(28px, 6vw, 56px);
+        padding-bottom: clamp(48px, 8vw, 80px);
+    }
+}
+
+.ea-hero-orbits {
+    position: absolute;
+    top: 50%;
+    right: -120px;
+    width: 520px;
+    height: 520px;
+    transform: translateY(-50%);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+.ea-hero-orbit {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(74, 122, 85, 0.25);
+}
+
+.ea-hero-orbit--b {
+    inset: 60px;
+    border-color: rgba(201, 216, 112, 0.32);
+    animation: ea-hero-spin 22s linear infinite reverse;
+}
+
+.ea-hero-orbit--c {
+    inset: 130px;
+    border-color: rgba(188, 210, 189, 0.4);
+    animation: ea-hero-spin 40s linear infinite;
+}
+
+.ea-hero-orbit--a {
+    animation: ea-hero-spin 32s linear infinite;
+}
+
+@keyframes ea-hero-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ea-hero-glow {
+    position: absolute;
+    inset: -10% 30% 20% -10%;
+    background:
+        radial-gradient(circle at 30% 35%, rgba(143, 214, 200, 0.22) 0%, rgba(143, 214, 200, 0) 58%),
+        radial-gradient(circle at 60% 60%, rgba(201, 216, 112, 0.16) 0%, rgba(74, 122, 85, 0) 62%);
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(8px);
+    animation: ea-hero-breathe 8s ease-in-out infinite;
+}
+
+@keyframes ea-hero-breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.55;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.85;
+    }
+}
+
+.ea-hero-grid > * {
+    position: relative;
+    z-index: 1;
+}
+
+.ea-hero-intro {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: ea-hero-in 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.1s forwards;
+}
+
+.ea-hero-card-anim {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+    animation: ea-hero-in 0.65s cubic-bezier(0.23, 1, 0.32, 1) 0.25s forwards;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+@keyframes ea-hero-in {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.ea-hero-tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #ecf2e8;
+    color: #1c4029;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.7188rem;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+    border: 1px solid rgba(74, 122, 85, 0.18);
+}
+
+:root[data-theme="dark"] .ea-hero-tagline {
+    background: rgba(74, 122, 85, 0.22);
+    color: #bcd2bd;
+    border-color: rgba(188, 210, 189, 0.2);
+}
+
+.ea-hero-tagline-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4a7a55;
+    box-shadow: 0 0 0 0 rgba(74, 122, 85, 0.55);
+    animation: ea-tag-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ea-tag-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 122, 85, 0.55);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(74, 122, 85, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(74, 122, 85, 0);
+    }
+}
+
+.ea-hero-card-anim:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-grande);
+}
+
+@media (max-width: 720px) {
+    .ea-hero-orbits {
+        display: none;
+    }
+}
+
+
+/* ---------- Sección "Qué es" pasos de funcionamiento -------------------------- */
+.ea-flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    counter-reset: flow;
+    position: relative;
+}
+
+.ea-flow::before {
+    content: "";
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: 36px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-linea) 15%, var(--color-linea) 85%, transparent);
+    z-index: 0;
+}
+
+.ea-flow-step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+.ea-flow-num {
+    counter-increment: flow;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    display: grid;
+    place-items: center;
+    color: #1c4029;
+    box-shadow: var(--sombra-chica);
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease;
+}
+
+.ea-flow-num::before {
+    content: counter(flow, decimal-leading-zero);
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.875rem;
+    letter-spacing: 0.12em;
+    color: var(--color-texto-suave);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-flow-step:hover .ea-flow-num {
+        transform: translateY(-4px) scale(1.04);
+        border-color: #82a987;
+        background: #ecf2e8;
+    }
+
+    :root[data-theme="dark"] .ea-flow-step:hover .ea-flow-num {
+        background: rgba(74, 122, 85, 0.22);
+    }
+}
+
+.ea-flow-step h4 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.0625rem;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+    color: var(--color-texto);
+}
+
+.ea-flow-step p {
+    font-size: 0.8438rem;
+    color: var(--color-texto-secundario);
+    line-height: 1.5;
+    max-width: 22ch;
+}
+
+@media (max-width: 960px) {
+    .ea-flow {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ea-flow::before {
+        display: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .ea-flow {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Carrusel de módulos ----------------------------------------------- */
+.ea-carousel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-linea);
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease, width 0.25s ease;
+}
+
+.ea-carousel-dot.is-active {
+    background: #4a7a55;
+    width: 20px;
+    border-radius: 999px;
+}
+
+:root[data-theme="dark"] .ea-carousel-dot.is-active {
+    background: #bcd2bd;
+}
+
+
+/* ---------- Grilla de sensores y actuadores ----------------------------------- */
+.ea-hardware {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+@media (max-width: 820px) {
+    .ea-hardware {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ea-hardware-block {
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea-suave);
+    border-radius: 22px;
+    padding: clamp(20px, 2.5vw, 28px);
+    box-shadow: var(--sombra-chica);
+}
+
+.ea-hardware-block h3 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    letter-spacing: -0.015em;
+    margin-bottom: 4px;
+}
+
+.ea-hardware-block > .ea-eyebrow {
+    margin-bottom: 10px;
+}
+
+.ea-hardware-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.ea-hardware-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--color-fondo-suave);
+    border: 1px solid transparent;
+    transition:
+        border-color 0.18s ease,
+        transform 0.18s ease,
+        background-color 0.18s ease;
+}
+
+:root[data-theme="dark"] .ea-hardware-item {
+    background: rgba(236, 242, 232, 0.05);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-hardware-item:hover {
+        border-color: #bcd2bd;
+        transform: translateX(2px);
+    }
+}
+
+.ea-hardware-item-ico {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--color-tarjeta);
+    color: #1c4029;
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.ea-hardware-item-ico svg {
+    width: 20px;
+    height: 20px;
+}
+
+:root[data-theme="dark"] .ea-hardware-item-ico {
+    background: rgba(74, 122, 85, 0.22);
+    color: #bcd2bd;
+}
+
+.ea-hardware-item strong {
+    display: block;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-size: 0.9063rem;
+    color: var(--color-texto);
+    line-height: 1.2;
+}
+
+.ea-hardware-item small {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-texto-suave);
+    text-transform: uppercase;
+}
+
+@media (max-width: 520px) {
+    .ea-hardware-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Llamado final ----------------------------------------------------- */
+.ea-cta {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    padding: clamp(32px, 5vw, 64px);
+    background: linear-gradient(140deg, #16301f 0%, #2b5638 100%);
+    color: #ecf2e8;
+    text-align: center;
+    isolation: isolate;
+}
+
+.ea-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 80% 0%, rgba(201, 216, 112, 0.22), transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(188, 210, 189, 0.18), transparent 55%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.ea-cta h2 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #ecf2e8;
+    margin-bottom: 14px;
+}
+
+.ea-cta h2 em {
+    font-style: italic;
+    color: #c9d870;
+}
+
+.ea-cta p {
+    color: rgba(236, 242, 232, 0.82);
+    font-size: 1rem;
+    max-width: 56ch;
+    margin: 0 auto 24px;
+}
+
+.ea-cta .ea-hero-actions {
+    justify-content: center;
+}
+
+.ea-cta .ea-button-secondary {
+    background: rgba(236, 242, 232, 0.1);
+    color: #ecf2e8;
+    border-color: rgba(236, 242, 232, 0.24);
+}
+
+.ea-cta .ea-button-secondary:hover {
+    background: rgba(236, 242, 232, 0.18);
+    color: #ecf2e8;
+    border-color: rgba(236, 242, 232, 0.42);
+}
+
+
+/* ---------- Aparición al hacer scroll ----------------------------------------- */
+[data-reveal] {
+    --reveal-y: 20px;
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y), 0);
+    transition:
+        opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: opacity, transform;
+}
+
+[data-reveal].is-visible {
+    --reveal-y: 0px;
+    opacity: 1;
+}
+
+[data-reveal-child] {
+    --reveal-y: 12px;
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y), 0);
+    transition:
+        opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transition-delay: calc(var(--reveal-i, 0) * 60ms);
+}
+
+[data-reveal].is-visible [data-reveal-child] {
+    --reveal-y: 0px;
+    opacity: 1;
+}
+
+/* Una vez completado el reveal, JS marca .is-revealed para que el delay
+   cascada no se aplique al hover-out (que se sentía pegajoso). */
+[data-reveal].is-revealed [data-reveal-child] {
+    transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal],
+    [data-reveal-child],
+    .ea-hero-intro,
+    .ea-hero-card-anim,
+    .ea-hero-orbit,
+    .ea-hero-glow,
+    .ea-hero-tagline-dot {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+
+/* ---------- Saltos a secciones ------------------------------------------------ */
+section[id] {
+    scroll-margin-top: 90px;
+}
+
+
+/* ---------- Tarjetas de características --------------------------------------- */
+.ea-feature-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #8fd6c8, #82a987, transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ea-feature-card .ea-feature-icon {
+    transition:
+        transform 0.28s cubic-bezier(0.23, 1, 0.32, 1),
+        background-color 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-feature-card:hover::after {
+        transform: scaleX(1);
+    }
+
+    .ea-feature-card:hover .ea-feature-icon {
+        transform: translateY(-3px) rotate(-4deg);
+        background: #dbe6d9;
+    }
+
+    :root[data-theme="dark"] .ea-feature-card:hover .ea-feature-icon {
+        background: rgba(74, 122, 85, 0.32);
+    }
+}
+
+
+/* ---------- Portada: hojas flotantes ------------------------------------------ */
+.ea-hero-leaves {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.ea-hero-leaf {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    opacity: 0.85;
+    filter: drop-shadow(0 6px 14px rgba(20, 32, 26, 0.08));
+}
+
+.ea-hero-leaf--a {
+    top: 14%;
+    left: 4%;
+    width: 56px;
+    height: 56px;
+    animation: ea-leaf-float 14s ease-in-out infinite;
+}
+
+.ea-hero-leaf--b {
+    top: 68%;
+    left: 8%;
+    width: 42px;
+    height: 42px;
+    animation: ea-leaf-float 18s ease-in-out infinite 1.4s reverse;
+}
+
+.ea-hero-leaf--c {
+    top: 28%;
+    right: 6%;
+    width: 80px;
+    height: 80px;
+    animation: ea-leaf-float 22s ease-in-out infinite 2.6s;
+}
+
+@keyframes ea-leaf-float {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+        transform: translate3d(10px, -16px, 0) rotate(8deg);
+    }
+}
+
+@media (max-width: 720px) {
+    .ea-hero-leaf--c {
+        display: none;
+    }
+}
+
+
+/* ---------- Ítems de hardware: tonos ------------------------------------------ */
+.ea-hardware-item.tone-success {
+    --tone: #4a7a55;
+    --tone-soft: var(--color-exito-suave);
+}
+
+.ea-hardware-item.tone-info {
+    --tone: var(--color-info);
+    --tone-soft: var(--color-info-suave);
+}
+
+.ea-hardware-item.tone-warning {
+    --tone: #c89c7a;
+    --tone-soft: var(--color-alerta-suave);
+}
+
+.ea-hardware-item.tone-citrus {
+    --tone: #8a9933;
+    --tone-soft: rgba(201, 216, 112, 0.22);
+}
+
+.ea-hardware-item[class*="tone-"] .ea-hardware-item-ico {
+    color: var(--tone, #1c4029);
+    background: var(--tone-soft, #ecf2e8);
+}
+
+.ea-hardware-item[class*="tone-"]:hover {
+    border-color: var(--tone, #bcd2bd);
+    background: var(--tone-soft, var(--color-fondo-suave));
+}
+
+:root[data-theme="dark"] .ea-hardware-item.tone-citrus {
+    --tone: #c9d870;
+}
+
+:root[data-theme="dark"] .ea-hardware-item.tone-warning {
+    --tone: #c89c7a;
+}
+
+:root[data-theme="dark"] .ea-hardware-item.tone-info {
+    --tone: #b8d5d0;
+}
+
+:root[data-theme="dark"] .ea-hardware-item.tone-success {
+    --tone: #bcd2bd;
+}
+
+
+/* ---------- Sección Automatización (reglas) ----------------------------------- */
+.ea-rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+}
+
+.ea-rule {
+    position: relative;
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea-suave);
+    border-radius: 22px;
+    padding: 22px 22px 24px;
+    box-shadow: var(--sombra-chica);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    overflow: hidden;
+}
+
+.ea-rule::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #4a7a55, #c9d870);
+    opacity: 0.85;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-rule:hover {
+        transform: translateY(-4px);
+        border-color: #bcd2bd;
+        box-shadow: var(--sombra-media);
+    }
+}
+
+.ea-rule-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.ea-rule-num {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    color: var(--color-texto-suave);
+}
+
+.ea-rule-cond {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    color: var(--color-texto);
+    background: var(--color-fondo-suave);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1.2;
+    margin: 4px 0 6px;
+}
+
+:root[data-theme="dark"] .ea-rule-cond {
+    background: rgba(236, 242, 232, 0.05);
+    color: #ecf2e8;
+}
+
+.ea-rule-var {
+    font-weight: 500;
+    color: #1c4029;
+}
+
+:root[data-theme="dark"] .ea-rule-var {
+    color: #bcd2bd;
+}
+
+.ea-rule-op {
+    color: var(--color-texto-suave);
+    font-size: 0.8125rem;
+}
+
+.ea-rule-val {
+    color: #a65b3d;
+    font-weight: 500;
+}
+
+:root[data-theme="dark"] .ea-rule-val {
+    color: #c89c7a;
+}
+
+.ea-rule-arrow {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 1.125rem;
+    color: #82a987;
+    line-height: 1;
+    text-align: center;
+    margin: 2px 0;
+    opacity: 0.7;
+}
+
+.ea-rule-action {
+    font-size: 0.9063rem;
+    color: var(--color-texto-secundario);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.ea-rule-action strong {
+    color: var(--color-texto);
+    font-weight: 600;
+}
+
+:root[data-theme="dark"] .ea-rule-action strong {
+    color: #ecf2e8;
+}
+
+.ea-rules-foot {
+    margin-top: 24px;
+    font-size: 0.8438rem;
+    color: var(--color-texto-suave);
+    text-align: center;
+}
+
+
+/* ---------- Portada: números -------------------------------------------------- */
+[data-counter] {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ---------- Sección "Sensores y actuadores": efecto al pasar el mouse ---------
+   .ea-hardware-block tiene su regla principal más arriba ("Grilla de
+   sensores y actuadores").
+   Esta va acá abajo a propósito: tiene que quedar después de
+   [data-reveal-child] para que su transition le gane a la de la aparición. */
+.ea-hardware-block {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-hardware-block:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--sombra-media);
+        border-color: #bcd2bd;
+    }
+}
+
+
+/* ---------- Bloque de hardware ------------------------------------------------ */
+.ea-hardware-desc {
+    color: var(--color-texto-secundario);
+    font-size: 0.9063rem;
+    line-height: 1.55;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+.ea-flow-notice {
+    margin-top: 28px;
+    font-size: 0.8438rem;
+    color: var(--color-texto-suave);
+    text-align: center;
+}
+
+
+/* ---------- Hero — Núcleo 3D flotante (EdenAir Core) -------------------------- */
+.ea-landing {
+    overflow-x: clip;
+}
+
+.ea-hero-core {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: 460px;
+    justify-self: end;
+    max-width: 520px;
+    margin-left: auto;
+    /* Sin background/border/shadow: el modelo flota libre sobre el hero,
+       NO es una card. */
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: visible;
+}
+
+/* Override de .ea-hero-card-anim:hover — el núcleo 3D no debe levantarse
+   ni proyectar sombra de card en hover. Sólo se le permite el reveal
+   inicial (opacity + translate desde abajo). */
+.ea-hero-core.ea-hero-card-anim:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.ea-hero-core-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    /* Sin background, sin border: el modelo flota libre. */
+    transition: transform 0.5s cubic-bezier(.2,.7,.2,1);
+}
+
+.ea-hero-core.is-dragging .ea-hero-core-stage {
+    cursor: grabbing;
+}
+
+.ea-hero-core-stage:focus-visible {
+    outline: 2px dashed #4a7a55;
+    outline-offset: 6px;
+    border-radius: 50%;
+}
+
+/* Halo teal radial — perfectamente difuso, sin forma reconocible. Va lejos
+   con un degradado largo para que no se perciba como una "elipse" detrás. */
+.ea-hero-core-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 85%;
+    height: 85%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, rgba(184, 213, 208, 0.14) 0%, rgba(184, 213, 208, 0.06) 22%, rgba(184, 213, 208, 0) 55%);
+    filter: blur(40px);
+    opacity: 0.55;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+:root[data-theme="dark"] .ea-hero-core-glow {
+    background: radial-gradient(circle at 50% 50%, rgba(184, 213, 208, 0.13) 0%, rgba(184, 213, 208, 0.06) 22%, rgba(184, 213, 208, 0) 55%);
+}
+
+.ea-hero-core.is-active .ea-hero-core-glow {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(1.025);
+}
+
+/* Sombra de "contacto" — muy reducida, sólo para que el modelo no parezca
+   volar contra un vacío. Se ve apenas. */
+.ea-hero-core-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    width: 32%;
+    height: 8px;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(13, 22, 18, 0.14) 0%, rgba(13, 22, 18, 0) 70%);
+    filter: blur(10px);
+    opacity: 0.22;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+:root[data-theme="dark"] .ea-hero-core-shadow {
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 70%);
+    opacity: 0.28;
+}
+
+.ea-hero-core.is-active .ea-hero-core-shadow {
+    opacity: 0.32;
+    transform: translateX(-50%) scale(1.04);
+}
+
+/* Canvas Three.js — transparente, ocupa todo el stage, no captura
+   pointer (el stage es el que escucha hover/drag). */
+.ea-hero-core-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.ea-hero-core.is-ready .ea-hero-core-canvas {
+    opacity: 1;
+}
+
+/* Fallback / placeholder mientras carga el GLB. */
+.ea-hero-core-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: 24px;
+    color: var(--color-texto-secundario);
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+
+.ea-hero-core.is-ready .ea-hero-core-fallback {
+    opacity: 0;
+}
+
+.ea-hero-core-fallback-orb {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), transparent 55%),
+        radial-gradient(circle at 50% 50%, #bcd2bd 0%, #4a7a55 55%, #1c4029 100%);
+    box-shadow:
+        inset 0 -22px 36px rgba(13, 22, 18, 0.35),
+        0 18px 44px -18px rgba(74, 122, 85, 0.55);
+    animation: ea-core-breathe 4.2s ease-in-out infinite;
+}
+
+.ea-hero-core-fallback-msg {
+    font-size: 0.7813rem;
+    color: var(--color-texto-suave);
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes ea-core-breathe {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.05);
+        filter: brightness(1.08);
+    }
+}
+
+
+/* ---------- HUD: micro-paneles ambientales emitidos por el núcleo ------------- */
+.ea-hero-core-cards {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.ea-hud-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(var(--pill-out-x, 0), var(--pill-out-y, 0));
+    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(.2,.7,.2,1);
+}
+
+/* Reverse direction para los paneles de la derecha: la línea queda
+   visualmente apuntando al núcleo y el bloque de datos hacia afuera. */
+.ea-hud-panel[data-position$="r"] {
+    flex-direction: row-reverse;
+}
+
+.ea-hero-core.is-active .ea-hud-panel {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+
+/* ---------- Bloque de datos --------------------------------------------------- */
+.ea-hud-data {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 5px 11px 5px 10px;
+    /* Glass casi imperceptible: el lado del dispositivo se desvanece
+       para que el panel parezca disolverse hacia él. */
+    background: linear-gradient(to right, rgba(8, 16, 12, 0.55) 0%, rgba(8, 16, 12, 0.32) 70%, rgba(8, 16, 12, 0.18) 100%);
+    border-left: 1px solid rgba(140, 230, 220, 0.50);
+    box-shadow: -1px 0 8px -2px rgba(140, 230, 220, 0.18);
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+    transition: border-color 0.45s ease, box-shadow 0.45s ease, background 0.45s ease;
+}
+
+.ea-hud-panel[data-position$="r"] .ea-hud-data {
+    align-items: flex-end;
+    text-align: right;
+    background: linear-gradient(to left, rgba(8, 16, 12, 0.55) 0%, rgba(8, 16, 12, 0.32) 70%, rgba(8, 16, 12, 0.18) 100%);
+    border-left: 0;
+    border-right: 1px solid rgba(140, 230, 220, 0.50);
+    box-shadow: 1px 0 8px -2px rgba(140, 230, 220, 0.18);
+}
+
+:root[data-theme="light"] .ea-hud-data {
+    background: linear-gradient(to right, rgba(244, 241, 234, 0.70) 0%, rgba(244, 241, 234, 0.45) 70%, rgba(244, 241, 234, 0.22) 100%);
+    border-left-color: rgba(74, 122, 85, 0.55);
+    box-shadow: -1px 0 8px -2px rgba(74, 122, 85, 0.20);
+}
+
+:root[data-theme="light"] .ea-hud-panel[data-position$="r"] .ea-hud-data {
+    background: linear-gradient(to left, rgba(244, 241, 234, 0.70) 0%, rgba(244, 241, 234, 0.45) 70%, rgba(244, 241, 234, 0.22) 100%);
+    border-left: 0;
+    border-right-color: rgba(74, 122, 85, 0.55);
+    box-shadow: 1px 0 8px -2px rgba(74, 122, 85, 0.20);
+}
+
+.ea-hero-core.is-active .ea-hud-data {
+    border-color: rgba(140, 230, 220, 0.72);
+    box-shadow: -1px 0 12px -2px rgba(140, 230, 220, 0.28);
+}
+
+.ea-hero-core.is-active .ea-hud-panel[data-position$="r"] .ea-hud-data {
+    box-shadow: 1px 0 12px -2px rgba(140, 230, 220, 0.28);
+}
+
+
+/* ---------- Tipografía: jerarquía clara --------------------------------------- */
+.ea-hud-key {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    /* Era 8px de base: ilegible. Ahora 11px. */
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(140, 200, 192, 0.62);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+:root[data-theme="light"] .ea-hud-key {
+    color: var(--color-texto-suave);
+}
+
+.ea-hud-val {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ea-hud-val b {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 0.01em;
+    color: rgba(232, 246, 242, 0.97);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.ea-hud-val b[data-text] {
+    font-size: 0.7813rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}
+
+:root[data-theme="light"] .ea-hud-val b {
+    color: var(--color-texto);
+}
+
+.ea-hud-unit {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    color: rgba(140, 200, 192, 0.62);
+    letter-spacing: 0.02em;
+}
+
+:root[data-theme="light"] .ea-hud-unit {
+    color: var(--color-texto-secundario);
+}
+
+
+/* ---------- Leader: hairline + punto conector hacia el núcleo ----------------- */
+.ea-hud-link {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 1px;
+    /* Gradiente: opaco del lado del dispositivo (la "fuente"), se desvanece
+       hacia el panel (la "recepción"). */
+    background: linear-gradient(to left, rgba(140, 230, 220, 0.65) 0%, rgba(140, 230, 220, 0.20) 60%, rgba(140, 230, 220, 0) 100%);
+}
+
+.ea-hud-panel[data-position$="r"] .ea-hud-link {
+    background: linear-gradient(to right, rgba(140, 230, 220, 0.65) 0%, rgba(140, 230, 220, 0.20) 60%, rgba(140, 230, 220, 0) 100%);
+}
+
+:root[data-theme="light"] .ea-hud-link {
+    background: linear-gradient(to left, rgba(74, 122, 85, 0.65) 0%, rgba(74, 122, 85, 0.20) 60%, rgba(74, 122, 85, 0) 100%);
+}
+
+:root[data-theme="light"] .ea-hud-panel[data-position$="r"] .ea-hud-link {
+    background: linear-gradient(to right, rgba(74, 122, 85, 0.65) 0%, rgba(74, 122, 85, 0.20) 60%, rgba(74, 122, 85, 0) 100%);
+}
+
+/* Punto pulsante en el extremo cercano al dispositivo */
+.ea-hud-link::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(140, 230, 220, 0.92);
+    box-shadow: 0 0 6px rgba(140, 230, 220, 0.65);
+    transform: translate(50%, -50%);
+    animation: ea-hud-tip-pulse 2.8s ease-in-out infinite;
+}
+
+.ea-hud-panel[data-position$="r"] .ea-hud-link::after {
+    right: auto;
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+:root[data-theme="light"] .ea-hud-link::after {
+    background: rgba(74, 122, 85, 0.92);
+    box-shadow: 0 0 6px rgba(74, 122, 85, 0.55);
+}
+
+@keyframes ea-hud-tip-pulse {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* ---------- Posiciones alrededor del núcleo ----------------------------------- */
+.ea-hud-panel[data-position="tl"] {
+    top: 6%;
+    left: 0;
+    --pill-out-x: -14px;
+    --pill-out-y: -8px;
+    transition-delay: 0.04s;
+}
+
+.ea-hud-panel[data-position="tr"] {
+    top: 6%;
+    right: 0;
+    --pill-out-x: 14px;
+    --pill-out-y: -8px;
+    transition-delay: 0.10s;
+}
+
+.ea-hud-panel[data-position="ml"] {
+    top: 45%;
+    left: -4%;
+    --pill-out-x: -18px;
+    --pill-out-y: 0;
+    transition-delay: 0.16s;
+}
+
+.ea-hud-panel[data-position="mr"] {
+    top: 45%;
+    right: -4%;
+    --pill-out-x: 18px;
+    --pill-out-y: 0;
+    transition-delay: 0.22s;
+}
+
+.ea-hud-panel[data-position="bl"] {
+    bottom: 8%;
+    left: 0;
+    --pill-out-x: -14px;
+    --pill-out-y: 8px;
+    transition-delay: 0.28s;
+}
+
+.ea-hud-panel[data-position="br"] {
+    bottom: 8%;
+    right: 0;
+    --pill-out-x: 14px;
+    --pill-out-y: 8px;
+    transition-delay: 0.34s;
+}
+
+
+/* ---------- Celular y tablet -------------------------------------------------- */
+@media (max-width: 920px) {
+    .ea-hero-core {
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+        justify-self: center;
+        height: 420px;
+    }
+}
+
+@media (max-width: 720px) {
+    .ea-hero-core {
+        max-width: 380px;
+        height: 380px;
+    }
+
+    .ea-hero-core-fallback-orb {
+        width: 108px;
+        height: 108px;
+    }
+
+    /* En mobile los paneles siempre visibles (no hay hover), con leader
+       acortado para no apretar el modelo. */
+    .ea-hud-panel {
+        opacity: 0.62;
+        transform: none;
+    }
+
+    .ea-hero-core.is-active .ea-hud-panel {
+        opacity: 1;
+    }
+
+    .ea-hud-link {
+        width: 18px;
+    }
+
+    .ea-hud-data {
+        padding: 4px 9px 4px 8px;
+    }
+
+    .ea-hud-val b {
+        font-size: 0.8125rem;
+    }
+
+    .ea-hud-val b[data-text] {
+        font-size: 0.7188rem;
+    }
+
+    .ea-hud-panel[data-position="tl"] {
+        top: 0;
+        left: 0;
+    }
+
+    .ea-hud-panel[data-position="tr"] {
+        top: 0;
+        right: 0;
+    }
+
+    .ea-hud-panel[data-position="ml"] {
+        top: 44%;
+        left: -1%;
+    }
+
+    .ea-hud-panel[data-position="mr"] {
+        top: 44%;
+        right: -1%;
+    }
+
+    .ea-hud-panel[data-position="bl"] {
+        bottom: 2%;
+        left: 0;
+    }
+
+    .ea-hud-panel[data-position="br"] {
+        bottom: 2%;
+        right: 0;
+    }
+}
+
+@media (max-width: 420px) {
+    .ea-hero-core {
+        max-width: 340px;
+        height: 360px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-hero-core-fallback-orb {
+        animation: none !important;
+    }
+}
+
+
+/* ---------- Eden Air Experience — video fullscreen controlado por scroll ------ */
+.ea-experience {
+    position: relative;
+    width: 100%;
+    height: 360vh;
+    /* longitud total del scroll-scrub */
+    margin: 0;
+    padding: 0;
+    background: #03070a;
+    color: #ecf2e8;
+    isolation: isolate;
+    overflow: clip;
+}
+
+.ea-experience-stage {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #02050a;
+}
+
+
+/* ---------- Video a pantalla completa ----------------------------------------- */
+.ea-experience-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: #02050a;
+}
+
+.ea-experience-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    background: #02050a;
+    display: block;
+    pointer-events: none;
+}
+
+
+/* ---------- Overlays cinematográficos ----------------------------------------- */
+.ea-experience-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(3, 7, 10, 0.55) 0%, rgba(3, 7, 10, 0) 22%, rgba(3, 7, 10, 0) 65%, rgba(3, 7, 10, 0.82) 100%),
+        linear-gradient(90deg, rgba(3, 7, 10, 0.55) 0%, rgba(3, 7, 10, 0) 35%);
+}
+
+.ea-experience-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(3, 7, 10, 0) 55%, rgba(3, 7, 10, 0.55) 100%);
+    /* mix-blend-mode eliminado: forzaba una capa de composición extra por frame */
+}
+
+.ea-experience-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    /* 90px → 60px: buffer de composición 55% más chico */
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 1;
+    will-change: transform;
+    animation: ea-exp-float 16s ease-in-out infinite alternate;
+}
+
+.ea-experience-glow--a {
+    width: 520px;
+    height: 520px;
+    top: -160px;
+    left: -140px;
+    background: radial-gradient(circle, rgba(106, 155, 159, 0.65) 0%, rgba(106, 155, 159, 0) 70%);
+}
+
+.ea-experience-glow--b {
+    width: 620px;
+    height: 620px;
+    bottom: -200px;
+    right: -180px;
+    background: radial-gradient(circle, rgba(74, 122, 85, 0.55) 0%, rgba(74, 122, 85, 0) 70%);
+    animation-delay: -8s;
+}
+
+@keyframes ea-exp-float {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    100% {
+        transform: translate3d(50px, -30px, 0) scale(1.1);
+    }
+}
+
+
+/* ---------- Respaldo ---------------------------------------------------------- */
+.ea-experience-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: rgba(188, 210, 189, 0.85);
+    font-size: 0.8438rem;
+    background:
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(106, 155, 159, 0.16) 0%, rgba(3, 7, 10, 0) 70%),
+        #02050a;
+    transition: opacity 0.5s ease;
+}
+
+.ea-experience-fallback p {
+    margin: 0;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.ea-experience-fallback.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ea-experience-fallback-orb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #b8d5d0, #4a7a55 60%, #16301f);
+    box-shadow: 0 0 32px rgba(184, 213, 208, 0.55);
+    animation: ea-exp-orb 2.4s ease-in-out infinite;
+}
+
+@keyframes ea-exp-orb {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.12);
+        opacity: 1;
+    }
+}
+
+
+/* ---------- Capa de tipografía premium ---------------------------------------- */
+/* SIN cards. SIN bordes. SIN backgrounds.
+   Solo texto blanco con sombra sutil flotando sobre el video. */
+.ea-experience-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.ea-experience-text {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(22px, 3.2vw, 44px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7), 0 0 36px rgba(0, 0, 0, 0.45);
+    max-width: 32ch;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+    will-change: opacity, transform;
+}
+
+.ea-experience-text.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+.ea-experience-text em {
+    font-style: italic;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: 500;
+}
+
+/* línea decorativa fina al lado del primer texto */
+.ea-experience-line {
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(184, 213, 208, 0.9), rgba(184, 213, 208, 0));
+    vertical-align: middle;
+    margin-right: 14px;
+    box-shadow: 0 0 8px rgba(184, 213, 208, 0.6);
+}
+
+/* kicker (etiqueta pequeña arriba del texto) */
+.ea-experience-kicker {
+    display: block;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.95);
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Tercer texto (sensores) es lista en línea, fuente sans más liviana */
+.ea-experience-text--bl {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: clamp(15px, 1.4vw, 19px);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.92);
+    max-width: 38ch;
+    bottom: clamp(10%, 12vh, 16%);
+    left: clamp(24px, 6vw, 80px);
+}
+
+/* Posiciones en la pantalla — uso "safe area" en % */
+.ea-experience-text--tl {
+    top: clamp(10%, 14vh, 18%);
+    left: clamp(24px, 6vw, 80px);
+}
+
+.ea-experience-text--mr {
+    top: 38%;
+    right: clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+
+.ea-experience-text--cr {
+    top: 46%;
+    right: clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+
+.ea-experience-text--br {
+    bottom: clamp(8%, 10vh, 14%);
+    right: clamp(24px, 6vw, 80px);
+    text-align: right;
+}
+
+
+/* ---------- Tablet ------------------------------------------------------------ */
+@media (max-width: 980px) {
+    .ea-experience {
+        height: 320vh;
+    }
+
+    .ea-experience-text {
+        font-size: clamp(20px, 3.6vw, 32px);
+        max-width: 18ch;
+    }
+
+    .ea-experience-text--bl {
+        max-width: 28ch;
+        font-size: clamp(14px, 1.8vw, 17px);
+    }
+}
+
+
+/* ---------- Mobile: experiencia simplificada y compacta ----------------------- */
+@media (max-width: 640px) {
+    .ea-experience {
+        height: 240vh;
+    }
+
+    .ea-experience-text {
+        font-size: clamp(20px, 6.5vw, 26px);
+        max-width: 80vw;
+        line-height: 1.18;
+    }
+
+    .ea-experience-text--bl {
+        font-size: 0.8438rem;
+        max-width: 84vw;
+        line-height: 1.45;
+        bottom: 28%;
+        left: 22px;
+        right: 22px;
+    }
+
+    .ea-experience-kicker {
+        font-size: 0.6875rem;
+        letter-spacing: 0.2em;
+        margin-bottom: 6px;
+    }
+
+    .ea-experience-line {
+        width: 26px;
+        margin-right: 10px;
+    }
+
+    /* En mobile alineamos todo a la izquierda, evitamos derecha que se corta */
+    .ea-experience-text--tl {
+        top: 10%;
+        left: 22px;
+        right: 22px;
+    }
+
+    .ea-experience-text--mr {
+        top: 32%;
+        left: 22px;
+        right: 22px;
+        text-align: left;
+    }
+
+    .ea-experience-text--cr {
+        top: 48%;
+        left: 22px;
+        right: 22px;
+        text-align: left;
+    }
+
+    .ea-experience-text--br {
+        bottom: 10%;
+        left: 22px;
+        right: 22px;
+        text-align: left;
+    }
+
+    .ea-experience-glow--a {
+        width: 320px;
+        height: 320px;
+        filter: blur(70px);
+    }
+
+    .ea-experience-glow--b {
+        width: 360px;
+        height: 360px;
+        filter: blur(70px);
+    }
+}
+
+
+/* ---------- prefers-reduced-motion -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .ea-experience-glow,
+    .ea-experience-fallback-orb {
+        animation: none !important;
+    }
+
+    .ea-experience-text {
+        transition: opacity 0.3s linear !important;
+        transform: none !important;
+    }
+
+    .ea-experience-text.is-visible {
+        transform: none !important;
+    }
+}
+
+/* Fade negro → paper al salir del video (vuelve a las secciones claras) */
+.ea-experience::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 200px;
+    pointer-events: none;
+    z-index: 3;
+    background: linear-gradient(to top, var(--color-fondo) 0%, rgba(3, 7, 10, 0) 100%);
+}
+
+
+/* ---------- Bridge — puente narrativo entre hero y video (continuidad de marca) --- */
+.ea-bridge {
+    position: relative;
+    width: 100%;
+    min-height: clamp(420px, 65vh, 680px);
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    color: #ecf2e8;
+}
+
+.ea-bridge-grad {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(180deg, var(--color-fondo) 0%, rgba(13, 22, 18, 0.55) 28%, #0a1310 62%, #03070a 100%);
+}
+
+:root[data-theme="dark"] .ea-bridge-grad {
+    background: linear-gradient(180deg, var(--color-fondo) 0%, #0a1310 55%, #03070a 100%);
+}
+
+.ea-bridge-glow {
+    position: absolute;
+    z-index: 0;
+    width: 760px;
+    height: 760px;
+    left: 50%;
+    bottom: -380px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(106, 155, 159, 0.40) 0%, rgba(106, 155, 159, 0) 65%);
+    filter: blur(80px);
+    border-radius: 50%;
+    animation: ea-bridge-breathe 10s ease-in-out infinite;
+}
+
+@keyframes ea-bridge-breathe {
+    0%, 100% {
+        opacity: 0.7;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.08);
+    }
+}
+
+.ea-bridge-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding-top: clamp(40px, 6vw, 80px);
+    padding-bottom: clamp(60px, 8vw, 110px);
+}
+
+.ea-bridge-eyebrow {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.88);
+    padding: 6px 14px;
+    border: 1px solid rgba(184, 213, 208, 0.25);
+    border-radius: 999px;
+    background: rgba(8, 14, 12, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.ea-bridge-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(30px, 5vw, 56px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #ffffff;
+    max-width: 22ch;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.ea-bridge-title em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.ea-bridge-hint {
+    margin-top: clamp(8px, 1.4vw, 18px);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.7);
+}
+
+.ea-bridge-hint-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #b8d5d0;
+    box-shadow: 0 0 10px rgba(184, 213, 208, 0.9);
+    animation: ea-bridge-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes ea-bridge-blink {
+    0%, 100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 0.35;
+        transform: translateY(3px);
+    }
+}
+
+/* Pequeño borde inferior 1px luminoso, separador sutil */
+.ea-bridge-fade {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184, 213, 208, 0.35), transparent);
+    box-shadow: 0 0 12px rgba(184, 213, 208, 0.35);
+    z-index: 2;
+    pointer-events: none;
+}
+
+@media (max-width: 640px) {
+    .ea-bridge {
+        min-height: clamp(360px, 70vh, 520px);
+    }
+
+    .ea-bridge-inner {
+        padding-top: 48px;
+        padding-bottom: 64px;
+    }
+
+    .ea-bridge-title {
+        font-size: clamp(26px, 7vw, 36px);
+        max-width: 18ch;
+    }
+
+    .ea-bridge-glow {
+        width: 480px;
+        height: 480px;
+        bottom: -240px;
+        filter: blur(60px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-bridge-glow,
+    .ea-bridge-hint-dot {
+        animation: none !important;
+    }
+}
+
+
+/* ---------- Environmental Control Core — reemplaza al carrusel genérico ------- */
+.ea-core-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(80px, 11vw, 160px) 0 clamp(60px, 8vw, 120px);
+    color: #ecf2e8;
+    background: linear-gradient(180deg, var(--color-fondo) 0%, #0a1310 18%, #07100c 100%);
+}
+
+:root[data-theme="dark"] .ea-core-section {
+    background: linear-gradient(180deg, var(--color-fondo) 0%, #0a1310 18%, #060d0a 100%);
+}
+
+.ea-core-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 50% 40% at 50% 60%, rgba(106, 155, 159, 0.18) 0%, rgba(7, 16, 12, 0) 60%),
+        radial-gradient(ellipse 40% 30% at 18% 28%, rgba(74, 122, 85, 0.16) 0%, rgba(7, 16, 12, 0) 60%);
+}
+
+.ea-core-page {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(40px, 6vw, 80px);
+}
+
+
+/* ---------- Encabezado -------------------------------------------------------- */
+.ea-core-head {
+    text-align: center;
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.ea-core-head .ea-eyebrow {
+    color: rgba(184, 213, 208, 0.85);
+    background: rgba(184, 213, 208, 0.08);
+    border: 1px solid rgba(184, 213, 208, 0.22);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.ea-core-head .ea-eyebrow::before {
+    display: none;
+}
+
+.ea-core-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #ffffff;
+}
+
+.ea-core-title em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.ea-core-lede {
+    margin: 0;
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.55;
+    color: rgba(236, 242, 232, 0.78);
+    max-width: 52ch;
+}
+
+
+/* ---------- Diagrama orbital -------------------------------------------------- */
+.ea-core {
+    position: relative;
+    width: min(680px, 90vw);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    container-type: inline-size;
+    container-name: eacore;
+}
+
+.ea-core-orbits {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Anillo intermedio rota lento */
+.ea-core-orbits circle:nth-of-type(2) {
+    transform-origin: 50% 50%;
+    animation: ea-core-spin 60s linear infinite;
+}
+
+.ea-core-orbits circle:nth-of-type(3) {
+    transform-origin: 50% 50%;
+    animation: ea-core-spin 120s linear infinite reverse;
+}
+
+@keyframes ea-core-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulso central */
+.ea-core-pulse {
+    transform-origin: 50% 50%;
+    animation: ea-core-pulse 3.4s ease-in-out infinite;
+}
+
+@keyframes ea-core-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+/* Spokes brillan secuenciados */
+.ea-core-spokes line {
+    stroke-dasharray: 80 60;
+    stroke-dashoffset: 0;
+    animation: ea-core-flow 6s linear infinite;
+    opacity: 0.6;
+}
+
+.ea-core-spokes line:nth-child(1) {
+    animation-delay: -0s;
+}
+
+.ea-core-spokes line:nth-child(2) {
+    animation-delay: -0.7s;
+}
+
+.ea-core-spokes line:nth-child(3) {
+    animation-delay: -1.4s;
+}
+
+.ea-core-spokes line:nth-child(4) {
+    animation-delay: -2.1s;
+}
+
+.ea-core-spokes line:nth-child(5) {
+    animation-delay: -2.8s;
+}
+
+.ea-core-spokes line:nth-child(6) {
+    animation-delay: -3.5s;
+}
+
+.ea-core-spokes line:nth-child(7) {
+    animation-delay: -4.2s;
+}
+
+@keyframes ea-core-flow {
+    0% {
+        stroke-dashoffset: 140;
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        stroke-dashoffset: -140;
+        opacity: 0.2;
+    }
+}
+
+/* Etiqueta central */
+.ea-core-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+    text-align: center;
+    gap: 4px;
+}
+
+.ea-core-center-label {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-style: italic;
+    font-size: clamp(20px, 2.2vw, 28px);
+    color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
+}
+
+.ea-core-center-sub {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.85);
+}
+
+/* Módulos absolutos posicionados con --ang y --r */
+.ea-core-modules {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+}
+
+.ea-core-mod {
+    /* --r es unitless; lo multiplicamos por 1cqi (1% del ancho del .ea-core) */
+    --offset-y: calc(var(--r, 38) * -1cqi);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1));
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: rgba(8, 14, 12, 0.55);
+    border: 1px solid rgba(184, 213, 208, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    transition:
+        transform 0.4s cubic-bezier(.2,.7,.2,1),
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+    white-space: nowrap;
+    cursor: default;
+}
+
+.ea-core-mod:hover {
+    border-color: rgba(184, 213, 208, 0.45);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(184, 213, 208, 0.15),
+        0 0 30px rgba(184, 213, 208, 0.25);
+    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(var(--offset-y)) rotate(calc(var(--ang) * -1)) scale(1.06);
+}
+
+@supports not (width: 1cqi) {
+    .ea-core-mod {
+        --offset-y: calc(var(--r, 38) * -0.9vw);
+    }
+}
+
+.ea-core-mod-key {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: 0.005em;
+}
+
+.ea-core-mod-val {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(184, 213, 208, 0.85);
+}
+
+/* Tone variants — dot pequeño antes del key */
+.ea-core-mod::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 8px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #b8d5d0;
+    box-shadow: 0 0 6px currentColor;
+    color: #b8d5d0;
+}
+
+.ea-core-mod[data-tone="warm"]::before {
+    color: #d5a76a;
+    background: #d5a76a;
+    box-shadow: 0 0 6px #d5a76a;
+}
+
+.ea-core-mod[data-tone="cool"]::before {
+    color: #b8d5d0;
+    background: #b8d5d0;
+    box-shadow: 0 0 6px #b8d5d0;
+}
+
+.ea-core-mod[data-tone="leaf"]::before {
+    color: #c9d870;
+    background: #c9d870;
+    box-shadow: 0 0 6px #c9d870;
+}
+
+
+/* ---------- Stats discretos --------------------------------------------------- */
+.ea-core-facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: clamp(28px, 6vw, 80px);
+    flex-wrap: wrap;
+}
+
+.ea-core-facts li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(236, 242, 232, 0.65);
+    text-align: center;
+}
+
+.ea-core-facts li span {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-style: italic;
+    font-size: clamp(32px, 5vw, 48px);
+    color: #ffffff;
+    /* Sin letter-spacing negativo: las itálicas inclinan los glifos hacia la
+       derecha y el clip "background-clip:text" usa el bounding box plano del
+       texto, no la caja inclinada → letras como "7" se cortan. Padding
+       horizontal generoso + line-height holgado + overflow visible aseguran
+       el glifo completo en todos los tamaños/tema. */
+    letter-spacing: 0;
+    line-height: 1.18;
+    display: inline-block;
+    padding: 0.05em 0.22em 0.05em 0.16em;
+    margin: 0 -0.06em;
+    /* compensa el padding extra para mantener el centrado del bloque */
+    overflow: visible;
+    background: linear-gradient(115deg, #b8d5d0 0%, #c9d870 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+
+/* ---------- Tablet ------------------------------------------------------------ */
+@media (max-width: 980px) {
+    .ea-core {
+        width: min(560px, 92vw);
+    }
+
+    .ea-core-mod {
+        padding: 8px 12px;
+    }
+
+    .ea-core-mod-key {
+        font-size: 0.75rem;
+    }
+
+    .ea-core-mod-val {
+        font-size: 0.6875rem;
+    }
+}
+
+
+/* ---------- Mobile: layout más compacto, evitar superposición ----------------- */
+@media (max-width: 640px) {
+    .ea-core-section {
+        padding: 64px 0 56px;
+    }
+
+    .ea-core {
+        width: 96vw;
+        max-width: 460px;
+    }
+
+    .ea-core-mod {
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+
+    .ea-core-mod-key {
+        font-size: 0.6875rem;
+    }
+
+    .ea-core-mod-val {
+        font-size: 0.6875rem;
+        letter-spacing: 0.18em;
+    }
+
+    .ea-core-mod::before {
+        top: 6px;
+        left: 6px;
+        width: 3px;
+        height: 3px;
+    }
+
+    .ea-core-center-label {
+        font-size: 1.125rem;
+    }
+
+    .ea-core-center-sub {
+        font-size: 0.6875rem;
+        letter-spacing: 0.28em;
+    }
+
+    .ea-core-facts li {
+        font-size: 0.6875rem;
+        letter-spacing: 0.18em;
+    }
+
+    .ea-core-facts li span {
+        font-size: 2rem;
+    }
+}
+
+
+/* ---------- prefers-reduced-motion -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .ea-core-orbits circle,
+    .ea-core-pulse,
+    .ea-core-spokes line {
+        animation: none !important;
+    }
+}
+
+
+/* ---------- Sección "Ingeniería interna" (video exploded view) ---------------- */
+.ea-tech {
+    padding: clamp(64px, 8vw, 120px) 0;
+}
+
+.ea-tech-head {
+    margin-bottom: clamp(32px, 5vw, 56px);
+}
+
+.ea-tech-stage {
+    position: relative;
+    max-width: 940px;
+    margin: 0 auto;
+    padding: clamp(0px, 3vw, 48px);
+}
+
+.ea-tech-media {
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #0c1611;
+    border: 1px solid rgba(236, 242, 232, 0.10);
+    box-shadow: var(--sombra-grande);
+    isolation: isolate;
+}
+
+.ea-tech-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ea-tech-glow {
+    position: absolute;
+    inset: -20%;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 45%, rgba(184, 213, 208, 0.18), transparent 60%);
+    mix-blend-mode: screen;
+}
+
+.ea-tech-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(8, 16, 12, 0.55) 100%),
+        linear-gradient(180deg, rgba(8, 16, 12, 0.18), transparent 30%, transparent 70%, rgba(8, 16, 12, 0.28));
+}
+
+/* Tarjetas flotantes — glass oscuro para leer sobre el video en ambos temas */
+.ea-tech-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ea-tech-card {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 230px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    background: rgba(12, 22, 17, 0.74);
+    border: 1px solid rgba(201, 216, 112, 0.22);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
+    color: #eef3ea;
+    animation: ea-tech-float 7s ease-in-out infinite;
+}
+
+.ea-tech-card-dot {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c9d870;
+    box-shadow: 0 0 0 4px rgba(201, 216, 112, 0.18);
+}
+
+.ea-tech-card-key {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b8d5d0;
+}
+
+.ea-tech-card-val {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: rgba(238, 243, 234, 0.86);
+}
+
+.ea-tech-card--tl {
+    top: 6%;
+    left: -2%;
+    animation-delay: 0s;
+}
+
+.ea-tech-card--tr {
+    top: 12%;
+    right: -2%;
+    animation-delay: -1.6s;
+}
+
+.ea-tech-card--bl {
+    bottom: 12%;
+    left: -2%;
+    animation-delay: -3.1s;
+}
+
+.ea-tech-card--br {
+    bottom: 6%;
+    right: -2%;
+    animation-delay: -4.7s;
+}
+
+@keyframes ea-tech-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@media (max-width: 860px) {
+    .ea-tech-stage {
+        padding: 0;
+    }
+
+    .ea-tech-cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .ea-tech-card {
+        position: static;
+        max-width: none;
+        animation: none;
+    }
+}
+
+@media (max-width: 460px) {
+    .ea-tech-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Sección de compra / plan ------------------------------------------ */
+.ea-buy-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 30px);
+    align-items: stretch;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.ea-buy-card,
+.ea-buy-includes {
+    border-radius: 22px;
+    padding: clamp(26px, 3.5vw, 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tarjeta principal: panel premium verde profundo (foco visual) */
+.ea-buy-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: #eef3ea;
+    background: linear-gradient(155deg, #16301f 0%, #1c4029 55%, #18351f 100%);
+    border: 1px solid rgba(201, 216, 112, 0.22);
+    box-shadow: var(--sombra-grande);
+}
+
+.ea-buy-card::before {
+    content: "";
+    position: absolute;
+    inset: -30% -30% auto auto;
+    width: 60%;
+    height: 60%;
+    z-index: -1;
+    background: radial-gradient(circle, rgba(201, 216, 112, 0.28), transparent 65%);
+}
+
+.ea-buy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(201, 216, 112, 0.16);
+    border: 1px solid rgba(201, 216, 112, 0.34);
+    color: #e7eebf;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.ea-buy-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c9d870;
+    box-shadow: 0 0 0 4px rgba(201, 216, 112, 0.22);
+}
+
+.ea-buy-name {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: clamp(28px, 4vw, 38px);
+    margin: 18px 0 8px;
+    color: #fff;
+}
+
+.ea-buy-tagline {
+    color: rgba(238, 243, 234, 0.8);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.ea-buy-price {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 24px 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(236, 242, 232, 0.14);
+}
+
+.ea-buy-amount {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: clamp(48px, 8vw, 68px);
+    line-height: 1;
+    color: #fff;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.ea-buy-cur {
+    font-size: 0.34em;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    letter-spacing: 0.08em;
+    color: #b8d5d0;
+    margin-top: 0.5em;
+}
+
+.ea-buy-period {
+    font-size: 0.7813rem;
+    line-height: 1.4;
+    color: rgba(238, 243, 234, 0.7);
+}
+
+.ea-buy-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.ea-buy-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    font-size: 0.75rem;
+    color: rgba(238, 243, 234, 0.66);
+}
+
+.ea-buy-note svg {
+    flex: none;
+    color: #c9d870;
+}
+
+/* Panel "Incluido": usa los colores del tema → se adapta a claro/oscuro */
+.ea-buy-includes {
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    box-shadow: var(--sombra-media);
+}
+
+.ea-buy-includes-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 1.3125rem;
+    margin: 0 0 18px;
+    color: var(--color-texto);
+}
+
+.ea-buy-list {
+    list-style: none;
+    margin: 0 0 18px;
+    padding: 0;
+    display: grid;
+    gap: 13px;
+}
+
+.ea-buy-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    font-size: 0.9063rem;
+    line-height: 1.45;
+    color: var(--color-texto-secundario);
+}
+
+.ea-buy-check {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: var(--color-exito-suave);
+    position: relative;
+}
+
+.ea-buy-check::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    width: 4px;
+    height: 8px;
+    border: solid #4a7a55;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.ea-buy-includes-foot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: auto 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-linea-suave);
+    font-size: 0.8125rem;
+    color: var(--color-texto-suave);
+}
+
+@media (max-width: 760px) {
+    .ea-buy-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ---------- Respeto a prefers-reduced-motion ---------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .ea-tech-card {
+        animation: none !important;
+    }
+}
+
+
+/* ---------- ScrollSmoother (GSAP) — FASE 1 ------------------------------------ */
+#smooth-wrapper {
+    width: 100%;
+}
+
+body.ea-has-smooth .ea-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+body.ea-has-smooth #smooth-content {
+    padding-top: var(--ea-nav-h, 72px);
+}
+
+/* Con ScrollSmoother activo, el stage del video deja de ser sticky
+   (sticky se rompe dentro del transform); lo pinea ScrollTrigger. */
+body.ea-has-smooth .ea-experience-stage {
+    position: relative;
+    top: auto;
+}

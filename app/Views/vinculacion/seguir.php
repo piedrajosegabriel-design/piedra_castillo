@@ -46,7 +46,7 @@ $rutaJs = '/' . ltrim((string) parse_url(base_url('JS/vinculacion.js'), PHP_URL_
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
 <title>Eden Air · Conectando tu equipo</title>
-<?php /* Estilos: public/CSS/vistas/vinculacion/seguir.css. La marca la
+<?php /* Estilos: public/CSS/vinculacion/seguir.css. La marca la
          cambia app/Libraries/Vista.php por el <link>, con la ruta sin host
          (igual que los links y el JS de esta vista). */ ?>
 <?= \App\Libraries\Vista::MARCA_ESTILOS ?>

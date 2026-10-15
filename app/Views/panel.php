@@ -190,12 +190,12 @@ $this->setData([
                      aria-label="<?= esc($altSpark, 'attr') ?>">
                     <defs>
                         <linearGradient id="ea-spark-grad" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="var(--eden-500)" stop-opacity=".30"/>
-                            <stop offset="1" stop-color="var(--eden-500)" stop-opacity="0"/>
+                            <stop offset="0" stop-color="#4a7a55" stop-opacity=".30"/>
+                            <stop offset="1" stop-color="#4a7a55" stop-opacity="0"/>
                         </linearGradient>
                     </defs>
                     <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?> L 220 60 L 0 60 Z" fill="url(#ea-spark-grad)" data-vivo-spark="relleno"/>
-                    <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="var(--eden-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
+                    <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="#4a7a55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
                 </svg>
 
                 <?php if ($hayEscala): ?>

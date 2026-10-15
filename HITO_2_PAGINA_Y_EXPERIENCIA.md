@@ -83,33 +83,53 @@ Usuario (1) ──┬─ (N) Dispositivos  ──── (1) Ambiente
 > **Regla de marca:** el verde es la identidad, pero el **aqua y el cítrico son
 > "el aire"** — se reservan para datos vivos.
 
-**Archivos:** `public/CSS/comun.css` (tokens, logo, botones premium, modo
-oscuro) y un CSS por vista en `public/CSS/vistas/` (ver la sección siguiente).
+**Archivos:** un CSS por pantalla en `public/CSS/`, con el mismo nombre que
+la vista (ver la sección siguiente).
 
 ---
 
 ## 1.bis Organización del CSS y el JS
 
-### CSS: un archivo común + un archivo por vista
+### CSS: un archivo por pantalla, y nada más
 
 | Archivo | Alcance | Qué tiene |
 |---|---|---|
-| `public/CSS/comun.css` | **Todas las páginas** (lo carga `partials/head.php`) | Paleta, tipografías, reset y los componentes que se repiten: barra de navegación, logo, interruptor de tema, botones, tarjetas, formularios, mensajes, tablas, pie. |
-| `public/CSS/vistas/<vista>.css` | **Solo la vista con ese nombre** | Lo propio de esa pantalla, layout o partial. Ej: `app/Views/ambientes/index.php` → `public/CSS/vistas/ambientes/index.css`. |
+| `public/CSS/<vista>.css` | **Solo la pantalla con ese nombre** | **Todo** lo que se ve en esa pantalla: letras, colores, menú, barra de arriba, botones, formularios y lo propio de la pantalla. Ej: `app/Views/ambientes/index.php` → `public/CSS/ambientes/index.css`. |
 
-**Cómo se cargan:** solos. `app/Libraries/Vista.php` anota cada vista que se
-dibuja y, al terminar la página, cambia una marca del `<head>` por un `<link>`
-por cada vista que tenga un CSS con su mismo nombre (primero el layout,
-después los partials y al final la pantalla). Si una vista no tiene CSS no se
-agrega nada. Para estilos nuevos alcanza con crear el archivo.
+Las pantallas son 15: `inicio`, `portfolio`, `login`, `registro`, `recuperar`,
+`restablecer_password`, `vinculacion/seguir`, `panel`, `panel/bienvenida`,
+`dispositivos/index`, `dispositivos/conectar`, `ambientes/index`,
+`ambientes/editar`, `perfil_usuario` y `compra_mercadopago`.
+
+No hay un CSS común: cada pantalla trae su propia copia de lo que comparte con
+otras (por ejemplo, el menú lateral está en los 8 CSS del panel). Así, lo que
+se cambia en un archivo cambia **solo** esa pantalla y nunca hay dos archivos
+peleándose por la misma clase. Si se quiere cambiar algo en todas las
+pantallas del panel, hay que cambiarlo en cada uno de sus CSS (buscar y
+reemplazar en la carpeta `public/CSS/`).
+
+**Cómo se carga:** solo. `app/Libraries/Vista.php` mira qué pantalla se
+dibujó (la primera vista que llama el controlador) y cambia una marca del
+`<head>` por un único `<link>` a `public/CSS/<esa pantalla>.css`. Si la
+pantalla no tiene CSS no se agrega nada.
 
 **Cómo está armado cada CSS:**
-- **PARTE 1 — AJUSTES:** variables con nombre en castellano y un comentario
-  que dice qué afectan en pantalla. Es lo único que hay que tocar para cambiar
-  cómo se ve algo. El modo oscuro va como par `-oscuro` al lado del valor claro.
-- **PARTE 2 — ESTRUCTURA:** selectores, grid, flex y media queries, escritos
-  con las variables de arriba. Los cortes de los `@media` quedan como número
-  (CSS no acepta variables ahí) y se listan en el encabezado de la parte 2.
+- **Encabezado** con la vista, la ruta y un índice "Qué hay acá": las partes
+  de la pantalla en orden (base, esqueleto del panel, menú lateral, barra
+  superior, la pantalla en sí...) y los títulos de sus secciones, para
+  buscarlos con Ctrl+F.
+- **Colores del tema:** los únicos colores escritos como variable
+  (`var(--color-texto)`, `var(--color-fondo)`...), porque cambian solos entre
+  modo claro y oscuro. Están todos juntos arriba: un bloque con los valores
+  claros y otro con los oscuros.
+- **Todo lo demás con valores directos** en cada regla: para cambiar el fondo,
+  el ancho o el alto de algo se busca la clase y se cambia el número o el color
+  ahí mismo.
+- Quedan algunas variables "por elemento" que pone el HTML o el JS y que no
+  pueden ser un valor fijo: la posición de los módulos del núcleo 3D
+  (`--ang`, `--r`), el ancho de las barras de costos (`--w`), los colores de
+  los botones (`--boton-fondo`, `--boton-texto`, `--boton-borde`, explicados
+  en la sección "Botones") o las medidas que corrige `dashboard.js`.
 
 **Excepciones documentadas (estilos embebidos en vistas):**
 - `partials/panel_loader.php` tiene un `<style>` dentro de `<noscript>`: es el

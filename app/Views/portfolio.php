@@ -1,7 +1,7 @@
 <?php
 /* =============================================================================
    VISTA: portfolio.php — PORTFOLIO PÚBLICO del proyecto (ruta "/portfolio")
-   CSS:  public/CSS/vistas/portfolio.css (+ comun.css). Se cargan solos (app/Libraries/Vista.php)
+   CSS:  public/CSS/portfolio.css (todo lo de esta página; se carga solo, ver app/Libraries/Vista.php)
    JS:   portfolio.js (menú, scrollspy, gráficos Chart.js) ·
          portfolio-gsap.js (animaciones de scroll) · ea-scrollbar.js
    CÓMO LEER ESTA VISTA:
@@ -180,7 +180,7 @@ $sitemap = [
                         <span class="ea-pf-eyebrow">Recorrido</span>
                         <h2 class="ea-pf-h ea-pf-h2" id="ea-pf-sitemap-title">Mapa del <em>portfolio</em>.</h2>
                     </div>
-                    <p class="ea-pf-lede" style="max-width: 38ch;">
+                    <p class="ea-pf-lede ea-pf-lede--angosta">
                         Siete paradas para entender, validar y proyectar Eden Air. Toca cualquier card para saltar a esa sección.
                     </p>
                 </header>
@@ -234,11 +234,11 @@ $sitemap = [
                     <article class="ea-pf-card">
                         <span class="ea-pf-card__eyebrow">Paleta</span>
                         <div class="ea-pf-palette">
-                            <div class="ea-pf-swatch" style="background: var(--eden-700);"><span class="ea-pf-swatch__hex">#1C4029</span></div>
-                            <div class="ea-pf-swatch" style="background: var(--eden-500);"><span class="ea-pf-swatch__hex">#4A7A55</span></div>
-                            <div class="ea-pf-swatch" style="background: var(--eden-300);"><span class="ea-pf-swatch__hex">#BCD2BD</span></div>
-                            <div class="ea-pf-swatch" style="background: var(--ea-citrus);"><span class="ea-pf-swatch__hex">#C9D870</span></div>
-                            <div class="ea-pf-swatch" style="background: var(--ea-breath);"><span class="ea-pf-swatch__hex">#B8D5D0</span></div>
+                            <div class="ea-pf-swatch ea-pf-swatch--verde-700"><span class="ea-pf-swatch__hex">#1C4029</span></div>
+                            <div class="ea-pf-swatch ea-pf-swatch--verde-500"><span class="ea-pf-swatch__hex">#4A7A55</span></div>
+                            <div class="ea-pf-swatch ea-pf-swatch--verde-300"><span class="ea-pf-swatch__hex">#BCD2BD</span></div>
+                            <div class="ea-pf-swatch ea-pf-swatch--citrico"><span class="ea-pf-swatch__hex">#C9D870</span></div>
+                            <div class="ea-pf-swatch ea-pf-swatch--menta"><span class="ea-pf-swatch__hex">#B8D5D0</span></div>
                         </div>
                         <h3 class="ea-pf-card__title">Color institucional</h3>
                         <p class="ea-pf-card__text">Verdes profundos para sustento, citrus y breath como acentos vivos.</p>
@@ -380,7 +380,7 @@ $sitemap = [
                     </article>
                 </div>
 
-                <h3 class="ea-pf-h ea-pf-h3" style="margin-top: 12px;">Cómo funciona, en cinco pasos.</h3>
+                <h3 class="ea-pf-h ea-pf-h3 ea-pf-h3--pasos">Cómo funciona, en cinco pasos.</h3>
                 <div class="ea-pf-journey">
                     <article class="ea-pf-journey__step">
                         <h4>Problema detectado</h4>
@@ -404,7 +404,7 @@ $sitemap = [
                     </article>
                 </div>
 
-                <h3 class="ea-pf-h ea-pf-h3" style="margin-top: 28px;">Stack del sistema</h3>
+                <h3 class="ea-pf-h ea-pf-h3 ea-pf-h3--stack">Stack del sistema</h3>
                 <div class="ea-pf-stack">
                     <span class="ea-pf-stack__item"><span class="ea-pf-stack__dot"></span>ESP32</span>
                     <span class="ea-pf-stack__item"><span class="ea-pf-stack__dot"></span>Sensores ambientales</span>
@@ -460,7 +460,7 @@ $sitemap = [
                 </header>
 
                 <!-- Status row dashboard -->
-                <div class="ea-pf-dash__row" style="margin-bottom: clamp(20px,3vw,28px);">
+                <div class="ea-pf-dash__row ea-pf-dash__row--estado">
                     <div class="ea-pf-stat ea-pf-stat--accent">
                         <span class="ea-pf-stat__label">Tipo de encuesta</span>
                         <span class="ea-pf-stat__value">Abierta</span>
@@ -552,7 +552,7 @@ $sitemap = [
                             <h3 class="ea-pf-block__title">Cuestionario</h3>
                         </div>
                         <div>
-                            <p class="ea-pf-lede" style="margin-bottom: 12px;">
+                            <p class="ea-pf-lede ea-pf-lede--encuesta">
                                 Estructura preparada para cargar las preguntas reales del Google Forms.
                             </p>
                             <!-- TODO: Cargar preguntas reales de la encuesta -->
@@ -577,11 +577,11 @@ $sitemap = [
                                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3c4 4 8 7 8 12a8 8 0 1 1-16 0c0-5 4-8 8-12Z"/><path d="M8 14c2 2 4 2 6 0"/></svg>
                                 </span>
                                 <div>
-                                    <span class="ea-pf-eyebrow" style="background: rgba(255,255,255,0.55);">Eje ambiental</span>
-                                    <h3 class="ea-pf-h ea-pf-h3" style="margin-top: 4px;">La encuesta también pregunta por sustentabilidad.</h3>
+                                    <span class="ea-pf-eyebrow ea-pf-eyebrow--claro">Eje ambiental</span>
+                                    <h3 class="ea-pf-h ea-pf-h3 ea-pf-h3--eje">La encuesta también pregunta por sustentabilidad.</h3>
                                 </div>
                             </header>
-                            <p class="ea-pf-lede" style="color: var(--ea-ink-2);">
+                            <p class="ea-pf-lede ea-pf-lede--secundaria">
                                 Buscamos saber qué grado de importancia le asignan los encuestados al impacto
                                 ambiental y cómo influye en su decisión de uso o compra. A partir de los resultados
                                 podremos tomar decisiones concretas sobre Eden Air:
@@ -594,7 +594,7 @@ $sitemap = [
                                 <li>Comunicar el beneficio ambiental del monitoreo inteligente.</li>
                                 <li>Evaluar materiales reciclables si el diseño lo permite.</li>
                             </ul>
-                            <p style="font-size: 12.5px; color: var(--ea-mute); margin: 14px 0 0;">
+                            <p class="ea-pf-encuesta-nota">
                                 Estas decisiones se confirman recién con respuestas reales — no se afirma nada antes.
                             </p>
                         </div>
@@ -617,7 +617,7 @@ $sitemap = [
                                     <div class="ea-pf-date__value">Miércoles 13 de mayo</div>
                                 </div>
                             </div>
-                            <p style="font-size: 13px; color: var(--ea-ink-2); margin-top: 12px;">
+                            <p class="ea-pf-encuesta-texto">
                                 La etapa de recolección de datos se encuentra finalizada. A partir de las 17 respuestas obtenidas, se realiza el análisis de mercado para validar el interés, la utilidad, la aceptación y los aspectos sustentables del producto. Estado: <span class="ea-pf-status is-ready">Finalizada</span>
                             </p>
                         </div>
@@ -634,13 +634,13 @@ $sitemap = [
                                 <span class="ea-pf-card__eyebrow">Enlace público del Google Forms</span>
                                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSfP5dDLkh80dF5tSIptzy2ySpS2VcnGI5H2iy8lT40c1n5HaQ/viewform?usp=sharing&amp;ouid=101966553140147513526"
                                    target="_blank" rel="noopener noreferrer"
-                                   class="ea-button ea-button-secondary" style="margin-top: 10px; display: inline-flex;">
+                                   class="ea-button ea-button-secondary ea-pf-boton-encuesta">
                                     Ver encuesta en Google Forms
                                 </a>
                             </div>
 
-                            <h4 class="ea-pf-h ea-pf-h3" style="margin-top: 22px; margin-bottom: 4px;">Pipeline de datos</h4>
-                            <p style="font-size: 13.5px; color: var(--ea-ink-2); margin: 0 0 6px;">
+                            <h4 class="ea-pf-h ea-pf-h3 ea-pf-h3--pipeline">Pipeline de datos</h4>
+                            <p class="ea-pf-pipeline-texto">
                                 Forms recolecta respuestas. Sheets las almacena. Un importador protegido las trae
                                 a MySQL y los endpoints alimentan los gráficos del portfolio con Chart.js.
                             </p>
@@ -653,7 +653,7 @@ $sitemap = [
                             </div>
                             <!-- TODO: Definir columnas reales de form_answers -->
                             <!-- TODO: Conectar Google Sheets / MySQL / Chart.js cuando estén definidas las columnas reales de form_answers -->
-                            <p style="font-size: 12px; color: var(--ea-mute); margin-top: 12px;">
+                            <p class="ea-pf-pipeline-nota">
                                 Privacidad: los endpoints públicos solo devuelven métricas agregadas — no exponen emails ni nombres.
                             </p>
                         </div>
@@ -674,10 +674,10 @@ $sitemap = [
                                         <h4>Tipo de espacio habitual</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:200px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--200">
                                         <canvas id="ea-chart-1"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">La mayoría pasa gran parte de su tiempo en el hogar, seguido por espacios educativos. Eden Air puede orientarse principalmente a ambientes cotidianos.</p>
+                                    <p class="ea-pf-chart__nota">La mayoría pasa gran parte de su tiempo en el hogar, seguido por espacios educativos. Eden Air puede orientarse principalmente a ambientes cotidianos.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -685,10 +685,10 @@ $sitemap = [
                                         <h4>Rango de edad</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:180px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--180">
                                         <canvas id="ea-chart-2"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">El segmento predominante (70.6%) es de 15 a 20 años, vinculado al entorno escolar y cotidiano.</p>
+                                    <p class="ea-pf-chart__nota">El segmento predominante (70.6%) es de 15 a 20 años, vinculado al entorno escolar y cotidiano.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -696,10 +696,10 @@ $sitemap = [
                                         <h4>Incomodidad por temperatura</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:200px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--200">
                                         <canvas id="ea-chart-3"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">El 88.2% manifiesta sentir incomodidad por la temperatura al menos algunas veces, validando la problemática que Eden Air busca resolver.</p>
+                                    <p class="ea-pf-chart__nota">El 88.2% manifiesta sentir incomodidad por la temperatura al menos algunas veces, validando la problemática que Eden Air busca resolver.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -707,10 +707,10 @@ $sitemap = [
                                         <h4>Importancia del confort automático</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas · opción duplicada en el formulario</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:220px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--220">
                                         <canvas id="ea-chart-4"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">Todas las respuestas expresan valoración positiva. Nota: el formulario original contiene una opción "Muy importante" duplicada; ambas se combinaron en el análisis (11 de 17).</p>
+                                    <p class="ea-pf-chart__nota">Todas las respuestas expresan valoración positiva. Nota: el formulario original contiene una opción "Muy importante" duplicada; ambas se combinaron en el análisis (11 de 17).</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -718,10 +718,10 @@ $sitemap = [
                                         <h4>Interés en automatización</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:220px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--220">
                                         <canvas id="ea-chart-5"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">La mayoría acepta un sistema automático; el resto muestra postura abierta. No se registraron respuestas negativas.</p>
+                                    <p class="ea-pf-chart__nota">La mayoría acepta un sistema automático; el resto muestra postura abierta. No se registraron respuestas negativas.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -729,10 +729,10 @@ $sitemap = [
                                         <h4>Prioridades en el producto</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:220px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--220">
                                         <canvas id="ea-chart-6"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">El aspecto más valorado es que el producto sea amable con el medio ambiente, seguido por funciones y utilidad.</p>
+                                    <p class="ea-pf-chart__nota">El aspecto más valorado es que el producto sea amable con el medio ambiente, seguido por funciones y utilidad.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -740,7 +740,7 @@ $sitemap = [
                                         <h4>Ideas de sustentabilidad</h4>
                                         <span class="ea-pf-chart__meta">7 respuestas abiertas · categorizado</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="padding:18px;align-items:flex-start;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--texto">
                                         <div class="ea-pf-chip-row">
                                             <span class="ea-pf-tag">Bajo consumo energético</span>
                                             <span class="ea-pf-tag">Energía renovable · solar</span>
@@ -750,7 +750,7 @@ $sitemap = [
                                             <span class="ea-pf-tag">Filtrado · calidad del aire</span>
                                         </div>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">Las ideas más repetidas se relacionan con bajo consumo eléctrico, energías renovables, reutilización de componentes y reducción del impacto ambiental.</p>
+                                    <p class="ea-pf-chart__nota">Las ideas más repetidas se relacionan con bajo consumo eléctrico, energías renovables, reutilización de componentes y reducción del impacto ambiental.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -758,10 +758,10 @@ $sitemap = [
                                         <h4>Utilidad de la personalización</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:220px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--220">
                                         <canvas id="ea-chart-8"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">El 94.1% considera útil o muy útil un apartado de personalización, reforzando la necesidad de opciones configurables en la plataforma.</p>
+                                    <p class="ea-pf-chart__nota">El 94.1% considera útil o muy útil un apartado de personalización, reforzando la necesidad de opciones configurables en la plataforma.</p>
                                 </article>
 
                                 <article class="ea-pf-chart">
@@ -769,10 +769,10 @@ $sitemap = [
                                         <h4>Disposición de precio</h4>
                                         <span class="ea-pf-chart__meta">17 respuestas</span>
                                     </header>
-                                    <div class="ea-pf-chart__stage" style="display:block;height:180px;">
+                                    <div class="ea-pf-chart__stage ea-pf-chart__stage--180">
                                         <canvas id="ea-chart-9"></canvas>
                                     </div>
-                                    <p style="font-size:12.5px;color:var(--ea-mute);margin-top:8px;">La mayoría se ubica entre $40.000 y $80.000. Sirve como referencia para evaluar costos y percepción de valor del producto.</p>
+                                    <p class="ea-pf-chart__nota">La mayoría se ubica entre $40.000 y $80.000. Sirve como referencia para evaluar costos y percepción de valor del producto.</p>
                                 </article>
 
                             </div>
@@ -862,21 +862,21 @@ $sitemap = [
                             <h3 class="ea-pf-block__title">Conclusiones y decisiones</h3>
                         </div>
                         <div>
-                            <article class="ea-pf-card" style="margin-bottom: clamp(16px, 2.5vw, 24px);">
+                            <article class="ea-pf-card ea-pf-card--separada">
                                 <span class="ea-pf-card__eyebrow">Conclusión general</span>
                                 <h3 class="ea-pf-card__title">Resultados y orientación del proyecto</h3>
                                 <p class="ea-pf-card__text">
                                     A partir de los resultados, Eden Air tiene una buena aceptación inicial entre los encuestados. La incomodidad por la temperatura en espacios interiores aparece como problemática frecuente, y la mayoría muestra interés en soluciones automáticas que ayuden a mantener un ambiente cómodo y saludable.
                                 </p>
-                                <p class="ea-pf-card__text" style="margin-top: 8px;">
+                                <p class="ea-pf-card__text ea-pf-card__text--separado">
                                     Una de las principales decisiones es mantener el enfoque del producto en el confort ambiental, la automatización y la visualización clara de datos. También resulta conveniente fortalecer el apartado de personalización, ya que el 94.1% lo considera útil o muy útil.
                                 </p>
-                                <p class="ea-pf-card__text" style="margin-top: 8px;">
+                                <p class="ea-pf-card__text ea-pf-card__text--separado">
                                     La sustentabilidad debe ocupar un lugar importante dentro de la propuesta de valor. Las respuestas abiertas mencionan bajo consumo energético, energías renovables y reutilización de componentes. En cuanto al precio, los rangos más aceptados se encuentran entre $40.000 y $80.000, útil como referencia para evaluar costos y estrategia de precio.
                                 </p>
                             </article>
 
-                            <h4 class="ea-pf-h ea-pf-h3" style="margin-bottom: 14px;">Decisiones posibles</h4>
+                            <h4 class="ea-pf-h ea-pf-h3 ea-pf-h3--decisiones">Decisiones posibles</h4>
                             <div class="ea-pf-grid-2">
                                 <article class="ea-pf-card">
                                     <span class="ea-pf-card__eyebrow">Función core</span>
@@ -1822,10 +1822,10 @@ $sitemap = [
                 </details>
 
                 <!-- Cierre presentación -->
-                <div class="ea-pf-close ea-page" style="padding-left: clamp(28px,5vw,56px); padding-right: clamp(28px,5vw,56px);">
+                <div class="ea-pf-close ea-page">
                     <span class="ea-pf-eyebrow">Recorrido completo</span>
                     <h2 class="ea-pf-h ea-pf-h2">Gracias por <em>recorrer Eden Air</em>.</h2>
-                    <p class="ea-pf-lede" style="margin: 0 auto;">
+                    <p class="ea-pf-lede ea-pf-lede--centrada">
                         Este portfolio es público y está pensado para mostrarse vía QR en la Expo Demostrativa.
                         El contenido se actualizará a medida que crezca el proyecto y se incorporen los datos reales de la encuesta.
                     </p>
