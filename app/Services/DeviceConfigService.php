@@ -54,10 +54,10 @@ class DeviceConfigService
     public const INTERVALO_MEDICION = 30;
 
     /** Segundos entre consultas de comandos manuales. */
-    public const INTERVALO_COMANDOS = 15;
+    public const INTERVALO_COMANDOS = 5;
 
     /** Cada cuánto conviene que el equipo vuelva a pedir su configuración. */
-    public const INTERVALO_CONFIG = 60;
+    public const INTERVALO_CONFIG = 10;
 
     /** Segundos que un relé tiene que quedarse quieto antes de volver a conmutar. */
     public const RELE_MINIMO_ESTADO = 10;

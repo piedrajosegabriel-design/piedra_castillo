@@ -213,7 +213,7 @@ class DeviceApiController extends BaseController
     }
 
     // =========================================================================
-    // AUTENTICACION DEL DISPOSITIVO
+    // AUTENTICACION DEL DISPOSITIVO: Revisa el documento, busca la placa y compara X-Device-Token con la api_token
     // =========================================================================
     private function resolveAuthenticatedDevice(string $deviceUid): array
     {
@@ -243,7 +243,7 @@ class DeviceApiController extends BaseController
     }
 
     // =========================================================================
-    // LECTURA Y VALIDACION DE PAYLOAD
+    // LECTURA Y VALIDACION DE PAYLOAD: Lee lo que mando la placa en .JSON
     // =========================================================================
     private function getJsonPayload(): array
     {
@@ -257,7 +257,7 @@ class DeviceApiController extends BaseController
     }
 
     // =========================================================================
-    // ACTIVIDAD DEL DISPOSITIVO
+    // ACTIVIDAD DEL DISPOSITIVO: Anota 'vino recién', pone hora actual en last_seen_at. Tambien en Last_command_sync_at (para saber si sigue viva)
     // =========================================================================
     private function actualizarActividadDispositivo(int $deviceId, bool $sincronizoComandos = false): void
     {
@@ -275,6 +275,8 @@ class DeviceApiController extends BaseController
     // =========================================================================
     // RESPUESTAS JSON
     // =========================================================================
+
+    //Arma la respuesta de error 401: “no sos quien decís”
     private function responderNoAutorizado(string $mensaje)
     {
         return $this->response
@@ -285,6 +287,7 @@ class DeviceApiController extends BaseController
             ]);
     }
 
+    //Arma la respuesta de error 422: “lo que mandaste está mal”
     private function responderErroresValidacion(array $errors)
     {
         return $this->response
@@ -296,6 +299,7 @@ class DeviceApiController extends BaseController
             ]);
     }
 
+    //Arma la respuesta de error 404: “eso no existe”
     private function responderNoEncontrado(string $mensaje)
     {
         return $this->response
@@ -307,7 +311,7 @@ class DeviceApiController extends BaseController
     }
 
     // =========================================================================
-    // FORMATEO DE COMANDOS
+    // FORMATEO DE COMANDOS: Ordena una orden para mandarla: lo necesarioa de device_command
     // =========================================================================
     private function formatCommand(array $command): array
     {
@@ -357,4 +361,7 @@ class DeviceApiController extends BaseController
    - getJSON(true)                   → (CI4) decodifica el body JSON a array
    - setStatusCode()/setJSON()       → (CI4) arman la respuesta HTTP de la API
    - json_decode($texto, true)       → (PHP) convierte texto JSON en array
+
+
+   X-Device-Token: es la cabecera por donde llega el api_token
    ============================================================================ */

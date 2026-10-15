@@ -121,35 +121,35 @@ $routes->post('api/pagos/mercadopago', 'Api\MercadoPagoController::notificacion'
 // el visitante de la landing ve aire medido de verdad, no números de relleno.
 // Si todavía no hay ninguna medición, responde 'sin_datos' y el hero muestra
 // sus valores de reposo.
-$routes->get('api/sensores', static function () {
-    $medicion = (new \App\Models\MeasurementModel())
-        ->orderBy('captured_at', 'DESC')
-        ->first();
+// $routes->get('api/sensores', static function () {
+//     $medicion = (new \App\Models\MeasurementModel())
+//         ->orderBy('captured_at', 'DESC')
+//         ->first();
 
-    if (! $medicion) {
-        return service('response')->setJSON([
-            'status'    => 'sin_datos',
-            'timestamp' => date('c'),
-            'sensores'  => null,
-        ]);
-    }
+//     if (! $medicion) {
+//         return service('response')->setJSON([
+//             'status'    => 'sin_datos',
+//             'timestamp' => date('c'),
+//             'sensores'  => null,
+//         ]);
+//     }
 
-    $temperatura = (float) $medicion['temperature'];
-    $humedad     = (int) round((float) $medicion['humidity']);
-    $co2ppm      = (int) $medicion['co2_ppm'];
-    $calidad     = (int) $medicion['air_quality_index'];
+//     $temperatura = (float) $medicion['temperature'];
+//     $humedad     = (int) round((float) $medicion['humidity']);
+//     $co2ppm      = (int) $medicion['co2_ppm'];
+//     $calidad     = (int) $medicion['air_quality_index'];
 
-    return service('response')->setJSON([
-        'status'    => 'success',
-        'timestamp' => date('c', strtotime((string) $medicion['captured_at'])),
-        'sensores'  => [
-            'temperatura'  => ['valor' => $temperatura, 'unidad' => '°C',   'texto' => number_format($temperatura, 1) . ' °C'],
-            'humedad'      => ['valor' => $humedad,     'unidad' => '%',    'texto' => $humedad . ' %'],
-            'co2'          => ['valor' => $co2ppm,      'unidad' => 'ppm',  'texto' => $co2ppm < 800 ? 'OK' : 'Alto'],
-            'calidad_aire' => ['valor' => $calidad,     'unidad' => '/100', 'texto' => (string) $medicion['air_quality_label']],
-        ],
-    ]);
-});
+//     return service('response')->setJSON([
+//         'status'    => 'success',
+//         'timestamp' => date('c', strtotime((string) $medicion['captured_at'])),
+//         'sensores'  => [
+//             'temperatura'  => ['valor' => $temperatura, 'unidad' => '°C',   'texto' => number_format($temperatura, 1) . ' °C'],
+//             'humedad'      => ['valor' => $humedad,     'unidad' => '%',    'texto' => $humedad . ' %'],
+//             'co2'          => ['valor' => $co2ppm,      'unidad' => 'ppm',  'texto' => $co2ppm < 800 ? 'OK' : 'Alto'],
+//             'calidad_aire' => ['valor' => $calidad,     'unidad' => '/100', 'texto' => (string) $medicion['air_quality_label']],
+//         ],
+//     ]);
+// });
 
 /* ============================================================================
    GLOSARIO DE ESTE ARCHIVO
