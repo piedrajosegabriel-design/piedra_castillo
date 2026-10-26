@@ -110,6 +110,10 @@ class MeasurementService
 
         $medicion = $this->mediciones->find($medicionId);
 
+        // Solo se guardan las últimas MeasurementModel::POR_EQUIPO lecturas:
+        // con una cada 30 s, la tabla crecería unas 2.880 filas por día.
+        $this->mediciones->conservarUltimas((int) $device['id']);
+
         // Si el equipo contó qué actuadores dejó encendidos, se guarda ese
         // estado. Si no manda nada (por ejemplo, un sensor sin actuadores),
         // simplemente no se toca el estado anterior.
@@ -239,8 +243,9 @@ class MeasurementService
 
    Público:
    - registrar($device, $space, $datos, $origen)
-       → valida, guarda la medición y registra los actuadores y el diagnóstico
-         que el equipo informó. Devuelve ['measurement' => ..., 'actuadores' => cambios]
+       → valida, guarda la medición (y borra las que pasan de las últimas 15
+         del equipo) y registra los actuadores y el diagnóstico que el equipo
+         informó. Devuelve ['measurement' => ..., 'actuadores' => cambios]
    - calcularIndiceAire($temp, $hum, $co2, $space) → índice 0–100 de RESPALDO,
          solo para cuando el equipo no manda ninguno
    - etiquetaAire($indice) → 'Excelente' | 'Buena' | 'Aceptable' | 'Mala'

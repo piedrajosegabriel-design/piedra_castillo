@@ -190,12 +190,12 @@ $this->setData([
                      aria-label="<?= esc($altSpark, 'attr') ?>">
                     <defs>
                         <linearGradient id="ea-spark-grad" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0" stop-color="var(--eden-500)" stop-opacity=".30"/>
-                            <stop offset="1" stop-color="var(--eden-500)" stop-opacity="0"/>
+                            <stop offset="0" stop-color="#4a7a55" stop-opacity=".30"/>
+                            <stop offset="1" stop-color="#4a7a55" stop-opacity="0"/>
                         </linearGradient>
                     </defs>
                     <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?> L 220 60 L 0 60 Z" fill="url(#ea-spark-grad)" data-vivo-spark="relleno"/>
-                    <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="var(--eden-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
+                    <path d="<?= esc((string) ($view['sparkPath'] ?? '')) ?>" fill="none" stroke="#4a7a55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-vivo-spark="linea"/>
                 </svg>
 
                 <?php if ($hayEscala): ?>
@@ -319,7 +319,7 @@ $this->setData([
             <div class="ea-card-head">
                 <h3>Actuadores</h3>
                 <span class="ea-mono ea-card-meta">
-                    <?= (int) ($view['actuadoresActivos'] ?? 0) ?> de <?= count($view['actuadores'] ?? []) ?> encendidos
+                    <span data-vivo="actuadoresActivos"><?= (int) ($view['actuadoresActivos'] ?? 0) ?></span> de <?= count($view['actuadores'] ?? []) ?> encendidos
                 </span>
             </div>
 
@@ -340,9 +340,14 @@ $this->setData([
                 </button>
             </form>
 
+            <?php /* data-vivo-act: panel-vivo.js redibuja cada fila con cada
+                     refresco (interruptor, ícono, ON/OFF y el aviso de orden
+                     pendiente). data-vivo-toggle: el interruptor manda la orden
+                     sin recargar; si el JS falla, el formulario sigue andando. */ ?>
             <ul class="ea-actuators-list">
                 <?php foreach (($view['actuadores'] ?? []) as $act):
                     $encendido = ! empty($act['encendido']);
+                    $pendiente = ! empty($act['pendiente']);
                     $clave     = (string) ($act['clave'] ?? 'fan');
                     // La clave que manda el service se traduce al ícono del set.
                     $iconoAct  = match ($clave) {
@@ -351,32 +356,35 @@ $this->setData([
                         default      => 'led',
                     };
                 ?>
-                    <li class="ea-actuator-row">
+                    <li class="ea-actuator-row" data-vivo-act="<?= esc($clave, 'attr') ?>">
                         <span class="ea-actuator-icon <?= $encendido ? 'is-on' : '' ?>" aria-hidden="true"><?= icono($iconoAct) ?></span>
 
                         <div class="ea-actuator-body">
                             <strong class="ea-actuator-name"><?= esc((string) ($act['titulo'] ?? 'Actuador')) ?></strong>
                             <span class="ea-actuator-reason"><?= esc((string) ($act['detalle'] ?? '')) ?></span>
+                            <span class="ea-actuator-wait" data-vivo="pendiente" <?= $pendiente ? '' : 'hidden' ?>>Orden enviada: esperando que el equipo la aplique.</span>
                         </div>
 
                         <span class="ea-actuator-state">
                             <?php if ($modoManual): ?>
                                 <!-- FORMULARIO: encender / apagar un actuador.
                                      POST /panel/actuador → PanelController::cambiarActuador
-                                     Deja la orden PENDIENTE: el panel no la da por hecha
-                                     hasta que el equipo la ejecuta y la confirma. -->
+                                     Deja la orden PENDIENTE hasta que el equipo la
+                                     ejecuta y la confirma. Mientras tanto el
+                                     interruptor ya muestra lo elegido, atenuado. -->
                                 <form action="<?= site_url('panel/actuador') ?>" method="POST" data-preserve-scroll class="ea-actuator-form">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="actuator" value="<?= esc($clave) ?>">
                                     <input type="hidden" name="value" value="<?= $encendido ? 'off' : 'on' ?>">
-                                    <button type="submit" class="ea-actuator-toggle <?= $encendido ? 'is-on' : '' ?>"
+                                    <button type="submit" class="ea-actuator-toggle <?= $encendido ? 'is-on' : '' ?> <?= $pendiente ? 'is-pendiente' : '' ?>"
+                                            data-vivo-toggle data-titulo="<?= esc((string) ($act['titulo'] ?? ''), 'attr') ?>"
                                             aria-label="<?= $encendido ? 'Apagar' : 'Encender' ?> <?= esc((string) ($act['titulo'] ?? '')) ?>">
                                         <span class="ea-actuator-toggle-thumb"></span>
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <span class="ea-badge <?= $encendido ? 'tone-success' : 'tone-neutral' ?> ea-actuator-badge">
-                                    <span class="ea-dot"></span><?= $encendido ? 'ON' : 'OFF' ?>
+                                <span class="ea-badge <?= $encendido ? 'tone-success' : 'tone-neutral' ?> ea-actuator-badge" data-vivo-badge>
+                                    <span class="ea-dot"></span><span data-vivo="onoff"><?= $encendido ? 'ON' : 'OFF' ?></span>
                                 </span>
                             <?php endif; ?>
                         </span>

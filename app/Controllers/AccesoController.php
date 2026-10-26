@@ -75,6 +75,8 @@ class AccesoController extends BaseController
         }
 
         $this->actualizarHashLoginSiHaceFalta($usuarios, $usuario, $datos['password']);
+        // La limpieza de cuentas sin uso mira esta fecha.
+        $usuarios->registrarIngreso((int) $usuario['id']);
         $this->iniciarSesion($usuario);
 
         return $this->redirigirDespuesDelLogin((int) $usuario['id']);
@@ -271,12 +273,9 @@ class AccesoController extends BaseController
         if ($usuario) {
             $token     = bin2hex(random_bytes(32)); // Token Seguro
             $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes')); // Vence en 15 min
-            // El tercer argumento (la config de App) fuerza a usar el baseURL
-            // configurado en vez del host por el que entró este pedido. Sin
-            // eso, pedir la recuperación desde "localhost" mandaría un enlace
-            // a localhost, que fuera de esta máquina no existe: el mail se
-            // abre en el celular y el botón no lleva a ningún lado.
-            $enlace = site_url('restablecer/' . $token, null, config('App'));
+            // El enlace tiene que llevar al servidor desde cualquier equipo:
+            // ver enlaceParaMail().
+            $enlace = $this->enlaceParaMail('restablecer/' . $token);
             $nombre    = (string) ($usuario['nombre'] ?? 'Usuario'); // Nombre o valor por defecto
 
             $usuarios->guardarToken((int) $usuario['id'], $token, $expiresAt);
@@ -312,6 +311,80 @@ class AccesoController extends BaseController
         // Mensaje neutro a propósito: no revela si el correo existe o no
         // (evita que un atacante descubra qué cuentas están registradas).
         return redirect()->to('/login')->with('success', 'Si el correo coincide con una cuenta registrada, recibiras un enlace de recuperacion en los proximos minutos.');
+    }
+
+    /**
+     * Arma el enlace absoluto que viaja en el mail.
+     *
+     * Si el baseURL del .env es un dominio (el sitio está publicado), se usa
+     * tal cual. Si es una IP o localhost (servidor en la red local), esa IP
+     * se vence apenas el router le da otra a la PC y el enlace termina en
+     * otra máquina, sin el token. Entonces se usa la IP con la que este
+     * servidor está atendiendo ahora: anda en cualquier PC donde corra el
+     * proyecto, sin tocar el .env.
+     *
+     * Nunca se usa el Host que manda el navegador: cualquiera puede
+     * falsificarlo para que el mail de OTRA persona lleve un enlace a su
+     * servidor y robarle el token.
+     */
+    private function enlaceParaMail(string $ruta): string
+    {
+        $config     = config('App');
+        $host       = (string) parse_url($config->baseURL, PHP_URL_HOST);
+        $esRedLocal = $host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP) !== false;
+        $ip         = $esRedLocal ? $this->ipDelServidorEnLaRed() : null;
+
+        if ($ip === null) {
+            return site_url($ruta, null, $config);
+        }
+
+        $puerto = parse_url($config->baseURL, PHP_URL_PORT);
+        $local  = clone $config;
+        $local->baseURL = preg_replace(
+            '#^(https?://)[^/]+#',
+            '${1}' . $ip . ($puerto ? ':' . $puerto : ''),
+            $config->baseURL
+        );
+
+        return site_url($ruta, null, $local);
+    }
+
+    /**
+     * IP de esta PC en la red, o null si no se puede saber.
+     *
+     * Primero, la IP de la placa de red que recibió este pedido (SERVER_ADDR,
+     * la pone Apache: no se puede falsificar). Si se entró por localhost esa
+     * no sirve fuera de esta PC, así que se le pregunta al sistema por qué
+     * placa saldría hacia internet: "conectar" un socket UDP no manda ningún
+     * paquete, solo elige la ruta.
+     */
+    private function ipDelServidorEnLaRed(): ?string
+    {
+        $ip = (string) $this->request->getServer('SERVER_ADDR');
+
+        if ($this->esIpDeRed($ip)) {
+            return $ip;
+        }
+
+        $socket = @stream_socket_client('udp://8.8.8.8:53', $codigo, $mensaje, 1);
+
+        if ($socket === false) {
+            return null;
+        }
+
+        // Devuelve "192.168.2.125:54321": nos quedamos con lo de antes del ":".
+        $ip = strstr((string) stream_socket_get_name($socket, false), ':', true);
+        fclose($socket);
+
+        return $this->esIpDeRed((string) $ip) ? $ip : null;
+    }
+
+    /** IPv4 alcanzable desde otro equipo (ni 127.x ni 0.0.0.0). */
+    private function esIpDeRed(string $ip): bool
+    {
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false
+            && ! str_starts_with($ip, '127.')
+            && $ip !== '0.0.0.0';
     }
 
     /**
@@ -408,7 +481,7 @@ class AccesoController extends BaseController
 
         $usuarios->actualizarPasswordConToken((int) $usuario['id'], $password);
 
-        return redirect()->to('/login')->with('success', 'Contrasena actualizada correctamente. Ya puedes iniciar sesion.');
+        return redirect()->to('/login')->with('success', 'Contraseña actualizada correctamente. Ya puedes iniciar sesion.');
     }
 
     // =========================================================================
@@ -462,6 +535,10 @@ class AccesoController extends BaseController
    - actualizarHashLoginSiHaceFalta()     → rehash si cambió el algoritmo
    - iniciarSesion()                      → regenera sesión + guarda user_id
    - redirigirDespuesDelLogin()           → siempre a /panel (flujo Hito 2)
+   - enlaceParaMail()                     → enlace absoluto del mail: dominio del
+                                            .env o, en red local, la IP actual
+   - ipDelServidorEnLaRed()               → IP de esta PC en la red (o null)
+   - esIpDeRed()                          → IPv4 que sirve desde otro equipo
    - adjuntarMarcaEnElMail()              → adjunta el logo 'inline' y devuelve
                                             sus Content-ID para la plantilla
    - mailRecuperacionEnTextoPlano()       → la versión sin HTML del mismo mail

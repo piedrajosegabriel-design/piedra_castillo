@@ -3,8 +3,9 @@
  * Interruptor claro / oscuro.
  *
  * Estructura: el <label> con un checkbox escondido y la pastilla que se corre.
- * Estilos:    comun.css, sección "Interruptor claro / oscuro" (la barra del
- *             panel lo achica en vistas/partials/panel_header.css).
+ * Estilos:    en el CSS de cada pantalla que lo usa, sección "Interruptor
+ *             claro / oscuro" (en el panel, la BARRA SUPERIOR lo achica en
+ *             "Interruptor de tema, versión chica para la barra").
  * Lógica:     public/JS/tema.js (guarda la elección en localStorage).
  *
  * Parámetros — todo adentro de la clave 'toggle', para que un uso no herede

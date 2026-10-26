@@ -1,7 +1,7 @@
 <?php
 /**
  * ============================================================================
- * BARRA SUPERIOR PÚBLICA — landing, portfolio, login, registro, recuperación.
+ * BARRA SUPERIOR PÚBLICA — landing, login, registro, recuperación.
  * ============================================================================
  * (La del panel es otra: app/Views/partials/panel_header.php)
  *
@@ -14,44 +14,11 @@
  *   $conSesion       bool    true → "Ir al panel" y "Cerrar sesión".
  *                            false → "Login" y "Crear cuenta".
  *   $navLinks        array   Accesos rápidos: [['href' => '#x', 'label' => 'X']]
- *   $portfolioMenu   bool    Mostrar el mega menú de Portfolio (default true).
- *   $activePortfolio bool    Marcarlo como activo (por defecto lo detecta solo).
- *
- * ---------------------------------------------------------------------------
- * ¿CÓMO AGREGO UNA SECCIÓN AL MENÚ DE PORTFOLIO?
- * ---------------------------------------------------------------------------
- * Una línea al array $portfolioSections de abajo. El ancla tiene que existir
- * como id="..." en app/Views/portfolio.php.
- *
- * ANIMACIÓN: la apertura del mega menú la maneja public/JS/navbar.js.
  */
 $subtitle  = $subtitle  ?? 'Monitoreo ambiental';
 $actions   = $actions   ?? null;
 $conSesion = $conSesion ?? false;
 $navLinks  = isset($navLinks) && is_array($navLinks) ? $navLinks : [];
-
-$portfolioMenu   = $portfolioMenu   ?? true;
-$activePortfolio = $activePortfolio ?? (function_exists('uri_string') && str_starts_with((string) uri_string(), 'portfolio'));
-
-$portfolioUrl = site_url('portfolio');
-
-$portfolioSections = [
-    ['anchor' => 'pagina-principal',     'label' => 'Página principal',           'hint' => 'Introducción del portfolio'],
-    ['anchor' => 'imagen-corporativa',   'label' => 'Imagen corporativa',         'hint' => 'Identidad visual'],
-    ['anchor' => 'quienes-somos',        'label' => 'Quiénes somos',              'hint' => 'El equipo detrás'],
-    ['anchor' => 'acerca-de-eden-air',   'label' => 'Acerca de Eden Air',         'hint' => 'Producto y propuesta'],
-    ['anchor' => 'analisis-mercado',     'label' => 'Análisis de mercado',        'hint' => 'TP Nº 2 · Emprendimientos'],
-    ['anchor' => 'analisis-competencia', 'label' => 'Análisis de la competencia', 'hint' => 'Comparativa con otros'],
-    ['anchor' => 'plan-operativo',       'label' => 'Plan operativo',             'hint' => 'Etapas y recursos'],
-    ['anchor' => 'analisis-costos',      'label' => 'Análisis de costos',         'hint' => 'TP Nº 5 · Costos y precio'],
-];
-
-// Dentro del propio portfolio los enlaces son anclas sueltas; desde afuera
-// tienen que llevar la URL completa.
-$portfolioHref = static fn (string $anchor): string
-    => ($activePortfolio ? '' : $portfolioUrl) . '#' . $anchor;
-
-$hasNavList = $navLinks !== [] || $portfolioMenu;
 ?>
 <header class="ea-navbar">
     <div class="ea-page ea-navbar-inner">
@@ -63,54 +30,13 @@ $hasNavList = $navLinks !== [] || $portfolioMenu;
             'variant'  => 'horizontal',
         ]]) ?>
 
-        <?php if ($hasNavList): ?>
+        <?php if ($navLinks !== []): ?>
             <ul class="ea-nav-links" aria-label="Secciones">
 
                 <!-- Accesos rápidos que pasó la página -->
                 <?php foreach ($navLinks as $link): ?>
                     <li><a href="<?= esc($link['href']) ?>"><?= esc($link['label']) ?></a></li>
                 <?php endforeach; ?>
-
-                <!-- Mega menú de Portfolio -->
-                <?php if ($portfolioMenu): ?>
-                    <li class="ea-mega" data-ea-mega>
-                        <a class="ea-mega-trigger<?= $activePortfolio ? ' is-active' : '' ?>"
-                           href="<?= esc($portfolioUrl) ?>"
-                           aria-haspopup="true" aria-expanded="false" data-ea-mega-trigger>
-                            <span>Portfolio</span>
-                            <?= icono('caret', 10, 'ea-mega-caret') ?>
-                        </a>
-
-                        <div class="ea-mega-panel" data-ea-mega-panel role="menu" aria-label="Secciones del portfolio">
-                            <div class="ea-mega-inner">
-                                <header class="ea-mega-head">
-                                    <span class="ea-mega-eyebrow">Portfolio · Eden Air</span>
-                                    <h3 class="ea-mega-title">Recorrido del <em>proyecto</em>.</h3>
-                                    <p class="ea-mega-lede">Análisis de mercado, identidad y plan operativo en un solo lugar.</p>
-                                </header>
-
-                                <ul class="ea-mega-list">
-                                    <?php foreach ($portfolioSections as $section): ?>
-                                        <li>
-                                            <a href="<?= esc($portfolioHref($section['anchor'])) ?>" role="menuitem" data-ea-mega-link>
-                                                <span class="ea-mega-link-label"><?= esc($section['label']) ?></span>
-                                                <span class="ea-mega-link-hint"><?= esc($section['hint']) ?></span>
-                                            </a>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-
-                                <div class="ea-mega-foot">
-                                    <span class="ea-mega-foot-tag">
-                                        <span class="ea-mega-foot-dot" aria-hidden="true"></span>
-                                        Apartado actual · <strong>Análisis de costos</strong>
-                                    </span>
-                                    <a href="<?= esc($portfolioUrl) ?>" class="ea-mega-foot-link">Abrir portfolio →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                <?php endif; ?>
 
             </ul>
         <?php endif; ?>
@@ -132,7 +58,3 @@ $hasNavList = $navLinks !== [] || $portfolioMenu;
 
     </div>
 </header>
-
-<?php if ($portfolioMenu): ?>
-    <script src="<?= asset('JS/navbar.js') ?>" defer></script>
-<?php endif; ?>

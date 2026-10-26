@@ -249,13 +249,13 @@ class PanelController extends BaseController
         $valor    = (string) $this->request->getPost('value');
 
         if (! $this->accionActuadorValida($actuador, $valor)) {
-            return $this->redirigirAlPanelConError('La acción seleccionada no es válida.');
+            return $this->responderActuador(false, 'La acción seleccionada no es válida.');
         }
 
         ['device' => $device] = $this->obtenerContexto();
 
         if (! $this->estaEnModoManual((int) $device['id'])) {
-            return $this->redirigirAlPanelConError('Activa el modo manual para controlar actuadores.');
+            return $this->responderActuador(false, 'Activa el modo manual para controlar actuadores.');
         }
 
         // La orden queda encolada. NO se marca como aplicada acá: el equipo la
@@ -267,7 +267,47 @@ class PanelController extends BaseController
             $this->usuarioActual()
         );
 
-        return $this->redirigirAlPanelConExito('Orden enviada. El equipo la aplica en unos segundos.');
+        return $this->responderActuador(true, 'Orden enviada. El equipo la aplica en unos segundos.');
+    }
+
+    /**
+     * Respuesta de cambiarActuador(), según quién preguntó.
+     *
+     * - panel-vivo.js (cabecera X-Requested-With: fetch): JSON con el panel ya
+     *   recalculado, para que el interruptor cambie sin recargar la página.
+     *   Lleva el token CSRF nuevo porque el proyecto lo regenera en cada POST:
+     *   sin él, el siguiente formulario de la página fallaría.
+     * - el formulario común (sin JS, o si el fetch falló): redirect con flash,
+     *   como siempre.
+     *
+     * Si la orden no se aceptó, el JSON solo avisa y deja el flash guardado:
+     * el JS recarga y el mensaje aparece arriba, igual que con el formulario.
+     */
+    private function responderActuador(bool $ok, string $mensaje): ResponseInterface
+    {
+        if ($this->request->getHeaderLine('X-Requested-With') !== 'fetch') {
+            return $ok
+                ? $this->redirigirAlPanelConExito($mensaje)
+                : $this->redirigirAlPanelConError($mensaje);
+        }
+
+        if (! $ok) {
+            session()->setFlashdata('error', $mensaje);
+
+            return $this->response->setStatusCode(ResponseInterface::HTTP_UNPROCESSABLE_ENTITY)
+                ->setJSON(['ok' => false, 'mensaje' => $mensaje]);
+        }
+
+        $userId = $this->usuarioActual();
+        $panel  = (new PanelService())->obtenerVistaPanel($userId, $this->dispositivoActivo($userId));
+
+        return $this->response->setJSON([
+            'ok'         => true,
+            'mensaje'    => $mensaje,
+            'csrf'       => csrf_hash(),
+            'csrfNombre' => csrf_token(),
+            'view'       => $panel['view'] ?? [],
+        ]);
     }
 
     // =========================================================================
@@ -477,7 +517,8 @@ class PanelController extends BaseController
    - actualizarPerfil()      → guarda nombre/apellido/email/usuario (pide contraseña)
    - actualizarPassword()    → cambia la contraseña (pide la actual)
    - cambiarModo()           → cambia automatic/manual vía CommandService
-   - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual)
+   - cambiarActuador()       → prende/apaga fan/aromatizer/alert_led (solo en manual);
+                               contesta JSON al interruptor y redirect al formulario
 
    Helpers privados:
    - dispositivoActivo()     → valida el active_device_id de sesión (pertenencia)
@@ -489,6 +530,7 @@ class PanelController extends BaseController
    - estaEnModoManual()      → lee operating_mode del estado del dispositivo
    - crearMensajeCambioModo()→ arma el flash; en automático corre la automatización
    - redirigirAlPanelConError()/ConExito() → redirect a /panel con mensaje flash
+   - responderActuador()     → JSON (interruptor sin recargar) o redirect con flash
    - redirigirConInputYDato()→ redirect + withInput + flash
    - usuarioActual()         → user_id guardado en sesión
    - redireccionarSiFaltaDispositivo() → guard: sin dispositivos no hay acciones

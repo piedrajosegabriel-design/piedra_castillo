@@ -26,12 +26,13 @@
                 <ul class="ea-stack">
                     <li>Tesina · 2026</li>
                     <li>CodeIgniter 4 · ESP32</li>
-                    <li><span style="color: var(--ea-citrus); font-family: var(--ea-font-mono);">● Aire limpio</span></li>
+                    <li><span class="ea-footer-aire">● Aire limpio</span></li>
                 </ul>
             </div>
         </div>
         <div class="ea-footer-bottom">
             <span>© <?= date('Y') ?> EdenAir</span>
+            <a class="link-politicas" href="<?= site_url('politicas') ?>">Políticas de Privacidad</a>
             <span>Respirá mejor, viví más cómodo.</span>
         </div>
     </div>

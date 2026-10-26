@@ -1,0 +1,2070 @@
+/* =====================================================================
+   dispositivos/index.css — Mis dispositivos
+   ---------------------------------------------------------------------
+   Vista: app/Views/dispositivos/index.php  ·  Ruta: /panel/dispositivos
+
+   TODO lo que se ve en esta pantalla sale de este archivo: no hay otro
+   CSS mezclado. Para cambiar algo, buscá la clase en la vista (o con
+   clic derecho → Inspeccionar en el navegador) y después buscala acá
+   con Ctrl+F. Los valores están escritos directo en cada regla.
+
+   Colores del modo oscuro: los pocos colores que cambian solos entre
+   claro y oscuro están escritos como var(--nombre). Su valor está en
+   "Colores del tema", justo abajo. Si querés que UN elemento tenga
+   otro color, reemplazá el var(...) de su regla por el color que
+   quieras. Si querés cambiar ese color en toda la pantalla, cambialo
+   en "Colores del tema".
+
+   Qué hay acá, en orden (buscá el título con Ctrl+F):
+     BASE Y PIEZAS GENERALES
+       · Reset suave
+       · Escala de la interfaz
+       · Base
+       · Logo (partials/logo.php y marca_e() del helper)
+       · Interruptor claro / oscuro
+       · Botones
+       · Carteles de aviso del panel (partials/flashes.php)
+     ESQUELETO DEL PANEL
+       · Títulos del panel
+       · Página
+       · Armazón
+       · Contenido
+       · Tarjetas, insignias y botones del panel
+       · Cuadro de confirmación (lo arma JS/dashboard.js)
+       · Celular y tablet: botones chicos
+       · Layout fijo: el contenido deja lugar al menú y a la barra
+       · Impresión
+       · Movimiento reducido
+       · Título de sección (ej: "Tus ambientes" + botón)
+       · Grilla de fichas
+       · Ficha de equipo / ambiente
+       · Estado vacío
+       · Celular angosto
+     MENÚ LATERAL
+       · El menú
+       · Marca de arriba
+       · Opciones
+       · Pie
+       · Menú colapsado: solo íconos
+       · Celular y tablet: el menú es un cajón
+       · Impresión: el menú no se imprime
+       · Opción "Comprar EdenAir" destacada
+     BARRA SUPERIOR
+       · La barra
+       · Hamburguesa
+       · Título de la pantalla
+       · Interruptor de tema y botones de la vista
+       · Usuario
+       · Botones que son solo un ícono
+       · Interruptor de tema, versión chica para la barra
+       · Celular y tablet
+       · Impresión: la barra no se imprime
+     ESTA PANTALLA: MIS DISPOSITIVOS
+       · Mis dispositivos
+   ===================================================================== */
+
+
+/* Tipografías (Google Fonts). Tiene que ir arriba de todo. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");
+
+
+/* ---------- Colores del tema (modo claro / modo oscuro) ----------------
+   Los únicos colores escritos como variable: cambian solos cuando se
+   toca el interruptor claro/oscuro. Arriba van los del modo claro; en
+   el bloque de abajo, los mismos en modo oscuro. ------------------- */
+:root {
+    color-scheme: light;
+    --color-fondo: #f6f4ec;   /* fondo principal de las páginas */
+    --color-fondo-suave: #eaf1ea;   /* fondo secundario (ej: el menú lateral) */
+    --color-fondo-aire: #eef7f4;   /* fondo alternativo aqua muy suave */
+    --color-tarjeta: #ffffff;   /* fondo de tarjetas */
+    --color-texto: #14231b;   /* texto principal */
+    --color-texto-secundario: #45544a;   /* texto de apoyo */
+    --color-texto-suave: #5f6e64;   /* texto apagado: aclaraciones, etiquetas (contraste mínimo 4.5 sobre blanco) */
+    --color-exito-suave: rgba(74, 122, 85, 0.14);
+    --color-info: #2f8a7e;   /* información, humedad, aire */
+    --color-info-suave: rgba(143, 214, 200, 0.20);
+    --color-alerta-suave: rgba(200, 156, 122, 0.18);
+    --color-peligro-suave: rgba(166, 91, 61, 0.16);
+    --color-primario: #2f6b4f;
+    --color-linea: rgba(20, 35, 27, 0.11);   /* bordes de tarjetas, botones secundarios */
+    --color-linea-suave: rgba(20, 35, 27, 0.055);   /* fondos grisados muy suaves */
+    --sombra-chica: 0 6px 16px rgba(20, 32, 26, 0.06);
+    --sombra-media: 0 14px 32px rgba(20, 32, 26, 0.08);
+    --panel-linea: rgba(14, 31, 23, 0.08);   /* bordes finos */
+    --panel-linea-fuerte: rgba(14, 31, 23, 0.14);   /* bordes más marcados */
+    --panel-fondo-suave: #f0ece2;
+    --panel-tarjeta: #ffffff;   /* fondo de tarjetas y botones de la barra */
+    --panel-sombra-elevada: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 14px 34px -16px rgba(14, 31, 23, 0.24);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-fondo: #0e1f17;
+    --color-fondo-suave: #13261d;
+    --color-fondo-aire: #13261d;
+    --color-tarjeta: #1a2c23;
+    --color-texto: #f4f1ea;
+    --color-texto-secundario: #c8d4c6;
+    --color-texto-suave: #93a194;
+    --color-exito-suave: rgba(74, 122, 85, 0.34);
+    --color-info: #8fd6c8;
+    --color-info-suave: rgba(143, 214, 200, 0.18);
+    --color-alerta-suave: rgba(200, 156, 122, 0.24);
+    --color-peligro-suave: rgba(166, 91, 61, 0.28);
+    --color-primario: #4f9a6f;
+    --color-linea: rgba(143, 214, 200, 0.15);
+    --color-linea-suave: rgba(143, 214, 200, 0.07);
+    --sombra-chica: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --sombra-media: 0 14px 32px rgba(0, 0, 0, 0.55);
+    --panel-linea: rgba(255, 255, 255, 0.07);
+    --panel-linea-fuerte: rgba(255, 255, 255, 0.14);
+    --panel-fondo-suave: #101e17;
+    --panel-tarjeta: #14221c;
+    --panel-sombra-elevada: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 42px -20px rgba(0, 0, 0, 0.72);
+}
+
+
+/* ---------- Medidas que corrige el JS ----------------------------------
+   Es el valor de arranque: JS/dashboard.js lo reemplaza por la medida
+   real apenas carga la página. */
+:root {
+    --ea-scroll-offset: 96px;   /* espacio libre arriba al saltar a un #ancla (alto de la barra superior) */
+    --ead-header-h: 64px;   /* alto de la barra superior del panel */
+}
+
+
+/* =====================================================================
+   BASE Y PIEZAS GENERALES
+   letras, reset, logo, barra de arriba, botones, formularios, mensajes…
+   ===================================================================== */
+
+
+/* ---------- Reset suave ---------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó con el zoom del navegador en 125%, así que al 100%
+   todo quedaba chico. Como las letras están en rem, subir el tamaño de
+   la raíz agranda toda la tipografía de una vez. Los saltos son por ancho
+   de ventana (CSS no puede leer el zoom): en una pantalla de 1920 al 100%
+   la ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no cambia. */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--ea-scroll-offset);
+}
+
+@media (min-width: 1400px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 1700px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Cualquier sección con id como destino directo de un link #ancla */
+section[id],
+article[id],
+div[id] {
+    scroll-margin-top: var(--ea-scroll-offset);
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+ul {
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+
+/* ---------- Base ------------------------------------------------------ */
+body.ea-body {
+    min-height: 100vh;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "ss02" on;
+}
+
+:root[data-theme="dark"] body.ea-body {
+    background:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%),
+        var(--color-fondo);
+}
+
+.ea-mono {
+    font-size: 0.7813rem;
+    letter-spacing: 0.04em;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-feature-settings: "tnum", "zero";
+}
+
+
+/* ---------- Logo (partials/logo.php y marca_e() del helper) ---------- */
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* La "e": un solo trazo con un degradado de 3 colores que salen de
+   --ea-elogo-a/b/c. Así el mismo SVG sirve en toda la página: la landing,
+   el pie, el menú del panel y la pantalla de carga dibujan el mismo logo. */
+/* Sobre fondo claro */
+.ea-logo-mark--e {
+    --ea-elogo-a: #143326;
+    --ea-elogo-b: var(--color-primario);
+    --ea-elogo-c: #3fae97;
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Sobre fondo oscuro: el modo oscuro y el tono "cream" (el pie) */
+:root[data-theme="dark"] .ea-logo-mark--e {
+    --ea-elogo-a: #F6F4EC;
+    --ea-elogo-b: #8FD6C8;
+    --ea-elogo-c: #5BE5B6;
+    filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
+}
+
+
+/* ---------- Interruptor claro / oscuro --------------------------------
+   HTML: partials/theme_toggle.php · lógica: JS/tema.js. --------------- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* El checkbox real queda invisible: se ve la pastilla de abajo */
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    background: #ecf2e8;
+    border: 1px solid var(--color-linea);
+    border-radius: 999px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: var(--color-tarjeta);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(20, 32, 26, 0.18);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1c4029;
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ea-theme-sun {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ea-theme-moon {
+    opacity: 0;
+    transform: scale(0.4) rotate(calc(-1 * 25deg));
+}
+
+/* Tildado = modo oscuro: la bolita se corre y cambia el sol por la luna */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: #16301f;
+    border-color: #1c4029;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(26px);
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun {
+    opacity: 0;
+    transform: scale(0.4) rotate(25deg);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+}
+
+
+/* ---------- Botones ---------------------------------------------------
+   La primera regla es la forma de TODOS los botones. Los colores salen
+   de tres variables que cada variante (primario, secundario, fantasma,
+   compra) define en su propia regla:
+     --boton-fondo   el fondo
+     --boton-texto   el color de la letra
+     --boton-borde   el color del borde
+   Ej: para cambiar el fondo del botón primario, buscá .ea-button-primary
+   y cambiá su --boton-fondo por el color que quieras. ------------------ */
+.ea-button,
+.ea-button-primary,
+.ea-button-secondary,
+.ea-button-ghost {
+    --boton-fondo: #1c4029;
+    --boton-texto: #ecf2e8;
+    --boton-borde: transparent;
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--boton-borde);
+    background: var(--boton-fondo);
+    color: var(--boton-texto);
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 500;
+    font-size: 0.8438rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        background-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        border-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.14s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: var(--sombra-chica);
+}
+
+/* Táctil: zona de toque mínima en pantallas chicas */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary,
+    .ea-button-ghost {
+        min-height: 44px;
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
+/* Al apretar, el botón se achica un poco: se siente que respondió */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+        transition-duration: 0.08s;
+    }
+}
+
+/* Pantallas táctiles: el mismo achique al tocar */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active,
+    .ea-button-ghost:active {
+        transform: scale(0.97);
+    }
+
+    .ea-button-buy:active {
+        transform: scale(0.97) !important;
+    }
+}
+
+.ea-button:focus-visible,
+.ea-button-primary:focus-visible,
+.ea-button-secondary:focus-visible,
+.ea-button-ghost:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+.ea-button-primary {
+    --boton-fondo: var(--color-primario);
+    --boton-texto: #ffffff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --boton-fondo: #1c4029;
+        transform: translateY(-1px);
+        box-shadow: var(--sombra-media);
+    }
+}
+
+.ea-button-secondary {
+    --boton-fondo: transparent;
+    --boton-texto: var(--color-texto);
+    --boton-borde: var(--color-linea);
+    box-shadow: none;
+    color: var(--color-texto);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --boton-fondo: #ecf2e8;
+        --boton-borde: #bcd2bd;
+        color: #1c4029;
+    }
+}
+
+:root[data-theme="dark"] .ea-button-secondary {
+    --boton-borde: rgba(236, 242, 232, 0.18);
+    color: #ecf2e8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --boton-fondo: rgba(74, 122, 85, 0.22);
+        --boton-borde: #4a7a55;
+        color: #bcd2bd;
+    }
+}
+
+.ea-button-ghost {
+    --boton-fondo: transparent;
+    --boton-texto: #4a7a55;
+    --boton-borde: transparent;
+    box-shadow: none;
+    padding: 8px 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-ghost:hover {
+        --boton-fondo: #ecf2e8;
+    }
+
+    :root[data-theme="dark"] .ea-button-ghost:hover {
+        --boton-fondo: rgba(74, 122, 85, 0.22);
+    }
+}
+
+:root[data-theme="dark"] .ea-button-ghost {
+    --boton-texto: #bcd2bd;
+}
+
+.ea-button-block {
+    width: 100%;
+}
+
+.ea-button-sm {
+    padding: 7px 13px;
+    font-size: 0.7813rem;
+}
+
+/* Botón de compra destacado — en la landing y en el panel */
+.ea-button-buy {
+    --boton-fondo: linear-gradient(120deg, var(--color-primario) 0%, #3c7a57 52%, #4e9069 100%);
+    --boton-texto: #ffffff;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    padding-inline: 22px;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+        0 10px 26px rgba(28, 64, 41, 0.30),
+        inset 0 0 0 1px rgba(201, 216, 112, 0.32);
+}
+
+/* Brillo que "respira" detrás del texto */
+.ea-button-buy::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 216, 112, 0.45), transparent 55%);
+    opacity: 0.7;
+    animation: ea-buy-glow 3.6s ease-in-out infinite;
+}
+
+/* Reflejo que cruza el botón cada tanto */
+.ea-button-buy::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    animation: ea-buy-shine 4.8s ease-in-out infinite;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-buy:hover {
+        --boton-fondo: linear-gradient(120deg, #1c4029 0%, var(--color-primario) 55%, #3c7a57 100%);
+        transform: translateY(-2px);
+        box-shadow:
+            0 16px 34px rgba(47, 107, 79, 0.4),
+            inset 0 0 0 1px rgba(201, 216, 112, 0.55);
+    }
+}
+
+@keyframes ea-buy-glow {
+    0%, 100% {
+        opacity: 0.45;
+    }
+    50% {
+        opacity: 0.85;
+    }
+}
+
+@keyframes ea-buy-shine {
+    0%, 62% {
+        left: -120%;
+    }
+    88%, 100% {
+        left: 140%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-button-buy::before {
+        animation: none !important;
+    }
+
+    .ea-button-buy::after {
+        display: none;
+    }
+}
+
+.ea-button:disabled,
+.ea-button-primary:disabled,
+.ea-button-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ---------- Carteles de aviso del panel (partials/flashes.php) -------- */
+.ea-flash {
+    border-radius: 11px;
+    padding: 12px 16px;
+    border: 1px solid transparent;
+    font-size: 0.8438rem;
+}
+
+.ea-flash-success {
+    background: rgba(74, 122, 85, 0.14);
+    border-color: rgba(74, 122, 85, 0.32);
+    color: #1c4029;
+}
+
+.ea-flash-danger {
+    background: rgba(166, 91, 61, 0.14);
+    border-color: rgba(166, 91, 61, 0.32);
+    color: #a65b3d;
+}
+
+/* Ni éxito ni error: ej. "tu pago quedó pendiente" */
+.ea-flash-info {
+    background: color-mix(in oklab, #b8d5d0 18%, transparent);
+    border-color: color-mix(in oklab, #b8d5d0 45%, transparent);
+    color: #2f6a6f;
+}
+
+:root[data-theme="dark"] .ea-flash-success {
+    color: #bcd2bd;
+}
+
+:root[data-theme="dark"] .ea-flash-danger {
+    color: #f2b79e;
+}
+
+:root[data-theme="dark"] .ea-flash-info {
+    color: #b8d5d0;
+}
+
+.ea-flash ul {
+    margin: 4px 0 0;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+
+/* =====================================================================
+   ESQUELETO DEL PANEL
+   HTML: app/Views/layouts/panel.php
+   ===================================================================== */
+
+
+/* ---------- Títulos del panel ------------------------------------------ */
+.dashboard-body h1,
+.dashboard-body h2,
+.dashboard-body h3 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+}
+
+
+/* ---------- Página ---------------------------------------------------- */
+body.dashboard-body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--color-texto);
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(143, 214, 200, 0.12), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(188, 210, 189, 0.14), transparent 36%),
+        linear-gradient(180deg, var(--color-fondo) 0%, var(--color-fondo-aire) 100%);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "tnum" on;
+    overflow-x: hidden;
+}
+
+:root[data-theme="dark"] body.dashboard-body {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(143, 214, 200, 0.10), transparent 34%),
+        radial-gradient(circle at 100% 100%, rgba(43, 86, 56, 0.40), transparent 40%),
+        linear-gradient(180deg, var(--color-fondo) 0%, #0a1611 100%);
+}
+
+/* Con el menú abierto en celular, la página de atrás no scrollea */
+body.dashboard-body.sidebar-lock {
+    overflow: hidden;
+}
+
+/* Aparición suave: JS/dashboard.js le pone .is-visible al entrar en pantalla */
+.ea-reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.ea-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ea-reveal,
+    .ea-reveal.is-visible {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+
+/* ---------- Armazón ---------------------------------------------------
+   Acá está solo la entrada (el fundido al terminar la carga). La POSICIÓN
+   del menú, la barra y el contenido está más abajo, en "Layout fijo". */
+.ea-dashboard {
+    min-height: 100vh;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.dashboard-body.dashboard-loading .ea-dashboard {
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+}
+
+.dashboard-body.dashboard-ready .ea-dashboard,
+.dashboard-body:not(.dashboard-loading) .ea-dashboard {
+    opacity: 1;
+    transform: none;
+}
+
+.ea-main {
+    min-width: 0;
+    display: block;
+    margin-left: 248px;
+    padding-top: var(--ead-header-h);
+    min-height: 100vh;
+    transition: margin-left 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Velo oscuro detrás del menú abierto en celular */
+.ea-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    background: rgba(14, 31, 23, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+.ea-dashboard.sidebar-open .ea-sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* ---------- Contenido ------------------------------------------------- */
+.ea-content {
+    padding: clamp(16px, 2.6vw, 26px) clamp(14px, 2.6vw, 26px) clamp(44px, 6vw, 64px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 2vw, 18px);
+    max-width: 1380px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* En pantallas muy anchas el contenido se ensancha (igual que .ea-page) */
+@media (min-width: 1700px) {
+    .ea-content {
+        max-width: 1660px;
+    }
+}
+
+
+/* ---------- Tarjetas, insignias y botones del panel --------------------------- */
+.ea-kbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid var(--panel-linea);
+    background: var(--panel-tarjeta);
+    color: var(--color-texto-secundario);
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.1s ease;
+    text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-kbtn:hover {
+        background: #ecf2e8;
+        border-color: var(--panel-linea-fuerte);
+        color: var(--color-texto);
+    }
+
+    :root[data-theme="dark"] .ea-kbtn:hover {
+        background: rgba(74, 122, 85, 0.18);
+        color: #ecf2e8;
+    }
+}
+
+.ea-kbtn:active {
+    transform: scale(0.97);
+    transition-duration: 0.08s;
+}
+
+.ea-kbtn:focus-visible {
+    outline: none;
+    border-color: #4a7a55;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.3);
+}
+
+/* Botón primario: acción de mayor peso (guardar, confirmar, ver más) */
+.ea-kbtn-primary {
+    background: #1c4029;
+    border-color: #1c4029;
+    color: #ecf2e8;
+    font-weight: 600;
+    box-shadow: 0 6px 16px -10px rgba(14, 31, 23, 0.6);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-kbtn-primary:hover {
+        background: #16301f;
+        border-color: #16301f;
+        color: #ecf2e8;
+    }
+}
+
+.ea-kbtn-primary:active {
+    transform: scale(0.97);
+    transition-duration: 0.08s;
+}
+
+:root[data-theme="dark"] .ea-kbtn-primary {
+    background: #4a7a55;
+    border-color: #4a7a55;
+    color: #0e1f17;
+}
+
+:root[data-theme="dark"] .ea-kbtn-primary:hover {
+    background: #82a987;
+    border-color: #82a987;
+    color: #0e1f17;
+}
+
+
+/* ---------- Cuadro de confirmación (lo arma JS/dashboard.js) ---------- */
+.confirm-lock {
+    overflow: hidden;
+}
+
+.ea-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(14, 31, 23, 0.52);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+}
+
+.ea-confirm.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ea-confirm-panel {
+    width: min(440px, 100%);
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid var(--panel-linea-fuerte);
+    background: var(--panel-tarjeta);
+    box-shadow: 0 24px 70px -36px rgba(14, 31, 23, 0.72);
+    transform: translateY(8px) scale(0.98);
+    transition: transform 0.18s ease;
+}
+
+.ea-confirm.is-open .ea-confirm-panel {
+    transform: none;
+}
+
+.ea-confirm-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: color-mix(in oklab, #c89c7a 18%, var(--panel-tarjeta));
+    border: 1px solid color-mix(in oklab, #c89c7a 42%, var(--panel-linea-fuerte));
+    color: #7a4a2c;
+}
+
+.ea-confirm-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.ea-confirm-copy h2 {
+    margin: 0;
+    color: var(--color-texto);
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.ea-confirm-copy p {
+    margin: 7px 0 0;
+    color: var(--color-texto-secundario);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.ea-confirm-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+
+/* ---------- Celular y tablet: botones chicos----------------------------------------------- */
+@media (max-width: 960px) {
+    .ea-kbtn {
+        height: auto;
+        min-height: 44px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+}
+
+
+/* ---------- Layout fijo: el contenido deja lugar al menú y a la barra -
+   El menú y la barra superior son position:fixed (ver sus archivos).
+   Tiene que ser así para que funcione el scroll suave de GSAP: su
+   transform rompe cualquier sticky/fixed que quede adentro del contenido.
+   Como salen del flujo, .ea-main compensa el hueco: margin-left por el
+   menú y padding-top por la barra. La compensación va en .ea-main y no en
+   #smooth-wrapper porque GSAP le pisa inset/width con estilos en línea. */
+.ea-dashboard.sidebar-closed .ea-main {
+    margin-left: 76px;
+}
+
+/* El envoltorio del scroll suave no lleva compensación propia */
+.ea-dashboard #smooth-wrapper {
+    min-height: 100vh;
+}
+
+@media (max-width: 960px) {
+    /* En celular el menú se superpone (es un cajón): el contenido no se corre */
+    .ea-main {
+        margin-left: 0;
+        transition: none;
+    }
+
+    .ea-dashboard.sidebar-closed .ea-main {
+        margin-left: 0;
+    }
+}
+
+
+/* ---------- Impresión -------------------------------------------------
+   Va DESPUÉS del layout fijo: si estuviera antes, el margen del menú le
+   ganaría y la hoja impresa quedaría corrida a la derecha. */
+@media print {
+    .ea-main,
+    .ea-dashboard.sidebar-closed .ea-main {
+        margin-left: 0;
+        padding-top: 0;
+    }
+
+    .ea-content {
+        padding: 12px;
+    }
+}
+
+
+/* ---------- Movimiento reducido --------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ---------- Título de sección (ej: "Tus ambientes" + botón) ----------- */
+.ea-dev-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.ea-dev-toolbar-title {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: clamp(19px, 2vw, 22px);
+    margin: 0 0 4px;
+    color: var(--color-texto);
+}
+
+.ea-dev-toolbar-sub {
+    margin: 0;
+    max-width: 56ch;
+    color: var(--color-texto-suave);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+
+/* ---------- Grilla de fichas ------------------------------------------ */
+.ea-dev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+
+/* ---------- Ficha de equipo / ambiente -------------------------------- */
+.ea-dev-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border-radius: 22px;
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    box-shadow: var(--sombra-chica);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.ea-dev-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+    border-color: #bcd2bd;
+}
+
+.ea-dev-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ea-dev-icon {
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--color-exito-suave);
+    color: #4a7a55;
+}
+
+.ea-dev-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ea-dev-name {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 1.1875rem;
+    margin: 0;
+    color: var(--color-texto);
+}
+
+/* Insignia de estado: el color sale de la clase tone-* */
+.ea-dev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7188rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.ea-dev-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ea-dev-badge.tone-success {
+    color: #4a7a55;
+    background: var(--color-exito-suave);
+}
+
+.ea-dev-badge.tone-info {
+    color: var(--color-info);
+    background: var(--color-info-suave);
+}
+
+.ea-dev-badge.tone-warning {
+    color: #c89c7a;
+    background: var(--color-alerta-suave);
+}
+
+.ea-dev-badge.tone-danger {
+    color: #a65b3d;
+    background: var(--color-peligro-suave);
+}
+
+/* Lista de datos: nombre a la izquierda, valor a la derecha */
+.ea-dev-meta {
+    margin: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.ea-dev-meta > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.8125rem;
+}
+
+.ea-dev-meta dt {
+    color: var(--color-texto-suave);
+    margin: 0;
+}
+
+.ea-dev-meta dd {
+    margin: 0;
+    color: var(--color-texto-secundario);
+    text-align: right;
+    font-weight: 500;
+}
+
+.ea-dev-card-foot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 6px;
+}
+
+.ea-dev-code {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    color: var(--color-texto-suave);
+}
+
+
+/* ---------- Estado vacío ---------------------------------------------- */
+.ea-dev-empty {
+    text-align: center;
+    padding: 48px 24px;
+    border-radius: 22px;
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    box-shadow: var(--sombra-chica);
+    margin-bottom: 30px;
+}
+
+.ea-dev-empty-orb {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #82a987, #1c4029);
+    box-shadow: 0 0 0 8px var(--color-exito-suave);
+}
+
+.ea-dev-empty h3 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 1.375rem;
+    margin: 0 0 8px;
+    color: var(--color-texto);
+}
+
+.ea-dev-empty p {
+    margin: 0 auto 18px;
+    max-width: 48ch;
+    color: var(--color-texto-suave);
+    line-height: 1.55;
+}
+
+
+/* ---------- Celular angosto ------------------------------------------- */
+@media (max-width: 520px) {
+    .ea-dev-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ea-dev-toolbar .ea-button {
+        justify-content: center;
+    }
+}
+
+
+/* =====================================================================
+   MENÚ LATERAL
+   HTML: app/Views/partials/panel_sidebar.php
+   ===================================================================== */
+
+
+/* ---------- El menú --------------------------------------------------
+   Es fijo a la izquierda en TODAS las resoluciones (lo necesita el scroll
+   suave de GSAP). El contenido le deja lugar en el ESQUELETO DEL PANEL
+   ("Layout fijo: el contenido deja lugar al menú y a la barra"). */
+.ea-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 248px;
+    z-index: 50;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 18px 14px;
+    background: var(--color-fondo-suave);
+    border-right: 1px solid var(--panel-linea);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--panel-linea-fuerte) transparent;
+    /* Mismo tiempo que el contenido y la barra: se mueven en bloque */
+    transition:
+        width 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:root[data-theme="dark"] .ea-sidebar {
+    background: var(--panel-fondo-suave);
+}
+
+.ea-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ea-sidebar::-webkit-scrollbar-thumb {
+    background: var(--panel-linea-fuerte);
+    border-radius: 999px;
+}
+
+
+/* ---------- Marca de arriba ------------------------------------------- */
+.ea-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 4px 8px 18px;
+}
+
+/* La "e" va sin caja: el ancho sale de su proporción y el alto se fija
+   acá. Los colores del trazo los pone .ea-logo-mark--e (sección "Logo"). */
+.ea-sidebar-mark {
+    display: grid;
+    place-items: center;
+}
+
+.ea-sidebar-mark--e {
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+.ea-sidebar-mark--e svg {
+    width: auto;
+    height: 32px;
+    display: block;
+}
+
+.ea-sidebar-word {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+    min-width: 0;
+}
+
+.ea-sidebar-word b {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.125rem;
+    letter-spacing: -0.012em;
+    color: var(--color-texto);
+}
+
+.ea-sidebar-word b em {
+    font-style: italic;
+    color: #4a7a55;
+}
+
+:root[data-theme="dark"] .ea-sidebar-word b {
+    color: #ecf2e8;
+}
+
+:root[data-theme="dark"] .ea-sidebar-word b em {
+    color: #bcd2bd;
+}
+
+.ea-sidebar-word span {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+    margin-top: 4px;
+}
+
+
+/* ---------- Opciones -------------------------------------------------- */
+.ea-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ea-sidebar-section {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--color-texto-suave);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 16px 12px 7px;
+}
+
+.ea-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 11px;
+    color: var(--color-texto-secundario);
+    font-size: 0.8438rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        background-color 0.18s cubic-bezier(0.23, 1, 0.32, 1),
+        color 0.15s ease;
+    position: relative;
+}
+
+.ea-sidebar-item:hover {
+    background: #ecf2e8;
+    color: var(--color-texto);
+}
+
+:root[data-theme="dark"] .ea-sidebar-item:hover {
+    background: rgba(74, 122, 85, 0.18);
+    color: #ecf2e8;
+}
+
+.ea-sidebar-item.is-active {
+    background: #dbe6d9;
+    color: #16301f;
+    font-weight: 600;
+}
+
+:root[data-theme="dark"] .ea-sidebar-item.is-active {
+    background: rgba(74, 122, 85, 0.32);
+    color: #ecf2e8;
+}
+
+/* La rayita vertical a la izquierda de la opción activa */
+.ea-sidebar-item.is-active::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    top: 9px;
+    bottom: 9px;
+    width: 3px;
+    background: #2b5638;
+    border-radius: 0 3px 3px 0;
+}
+
+:root[data-theme="dark"] .ea-sidebar-item.is-active::before {
+    background: #bcd2bd;
+}
+
+.ea-sidebar-icon {
+    flex: 0 0 18px;
+    display: inline-flex;
+}
+
+.ea-sidebar-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.ea-sidebar-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Globito con la cantidad de equipos ("Mis dispositivos  2") */
+.ea-sidebar-meta {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    color: var(--color-texto-suave);
+    background: var(--panel-tarjeta);
+    border: 1px solid var(--panel-linea);
+    padding: 2px 7px;
+    border-radius: 6px;
+    line-height: 1.2;
+}
+
+
+/* ---------- Pie ------------------------------------------------------- */
+.ea-sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--panel-linea);
+}
+
+.ea-sidebar-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px;
+    color: var(--color-texto-suave);
+    font-size: 0.7188rem;
+}
+
+.ea-sidebar-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #c9d870;
+    box-shadow: 0 0 0 3px rgba(201, 216, 112, 0.3);
+    flex-shrink: 0;
+}
+
+.ea-sidebar-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 11px;
+    border: 1px solid color-mix(in oklab, #a65b3d 32%, var(--panel-linea));
+    background: var(--color-peligro-suave);
+    color: #a65b3d;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.ea-sidebar-logout svg {
+    flex: 0 0 16px;
+}
+
+.ea-sidebar-logout:hover {
+    background: color-mix(in oklab, #a65b3d 16%, var(--panel-tarjeta));
+    border-color: color-mix(in oklab, #a65b3d 55%, transparent);
+    color: #a65b3d;
+}
+
+:root[data-theme="dark"] .ea-sidebar-logout {
+    color: #f2b79e;
+}
+
+:root[data-theme="dark"] .ea-sidebar-logout:hover {
+    color: #f6c6b2;
+}
+
+.ea-sidebar-logout:focus-visible,
+.ea-sidebar-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+
+/* ---------- Menú colapsado: solo íconos ------------------------------- */
+.ea-dashboard.sidebar-closed .ea-sidebar {
+    width: 76px;
+}
+
+.ea-dashboard.sidebar-closed .ea-sidebar-word,
+.ea-dashboard.sidebar-closed .ea-sidebar-label,
+.ea-dashboard.sidebar-closed .ea-sidebar-meta,
+.ea-dashboard.sidebar-closed .ea-sidebar-section,
+.ea-dashboard.sidebar-closed .ea-sidebar-foot-label {
+    display: none;
+}
+
+.ea-dashboard.sidebar-closed .ea-sidebar-item,
+.ea-dashboard.sidebar-closed .ea-sidebar-logout {
+    justify-content: center;
+    padding: 10px 6px;
+}
+
+.ea-dashboard.sidebar-closed .ea-sidebar-brand {
+    justify-content: center;
+    padding: 4px 0 18px;
+}
+
+.ea-dashboard.sidebar-closed .ea-sidebar-status {
+    justify-content: center;
+    padding: 4px 0;
+}
+
+
+/* ---------- Celular y tablet: el menú es un cajón --------------------- */
+@media (max-width: 960px) {
+    .ea-sidebar {
+        /* En pantallas muy angostas deja ver el velo de atrás */
+        width: min(284px, 86vw);
+        transform: translateX(-100%);
+        transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: var(--panel-sombra-elevada);
+    }
+
+    .ea-dashboard.sidebar-closed .ea-sidebar {
+        width: min(284px, 86vw);
+    }
+
+    /* Abierto: entra y muestra los textos aunque en escritorio esté colapsado */
+    .ea-dashboard.sidebar-open .ea-sidebar {
+        transform: translateX(0);
+    }
+
+    .ea-dashboard.sidebar-open .ea-sidebar-word,
+    .ea-dashboard.sidebar-open .ea-sidebar-label,
+    .ea-dashboard.sidebar-open .ea-sidebar-meta,
+    .ea-dashboard.sidebar-open .ea-sidebar-section,
+    .ea-dashboard.sidebar-open .ea-sidebar-foot-label {
+        display: revert;
+    }
+
+    /* Zonas de toque cómodas para el dedo */
+    .ea-sidebar-item,
+    .ea-sidebar-logout {
+        min-height: 44px;
+    }
+}
+
+
+/* ---------- Impresión: el menú no se imprime -------------------------- */
+@media print {
+    .ea-sidebar {
+        display: none !important;
+    }
+}
+
+
+/* ---------- Opción "Comprar EdenAir" destacada ------------------------ */
+.ea-sidebar-item--cta {
+    margin: 8px 12px 4px;
+    padding: 10px 12px !important;
+    border-radius: 12px;
+    background: linear-gradient(120deg, #1c4029, #2b5638);
+    color: #ffffff !important;
+    box-shadow:
+        0 6px 18px rgba(28, 64, 41, 0.25),
+        inset 0 0 0 1px rgba(201, 216, 112, 0.22);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.ea-sidebar-item--cta:hover {
+    background: linear-gradient(120deg, #1c4029, #2b5638);
+    transform: translateY(-1px);
+    box-shadow:
+        0 10px 24px rgba(28, 64, 41, 0.30),
+        inset 0 0 0 1px rgba(201, 216, 112, 0.38);
+}
+
+/* En oscuro, la regla de hover de las opciones es más fuerte: se repite acá
+   para que el botón no pierda su fondo verde (el texto es blanco). */
+:root[data-theme="dark"] .ea-sidebar-item--cta:hover {
+    background: linear-gradient(120deg, #1c4029, #2b5638);
+}
+
+.ea-sidebar-item--cta .ea-sidebar-icon {
+    color: #c9d870;
+}
+
+.ea-sidebar-item--cta .ea-sidebar-label {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+
+/* =====================================================================
+   BARRA SUPERIOR
+   HTML: app/Views/partials/panel_header.php
+   ===================================================================== */
+
+
+/* ---------- La barra --------------------------------------------------
+   Es fija arriba en TODAS las resoluciones (lo necesita el scroll suave
+   de GSAP) y se corre a la derecha lo que ocupa el menú. */
+.ea-header,
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 248px;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 26px;
+    border-bottom: 1px solid var(--panel-linea);
+    background: color-mix(in oklab, var(--color-fondo) 90%, transparent);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    backdrop-filter: saturate(160%) blur(12px);
+    transition: left 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Con el menú colapsado, la barra arranca donde termina el menú angosto */
+.ea-dashboard.sidebar-closed .ea-header,
+.ea-dashboard.sidebar-closed .dashboard-header {
+    left: 76px;
+}
+
+:root[data-theme="dark"] .ea-header {
+    background: rgba(11, 22, 18, 0.82);
+}
+
+
+/* ---------- Hamburguesa ----------------------------------------------- */
+.ea-burger {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 11px;
+    border: 1px solid var(--panel-linea);
+    background: var(--panel-tarjeta);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ea-burger span {
+    display: block;
+    width: 17px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-texto-secundario);
+    transition: transform 0.22s ease, opacity 0.18s ease, width 0.22s ease;
+}
+
+.ea-burger:hover {
+    background: #ecf2e8;
+    border-color: var(--panel-linea-fuerte);
+}
+
+:root[data-theme="dark"] .ea-burger:hover {
+    background: rgba(74, 122, 85, 0.18);
+}
+
+.ea-burger:hover span {
+    background: var(--color-texto);
+}
+
+.ea-burger:focus-visible {
+    outline: none;
+    border-color: #4a7a55;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.22);
+}
+
+.ea-burger span:nth-child(1) {
+    width: 17px;
+}
+
+.ea-burger span:nth-child(2) {
+    width: 13px;
+}
+
+.ea-burger span:nth-child(3) {
+    width: 17px;
+}
+
+.ea-burger:hover span:nth-child(2) {
+    width: 17px;
+}
+
+
+/* ---------- Título de la pantalla ------------------------------------- */
+.ea-header-titles {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    margin-right: auto;
+    min-width: 0;
+    padding-left: 4px;
+}
+
+.ea-header-titles h1 {
+    margin: 0;
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(18px, 1.7vw, 22px);
+    letter-spacing: -0.015em;
+    color: var(--color-texto);
+    /* Se corta con "..." en vez de pisar lo que tiene al lado */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ea-header-titles p {
+    margin: 2px 0 0;
+    color: var(--color-texto-suave);
+    font-size: 0.7813rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ---------- Interruptor de tema y botones de la vista ----------------- */
+.ea-header-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Botones que agrega cada pantalla ('botones' en la config de la vista):
+   un botón nuevo ya sale bien alineado sin tocar este CSS. */
+.ea-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* ---------- Usuario --------------------------------------------------- */
+.ea-header-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 12px 3px 4px;
+    border: 1px solid var(--panel-linea);
+    background: var(--panel-tarjeta);
+    border-radius: 999px;
+    cursor: default;
+}
+
+.ea-header-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a7a55, #1c4029);
+    color: #ecf2e8;
+    display: grid;
+    place-items: center;
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.ea-header-name {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    font-size: 0.7813rem;
+    color: var(--color-texto);
+    font-weight: 500;
+}
+
+
+/* ---------- Botones que son solo un ícono ----------------------------- */
+.ea-header-icon-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    border: 1px solid var(--panel-linea);
+    background: var(--panel-tarjeta);
+    color: var(--color-texto-secundario);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.ea-header-icon-btn:hover {
+    background: #ecf2e8;
+    border-color: var(--panel-linea-fuerte);
+    color: var(--color-texto);
+}
+
+:root[data-theme="dark"] .ea-header-icon-btn:hover {
+    background: rgba(74, 122, 85, 0.18);
+    color: #ecf2e8;
+}
+
+.ea-header-icon-btn:focus-visible {
+    outline: none;
+    border-color: #4a7a55;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.3);
+}
+
+
+/* ---------- Interruptor de tema, versión chica para la barra ----------- */
+.ea-header .ea-theme-switch .ea-theme-track {
+    width: 50px;
+    height: 28px;
+}
+
+.ea-header .ea-theme-switch .ea-theme-thumb {
+    width: 22px;
+    height: 22px;
+}
+
+.ea-header .ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(22px);
+}
+
+
+/* ---------- Celular y tablet ------------------------------------------ */
+@media (max-width: 960px) {
+    .ea-header {
+        padding: 10px 16px;
+    }
+
+    /* En celular la barra ocupa todo el ancho: el menú se abre encima */
+    .ea-header,
+    .dashboard-header {
+        left: 0;
+        transition: none;
+    }
+
+    .ea-dashboard.sidebar-closed .ea-header,
+    .ea-dashboard.sidebar-closed .dashboard-header {
+        left: 0;
+    }
+
+    /* Zonas de toque cómodas para el dedo */
+    .ea-burger {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* El interruptor agranda su zona de toque sin mover el resto */
+    .ea-header .ea-theme-switch {
+        padding: 8px 4px;
+        margin: calc(-1 * 8px) calc(-1 * 4px);
+    }
+}
+
+@media (max-width: 680px) {
+    /* Barra en dos filas: fila 1 = hamburguesa + título + tema + usuario;
+       fila 2 = chips, selector de dispositivo y botones de la pantalla. Así
+       nada se superpone ni se corta. La altura la sincroniza dashboard.js. */
+    .ea-header,
+    .dashboard-header {
+        flex-wrap: wrap;
+    }
+
+    /* Un "salto de renglón" invisible entre la fila 1 y la fila 2 */
+    .ea-header::after,
+    .dashboard-header::after {
+        content: "";
+        order: 4;
+        flex-basis: 100%;
+        height: 0;
+    }
+
+    .ea-burger {
+        order: 0;
+    }
+
+    .ea-header-titles {
+        order: 1;
+    }
+
+    .ea-header-tools {
+        order: 2;
+        margin-left: auto;
+    }
+
+    .ea-header-user {
+        order: 3;
+    }
+
+    .ea-header-actions {
+        order: 5;
+        margin-top: 2px;
+    }
+
+    .ea-header-user .ea-header-name {
+        display: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .ea-header-titles p {
+        display: none;
+    }
+}
+
+
+/* ---------- Impresión: la barra no se imprime ------------------------- */
+@media print {
+    .ea-header {
+        display: none !important;
+    }
+}
+
+
+/* =====================================================================
+   ESTA PANTALLA: MIS DISPOSITIVOS
+   HTML: app/Views/dispositivos/index.php
+   ===================================================================== */
+
+
+/* ---------- Mis dispositivos -------------------------------------------------- */
+.ea-dev-tag {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 1px 5px;
+    border-radius: 5px;
+    margin-left: 4px;
+    background: var(--color-linea-suave);
+    color: var(--color-texto-suave);
+    font-weight: 600;
+}
+
+.ea-dev-notes {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--color-linea-suave);
+    color: var(--color-texto-secundario);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+}
+
+/* Tarjeta "agregar" */
+.ea-dev-card-add {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    border-style: dashed;
+    color: var(--color-texto-suave);
+    gap: 6px;
+}
+
+.ea-dev-card-add:hover {
+    color: #4a7a55;
+}
+
+.ea-dev-add-plus {
+    font-size: 1.875rem;
+    line-height: 1;
+    font-weight: 300;
+    color: #4a7a55;
+}
+
+.ea-dev-add-label {
+    font-weight: 600;
+    color: var(--color-texto-secundario);
+}
+
+.ea-dev-add-hint {
+    font-size: 0.7813rem;
+}
+
+.ea-dev-empty-hint {
+    font-size: 0.8125rem;
+}
+
+.ea-dev-empty-hint strong {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color: #4a7a55;
+}
+
+/* Bloque informativo de pasos */
+.ea-dev-info {
+    padding: 24px;
+    border-radius: 22px;
+    background: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+}
+
+.ea-dev-info h3 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-size: 1.125rem;
+    margin: 0 0 16px;
+    color: var(--color-texto);
+}
+
+.ea-dev-steps {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.ea-dev-steps li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.875rem;
+    color: var(--color-texto-secundario);
+}
+
+.ea-dev-steps li span {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-exito-suave);
+    color: #4a7a55;
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.ea-dev-info-note {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--color-texto-suave);
+    line-height: 1.5;
+}

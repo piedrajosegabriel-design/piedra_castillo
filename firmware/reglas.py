@@ -147,6 +147,33 @@ def etiqueta_aire(indice):
     return "Mala"
 
 
+def leds_modo_manual(estado):
+    """
+    Los LEDs verde y azul en MODO MANUAL, a partir de lo que quedo encendido.
+
+    En automatico los decide Decisor.decidir(). En manual ese metodo no se
+    llama, y antes nadie los tocaba: quedaban congelados como los habia dejado
+    el automatico. Si el aire estaba prendido al pasar a manual y el usuario
+    lo apagaba, el LED azul seguia encendido.
+
+    La regla es la misma que en automatico, pero mirando los actuadores en
+    vez de las mediciones:
+      azul  -> el aire acondicionado esta encendido
+      verde -> ni azul ni rojo
+    El rojo (alert_led) no se toca: en manual lo prende y apaga el usuario.
+
+    estado -> {"fan": "on", "alert_led": "off", ...} (el de Actuadores)
+    Devuelve {"blue_led": ..., "green_led": ...}
+    """
+    azul = estado.get("fan") == "on"
+    rojo = estado.get("alert_led") == "on"
+
+    return {
+        "blue_led": "on" if azul else "off",
+        "green_led": "on" if not azul and not rojo else "off",
+    }
+
+
 class Decisor:
     """
     Guarda lo minimo que hace falta recordar entre una medicion y la siguiente:
@@ -345,6 +372,8 @@ GLOSARIO DE ESTE ARCHIVO
 - calcular_indice_aire(t, h, co2, umbrales) -> indice 0-100 de RESPALDO, para
   cuando el MQ-135 no esta o esta calentando
 - etiqueta_aire(indice)  -> 'Excelente' | 'Buena' | 'Aceptable' | 'Mala'
+- leds_modo_manual(estado) -> LEDs azul y verde en manual: el azul sigue al
+                            aire acondicionado, el verde es "ni azul ni rojo"
 - _redondear(valor)      -> redondeo estilo PHP, para que equipo y servidor
                             den el mismo numero en los empates exactos
 

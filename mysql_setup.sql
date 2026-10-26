@@ -33,18 +33,25 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     reset_token VARCHAR(64) NULL,
     reset_expires_at DATETIME NULL,
+    -- Ultimo inicio de sesion. Junto con devices.last_seen_at decide si la
+    -- cuenta esta "sin uso" (php spark edenair:limpiar). NULL = no entro
+    -- desde que se guarda este dato: la limpieza usa created_at.
+    last_login_at DATETIME NULL,
     created_at DATETIME NULL,
     updated_at DATETIME NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uq_users_email (email),
-    UNIQUE KEY uq_users_usuario (usuario)
+    UNIQUE KEY uq_users_usuario (usuario),
+    KEY idx_users_last_login (last_login_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Compatibilidad con bases creadas antes de perfil/apellido y recuperacion.
+-- Compatibilidad con bases creadas antes de perfil/apellido, recuperacion
+-- y ultimo ingreso. El indice de last_login_at se agrega mas abajo.
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS apellido VARCHAR(120) NOT NULL DEFAULT '' AFTER nombre,
 ADD COLUMN IF NOT EXISTS reset_token VARCHAR(64) NULL AFTER password_hash,
-ADD COLUMN IF NOT EXISTS reset_expires_at DATETIME NULL AFTER reset_token;
+ADD COLUMN IF NOT EXISTS reset_expires_at DATETIME NULL AFTER reset_token,
+ADD COLUMN IF NOT EXISTS last_login_at DATETIME NULL AFTER reset_expires_at;
 
 
 -- =========================================================
@@ -335,6 +342,7 @@ SELECT * FROM (
     UNION ALL SELECT '2026-08-05-000001', 'App\\Database\\Migrations\\AddSessionCodeToPairings',     'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-09-08-000001', 'App\\Database\\Migrations\\ActualizarLogicaControl',      'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-09-15-000001', 'App\\Database\\Migrations\\CreatePurchasesTable',         'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-10-16-000001', 'App\\Database\\Migrations\\RegistrarUltimoIngreso',       'default', 'App', UNIX_TIMESTAMP(), 1
 ) AS nuevas
 WHERE NOT EXISTS (SELECT 1 FROM migrations);
 
@@ -380,11 +388,24 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+-- users.last_login_at: si la tabla se creo con una version anterior de este
+-- archivo, el ALTER de arriba agrega la columna pero no su indice.
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM information_schema.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_users_last_login') = 0,
+    'ALTER TABLE users ADD INDEX idx_users_last_login (last_login_at)',
+    'DO 0'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 -- =========================================================
 -- RESUMEN RAPIDO DE USO
 -- =========================================================
 -- users:
---   login, registro, hash de contraseña.
+--   login, registro, hash de contraseña y ultimo ingreso.
 --
 -- spaces:
 --   ambiente del usuario y limites configurados.

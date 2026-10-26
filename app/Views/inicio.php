@@ -1,7 +1,7 @@
 <?php
 /* =============================================================================
    VISTA: inicio.php — LANDING PÚBLICA de EdenAir (ruta "/")
-   CSS:  public/CSS/vistas/inicio.css (+ comun.css). Se cargan solos (app/Libraries/Vista.php)
+   CSS:  public/CSS/inicio.css (todo lo de esta página; se carga solo, ver app/Libraries/Vista.php)
    JS:   inicio.js (menú, fetch sensores) · inicio-gsap.js (animaciones de
          scroll) · eden-core-3d.js (núcleo 3D del hero) · ea-scrollbar.js
    CÓMO LEER ESTA VISTA: cada sección está marcada con un comentario
@@ -46,6 +46,7 @@ ob_start(); ?>
         'conSesion' => $conSesion,
         'actions'   => $eaNavActions,
         'navLinks'  => [
+            ['href' => '#inicio',             'label' => 'Inicio'],
             ['href' => '#que-es',             'label' => 'Qué es'],
             ['href' => '#beneficios',         'label' => 'Beneficios'],
             ['href' => '#tecnologia-interna', 'label' => 'Tecnología'],
@@ -70,7 +71,6 @@ ob_start(); ?>
             <li><a href="#sensores">Sensores</a></li>
             <li><a href="#automatizacion">Automatización</a></li>
             <li><a href="#comprar">Comprar</a></li>
-            <li><a href="<?= site_url('portfolio') ?>">Portfolio →</a></li>
         </ul>
         <div class="ea-mobile-nav-actions">
             <div class="ea-mobile-nav-theme">
@@ -98,7 +98,7 @@ ob_start(); ?>
              Columna izquierda: tagline + título + CTAs.
              Columna derecha: el núcleo 3D con sus tarjetas HUD. -->
         <!-- ===== ANIMACIÓN (CSS + GSAP + Three.js) =====
-             · glow/orbits/leaves: decorado animado por CSS (vistas/inicio.css)
+             · glow/orbits/leaves: decorado animado por CSS (public/CSS/inicio.css)
              · data-eden-core: eden-core-3d.js monta el modelo .glb en el
                canvas y actualiza las tarjetas HUD con /api/sensores
              · la entrada del hero la anima inicio-gsap.js -->
@@ -815,7 +815,7 @@ ob_start(); ?>
 
                         <p class="ea-buy-note">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
-                            Precio calculado en el análisis de costos del portfolio; el cobro en línea todavía no está activo.
+                            Precio de referencia; el cobro en línea todavía no está activo.
                         </p>
                     </article>
 

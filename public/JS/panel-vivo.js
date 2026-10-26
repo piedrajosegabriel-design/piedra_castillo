@@ -23,6 +23,15 @@
        data-vivo-spark            -> las dos curvas del grafico de tendencia
        data-vivo-mensajes         -> la tira de avisos del equipo
        data-vivo-led="green_led"  -> cada uno de los tres LEDs
+       data-vivo-act="fan"        -> la fila de cada actuador
+       data-vivo-toggle           -> su interruptor (modo manual)
+
+   LOS INTERRUPTORES NO RECARGAN LA PAGINA. Al tocar uno, se mueve en el acto
+   a la posicion elegida (atenuado: la placa todavia no la aplico) y la orden
+   viaja por fetch. El servidor contesta con el panel ya recalculado, que
+   incluye la orden pendiente, asi que ni esa respuesta ni los refrescos
+   siguientes lo devuelven a su posicion vieja. Cuando la placa confirma, el
+   refresco le saca el atenuado.
 
    SI EL SERVIDOR NO CONTESTA no pasa nada: se muestra el ultimo dato bueno
    y se reintenta en el proximo ciclo. Nunca se borra lo que ya estaba.
@@ -86,8 +95,12 @@
 
     // -----------------------------------------------------------------------
     // Pintado
+    //
+    // sinActuadores: true cuando el dato de los actuadores puede ser mas viejo
+    // que el ultimo toque del usuario (ver "Interruptores" mas abajo). Se
+    // pinta todo lo demas igual.
     // -----------------------------------------------------------------------
-    function pintar(view) {
+    function pintar(view, sinActuadores) {
         // ---- Diagnostico general ----
         // trendMin/trendMax son los topes de la curva de tendencia: si entran
         // lecturas nuevas la escala cambia, y dejarlos fijos haria que el
@@ -137,6 +150,11 @@
         // ---- Mensajes del equipo y LEDs ----
         pintarMensajes(view.mensajes);
         pintarLeds(view.leds);
+
+        // ---- Actuadores ----
+        if (!sinActuadores) {
+            pintarActuadores(view.actuadores, view.actuadoresActivos);
+        }
 
         // ---- Historial de lecturas ----
         pintarHistorial(view.historial);
@@ -217,6 +235,160 @@
             texto(el.querySelector('[data-vivo="estado"]'), led.encendido ? "encendido" : "apagado");
         });
     }
+
+    // -----------------------------------------------------------------------
+    // Actuadores
+    //
+    // Antes no se refrescaban: si la placa confirmaba una orden, o si en
+    // automatico prendia el aire, la tarjeta seguia igual hasta apretar F5.
+    // -----------------------------------------------------------------------
+    function pintarActuadores(actuadores, activos) {
+        if (Object.prototype.toString.call(actuadores) !== "[object Array]") { return; }
+
+        actuadores.forEach(function (act) {
+            var fila = document.querySelector('[data-vivo-act="' + act.clave + '"]');
+            if (fila) { pintarFila(fila, !!act.encendido, !!act.pendiente); }
+        });
+
+        texto(document.querySelector('[data-vivo="actuadoresActivos"]'), activos);
+    }
+
+    /** Deja una fila como dice el estado: icono, interruptor o badge, y aviso. */
+    function pintarFila(fila, encendido, pendiente) {
+        var icono = fila.querySelector(".ea-actuator-icon");
+        if (icono) { icono.classList.toggle("is-on", encendido); }
+
+        var aviso = fila.querySelector('[data-vivo="pendiente"]');
+        if (aviso) { aviso.hidden = !pendiente; }
+
+        // Modo manual: el interruptor.
+        var boton = fila.querySelector("[data-vivo-toggle]");
+        if (boton) {
+            boton.classList.toggle("is-on", encendido);
+            boton.classList.toggle("is-pendiente", pendiente);
+            boton.setAttribute("aria-label",
+                (encendido ? "Apagar " : "Encender ") + (boton.getAttribute("data-titulo") || ""));
+
+            // Lo que va a mandar el PROXIMO toque: lo contrario de lo que se ve.
+            var valor = boton.form && boton.form.querySelector('input[name="value"]');
+            if (valor) { valor.value = encendido ? "off" : "on"; }
+        }
+
+        // Modo automatico: el badge ON/OFF.
+        var badge = fila.querySelector("[data-vivo-badge]");
+        if (badge) {
+            tono(badge, encendido ? "success" : "neutral");
+            texto(badge.querySelector('[data-vivo="onoff"]'), encendido ? "ON" : "OFF");
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Interruptores (modo manual)
+    //
+    // EL PROBLEMA QUE RESUELVE: el interruptor era un formulario comun. Al
+    // tocarlo la pagina se recargaba y lo dibujaba con el estado CONFIRMADO,
+    // que no cambia hasta que la placa aplica la orden (hasta 15 s). Volvia a
+    // su posicion vieja y ahi quedaba, porque el refresco no lo tocaba.
+    //
+    // Ahora se mueve al instante y la orden viaja por fetch. Queda una
+    // carrera: un refresco que salio ANTES del toque puede volver DESPUES con
+    // el estado viejo. Para eso estan estos dos contadores: si mientras viajaba
+    // un pedido hubo un toque, sus actuadores no se pintan.
+    //
+    // Si el fetch falla, se envia el formulario de la forma comun: lo peor que
+    // puede pasar es lo de antes, una recarga.
+    // -----------------------------------------------------------------------
+    var versionOrden = 0;      // sube con cada toque
+    var ordenesEnCamino = 0;   // ordenes que todavia no contestaron
+
+    /** El proyecto renueva el token CSRF en cada POST: hay que copiarlo a
+        todos los formularios de la pagina o el proximo fallaria. */
+    function renovarCsrf(nombre, valor) {
+        if (!nombre || !valor) { return; }
+        document.querySelectorAll('input[name="' + nombre + '"]').forEach(function (input) {
+            input.value = valor;
+        });
+    }
+
+    /** Envio comun del formulario, como antes de este archivo. */
+    function enviarComoFormulario(form) {
+        if (typeof form.requestSubmit === "function") {
+            form.requestSubmit();   // dispara "submit": dashboard.js guarda el scroll
+        } else {
+            form.submit();
+        }
+    }
+
+    function enviarOrden(boton) {
+        var form = boton.form;
+        var fila = boton.closest("[data-vivo-act]");
+        if (!form || !fila) { return; }
+
+        var antes = {
+            encendido: boton.classList.contains("is-on"),
+            pendiente: boton.classList.contains("is-pendiente")
+        };
+        var encender = !antes.encendido;
+
+        var cuerpo = new FormData(form);   // lleva el CSRF y el actuador
+        cuerpo.set("value", encender ? "on" : "off");
+
+        // En el acto: lo elegido, atenuado hasta que la placa lo confirme.
+        pintarFila(fila, encender, true);
+
+        var mia = ++versionOrden;
+        var abierta = true;
+        ordenesEnCamino++;
+
+        function cerrar() {
+            if (abierta) { abierta = false; ordenesEnCamino--; }
+        }
+
+        fetch(form.action, {
+            method: "POST",
+            body: cuerpo,
+            headers: { "X-Requested-With": "fetch", "Accept": "application/json" },
+            credentials: "same-origin"
+        }).then(function (r) {
+            return r.json().catch(function () { return null; }).then(function (data) {
+                return { estado: r.status, data: data };
+            });
+        }).then(function (res) {
+            cerrar();
+            var data = res.data;
+
+            if (data && data.ok && data.view) {
+                renovarCsrf(data.csrfNombre, data.csrf);
+                // Si despues de este toque hubo otro, sus actuadores ya son viejos.
+                pintar(data.view, mia !== versionOrden);
+                return;
+            }
+
+            if (data && data.ok === false) {
+                // El servidor no la acepto (por ejemplo, el modo cambio en otra
+                // pestaña). Recargando se ve el panel como quedo y el motivo.
+                window.location.reload();
+                return;
+            }
+
+            throw new Error("HTTP " + res.estado);
+        }).catch(function () {
+            cerrar();
+            pintarFila(fila, antes.encendido, antes.pendiente);
+            enviarComoFormulario(form);
+        });
+    }
+
+    // Un solo escuchador para todos los interruptores. Se engancha al click y
+    // no al submit para que dashboard.js no guarde un scroll que no se va a
+    // usar (no hay recarga).
+    document.addEventListener("click", function (e) {
+        var boton = e.target && e.target.closest ? e.target.closest("[data-vivo-toggle]") : null;
+        if (!boton || !window.fetch || !window.FormData) { return; }
+
+        e.preventDefault();
+        enviarOrden(boton);
+    });
 
     // -----------------------------------------------------------------------
     // Historial de lecturas
@@ -416,6 +588,8 @@
         // Si la pestaña no se ve, no gastamos pedidos.
         if (document.hidden) { return; }
 
+        var version = versionOrden;
+
         fetch(URL_DATOS, {
             headers: { "X-Requested-With": "fetch" },
             credentials: "same-origin",
@@ -430,7 +604,10 @@
             return r.json();
         }).then(function (data) {
             if (!data || !data.ok || !data.view) { return; }
-            pintar(data.view);
+
+            // Si mientras viajaba este pedido se toco un interruptor, lo que
+            // trae de los actuadores puede ser de antes del toque.
+            pintar(data.view, ordenesEnCamino > 0 || version !== versionOrden);
 
             var epoch = parseInt(data.view.ultimaLecturaEpoch, 10);
             epochLectura = isFinite(epoch) ? epoch : null;
@@ -480,6 +657,14 @@
    Mensajes y LEDs:
    - pintarMensajes(m)    → rehace la tira de avisos si cambiaron los códigos
    - pintarLeds(l)        → enciende/apaga los tres LEDs del equipo
+
+   Actuadores e interruptores:
+   - pintarActuadores(a)  → pone al día las tres filas y el "N de 3 encendidos"
+   - pintarFila(f, on, p) → ícono, interruptor (o badge ON/OFF) y aviso de pendiente
+   - enviarOrden(boton)   → mueve el interruptor en el acto y manda la orden por fetch
+   - renovarCsrf(n, v)    → copia el token CSRF nuevo a todos los formularios
+   - enviarComoFormulario → respaldo: el envío de siempre, con recarga
+   - versionOrden / ordenesEnCamino → evitan pintar actuadores con un dato viejo
 
    Historial:
    - pintarHistorial(h)   → rehace las filas de la tabla si llegó algo nuevo

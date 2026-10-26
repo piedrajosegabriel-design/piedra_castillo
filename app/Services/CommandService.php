@@ -83,6 +83,11 @@ class CommandService
      * ejecutado (es instantáneo, no espera al ESP32) y se actualiza el estado.
      * Al pasar a manual se cancelan los comandos automáticos pendientes:
      * desde ese momento manda el usuario.
+     *
+     * Al volver a automático pasa lo inverso: se cancelan las órdenes del
+     * usuario que el equipo todavía no aplicó. En automático la placa no las
+     * ejecuta, y si quedaban en la cola las aplicaba la próxima vez que
+     * alguien pasara a manual, aunque fuera días después.
      */
     public function changeOperatingMode(int $deviceId, string $mode, ?int $userId, string $source = 'web'): array
     {
@@ -118,6 +123,8 @@ class CommandService
 
         if ($mode === 'manual') {
             $this->cancelPendingAutomationCommands($deviceId);
+        } else {
+            $this->cancelarOrdenesDelUsuario($deviceId);
         }
 
         return $this->getStateByDeviceId($deviceId) ?? $state;
@@ -310,6 +317,38 @@ class CommandService
     // Lectura y ejecución de la cola
     // -------------------------------------------------------------------------
 
+    /**
+     * Lo que el usuario pidió desde el panel y el equipo todavía no aplicó:
+     * ['fan' => 'on', ...], uno por actuador.
+     *
+     * Lo usa PanelService para que el interruptor muestre lo ELEGIDO y no lo
+     * que había antes. Sin esto, entre que el usuario aprieta y la placa
+     * confirma (hasta 15 s), cada refresco volvía a dibujar el estado viejo.
+     * Hay como mucho una pendiente por actuador: encolarComandoManual()
+     * cancela la anterior antes de anotar la nueva.
+     *
+     * @return array<string,string>
+     */
+    public function ordenesPendientes(int $deviceId): array
+    {
+        $pendientes = $this->commandModel
+            ->where('device_id', $deviceId)
+            ->where('status', 'pending')
+            ->where('source', 'web')
+            ->whereIn('command_type', array_keys($this->actuatorMap))
+            ->orderBy('id', 'ASC')
+            ->findAll();
+
+        $ordenes = [];
+
+        foreach ($pendientes as $comando) {
+            // Si por algo quedaran dos, gana la última (orden por id).
+            $ordenes[$comando['command_type']] = $comando['target_value'] === 'on' ? 'on' : 'off';
+        }
+
+        return $ordenes;
+    }
+
     /** Comandos pendientes en orden de llegada (los consulta el ESP32). */
     public function getPendingCommands(int $deviceId): array
     {
@@ -389,6 +428,20 @@ class CommandService
             ->where('device_id', $deviceId)
             ->where('status', 'pending')
             ->where('source', 'automation')
+            ->findAll();
+
+        foreach ($pending as $command) {
+            $this->commandModel->update($command['id'], ['status' => 'cancelled']);
+        }
+    }
+
+    /** Cancela las órdenes del usuario que siguen esperando (al volver a automático). */
+    private function cancelarOrdenesDelUsuario(int $deviceId): void
+    {
+        $pending = $this->commandModel
+            ->where('device_id', $deviceId)
+            ->where('status', 'pending')
+            ->where('source', 'web')
             ->findAll();
 
         foreach ($pending as $command) {
@@ -481,6 +534,8 @@ class CommandService
                                    historial solo los actuadores que realmente
                                    cambiaron (los LEDs verde y azul se guardan
                                    pero no se historizan: son indicadores)
+   - ordenesPendientes()         → lo que el usuario pidió y el equipo todavía
+                                   no aplicó, para que el panel lo muestre
    - getPendingCommands()        → cola pendiente del dispositivo (para la API)
    - markCommandAsExecuted()     → lo llama el equipo tras aplicar la orden;
                                    es lo único que cambia device_states
@@ -491,6 +546,8 @@ class CommandService
 
    Privados:
    - cancelPendingByType()       → cancela pendientes de un mismo command_type
+   - cancelarOrdenesDelUsuario() → al volver a automático, descarta las
+                                   órdenes manuales que no llegaron a aplicarse
    - cambiosDeDiagnostico()      → solo los campos de diagnóstico que cambiaron
                                    (confirmación IR, estado del MQ-135, avisos)
    - buildReasonFromCommand()    → saca el 'reason' del payload JSON

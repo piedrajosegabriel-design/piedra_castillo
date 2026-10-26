@@ -1,0 +1,885 @@
+/* =====================================================================
+   recuperar.css — Recuperar contraseña
+   ---------------------------------------------------------------------
+   Vista: app/Views/recuperar.php  ·  Ruta: /recuperar
+
+   TODO lo que se ve en esta pantalla sale de este archivo: no hay otro
+   CSS mezclado. Para cambiar algo, buscá la clase en la vista (o con
+   clic derecho → Inspeccionar en el navegador) y después buscala acá
+   con Ctrl+F. Los valores están escritos directo en cada regla.
+
+   Colores del modo oscuro: los pocos colores que cambian solos entre
+   claro y oscuro están escritos como var(--nombre). Su valor está en
+   "Colores del tema", justo abajo. Si querés que UN elemento tenga
+   otro color, reemplazá el var(...) de su regla por el color que
+   quieras. Si querés cambiar ese color en toda la pantalla, cambialo
+   en "Colores del tema".
+
+   Qué hay acá, en orden (buscá el título con Ctrl+F):
+     BASE Y PIEZAS GENERALES
+       · Reset suave
+       · Escala de la interfaz
+       · Base
+       · Armazón de las páginas públicas
+       · Logo (partials/logo.php y marca_e() del helper)
+       · Barra de navegación
+       · Links de la barra y cajón del celular
+       · Interruptor claro / oscuro
+       · Botones
+       · Formularios
+       · Mensajes
+     TARJETA DE ACCESO
+       · Acceso (login, registro, recuperación)
+   ===================================================================== */
+
+
+/* Tipografías (Google Fonts). Tiene que ir arriba de todo. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap");
+
+
+/* ---------- Colores del tema (modo claro / modo oscuro) ----------------
+   Los únicos colores escritos como variable: cambian solos cuando se
+   toca el interruptor claro/oscuro. Arriba van los del modo claro; en
+   el bloque de abajo, los mismos en modo oscuro. ------------------- */
+:root {
+    color-scheme: light;
+    --color-fondo: #f6f4ec;   /* fondo principal de las páginas */
+    --color-tarjeta: #ffffff;   /* fondo de tarjetas */
+    --color-tarjeta-suave: #fbfaf5;   /* fondo de tarjetas secundarias */
+    --color-texto: #14231b;   /* texto principal */
+    --color-texto-secundario: #45544a;   /* texto de apoyo */
+    --color-texto-suave: #5f6e64;   /* texto apagado: aclaraciones, etiquetas (contraste mínimo 4.5 sobre blanco) */
+    --color-exito-suave: rgba(74, 122, 85, 0.14);
+    --color-peligro-suave: rgba(166, 91, 61, 0.16);
+    --color-primario: #2f6b4f;
+    --color-linea: rgba(20, 35, 27, 0.11);   /* bordes de tarjetas, botones secundarios */
+    --color-linea-suave: rgba(20, 35, 27, 0.055);   /* fondos grisados muy suaves */
+    --sombra-chica: 0 6px 16px rgba(20, 32, 26, 0.06);
+    --sombra-media: 0 14px 32px rgba(20, 32, 26, 0.08);
+    --sombra-grande: 0 28px 56px rgba(20, 32, 26, 0.12);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-fondo: #0e1f17;
+    --color-tarjeta: #1a2c23;
+    --color-tarjeta-suave: #21342a;
+    --color-texto: #f4f1ea;
+    --color-texto-secundario: #c8d4c6;
+    --color-texto-suave: #93a194;
+    --color-exito-suave: rgba(74, 122, 85, 0.34);
+    --color-peligro-suave: rgba(166, 91, 61, 0.28);
+    --color-primario: #4f9a6f;
+    --color-linea: rgba(143, 214, 200, 0.15);
+    --color-linea-suave: rgba(143, 214, 200, 0.07);
+    --sombra-chica: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --sombra-media: 0 14px 32px rgba(0, 0, 0, 0.55);
+    --sombra-grande: 0 28px 56px rgba(0, 0, 0, 0.6);
+}
+
+
+/* =====================================================================
+   BASE Y PIEZAS GENERALES
+   letras, reset, logo, barra de arriba, botones, formularios, mensajes…
+   ===================================================================== */
+
+
+/* ---------- Reset suave ---------------------------------------------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+/* ---------- Escala de la interfaz ------------------------------------
+   El diseño se ajustó con el zoom del navegador en 125%, así que al 100%
+   todo quedaba chico. Como las letras están en rem, subir el tamaño de
+   la raíz agranda toda la tipografía de una vez. Los saltos son por ancho
+   de ventana (CSS no puede leer el zoom): en una pantalla de 1920 al 100%
+   la ventana mide 1920, y al 125% mide 1536. Abajo de 1400 no cambia. */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+}
+
+@media (min-width: 1400px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 1700px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Cualquier sección con id como destino directo de un link #ancla */
+section[id],
+div[id] {
+    scroll-margin-top: 96px;
+}
+
+body,
+h1,
+h3,
+p,
+ul {
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
+}
+
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+
+/* ---------- Base ------------------------------------------------------ */
+body.ea-body {
+    min-height: 100vh;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01" on, "ss02" on;
+}
+
+:root[data-theme="dark"] body.ea-body {
+    background:
+        radial-gradient(1200px 620px at 82% -6%, rgba(143, 214, 200, 0.10), transparent 60%),
+        radial-gradient(1000px 700px at -8% 6%, rgba(201, 216, 112, 0.05), transparent 55%),
+        var(--color-fondo);
+}
+
+.ea-eyebrow {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.ea-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4a7a55;
+    flex-shrink: 0;
+}
+
+
+/* ---------- Armazón de las páginas públicas ----------------------------------- */
+.ea-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.ea-page {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 48px);
+}
+
+@media (min-width: 1400px) {
+    .ea-page {
+        max-width: 1400px;
+    }
+}
+
+@media (min-width: 1700px) {
+    .ea-page {
+        max-width: 1600px;
+    }
+}
+
+
+/* ---------- Logo (partials/logo.php y marca_e() del helper) ---------- */
+.ea-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.ea-logo--stacked {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
+}
+
+.ea-logo-mark {
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* La "e": un solo trazo con un degradado de 3 colores que salen de
+   --ea-elogo-a/b/c. Así el mismo SVG sirve en toda la página: la landing,
+   el pie, el menú del panel y la pantalla de carga dibujan el mismo logo. */
+/* Sobre fondo claro */
+.ea-logo-mark--e {
+    --ea-elogo-a: #143326;
+    --ea-elogo-b: var(--color-primario);
+    --ea-elogo-c: #3fae97;
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Sobre fondo oscuro: el modo oscuro y el tono "cream" (el pie) */
+:root[data-theme="dark"] .ea-logo-mark--e,
+.ea-logo--tone-cream .ea-logo-mark--e {
+    --ea-elogo-a: #F6F4EC;
+    --ea-elogo-b: #8FD6C8;
+    --ea-elogo-c: #5BE5B6;
+    filter: drop-shadow(0 0 8px rgba(143, 214, 200, 0.35));
+}
+
+/* Tono "moss": todo verde, igual en claro y en oscuro */
+.ea-logo--tone-moss .ea-logo-mark--e,
+:root[data-theme="dark"] .ea-logo--tone-moss .ea-logo-mark--e {
+    --ea-elogo-a: #1c4029;
+    --ea-elogo-b: #2b5638;
+    --ea-elogo-c: #4a7a55;
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.ea-logo-word {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ea-logo--tone-ink .ea-logo-word {
+    color: var(--color-texto);
+}
+
+.ea-logo--tone-ink .ea-logo-word em {
+    color: #4a7a55;
+    font-style: italic;
+}
+
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word {
+    color: #ecf2e8;
+}
+
+:root[data-theme="dark"] .ea-logo--tone-ink .ea-logo-word em {
+    color: #bcd2bd;
+}
+
+.ea-logo--tone-cream .ea-logo-word {
+    color: #ecf2e8;
+}
+
+.ea-logo--tone-cream .ea-logo-word em {
+    color: #c9d870;
+    font-style: italic;
+}
+
+.ea-logo--tone-moss .ea-logo-word {
+    color: #4a7a55;
+}
+
+.ea-logo--tone-moss .ea-logo-word em {
+    color: #bcd2bd;
+    font-style: italic;
+}
+
+.ea-logo-text {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1;
+}
+
+.ea-logo-sub {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-texto-suave);
+    line-height: 1;
+}
+
+.ea-logo--tone-cream .ea-logo-sub {
+    color: rgba(236, 242, 232, 0.65);
+}
+
+.ea-slogan {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-style: italic;
+    color: var(--color-texto-secundario);
+    margin: 12px 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+}
+
+
+/* ---------- Barra de navegación ----------------------------------------------- */
+.ea-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.92);
+    backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--color-linea);
+    /* Al scrollear la barra se achica: el alto lo pone el padding vertical del
+       .ea-navbar-inner, asi que el que cambia es --ea-nav-pad (12px en reposo,
+       6px al scrollear). Ponerle padding al <header> lo agrandaba en vez de
+       achicarlo, porque se sumaba al del inner. */
+    --ea-nav-pad: 12px;
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+:root[data-theme="dark"] .ea-navbar {
+    background: rgba(13, 22, 18, 0.88);
+}
+
+.ea-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    /* Solo vertical: el margen lateral lo pone .ea-page, que esta en el
+       mismo elemento. Con el atajo "padding: 12px 0" se perdia y el logo y
+       los botones quedaban pegados al borde de la ventana. */
+    padding-block: var(--ea-nav-pad, 12px);
+    transition: padding-block 0.25s ease;
+}
+
+.ea-nav-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ---------- Links de la barra y cajón del celular ----------------------------- */
+.ea-nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+    list-style: none;
+    padding: 0;
+}
+
+.ea-nav-links a {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.8438rem;
+    color: var(--color-texto-secundario);
+    font-weight: 500;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.ea-nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: #4a7a55;
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.ea-nav-links a:hover,
+.ea-nav-links a.is-active {
+    color: #1c4029;
+}
+
+.ea-nav-links a:hover::after,
+.ea-nav-links a.is-active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+:root[data-theme="dark"] .ea-nav-links a {
+    color: var(--color-texto-secundario);
+}
+
+:root[data-theme="dark"] .ea-nav-links a:hover,
+:root[data-theme="dark"] .ea-nav-links a.is-active {
+    color: #bcd2bd;
+}
+
+:root[data-theme="dark"] .ea-nav-links a::after {
+    background: #bcd2bd;
+}
+
+@media (max-width: 900px) {
+    .ea-nav-links {
+        display: none;
+    }
+}
+
+
+/* ---------- Interruptor claro / oscuro --------------------------------
+   HTML: partials/theme_toggle.php · lógica: JS/tema.js. --------------- */
+.ea-theme-switch {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* El checkbox real queda invisible: se ve la pastilla de abajo */
+.ea-theme-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ea-theme-track {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    background: #ecf2e8;
+    border: 1px solid var(--color-linea);
+    border-radius: 999px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ea-theme-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: var(--color-tarjeta);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(20, 32, 26, 0.18);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1c4029;
+}
+
+.ea-theme-sun,
+.ea-theme-moon {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ea-theme-sun {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ea-theme-moon {
+    opacity: 0;
+    transform: scale(0.4) rotate(calc(-1 * 25deg));
+}
+
+/* Tildado = modo oscuro: la bolita se corre y cambia el sol por la luna */
+.ea-theme-switch input:checked + .ea-theme-track {
+    background: #16301f;
+    border-color: #1c4029;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-thumb {
+    transform: translateX(26px);
+    background: #1c4029;
+    color: #ecf2e8;
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-sun {
+    opacity: 0;
+    transform: scale(0.4) rotate(25deg);
+}
+
+.ea-theme-switch input:checked + .ea-theme-track .ea-theme-moon {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+}
+
+
+/* ---------- Botones ---------------------------------------------------
+   La primera regla es la forma de TODOS los botones. Los colores salen
+   de tres variables que cada variante (primario, secundario, fantasma,
+   compra) define en su propia regla:
+     --boton-fondo   el fondo
+     --boton-texto   el color de la letra
+     --boton-borde   el color del borde
+   Ej: para cambiar el fondo del botón primario, buscá .ea-button-primary
+   y cambiá su --boton-fondo por el color que quieras. ------------------ */
+.ea-button,
+.ea-button-primary,
+.ea-button-secondary {
+    --boton-fondo: #1c4029;
+    --boton-texto: #ecf2e8;
+    --boton-borde: transparent;
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--boton-borde);
+    background: var(--boton-fondo);
+    color: var(--boton-texto);
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 500;
+    font-size: 0.8438rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        background-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        border-color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        color 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.14s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: var(--sombra-chica);
+}
+
+/* Táctil: zona de toque mínima en pantallas chicas */
+@media (max-width: 960px) {
+    .ea-button,
+    .ea-button-primary,
+    .ea-button-secondary {
+        min-height: 44px;
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
+/* Al apretar, el botón se achica un poco: se siente que respondió */
+@media (hover: hover) and (pointer: fine) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active {
+        transform: scale(0.97);
+        transition-duration: 0.08s;
+    }
+}
+
+/* Pantallas táctiles: el mismo achique al tocar */
+@media (hover: none) {
+    .ea-button:active,
+    .ea-button-primary:active,
+    .ea-button-secondary:active {
+        transform: scale(0.97);
+    }
+}
+
+.ea-button:focus-visible,
+.ea-button-primary:focus-visible,
+.ea-button-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.32);
+}
+
+.ea-button-primary {
+    --boton-fondo: var(--color-primario);
+    --boton-texto: #ffffff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-primary:hover {
+        --boton-fondo: #1c4029;
+        transform: translateY(-1px);
+        box-shadow: var(--sombra-media);
+    }
+}
+
+.ea-button-secondary {
+    --boton-fondo: transparent;
+    --boton-texto: var(--color-texto);
+    --boton-borde: var(--color-linea);
+    box-shadow: none;
+    color: var(--color-texto);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-button-secondary:hover {
+        --boton-fondo: #ecf2e8;
+        --boton-borde: #bcd2bd;
+        color: #1c4029;
+    }
+}
+
+:root[data-theme="dark"] .ea-button-secondary {
+    --boton-borde: rgba(236, 242, 232, 0.18);
+    color: #ecf2e8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :root[data-theme="dark"] .ea-button-secondary:hover {
+        --boton-fondo: rgba(74, 122, 85, 0.22);
+        --boton-borde: #4a7a55;
+        color: #bcd2bd;
+    }
+}
+
+.ea-button-block {
+    width: 100%;
+}
+
+.ea-button:disabled,
+.ea-button-primary:disabled,
+.ea-button-secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ---------- Formularios ------------------------------------------------------- */
+.ea-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+}
+
+.ea-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ea-field label {
+    font-family: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7188rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-texto-secundario);
+}
+
+.ea-field input[type="text"],
+.ea-field input[type="email"],
+.ea-field input[type="password"],
+.ea-field input[type="number"],
+.ea-field input[type="search"],
+.ea-field input[type="tel"],
+.ea-field input[type="url"] {
+    appearance: none;
+    width: 100%;
+    background: var(--color-tarjeta);
+    color: var(--color-texto);
+    border: 1px solid var(--color-linea);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.9063rem;
+    line-height: 1.4;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.ea-field input::placeholder {
+    color: var(--color-texto-suave);
+    opacity: 0.85;
+}
+
+.ea-field input:focus {
+    outline: none;
+    border-color: #4a7a55;
+    box-shadow: 0 0 0 3px rgba(74, 122, 85, 0.22);
+}
+
+:root[data-theme="dark"] .ea-field input {
+    background: var(--color-tarjeta-suave);
+    border-color: var(--color-linea);
+}
+
+:root[data-theme="dark"] .ea-field input:focus {
+    border-color: #bcd2bd;
+    box-shadow: 0 0 0 3px rgba(188, 210, 189, 0.18);
+}
+
+.ea-field .ea-hint,
+.ea-hint {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.7813rem;
+    color: var(--color-texto-suave);
+}
+
+
+/* ---------- Mensajes ---------------------------------------------------------- */
+.ea-message {
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.ea-message::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+    background: currentColor;
+}
+
+.ea-message--error {
+    background: var(--color-peligro-suave);
+    color: #a65b3d;
+    border-color: rgba(166, 91, 61, 0.32);
+}
+
+.ea-message--success {
+    background: var(--color-exito-suave);
+    color: #1c4029;
+    border-color: rgba(74, 122, 85, 0.32);
+}
+
+:root[data-theme="dark"] .ea-message--success {
+    color: #bcd2bd;
+    border-color: rgba(74, 122, 85, 0.4);
+}
+
+:root[data-theme="dark"] .ea-message--error {
+    color: #e08465;
+    border-color: rgba(166, 91, 61, 0.45);
+}
+
+.ea-message ul {
+    margin: 4px 0 0;
+    padding: 0 0 0 18px;
+    list-style: disc;
+}
+
+
+/* =====================================================================
+   TARJETA DE ACCESO
+   HTML: app/Views/layouts/acceso.php
+   ===================================================================== */
+
+
+/* ---------- Acceso (login, registro, recuperación) ---------------------------- */
+.ea-auth {
+    min-height: calc(100vh - 88px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ea-auth-main {
+    width: 100%;
+    padding: clamp(32px, 5vw, 64px) 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    background: var(--color-fondo);
+}
+
+.ea-auth-card {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ea-auth-card h1 {
+    font-family: "DM Serif Display", "DM Serif Text", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.75rem;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    color: var(--color-texto);
+}
+
+.ea-auth-card p.ea-lede {
+    color: var(--color-texto-secundario);
+    font-size: 0.9375rem;
+}
+
+.ea-auth-foot {
+    display: flex;
+    /* Con la tipografia mas grande los dos enlaces del login no entraban
+       en una linea y el segundo se salia de la tarjeta. Que bajen. */
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.ea-auth-link {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-wrap: nowrap;
+    color: #1c4029;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.18s ease;
+}
+
+.ea-auth-link:hover {
+    border-color: #4a7a55;
+}
+
+:root[data-theme="dark"] .ea-auth-link {
+    color: #bcd2bd;
+}
+
+@media (max-width: 960px) {
+    .ea-auth-main {
+        padding: 40px 20px;
+    }
+}

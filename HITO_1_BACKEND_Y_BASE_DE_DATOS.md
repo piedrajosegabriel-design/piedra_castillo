@@ -144,7 +144,8 @@ HTML del dashboard en el navegador
 2. `AccesoController::validarLogin()` valida el formulario, busca al usuario con
    `UserModel::buscarParaLogin()` y compara la contraseña con
    `password_verify()` contra el `password_hash` (bcrypt).
-3. Si coincide, `iniciarSesion()` **regenera la sesión** y guarda
+3. Si coincide, `UserModel::registrarIngreso()` anota la fecha en
+   `users.last_login_at` e `iniciarSesion()` **regenera la sesión** y guarda
    `user_id`, `user_name` e `is_logged_in`.
 4. `redirigirDespuesDelLogin()` devuelve **siempre** `redirect()->to('/panel')`.
    **Ya no se evalúa si el usuario tiene un ambiente.**
@@ -508,6 +509,7 @@ activación** vincula un EdenAir físico con una cuenta.
 | `usuario` *(único)* | Nombre de usuario para login. |
 | `password_hash` | Contraseña **encriptada** (bcrypt). |
 | `reset_token`, `reset_expires_at` | Token de recuperación (hasheado) y vencimiento. |
+| `last_login_at` *(índice)* | Último inicio de sesión. Lo usa `php spark edenair:limpiar` para encontrar cuentas sin uso. `NULL` en las cuentas que no entraron desde que existe la columna (la limpieza usa `created_at`). |
 | `created_at`, `updated_at` | Fechas automáticas. |
 
 #### `spaces` — el ambiente del usuario (perfil de rangos)
@@ -559,6 +561,13 @@ Define qué es "normal" para ese espacio. **Ahora puede haber varios por usuario
 | `co2_ppm` | CO₂ en partes por millón. |
 | `air_quality_index` (0–100), `air_quality_label` | Índice y etiqueta legible. |
 | `captured_at` | Momento de la medición. |
+
+> Solo se guardan las **últimas 15 lecturas de cada equipo**
+> (`MeasurementModel::POR_EQUIPO`). Llega una fila cada 30 s por equipo (unas
+> 2.880 por día) y el panel lee solo las últimas 6, así que
+> `MeasurementService::registrar()` borra las que sobran cada vez que guarda
+> una. `php spark edenair:limpiar` hace el mismo recorte en todos los equipos,
+> para los que dejaron de reportar.
 
 #### `device_commands` — cola de comandos hacia el ESP32
 | Campo | Significado |

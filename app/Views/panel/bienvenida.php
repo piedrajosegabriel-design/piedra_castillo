@@ -20,7 +20,7 @@
  * JERARQUÍA DE TÍTULOS: el <h1> lo pone partials/panel_header.php, así que acá
  * se arranca en <h2> y se baja de a un nivel.
  *
- * ANIMACIÓN: la utilidad .ea-reveal (vistas/layouts/panel.css), que dashboard.js destapa
+ * ANIMACIÓN: la utilidad .ea-reveal (public/CSS/panel/bienvenida.css), que dashboard.js destapa
  * al entrar en pantalla y respeta prefers-reduced-motion sola.
  */
 $usuario = isset($usuario) && is_array($usuario) ? $usuario : [];
@@ -84,7 +84,7 @@ $this->setData([
     </section>
 
     <!-- ===== 2 · Los tres pasos, en una línea cada uno ===== -->
-    <section class="ea-welcome-pasos ea-reveal" style="transition-delay:.08s"
+    <section class="ea-welcome-pasos ea-reveal"
              aria-labelledby="ea-pasos-title">
         <h3 id="ea-pasos-title" class="ea-welcome-subtitulo">Cómo se conecta</h3>
 
