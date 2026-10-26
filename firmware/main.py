@@ -22,7 +22,8 @@ EL CICLO
   3. Bajar la configuracion: con que umbrales decidir.
   4. Para siempre:
        - medir (SCD41 + MQ-135)
-       - decidir localmente y accionar
+       - decidir localmente y accionar (en manual, solo los LEDs siguen a
+         lo que dejo encendido el usuario)
        - reportar la medicion, lo que hizo y como esta cada sensor
        - revisar si el usuario mando alguna orden manual
        - cada tanto, refrescar la configuracion
@@ -303,6 +304,23 @@ def atender_comandos(api, salidas, cfg):
         except ErrorServidor:
             pass
 
+    # Los LEDs acompañan en el acto: el azul se apaga junto con el aire, no en
+    # la medicion siguiente. Tambien corre sin ordenes nuevas, asi el pase de
+    # automatico a manual los deja bien desde la primera consulta.
+    seguir_con_los_leds(salidas)
+
+
+def seguir_con_los_leds(salidas):
+    """
+    En modo manual, pone el LED azul y el verde de acuerdo con lo que el
+    usuario dejo encendido (ver reglas.leds_modo_manual).
+
+    aplicar() solo mueve lo que cambia, asi que llamarla de mas no hace nada.
+    Si el rele del aire todavia esta en su tiempo minimo, el aire no cambio y
+    el azul tampoco: el LED sigue al rele real, no a la orden.
+    """
+    salidas.aplicar(reglas.leds_modo_manual(salidas.estado))
+
 
 # ---------------------------------------------------------------------------
 # Programa principal
@@ -415,6 +433,10 @@ def main():
                         print("  -> espera tiempo minimo de rele:", ", ".join(salidas.demorados))
                 else:
                     motivo = "Modo manual: manda el usuario."
+                    # Por si el modo cambio con la configuracion y no con la
+                    # consulta de comandos: lo que se reporta abajo ya sale
+                    # con el azul siguiendo al aire.
+                    seguir_con_los_leds(salidas)
 
                 avisos = avisos_de_los_sensores(estado_aire, salidas, avisos)
 

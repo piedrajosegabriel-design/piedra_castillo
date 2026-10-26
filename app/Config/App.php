@@ -38,8 +38,26 @@ class App extends BaseConfig
      * host) y CodeIgniter responde 403 "The action you requested is not
      * allowed". Listando acá los nombres válidos, cada página arma sus
      * enlaces con el host por el que la abriste y deja de haber cruce.
+     *
+     * Además, el constructor suma la IP por la que entró cada pedido: si el
+     * router le cambia la IP a la PC, el .env queda viejo pero las páginas
+     * abiertas por la IP nueva siguen armando sus formularios con ella.
      */
     public array $allowedHostnames = ['localhost', '127.0.0.1'];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // SERVER_ADDR es la IP de la placa de red que recibió el pedido: la
+        // pone Apache, no el navegador, así que no se puede falsificar.
+        // En la consola (spark, tests) no existe y no se agrega nada.
+        $ip = (string) ($_SERVER['SERVER_ADDR'] ?? '');
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && ! in_array($ip, $this->allowedHostnames, true)) {
+            $this->allowedHostnames[] = $ip;
+        }
+    }
 
     /**
      * --------------------------------------------------------------------------

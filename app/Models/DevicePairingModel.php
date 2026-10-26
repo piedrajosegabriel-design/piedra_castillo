@@ -87,6 +87,36 @@ class DevicePairingModel extends Model
             ->set(['status' => 'cancelado', 'updated_at' => date('Y-m-d H:i:s')])
             ->update();
     }
+
+    // -------------------------------------------------------------------------
+    // Limpieza (`php spark edenair:limpiar`)
+    // La tabla no tiene clave foránea a `users`: al borrar una cuenta, sus
+    // ventanas no se van solas.
+    // -------------------------------------------------------------------------
+
+    /** Borra todas las ventanas de un usuario (se usa al borrar su cuenta). */
+    public function borrarDeUsuario(int $userId): void
+    {
+        $this->where('user_id', $userId)->delete();
+    }
+
+    /** Cuántas ventanas vencieron antes de $limite (lo que borraría la limpieza). */
+    public function contarVencidasAntesDe(string $limite): int
+    {
+        return $this->where('expires_at <', $limite)->countAllResults();
+    }
+
+    /**
+     * Borra las ventanas que vencieron antes de $limite. Una ventana dura
+     * minutos: pasado eso ya no la consulta nadie, y guarda la clave del WiFi
+     * de configuración del equipo, que no tiene por qué quedar para siempre.
+     */
+    public function borrarVencidasAntesDe(string $limite): int
+    {
+        $this->where('expires_at <', $limite)->delete();
+
+        return $this->db->affectedRows();
+    }
 }
 
 /* ============================================================================
@@ -98,6 +128,9 @@ class DevicePairingModel extends Model
    - marcarVencidas()         → pasa a 'expirado' las que se pasaron de hora
    - cancelarAbiertasDe($id)  → cierra las anteriores del mismo usuario, para
                                 que nunca tenga dos ventanas compitiendo
+   - borrarDeUsuario($id)     → borra las ventanas de una cuenta que se borra
+   - contarVencidasAntesDe()  → cuántas ventanas viejas hay (para avisar)
+   - borrarVencidasAntesDe()  → borra las ventanas viejas (limpieza)
    - set()/update() sin id    → (CI4) UPDATE masivo con el where acumulado
    - affectedRows()           → (CI4) cuántas filas tocó el último UPDATE
    ============================================================================ */

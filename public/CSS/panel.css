@@ -3683,6 +3683,19 @@ body.dashboard-body.sidebar-lock {
     background: #0e1f17;
 }
 
+/* Orden enviada que la placa todavía no confirmó: el interruptor ya está en
+   la posición elegida, pero atenuado, y abajo del nombre lo dice en texto. */
+.ea-actuator-toggle.is-pendiente {
+    opacity: 0.6;
+}
+
+.ea-actuator-wait {
+    font-size: 0.6875rem;
+    color: var(--color-texto-suave);
+    font-style: italic;
+    line-height: 1.35;
+}
+
 .ea-actuator-badge {
     font-size: 0.6875rem;
 }

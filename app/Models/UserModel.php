@@ -127,6 +127,51 @@ class UserModel extends Model
         ]);
     }
 
+    /**
+     * Anota que el usuario acaba de iniciar sesión.
+     * Va por el builder y no por update() para no mover `updated_at`: esa
+     * fecha sigue diciendo cuándo cambiaron los datos de la cuenta.
+     */
+    public function registrarIngreso(int $userId): void
+    {
+        $this->builder()
+            ->where('id', $userId)
+            ->update(['last_login_at' => date('Y-m-d H:i:s')]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Cuentas sin uso (las borra `php spark edenair:limpiar`)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Cuentas que nadie usa desde $limite (fecha 'Y-m-d H:i:s'):
+     * - no iniciaron sesión desde entonces (si nunca se anotó el ingreso,
+     *   cuenta la fecha de registro),
+     * - ninguno de sus equipos reportó desde entonces (o no tienen equipos),
+     * - y nunca iniciaron una compra: los registros de pagos no se tocan.
+     *
+     * Una cuenta sin fecha de registro ni de ingreso no entra: sin datos,
+     * mejor no borrar.
+     */
+    public function sinUsoDesde(string $limite): array
+    {
+        // equipos y mediciones son solo para mostrar qué se va con la cuenta.
+        $sql = 'SELECT u.id, u.usuario, u.email, u.created_at, u.last_login_at,
+                       (SELECT COUNT(*) FROM devices d WHERE d.user_id = u.id) AS equipos,
+                       (SELECT COUNT(*) FROM measurements m WHERE m.user_id = u.id) AS mediciones
+                FROM users u
+                WHERE COALESCE(u.last_login_at, u.created_at) < ?
+                  AND NOT EXISTS (
+                      SELECT 1 FROM devices d
+                      WHERE d.user_id = u.id
+                        AND COALESCE(d.last_seen_at, d.created_at) >= ?
+                  )
+                  AND NOT EXISTS (SELECT 1 FROM purchases p WHERE p.user_id = u.id)
+                ORDER BY u.id';
+
+        return $this->db->query($sql, [$limite, $limite])->getResultArray();
+    }
+
     // -------------------------------------------------------------------------
     // Recuperación de contraseña (token por email)
     // El token viaja en claro en el enlace, pero en la base se guarda HASHEADO
@@ -195,6 +240,11 @@ class UserModel extends Model
    - crearUsuario($datos)         → INSERT con password_hash(); devuelve el id
    - actualizarPerfil()           → UPDATE de nombre/apellido/email/usuario
    - actualizarHashContrasena()   → UPDATE solo del hash de contraseña
+   - registrarIngreso()           → anota last_login_at (sin tocar updated_at)
+
+   Cuentas sin uso:
+   - sinUsoDesde($limite)         → cuentas sin ingresos ni equipos activos
+                                    desde esa fecha y sin compras
 
    Recuperación de contraseña:
    - guardarToken()               → guarda hash del token + vencimiento

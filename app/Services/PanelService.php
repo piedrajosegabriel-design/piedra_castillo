@@ -141,6 +141,8 @@ class PanelService
             'dispositivo' => $dispositivo,
             'espacio'    => $espacio,
             'estado'     => $this->comandos->getStateByDeviceId((int) $dispositivo['id']),
+            // Órdenes del usuario que el equipo todavía no confirmó.
+            'pendientes' => $this->comandos->ordenesPendientes((int) $dispositivo['id']),
             'ultima'     => $historial[0] ?? null,
             'historial'  => $historial,
             // Nombre del ambiente y rangos, usados por la vista y el controller.
@@ -383,8 +385,17 @@ class PanelService
      * los nombres internos de siempre (base de datos, API y firmware) y no se
      * tocan: renombrarlos rompería el historial guardado. Lo que cambió es qué
      * son en la maqueta y, por lo tanto, cómo se llaman en pantalla.
+     *
+     * EN MODO MANUAL MANDA LO QUE ELIGIÓ EL USUARIO. Si hay una orden suya
+     * esperando que la placa la aplique, el interruptor muestra esa orden
+     * (marcada `pendiente`) y no el estado anterior. Antes se dibujaba solo
+     * `device_states`, que recién cambia cuando la placa confirma: el
+     * interruptor volvía a su posición vieja al recargar y así quedaba hasta
+     * que alguien apretara F5 después de la confirmación.
+     *
+     * @param array<string,string> $pendientes ['fan' => 'on', ...] (solo en manual)
      */
-    private function actuadores(?array $estado): array
+    private function actuadores(?array $estado, array $pendientes = []): array
     {
         $definicion = [
             [
@@ -407,13 +418,17 @@ class PanelService
         $salida = [];
 
         foreach ($definicion as [$clave, $titulo, $detalle]) {
-            $encendido = ($estado[$clave . '_state'] ?? 'off') === 'on';
+            $confirmado = ($estado[$clave . '_state'] ?? 'off') === 'on' ? 'on' : 'off';
+            $pedido     = $pendientes[$clave] ?? $confirmado;
+            $encendido  = $pedido === 'on';
 
             $salida[] = [
                 'clave'     => $clave,
                 'titulo'    => $titulo,
                 'detalle'   => $detalle,
                 'encendido' => $encendido,
+                // true = el usuario ya lo pidió pero la placa todavía no lo hizo.
+                'pendiente' => $pedido !== $confirmado,
                 'tono'      => $encendido
                     ? ($clave === 'alert_led' ? 'danger' : ($clave === 'fan' ? 'info' : 'success'))
                     : 'neutral',
@@ -431,8 +446,17 @@ class PanelService
      * tienen que decir lo mismo.
      *
      * El rojo se sigue llamando `alert_led` en la base por compatibilidad.
+     *
+     * EN MODO MANUAL EL AZUL Y EL VERDE SE DEDUCEN. Es la misma regla que
+     * aplica la placa (reglas.leds_modo_manual): azul = aire acondicionado
+     * encendido, verde = ni azul ni rojo. No se leen de `device_states`
+     * porque ahí llegan con la medición siguiente (hasta 30 s tarde) y una
+     * placa con firmware viejo los deja congelados como estaban en
+     * automático: apagabas el aire y el azul seguía prendido. Se usa el
+     * estado CONFIRMADO del aire, no la orden pendiente: el LED muestra lo
+     * que hace el equipo, el interruptor lo que pediste.
      */
-    private function leds(?array $estado): array
+    private function leds(?array $estado, bool $manual = false): array
     {
         $definicion = [
             ['green_led', 'Verde', 'Todo normal, monitoreo pasivo.',           'success'],
@@ -440,10 +464,23 @@ class PanelService
             ['alert_led', 'Rojo',  'Alerta: CO₂ alto o calidad de aire mala.', 'danger'],
         ];
 
+        $prendido = static fn (string $campo): bool => ($estado[$campo] ?? 'off') === 'on';
+
+        $valores = [
+            'green_led' => $prendido('green_led_state'),
+            'blue_led'  => $prendido('blue_led_state'),
+            'alert_led' => $prendido('alert_led_state'),
+        ];
+
+        if ($manual) {
+            $valores['blue_led']  = $prendido('fan_state');
+            $valores['green_led'] = ! $valores['blue_led'] && ! $valores['alert_led'];
+        }
+
         $salida = [];
 
         foreach ($definicion as [$clave, $titulo, $detalle, $tono]) {
-            $encendido = ($estado[$clave . '_state'] ?? 'off') === 'on';
+            $encendido = $valores[$clave];
 
             $salida[] = [
                 'clave'     => $clave,
@@ -702,9 +739,11 @@ class PanelService
         $tono   = $sinLecturas ? 'neutral' : $this->tonoGeneral(array_values($tonos));
         $manual = ($ctx['estado']['operating_mode'] ?? 'automatic') === 'manual';
 
-        $actuadores = $this->actuadores($ctx['estado']);
+        // Las órdenes pendientes solo cuentan en manual: en automático la
+        // placa no las aplica (y al volver a automático se cancelan).
+        $actuadores = $this->actuadores($ctx['estado'], $manual ? $ctx['pendientes'] : []);
         $reglas     = $this->reglas($lec, $perfil);
-        $leds       = $this->leds($ctx['estado']);
+        $leds       = $this->leds($ctx['estado'], $manual);
         $mensajes   = $sinLecturas ? [] : $this->mensajes($ctx['estado']);
         $nombre     = (string) $ctx['usuario']['nombre'] . ' ' . (string) $ctx['usuario']['apellido'];
 
@@ -854,8 +893,10 @@ class PanelService
    Bloques visuales (privados):
    - sensores()   → las 4 tarjetas con medidor
    - actuadores() → fan (aire acondicionado) / aromatizer (humidificador) /
-                    alert_led (luz de alerta) con su estado
-   - leds()       → los tres LEDs del equipo: verde, azul y rojo
+                    alert_led (luz de alerta) con su estado; en manual, la
+                    orden pendiente del usuario manda (con `pendiente`)
+   - leds()       → los tres LEDs del equipo: verde, azul y rojo; en manual
+                    el azul sigue al aire y el verde es "ni azul ni rojo"
    - ledActivo()  → cuál de los tres manda ahora
    - reglas()     → qué hace el equipo con cada variable, y si ACTÚA o AVISA
    - mensajes()   → los avisos del equipo, traducidos por el catálogo AVISOS

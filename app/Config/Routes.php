@@ -6,7 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  *
  * Mapa de rutas de EdenAir, agrupado por QUIÉN puede entrar:
- *   1) Públicas            → cualquiera (landing, portfolio, api/sensores)
+ *   1) Públicas            → cualquiera (landing, api/sensores)
  *   2) Grupo 'guest'       → solo SIN sesión (login, registro, recuperación)
  *   3) Grupo 'panel'       → solo CON sesión (filtro 'auth'): el área privada
  *   4) Grupo 'api/devices' → el ESP32 (autentica por token, no por sesión)
@@ -17,10 +17,6 @@ use CodeIgniter\Router\RouteCollection;
 // 1) RUTAS PÚBLICAS — accesibles sin login
 // =============================================================================
 $routes->get('/', 'AccesoController::inicio');
-
-// Portfolio público
-$routes->get('portfolio',     'PortfolioController::index');
-$routes->get('portfolio.php', 'PortfolioController::index');
 
 // Seguimiento de la vinculación desde el CELULAR. Es público a propósito:
 // el teléfono que acaba de configurar el WiFi del equipo no tiene sesión
