@@ -88,7 +88,7 @@ C:\xampp\php\php.exe spark db:seed DatabaseSeeder
 
 4. Abrir en navegador:
 
-`http://localhost/piedra_castillo/public/`
+`http://localhost/EdenAir/public/`
 
 ## Trabajar en dos computadoras
 
