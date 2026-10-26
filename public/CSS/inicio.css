@@ -1205,6 +1205,16 @@ body.ea-nav-open {
     color: rgba(236, 242, 232, 0.5);
 }
 
+@keyframes aclarando {
+    0% {
+      background-image: linear-gradient(rgba(236, 242, 232, 0.5), rgba(236, 242, 232, 0.5));
+    }
+    100% {
+      /* Reducimos la opacidad a 0.1 para que casi desaparezca de lo claro */
+      background-image: linear-gradient(rgba(236, 242, 232, 0.1), rgba(236, 242, 232, 0.1));
+    }
+  }
+
 @media (max-width: 820px) {
     .ea-footer-inner {
         grid-template-columns: 1fr;
@@ -1225,6 +1235,27 @@ body.ea-nav-open {
     gap: 10px;
 }
 
+.ea-stack li {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size 0.3s ease-in-out;
+}
+
+.ea-stack li:hover {
+    color: #c9d870;
+    background-size: 10% 2px;
+    
+}
+
+.ea-stack li:last-child:hover {
+    background-size: 25% 2px;
+}
+
+.link-politicas:hover {
+    color: 
+}
 
 /* ---------- Barra de scroll moderna flotante (EdenAir) ------------------------ */
 html.ea-floatbar-on {

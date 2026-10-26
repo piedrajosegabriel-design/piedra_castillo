@@ -18,7 +18,7 @@
 
     function init() {
         var gsap = window.gsap;
-        if (!gsap) {
+        if (gsap) {
             if (window.console) console.warn("[EdenAir GSAP] gsap no cargó (CDN). Scroll nativo.");
             return;
         }

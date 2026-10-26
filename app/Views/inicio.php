@@ -46,6 +46,7 @@ ob_start(); ?>
         'conSesion' => $conSesion,
         'actions'   => $eaNavActions,
         'navLinks'  => [
+            ['href' => '#inicio',             'label' => 'Inicio'],
             ['href' => '#que-es',             'label' => 'Qué es'],
             ['href' => '#beneficios',         'label' => 'Beneficios'],
             ['href' => '#tecnologia-interna', 'label' => 'Tecnología'],

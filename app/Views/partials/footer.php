@@ -32,6 +32,7 @@
         </div>
         <div class="ea-footer-bottom">
             <span>© <?= date('Y') ?> EdenAir</span>
+            <a class="link-politicas" href="<?= site_url('politicas') ?>">Políticas de Privacidad</a>
             <span>Respirá mejor, viví más cómodo.</span>
         </div>
     </div>
