@@ -22,6 +22,7 @@ use CodeIgniter\HTTP\ResponseInterface;
  *   POST pair                    → el ESP32 se da de alta y recibe credenciales
  *   POST .../measurements        → el ESP32 sube una medición
  *   GET  .../commands/pending    → el ESP32 pregunta qué comandos ejecutar
+ *                                  (y de paso, si su configuración cambió)
  *   POST .../commands/N/executed → el ESP32 confirma que ejecutó un comando
  *
  * Cuerpo esperado en measurements:
@@ -163,7 +164,7 @@ class DeviceApiController extends BaseController
     public function pendingCommands(string $deviceUid)
     {
         try {
-            [$device] = $this->resolveAuthenticatedDevice($deviceUid);
+            [$device, $space] = $this->resolveAuthenticatedDevice($deviceUid);
         } catch (\InvalidArgumentException $exception) {
             return $this->responderNoAutorizado($exception->getMessage());
         }
@@ -176,6 +177,10 @@ class DeviceApiController extends BaseController
             'status'           => 'success',
             'device_uid'       => $device['device_uid'],
             'pending_commands' => array_map([$this, 'formatCommand'], $commands),
+            // Versión de la configuración. Si no es la que tiene el equipo,
+            // el usuario cambió algo desde el panel: la placa pide GET config
+            // en el momento, sin esperar al refresco periódico ni reiniciarse.
+            'config_version'   => (new DeviceConfigService())->version($device, $space),
         ]);
     }
 
@@ -330,6 +335,8 @@ class DeviceApiController extends BaseController
    - storeMeasurement($uid)          → recibe y guarda una medición del ESP32;
                                        corre la automatización y responde JSON
    - pendingCommands($uid)           → lista los comandos pendientes del dispositivo
+                                       + config_version, para que el equipo
+                                       note que cambió su configuración
    - markCommandExecuted($uid, $id)  → marca un comando como ejecutado
 
    Helpers privados:

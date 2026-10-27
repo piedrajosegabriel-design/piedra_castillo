@@ -359,11 +359,18 @@ Para dejar una placa como recien salida, borra desde Thonny los archivos
 cada 30 segundos:              cada 15 segundos:
   leer el SCD41                  consultar ordenes del usuario
   leer el MQ-135                 aplicarlas y confirmarlas
-  DECIDIR (reglas.py)
-  emitir la orden IR           cada hora:
-  mover reles y LEDs             refrescar los umbrales
-  reportar al servidor
+  DECIDIR (reglas.py)            si la config cambio: bajarla ya
+  emitir la orden IR
+  mover reles y LEDs           cada hora (respaldo):
+  reportar al servidor           refrescar los umbrales
 ```
+
+**Cambiar un rango desde la web no obliga a reiniciar la placa.** La consulta
+de ordenes trae tambien `config_version`, un resumen de la configuracion del
+equipo. Si no coincide con el de la config que tiene la placa, el usuario
+cambio algo en `/panel/ambientes` (o el modo) y la placa pide `config` en ese
+momento: el cambio se aplica en 15 segundos como mucho. El refresco de cada
+hora sigue, por si un aviso se pierde.
 
 Fijate el orden: **primero acciona, despues reporta**. Si el servidor no
 contesta, el ambiente igual quedo regulado.
@@ -428,7 +435,7 @@ Cinco llamadas. Estan en `servidor.py`, una funcion por cada una.
 | POST | `/api/devices/pair` | Darse de alta. Devuelve `device_uid` y `api_token`. **200** = vinculado, **202** = todavia nadie apreto "Conectar". Lleva tambien `session`: el codigo que el portal ya le dio al celular |
 | GET | `/api/devices/{uid}/config` | Con que umbrales decidir, y en que modo esta |
 | POST | `/api/devices/{uid}/measurements` | Subir la medicion, que actuadores quedaron encendidos y el diagnostico del equipo |
-| GET | `/api/devices/{uid}/commands/pending` | Ordenes manuales del usuario |
+| GET | `/api/devices/{uid}/commands/pending` | Ordenes manuales del usuario, y `config_version`: si cambio, hay que volver a pedir `config` |
 | POST | `/api/devices/{uid}/commands/{id}/executed` | Confirmar que se aplico una orden |
 
 Todas menos `pair` llevan el header `X-Device-Token`.

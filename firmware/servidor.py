@@ -10,6 +10,7 @@ EL CONTRATO (ver app/Config/Routes.php, grupo api/devices):
   GET  api/devices/{uid}/config                -> con que umbrales decidir
   POST api/devices/{uid}/measurements          -> subir una medicion
   GET  api/devices/{uid}/commands/pending      -> ordenes manuales del usuario
+                                                  (y la version de la config)
   POST api/devices/{uid}/commands/{id}/executed-> confirmar que se aplico
 
 Salvo `pair`, todas piden el header X-Device-Token.
@@ -178,6 +179,14 @@ class Servidor:
     # 4) Ordenes manuales del usuario
     # -----------------------------------------------------------------------
     def comandos_pendientes(self):
+        """
+        Devuelve (comandos, version_config).
+
+        version_config es la version de la configuracion que tiene ahora el
+        servidor. Si no es la del equipo, el usuario cambio algo desde el
+        panel y hay que volver a pedir config(). Es None si el servidor no la
+        manda: ahi queda solo el refresco periodico.
+        """
         estado, datos = self._pedir(
             "GET", "/api/devices/%s/commands/pending" % self.device_uid
         )
@@ -185,7 +194,7 @@ class Servidor:
         if estado != 200:
             raise ErrorServidor("No se pudieron consultar los comandos (HTTP %s)" % estado)
 
-        return datos.get("pending_commands", [])
+        return datos.get("pending_commands", []), datos.get("config_version")
 
     def confirmar_comando(self, comando_id):
         """Avisa que la orden ya se aplico fisicamente."""

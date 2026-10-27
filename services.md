@@ -385,7 +385,8 @@ decisión, y eso es a propósito.
 ### Métodos públicos
 | Método | Firma | Qué hace |
 |---|---|---|
-| `paraDispositivo()` | `(array $device, array $space): array` | Devuelve el paquete completo de configuración: ambiente, umbrales, márgenes, modo, estado de actuadores e intervalos. |
+| `paraDispositivo()` | `(array $device, array $space): array` | Devuelve el paquete completo de configuración: ambiente, umbrales, márgenes, modo, estado de actuadores, intervalos y `config_version`. |
+| `version()` | `(array $device, array $space): string` | Solo `config_version`: un crc32 de todo el paquete menos `actuadores`. Viaja en cada `GET .../commands/pending`; si el equipo ve uno distinto del suyo, vuelve a pedir la configuración en el momento. |
 
 ### Qué le llega al equipo
 ```json

@@ -26,7 +26,8 @@ EL CICLO
          lo que dejo encendido el usuario)
        - reportar la medicion, lo que hizo y como esta cada sensor
        - revisar si el usuario mando alguna orden manual
-       - cada tanto, refrescar la configuracion
+       - si esa consulta avisa que la configuracion cambio, bajarla en el
+         momento (y cada tanto igual, de respaldo)
 
 Lo importante: el paso "decidir y accionar" NO depende del servidor. Si se
 corta internet, el equipo sigue regulando el ambiente igual; lo unico que
@@ -152,13 +153,14 @@ def bajar_config(api, anterior=None):
     """
     try:
         nueva = api.config()
-        print("Config: %s | aire ON >%.1f C / OFF <%.1f C | hum ON <%.0f %% / OFF >%.0f %% | CO2 aviso %s ppm | aire min %s | modo %s" % (
+        print("Config: %s | aire ON >%.1f C / OFF <%.1f C | hum ON <%.0f %% / OFF >%.0f %% | CO2 aviso %s ppm | aire min %s | modo %s | version %s" % (
             nueva["ambiente"]["nombre"],
             nueva["umbrales"]["temp_max"], nueva["apagado"]["temp"],
             nueva["umbrales"]["hum_min"], nueva["apagado"]["hum"],
             nueva["umbrales"]["co2_max"],
             nueva["umbrales"]["aire_min"],
             nueva["modo"],
+            nueva.get("config_version", "-"),
         ))
         return nueva
     except ErrorServidor as e:
@@ -260,11 +262,14 @@ def atender_comandos(api, salidas):
     tiempo minimo, se deja pendiente: confirmarla haria que el panel mostrara
     encendido algo que no lo esta. El servidor no acumula mas de una pendiente
     por actuador, asi que no se llena la cola.
+
+    Devuelve la version de la configuracion que informo el servidor (None si
+    no se pudo consultar), para que main() la compare con la que tiene.
     """
     try:
-        pendientes = api.comandos_pendientes()
+        pendientes, version_config = api.comandos_pendientes()
     except ErrorServidor:
-        return
+        return None
 
     for comando in pendientes:
         tipo = comando.get("command_type")
@@ -294,6 +299,8 @@ def atender_comandos(api, salidas):
     # la medicion siguiente. Tambien corre sin ordenes nuevas, asi el pase de
     # automatico a manual los deja bien desde la primera consulta.
     seguir_con_los_leds(salidas)
+
+    return version_config
 
 
 def seguir_con_los_leds(salidas):
@@ -438,12 +445,30 @@ def main():
                     print("  (no se pudo reportar: %s)" % e)
 
             # ---- Ordenes manuales ----
+            config_cambio = False
+
             if ahora - ultimos_comandos >= intervalos.get("comandos", config.INTERVALO_COMANDOS):
                 ultimos_comandos = ahora
-                atender_comandos(api, salidas)
+                version_config = atender_comandos(api, salidas)
+
+                # La consulta trae la version de la config del servidor. Si
+                # no es la que tenemos, el usuario cambio algo desde el panel
+                # (un rango, el modo): se baja ya, sin esperar al refresco
+                # periodico. Si la descarga falla, la proxima consulta vuelve
+                # a ver la diferencia y reintenta.
+                #
+                # Con una bandera y no poniendo ultima_config en 0: sin hora
+                # de internet, time.time() cuenta desde que se enchufo la
+                # placa y "ahora - 0" no llega a una hora hasta pasada la
+                # primera.
+                if version_config and version_config != cfg.get("config_version"):
+                    print("La configuracion cambio en el servidor. Bajandola...")
+                    config_cambio = True
 
             # ---- Refrescar configuracion ----
-            if ahora - ultima_config >= intervalos.get("config", config.INTERVALO_CONFIG):
+            # El refresco periodico queda igual, de respaldo: cubre un servidor
+            # que no mande la version o un aviso que se haya perdido.
+            if config_cambio or ahora - ultima_config >= intervalos.get("config", config.INTERVALO_CONFIG):
                 ultima_config = ahora
                 cfg = bajar_config(api, cfg)
                 sincronizar_tiempos(cfg, salidas, medidor, cadena)

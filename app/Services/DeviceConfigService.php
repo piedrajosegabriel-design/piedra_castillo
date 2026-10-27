@@ -56,7 +56,11 @@ class DeviceConfigService
     /** Segundos entre consultas de comandos manuales. */
     public const INTERVALO_COMANDOS = 15;
 
-    /** Cada cuánto conviene que el equipo vuelva a pedir su configuración. */
+    /**
+     * Cada cuánto conviene que el equipo vuelva a pedir su configuración.
+     * Es el respaldo: un cambio desde el panel llega antes, porque la
+     * consulta de comandos trae `config_version` (ver version()).
+     */
     public const INTERVALO_CONFIG = 3600;
 
     /** Segundos que un relé tiene que quedarse quieto antes de volver a conmutar. */
@@ -108,7 +112,7 @@ class DeviceConfigService
         $humMin  = (float) $space['min_humidity'];
         $co2Max  = (int)   $space['max_co2'];
 
-        return [
+        $config = [
             'device_uid' => (string) $device['device_uid'],
             'nombre'     => (string) $device['name'],
 
@@ -180,6 +184,41 @@ class DeviceConfigService
                 'config'   => self::INTERVALO_CONFIG,
             ],
         ];
+
+        $config['config_version'] = $this->calcularVersion($config);
+
+        return $config;
+    }
+
+    /**
+     * Solo la versión de la configuración actual del dispositivo.
+     *
+     * Viaja en cada consulta de comandos (cada 15 s). Si no coincide con la
+     * que tiene el equipo, el usuario cambió algo desde el panel y la placa
+     * vuelve a pedir GET config en ese momento, sin esperar al refresco
+     * periódico.
+     */
+    public function version(array $device, array $space): string
+    {
+        return $this->paraDispositivo($device, $space)['config_version'];
+    }
+
+    /**
+     * Resumen corto (crc32) de todo lo que el equipo usa para decidir.
+     *
+     * Se calcula sobre el contenido y no con una fecha de modificación: así
+     * cambia con cualquier cosa que viaje al equipo (un rango, el tipo de
+     * ambiente, el modo), sin tener que acordarse de marcar una columna en
+     * cada lugar que los edita.
+     *
+     * `actuadores` queda afuera: cambia con cada medición, y si entrara el
+     * equipo bajaría la configuración todo el tiempo sin que nada cambiara.
+     */
+    private function calcularVersion(array $config): string
+    {
+        unset($config['actuadores']);
+
+        return hash('crc32b', json_encode($config));
     }
 }
 
@@ -187,6 +226,8 @@ class DeviceConfigService
    GLOSARIO DE ESTE ARCHIVO
 
    - paraDispositivo($device, $space) → el JSON de configuración completo
+   - version($device, $space)         → solo `config_version` (va en la
+                                        consulta de comandos)
 
    Bloques que viajan al equipo:
    - umbrales   → dónde ENCIENDE cada regla (y dónde empieza cada aviso)
@@ -198,6 +239,8 @@ class DeviceConfigService
    - modo       → 'automatic' (decide el equipo) o 'manual' (manda el usuario)
    - actuadores → cómo cree el servidor que quedó cada salida
    - intervalos → cada cuánto medir, consultar comandos y refrescar config
+   - config_version → resumen de todo lo anterior menos `actuadores`; si
+                  cambia, el equipo vuelve a bajar la configuración
 
    Idea clave:
    El servidor manda los NÚMEROS; el equipo aplica la REGLA. Así se pueden
