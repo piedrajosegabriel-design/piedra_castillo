@@ -15,9 +15,16 @@
 .env
 !.env.example
 
+# Dependencias de Composer: se reinstalan con `composer install`, no se
+# versionan. (El framework en si vive en system/, que si esta en el repo.)
+/vendor/
+
 # IDE / OS
 .vscode/
 .idea/
+# Cursor guarda acá su cache, sus logs de debug y a veces una copia entera
+# del proyecto. Una de esas copias se subió sin querer y hubo que borrarla.
+.cursor/
 .DS_Store
 Thumbs.db
 

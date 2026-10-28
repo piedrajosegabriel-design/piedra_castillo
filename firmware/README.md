@@ -232,25 +232,34 @@ Cuando termine, en la consola de Thonny (abajo) tiene que aparecer `>>>`.
 
 ### 3. Configurar `config.py`
 
-Es el unico archivo que hay que editar. Lo importante:
+**La direccion del servidor NO se pone aca.** En el repo viene sin completar:
 
 ```python
-SERVIDOR_DEFECTO = "http://192.168.1.100/piedra_castillo/public"
+SERVIDOR_DEFECTO = "http://0.0.0.0"
 ```
 
-> **Ojo con esto.** No sirve `localhost` ni `127.0.0.1`: para la ESP32,
-> localhost es ella misma. Tenes que poner la **IP de la computadora que corre
-> XAMPP** dentro de tu red WiFi. En Windows la sacas con `ipconfig` (campo
-> "Direccion IPv4", algo como `192.168.1.x`).
+Se configura una sola vez **desde el celular**, en el mismo portal donde se
+elige el WiFi: *Opciones avanzadas* → escribir
+`http://IP-DE-LA-PC/piedra_castillo/public`. Queda guardada en `servidor.json`
+y tiene prioridad sobre `config.py`, asi que **cambiar de red o de
+computadora no obliga a abrir Thonny**.
+
+> **Como averiguar esa IP.** No sirve `localhost` ni `127.0.0.1`: para la
+> ESP32, localhost es ella misma. Necesitas la **IP de la computadora que
+> corre XAMPP** dentro de tu red WiFi. En Windows la sacas con `ipconfig`
+> (campo "Direccion IPv4", algo como `192.168.1.x`).
 >
 > Esa computadora tiene que estar **en la misma red WiFi** que la ESP32, y con
 > Apache prendido.
 
-Es el **valor de fabrica**, no una condena: si despues la IP cambia, se
-corrige desde el portal del celular (*Opciones avanzadas*) y queda guardada en
-`servidor.json`. No hay que volver a abrir Thonny por un cambio de red.
+Si la placa arranca sin esa direccion, lo dice en la consola de Thonny con
+el paso a paso, asi que no hay que adivinar.
 
-Despues revisa los pines (`PIN_RELE_AIRE`, `PIN_MQ135`, `PIN_I2C_SDA`, etc.)
+Solo tiene sentido escribirla en `config.py` si programas **varias placas para
+la misma red** y te molesta tipearla en cada una. En ese caso acordate de que
+es un valor de tu maquina: no lo subas al repo.
+
+Lo que si hay que revisar aca son los pines (`PIN_RELE_AIRE`, `PIN_MQ135`, `PIN_I2C_SDA`, etc.)
 segun como tengas armado el circuito, y deja en `None` lo que todavia no
 armaste.
 

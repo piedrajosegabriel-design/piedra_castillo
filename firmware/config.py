@@ -24,7 +24,22 @@ tiempos que protegen al hardware.
 # OJO: no sirve "localhost" ni "127.0.0.1". Para la ESP32, localhost es ella
 # misma. Tenes que poner la IP de la computadora que corre XAMPP dentro de
 # tu red WiFi (en Windows se averigua con `ipconfig`, campo IPv4).
-SERVIDOR_DEFECTO = "http://192.168.1.194/piedra_castillo/public"
+#
+# POR QUE ESTA EN 0.0.0.0 Y NO EN UNA IP DE VERDAD
+# Porque la IP de la PC cambia con cada maquina y con cada red, y tenerla
+# escrita aca hacia que el repo quedara atado a una computadora: al clonarlo
+# en otra (o al cambiar de router), este valor quedaba viejo y la placa
+# buscaba un servidor que no existia.
+#
+# No hace falta completarlo: la direccion real se configura UNA VEZ desde el
+# portal del celular, en "Opciones avanzadas" (queda en servidor.json, que
+# tiene prioridad sobre esto). Es el mismo paso en el que se elige el WiFi,
+# asi que no agrega trabajo.
+#
+# Completalo solo si programas muchas placas para la MISMA red y te molesta
+# tipear la IP en cada una. Si lo haces, acordate de que es un valor local:
+# no lo subas al repo.
+SERVIDOR_DEFECTO = "http://0.0.0.0"
 
 
 def servidor():
@@ -45,6 +60,16 @@ def servidor():
         pass
 
     return SERVIDOR_DEFECTO
+
+
+def servidor_configurado():
+    """
+    False mientras nadie le dijo al equipo donde esta la web.
+
+    Sirve para avisar con un mensaje claro en vez de dejar que la placa
+    reintente contra 0.0.0.0 sin explicar por que no conecta.
+    """
+    return servidor() not in ("http://0.0.0.0", "")
 
 # ---------------------------------------------------------------------------
 # PUNTO DE ACCESO DE CONFIGURACION
@@ -137,7 +162,12 @@ INTERVALO_MEDICION = 30
 
 # Cada cuanto preguntar por ordenes manuales del usuario y refrescar umbrales.
 INTERVALO_COMANDOS = 15
-INTERVALO_CONFIG = 60
+
+# Refresco de la configuracion. Es el MISMO valor que
+# DeviceConfigService::INTERVALO_CONFIG, y es solo el respaldo: un cambio
+# hecho desde /panel/ambientes llega en 15 s como mucho, porque la consulta
+# de comandos trae `config_version` y la placa la baja en el momento.
+INTERVALO_CONFIG = 3600
 
 # Cada cuanto da una vuelta el ciclo principal. Es corto para que cada tarea
 # arranque cerca de su horario; no es el ritmo de ninguna de ellas.
@@ -157,8 +187,10 @@ REINTENTO_RED = 15
 # conmutar. Evita el traqueteo cuando el valor queda justo sobre el umbral.
 RELE_MINIMO_ESTADO = 30
 
-# La trama IR no se emite mas de una vez cada tanto...
-IR_MINIMO_ENTRE_TRAMAS = 30
+# La trama IR no se emite mas de una vez cada tanto. Es el MISMO valor que
+# DeviceConfigService::IR_MINIMO_ENTRE_TRAMAS, que es el que manda en cuanto
+# la placa baja la configuracion; este vale solo hasta ese momento.
+IR_MINIMO_ENTRE_TRAMAS = 60
 # ...y despues de emitirla se espera como mucho esto (en MILISEGUNDOS) a que
 # el receptor la confirme. Si no confirma, el rele se activa igual y el
 # servidor se entera de que la confirmacion no llego.

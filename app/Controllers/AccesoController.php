@@ -33,6 +33,12 @@ class AccesoController extends BaseController
         return view('inicio');
     }
 
+    /** Politicas de privacidad (la enlaza el pie de la landing). */
+    public function politicas(): string
+    {
+        return view('politicas');
+    }
+
     /** Formulario de inicio de sesión. */
     public function login(): string
     {

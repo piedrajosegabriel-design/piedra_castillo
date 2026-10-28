@@ -360,6 +360,19 @@ def main():
         return
 
     # 3) Credenciales y configuracion.
+    if not config.servidor_configurado():
+        print("")
+        print("FALTA LA DIRECCION DEL SERVIDOR.")
+        print("Esta placa todavia no sabe donde esta la web de EdenAir, asi")
+        print("que no va a poder darse de alta. Se configura una sola vez:")
+        print("  1) conectate con el celular a la red %s" % config.AP_SSID)
+        print("  2) en el portal, entra a 'Opciones avanzadas'")
+        print("  3) escribi http://IP-DE-LA-PC/piedra_castillo/public")
+        print("     (en Windows la IP sale con `ipconfig`, campo IPv4)")
+        print("Tambien podes dejarla fija en firmware/config.py")
+        print("(SERVIDOR_DEFECTO) si siempre vas a usar la misma red.")
+        print("")
+
     api = Servidor()
     obtener_credenciales(api)
 

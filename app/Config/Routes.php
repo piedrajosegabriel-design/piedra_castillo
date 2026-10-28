@@ -6,7 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  *
  * Mapa de rutas de EdenAir, agrupado por QUIÉN puede entrar:
- *   1) Públicas            → cualquiera (landing, api/sensores)
+ *   1) Públicas            → cualquiera (landing, políticas, api/sensores)
  *   2) Grupo 'guest'       → solo SIN sesión (login, registro, recuperación)
  *   3) Grupo 'panel'       → solo CON sesión (filtro 'auth'): el área privada
  *   4) Grupo 'api/devices' → el ESP32 (autentica por token, no por sesión)
@@ -17,6 +17,10 @@ use CodeIgniter\Router\RouteCollection;
 // 1) RUTAS PÚBLICAS — accesibles sin login
 // =============================================================================
 $routes->get('/', 'AccesoController::inicio');
+
+// Politicas de privacidad. Publica: el pie de la landing la enlaza, y a una
+// politica de privacidad tiene que poder entrar cualquiera sin loguearse.
+$routes->get('politicas', 'AccesoController::politicas');
 
 // Seguimiento de la vinculación desde el CELULAR. Es público a propósito:
 // el teléfono que acaba de configurar el WiFi del equipo no tiene sesión
