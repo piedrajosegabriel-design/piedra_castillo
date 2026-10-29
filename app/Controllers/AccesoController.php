@@ -202,6 +202,10 @@ class AccesoController extends BaseController
             'usuario'          => trim((string) $this->request->getPost('usuario')),
             'password'         => (string) $this->request->getPost('password'),
             'password_confirm' => (string) $this->request->getPost('password_confirm'),
+            // Un checkbox sin tildar NO se manda: llega null. Se normaliza a
+            // cadena vacia para que la regla 'required' lo rechace igual que
+            // a un campo de texto en blanco.
+            'politicas'        => (string) ($this->request->getPost('politicas') ?? ''),
         ];
     }
 
@@ -215,6 +219,10 @@ class AccesoController extends BaseController
             'usuario'          => 'required|min_length[3]|max_length[80]|regex_match[/^[A-Za-z0-9._-]+$/]',
             'password'         => 'required|min_length[8]|max_length[255]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
             'password_confirm' => 'required|matches[password]',
+            // Sin aceptar las politicas no hay cuenta. Se valida en el
+            // servidor y no solo con el `required` del HTML: el atributo del
+            // formulario se saltea con cualquier cliente que no sea un navegador.
+            'politicas'        => 'required',
         ];
     }
 
@@ -230,6 +238,9 @@ class AccesoController extends BaseController
             ],
             'password_confirm' => [
                 'matches' => 'La confirmacion de contrasena no coincide.',
+            ],
+            'politicas' => [
+                'required' => 'Tenes que aceptar las Politicas de Privacidad para crear la cuenta.',
             ],
         ];
     }

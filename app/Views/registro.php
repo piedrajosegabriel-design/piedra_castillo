@@ -82,6 +82,23 @@ $this->setData([
 
         <p id="coincideTexto" class="ea-hint">Esperando confirmación de contraseña.</p>
 
+        <?php /* Aceptación de las políticas. Es obligatoria: la regla
+                 'politicas' => 'required' de AccesoController la vuelve a
+                 revisar en el servidor, así que sacar el `required` del HTML
+                 desde el inspector no alcanza para saltearla.
+                 old() lo deja tildado si el formulario vuelve con un error en
+                 otro campo: sería molesto tener que volver a marcarlo. */ ?>
+        <div class="ea-field ea-check-field">
+            <label class="ea-check" for="politicas">
+                <input type="checkbox" id="politicas" name="politicas" value="1" required
+                       <?= old('politicas') ? 'checked' : '' ?>>
+                <span>
+                    Leí y acepto las
+                    <a href="<?= site_url('politicas') ?>" target="_blank" rel="noopener">Políticas de Privacidad</a>.
+                </span>
+            </label>
+        </div>
+
         <button type="submit" class="ea-button ea-button-primary ea-button-block">
             Crear cuenta
         </button>

@@ -762,6 +762,53 @@ body.ea-body {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+/* ---------- Aceptación de las políticas ---------------------------------
+   El checkbox va dentro del <label>, así que tocar el texto también lo
+   marca: en el celular, apuntarle a una casilla de 16 px es incómodo. */
+.ea-check-field {
+    margin-top: 2px;
+}
+
+.ea-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-texto-secundario);
+}
+
+.ea-check input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    /* 3px alinea la casilla con la primera línea del texto, no con el alto
+       completo del párrafo cuando baja a dos renglones. */
+    margin-top: 3px;
+    accent-color: #2f6b4f;
+    cursor: pointer;
+}
+
+.ea-check input[type="checkbox"]:focus-visible {
+    outline: 2px solid #2f6b4f;
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.ea-check a {
+    color: var(--color-texto);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-check a:hover {
+        color: var(--color-primario);
+    }
+}
+
 
 /* ---------- Contraseña con ojo ------------------------------------------------ */
 .ea-password {
