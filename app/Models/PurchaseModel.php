@@ -76,6 +76,31 @@ class PurchaseModel extends Model
             ->orderBy('id', 'DESC')
             ->findAll($limite);
     }
+
+    // -------------------------------------------------------------------------
+    // Baja de cuenta
+    // -------------------------------------------------------------------------
+
+    /**
+     * Le saca el dueño a las compras de una cuenta que se da de baja.
+     *
+     * No las borra: quedan el monto, la fecha y el número de pago, que son el
+     * respaldo de una operación de dinero. Sin `user_id` la fila ya no apunta
+     * a ninguna persona, así que deja de ser un dato personal.
+     *
+     * Va por el builder y no por update() porque `user_id` tiene que quedar
+     * en NULL, y el modelo descarta los null al armar el UPDATE.
+     *
+     * Devuelve cuántas compras quedaron anónimas.
+     */
+    public function anonimizarDeUsuario(int $userId): int
+    {
+        $this->builder()
+            ->where('user_id', $userId)
+            ->update(['user_id' => null]);
+
+        return $this->db->affectedRows();
+    }
 }
 
 /* ============================================================================
@@ -84,6 +109,8 @@ class PurchaseModel extends Model
    - deUsuario($id, $limite)     → historial para "Tus compras"
    - abiertasDe($id)             → compras que conviene volver a consultar
                                    (iniciadas o pendientes de los últimos días)
+   - anonimizarDeUsuario($id)    → deja las compras sin dueño cuando la cuenta
+                                   se da de baja (conserva el comprobante)
    - whereIn('status', [...])    → (CI4) WHERE status IN (...)
    - findAll($limite)            → (CI4) SELECT con LIMIT
    ============================================================================ */

@@ -287,7 +287,10 @@ CREATE TABLE IF NOT EXISTS device_pairings (
 
 CREATE TABLE IF NOT EXISTS purchases (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id INT UNSIGNED NOT NULL,
+    -- NULL = la cuenta se dio de baja. La compra se conserva sin dueño:
+    -- queda el monto, la fecha y el numero de pago, nada que identifique a
+    -- una persona. Ver la migracion PermitirCompraSinUsuario.
+    user_id INT UNSIGNED NULL,
     reference VARCHAR(40) NOT NULL,
     -- Producto y monto congelados al momento de la compra.
     product VARCHAR(120) NOT NULL,
@@ -343,6 +346,7 @@ SELECT * FROM (
     UNION ALL SELECT '2026-09-08-000001', 'App\\Database\\Migrations\\ActualizarLogicaControl',      'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-09-15-000001', 'App\\Database\\Migrations\\CreatePurchasesTable',         'default', 'App', UNIX_TIMESTAMP(), 1
     UNION ALL SELECT '2026-10-16-000001', 'App\\Database\\Migrations\\RegistrarUltimoIngreso',       'default', 'App', UNIX_TIMESTAMP(), 1
+    UNION ALL SELECT '2026-10-29-000001', 'App\\Database\\Migrations\\PermitirCompraSinUsuario',     'default', 'App', UNIX_TIMESTAMP(), 1
 ) AS nuevas
 WHERE NOT EXISTS (SELECT 1 FROM migrations);
 
@@ -395,6 +399,21 @@ SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.STATISTICS
      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND INDEX_NAME = 'idx_users_last_login') = 0,
     'ALTER TABLE users ADD INDEX idx_users_last_login (last_login_at)',
+    'DO 0'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- purchases.user_id: si la tabla se creo con una version anterior de este
+-- archivo, la columna todavia es NOT NULL y no deja dar de baja una cuenta
+-- conservando su comprobante.
+
+SET @sql := IF(
+    (SELECT IS_NULLABLE FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'purchases'
+       AND COLUMN_NAME = 'user_id') = 'NO',
+    'ALTER TABLE purchases MODIFY user_id INT UNSIGNED NULL',
     'DO 0'
 );
 PREPARE stmt FROM @sql;

@@ -64,6 +64,9 @@ $routes->group('panel', ['filter' => 'auth'], static function ($routes) {
     $routes->get('perfil', 'PanelController::perfil');
     $routes->post('perfil', 'PanelController::actualizarPerfil');
     $routes->post('password', 'PanelController::actualizarPassword');
+    // Baja de cuenta. POST y no GET: borra datos, no se puede disparar con
+    // un enlace ni quedar guardado en el historial del navegador.
+    $routes->post('eliminar-cuenta', 'PanelController::eliminarCuenta');
 
     // Compra con Mercado Pago: pantalla, generar el link de pago (POST con
     // CSRF) y la vuelta desde Mercado Pago, donde se confirma el pago real.

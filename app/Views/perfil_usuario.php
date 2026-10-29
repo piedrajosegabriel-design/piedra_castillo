@@ -160,6 +160,49 @@ $this->setData([
             </form>
         </article>
 
+        <!-- ===== FORMULARIO 3: baja de cuenta =====
+             POST /panel/eliminar-cuenta → PanelController::eliminarCuenta
+             Va último y aparte del resto: es la única acción de esta pantalla
+             que no se puede deshacer. -->
+        <article class="ea-card ea-account-card ea-account-danger" aria-labelledby="bajaTitulo">
+            <div class="ea-card-head">
+                <h3 id="bajaTitulo">Borrar mi cuenta</h3>
+                <span class="ea-mono ea-card-meta">No se puede deshacer</span>
+            </div>
+
+            <p class="ea-account-lede">
+                Se borran tu cuenta, tus ambientes, tus equipos y todas tus mediciones.
+                Si tenés un equipo andando, deja de reportar y hay que volver a vincularlo
+                a una cuenta nueva.
+            </p>
+            <p class="ea-account-hint">
+                Tus compras no se borran: quedan sin tu nombre, solo con el monto, la fecha
+                y el número de pago, porque son el comprobante de una operación de dinero.
+                Lo contamos en las <a href="<?= site_url('politicas') ?>">Políticas de Privacidad</a>.
+            </p>
+
+            <form action="<?= site_url('panel/eliminar-cuenta') ?>" method="POST" class="ea-account-form"
+                  data-confirm-form
+                  data-confirm-message="Vas a BORRAR tu cuenta y todos tus datos. Esta acción no se puede deshacer. ¿Seguro?">
+                <?= csrf_field() ?>
+
+                <label class="ea-account-wide">
+                    <span>Confirmá con tu contraseña</span>
+                    <div class="ea-password">
+                        <input type="password" id="perfilPasswordBaja" name="current_password"
+                               autocomplete="current-password" required>
+                        <?= view('partials/ojo_password', ['objetivo' => '#perfilPasswordBaja']) ?>
+                    </div>
+                </label>
+
+                <div class="ea-account-actions ea-account-wide">
+                    <button type="submit" class="ea-kbtn ea-kbtn-danger">
+                        Borrar mi cuenta definitivamente
+                    </button>
+                </div>
+            </form>
+        </article>
+
     </div>
 
 <?= $this->endSection() ?>

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Services\BajaCuentaService;
 use App\Services\CommandService;
 use App\Services\PanelService;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -212,6 +213,41 @@ class PanelController extends BaseController
         $usuarios->actualizarHashContrasena((int) $usuario['id'], $datos['password']);
 
         return redirect()->to('/panel/perfil')->with('success', 'Contrasena actualizada correctamente.');
+    }
+
+    /**
+     * Baja de cuenta a pedido del usuario (derecho de supresion, Ley 25.326).
+     *
+     * Pide la contrasena actual, igual que cualquier otro cambio sensible del
+     * perfil: con la sesion abierta en una maquina prestada, un clic no
+     * tendria que poder borrar la cuenta.
+     *
+     * Lo que se borra y lo que se conserva esta en BajaCuentaService.
+     */
+    public function eliminarCuenta(): RedirectResponse
+    {
+        $password = (string) ($this->request->getPost('current_password') ?? '');
+
+        $usuarios = new UserModel();
+        $usuario  = $usuarios->obtenerPorId($this->usuarioActual());
+
+        if ($redirect = $this->validarAutenticacionPerfil($usuario, $password)) {
+            return $redirect;
+        }
+
+        if (! (new BajaCuentaService())->eliminar((int) $usuario['id'])) {
+            return $this->redirigirConInputYDato(
+                '/panel/perfil',
+                'error',
+                'No pudimos borrar la cuenta. No se toco nada: volve a intentar en un rato.'
+            );
+        }
+
+        // La sesion apunta a un usuario que ya no existe: si no se destruye,
+        // la proxima pantalla del panel sale rota en vez de despedirse.
+        session()->destroy();
+
+        return redirect()->to('/')->with('success', 'Tu cuenta y tus datos fueron borrados. Gracias por haber usado EdenAir.');
     }
 
     // =========================================================================

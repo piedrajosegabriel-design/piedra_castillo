@@ -2067,6 +2067,52 @@ body.dashboard-body.sidebar-lock {
     line-height: 1.4;
 }
 
+.ea-account-hint a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* ---------- Baja de cuenta ----------------------------------------------
+   La única acción de esta pantalla que no se puede deshacer. Se marca con el
+   borde, no con un fondo rojo: tiene que distinguirse de las otras tarjetas
+   sin gritar cada vez que alguien entra a cambiar su nombre. El rojo fuerte
+   queda para el botón, que es lo que de verdad borra. */
+.ea-account-danger {
+    border-color: color-mix(in oklab, #a65b3d 32%, var(--panel-linea));
+}
+
+.ea-account-danger .ea-card-head h3 {
+    color: #a65b3d;
+}
+
+.ea-kbtn-danger {
+    background: #a65b3d;
+    border-color: #a65b3d;
+    color: #fdf6f2;
+    font-weight: 600;
+    box-shadow: 0 6px 16px -10px rgba(102, 48, 28, 0.6);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ea-kbtn-danger:hover {
+        background: #8e4c32;
+        border-color: #8e4c32;
+        color: #fdf6f2;
+    }
+}
+
+.ea-kbtn-danger:active {
+    transform: scale(0.97);
+    transition-duration: 0.08s;
+}
+
+.ea-kbtn-danger:focus-visible {
+    outline: none;
+    border-color: #a65b3d;
+    box-shadow: 0 0 0 3px rgba(166, 91, 61, 0.35);
+}
+
 :root[data-theme="dark"] .ea-account-secure {
     background: color-mix(in oklab, var(--color-alerta-suave) 28%, transparent);
 }
