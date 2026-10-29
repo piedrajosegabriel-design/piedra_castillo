@@ -37,13 +37,26 @@ class Email extends BaseConfig
 
     /**
      * SMTP Username
+     *
+     * Sale del `.env` (email.SMTPUser). El valor de aca es solo el de
+     * respaldo para que el proyecto arranque sin configurar.
      */
-    public string $SMTPUser = 'edenair.safe@gmail.com';
+    public string $SMTPUser = '';
 
     /**
      * SMTP Password
+     *
+     * NO ESCRIBAS LA CLAVE ACA. Este archivo se versiona: lo que pongas
+     * queda publicado en el repo para siempre, aunque despues lo borres.
+     *
+     * Va en el `.env` (email.SMTPPass), que no se sube. Con Gmail no es la
+     * contrasena de la cuenta sino una "contrasena de aplicacion", que se
+     * genera en https://myaccount.google.com/apppasswords.
+     *
+     * Sin esto, el unico correo que manda EdenAir (el de recuperacion de
+     * contrasena) no sale, y queda anotado en writable/logs.
      */
-    public string $SMTPPass = 'qyoh zwwf dczy iwrk';
+    public string $SMTPPass = '';
 
     /**
      * SMTP Port
